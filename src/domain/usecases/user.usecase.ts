@@ -8,6 +8,8 @@ import {
 import { ResposeUserDto } from "../dtos/user.dto";
 import { User } from "../entities/User.entity";
 import bcrypt from "bcryptjs";
+import { sendVerificationEmail } from "../../infrastructure/services/email.service";
+import { generateOtp } from "../../infrastructure/services/otp.service";
 
 export class UserUseCase {
   private userRepository: UserRepository;
@@ -28,8 +30,20 @@ export class UserUseCase {
     userData.password = await this.hashPassword(userData.password);
     try {
       const user = await this.userRepository.create(userData);
+      const otp = await generateOtp();
+      try {
+        await sendVerificationEmail(user.email, user.user_id, otp);
+        console.log("email send successfully");
+      } catch (error) {
+        console.log(error)
+        throw new Error("MAIL_SEND_ERROR");
+      }
       return new ResposeUserDto(user);
-    } catch (error) {
+    } catch (error: any) {
+      console.log(error);
+      if (error.message === "MAIL_SEND_ERROR") {
+        throw new Error(error.message);
+      }
       throw new Error("DB_ERROR");
     }
   }

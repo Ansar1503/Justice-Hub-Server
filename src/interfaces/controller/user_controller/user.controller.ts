@@ -4,6 +4,7 @@ import { ResposeUserDto, RegisterUserDto } from "../../../domain/dtos/user.dto";
 import { UserUseCase } from "../../../domain/usecases/user.usecase";
 import { UserRepository } from "../../../infrastructure/database/repo/user.repo";
 import { v4 as uuidv4 } from "uuid";
+import "dotenv/config";
 
 const userusecase = new UserUseCase(new UserRepository());
 
@@ -21,6 +22,7 @@ export const registerUser = async (req: Request, res: Response) => {
     });
     return;
   } catch (error: any) {
+    console.log(error);
     switch (error.message) {
       case "USER_EXISTS":
         res.status(STATUS_CODES.BAD_REQUEST).json({
@@ -35,7 +37,12 @@ export const registerUser = async (req: Request, res: Response) => {
           message: "Something went wrong. Please try again later.",
         });
         return;
-
+      case "MAIL_SEND_ERROR":
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "verification mail send failed, please try again",
+        });
+        return;
       default:
         res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
           success: false,
@@ -157,4 +164,17 @@ export const handleRefreshToken = (req: Request, res: Response) => {
         return;
     }
   }
+};
+
+export const verifyMail = (req: Request, res: Response) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      res.redirect(
+        `${process.env.FRONTEND_URL}/email-validation-error?error=invalid`
+      );
+      return;
+    }
+  } catch (error) {}
 };
