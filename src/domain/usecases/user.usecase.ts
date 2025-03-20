@@ -8,7 +8,10 @@ import {
 import { ResposeUserDto } from "../dtos/user.dto";
 import { User } from "../entities/User.entity";
 import bcrypt from "bcryptjs";
-import { sendVerificationEmail } from "../../infrastructure/services/email.service";
+import {
+  emailVerification,
+  sendVerificationEmail,
+} from "../../infrastructure/services/email.service";
 import { generateOtp } from "../../infrastructure/services/otp.service";
 
 export class UserUseCase {
@@ -35,7 +38,7 @@ export class UserUseCase {
         await sendVerificationEmail(user.email, user.user_id, otp);
         console.log("email send successfully");
       } catch (error) {
-        console.log(error)
+        console.log(error);
         throw new Error("MAIL_SEND_ERROR");
       }
       return new ResposeUserDto(user);
@@ -99,5 +102,21 @@ export class UserUseCase {
     });
 
     return accesstoken;
+  }
+
+  async verifyEmail(email: string, token: string) {
+    try {
+      const user = await this.userRepository.findByEmail(email);
+      if (!user) {
+        throw new Error("USER_NOT_FOUND");
+      }
+      emailVerification(email, token);
+      user.is_verified = true;
+      await user.save();
+      return;
+    } catch (error:any) {
+      console.log('catched')
+      throw new Error(error.message)
+    }
   }
 }

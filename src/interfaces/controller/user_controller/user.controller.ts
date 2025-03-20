@@ -166,15 +166,47 @@ export const handleRefreshToken = (req: Request, res: Response) => {
   }
 };
 
-export const verifyMail = (req: Request, res: Response) => {
-  try {
-    const { token } = req.query;
+export const verifyMail = async (req: Request, res: Response) => {
+  const { token, email } = req.query;
+  if (!token || !email) {
+    res.redirect(
+      `${process.env.FRONTEND_URL}/email-validation-error?error=invalid&email=${email}`
+    );
+    return;
+  }
 
-    if (!token) {
-      res.redirect(
-        `${process.env.FRONTEND_URL}/email-validation-error?error=invalid`
-      );
-      return;
+  try {
+    console.log("fronden", process.env.FRONTEND_URL);
+    await userusecase.verifyEmail(email as string, token as string);
+    res.redirect(`${process.env.FRONTEND_URL}/email-verified`);
+    return;
+  } catch (error: any) {
+    switch (error.message) {
+      case "USER_NOT_FOUND":
+        res.redirect(
+          `${process.env.FRONTEND_URL}/email-validation-error?error=invaliduser&email=${email}`
+        );
+        return;
+      case "TOKEN_EXPIRED":
+        res.redirect(
+          `${process.env.FRONTEND_URL}/email-validation-error?error=expired&email=${email}`
+        );
+        return;
+      case "INVALID_TOKEN":
+        res.redirect(
+          `${process.env.FRONTEND_URL}/email-validation-error?error=invalid&email=${email}`
+        );
+        return;
+      case "TOKEN_NOT_ACTIVE":
+        res.redirect(
+          `${process.env.FRONTEND_URL}/email-validation-error?error=invalid&email=${email}`
+        );
+        return;
+      default:
+        res.redirect(
+          `${process.env.FRONTEND_URL}/email-validation-error?error=invalid&email=${email}`
+        );
+        return;
     }
-  } catch (error) {}
+  }
 };
