@@ -1,12 +1,13 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
 import { ResposeUserDto, RegisterUserDto } from "../../../domain/dtos/user.dto";
 import { UserUseCase } from "../../../domain/usecases/user.usecase";
 import { UserRepository } from "../../../infrastructure/database/repo/user.repo";
 import { v4 as uuidv4 } from "uuid";
 import "dotenv/config";
+import { OtpRepository } from "../../../infrastructure/database/repo/otp.repo";
 
-const userusecase = new UserUseCase(new UserRepository());
+const userusecase = new UserUseCase(new UserRepository(), new OtpRepository());
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
@@ -176,7 +177,7 @@ export const verifyMail = async (req: Request, res: Response) => {
   }
 
   try {
-    console.log("fronden", process.env.FRONTEND_URL);
+    // console.log("fronden", process.env.FRONTEND_URL);
     await userusecase.verifyEmail(email as string, token as string);
     res.redirect(`${process.env.FRONTEND_URL}/email-verified`);
     return;
@@ -202,10 +203,139 @@ export const verifyMail = async (req: Request, res: Response) => {
           `${process.env.FRONTEND_URL}/email-validation-error?error=invalid&email=${email}`
         );
         return;
+      case "USER_BLOCKED":
+        res.redirect(
+          `${process.env.FRONTEND_URL}/email-validation-error?error=blocked&email=${email}`
+        );
+        return;
+      case "USER_VERIFIED":
+        res.redirect(
+          `${process.env.FRONTEND_URL}/email-validation-error?error=verified&email=${email}`
+        );
+        return;
       default:
         res.redirect(
           `${process.env.FRONTEND_URL}/email-validation-error?error=invalid&email=${email}`
         );
+        return;
+    }
+  }
+};
+
+export const verifyEmailOtp = async (req: Request, res: Response) => {
+  const { otpValue: otp, email } = req.body;
+  // console.log(req.body);
+  if (!otp || !email) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "please provide required credentials",
+    });
+    return;
+  }
+  try {
+    await userusecase.verifyEmailByOtp(email, otp);
+    res.status(STATUS_CODES.ACCEPTED).json({
+      success: true,
+      message: "otp verified successfully",
+      email,
+    });
+    return;
+  } catch (error: any) {
+    console.log(error);
+    switch (error.message) {
+      case "INVALID_EMAIL":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "please provide a valid mail",
+        });
+        return;
+      case "OTP_EXPIRED":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "otp expired. try to resend otp",
+        });
+        return;
+      case "INVALID":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "invalid otp please try again",
+        });
+        return;
+      case "USER_BLOCKED":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "user is blocked. contact admin",
+        });
+        return;
+      case "USER_VERIFIED":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "user is already verified. try login",
+        });
+        return;
+      default:
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "internal server error",
+        });
+        return;
+    }
+  }
+};
+
+export const ResendOtp = async (req: Request, res: Response) => {
+  const { email } = req.body;
+  if (!email) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "Email not found",
+    });
+    return;
+  }
+  try {
+    await userusecase.ResendOtp(email);
+    res.status(STATUS_CODES.ACCEPTED).json({
+      success: false,
+      message: "otp send successfully",
+    });
+    return;
+  } catch (error: any) {
+    switch (error.message) {
+      case "INVALID_EMAIL":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "please provide a valid mail",
+        });
+        return;
+      case "USER_BLOCKED":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "user is blocked. contact admin",
+        });
+        return;
+      case "USER_VERIFIED":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "user is already verified. try login",
+        });
+        return;
+      case "MAIL_SEND_ERROR":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "verification mail send failed, please try again",
+        });
+        return;
+      case "DB_ERROR":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "something went wrong. please try again.",
+        });
+        return;
+      default:
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "internal server error",
+        });
         return;
     }
   }

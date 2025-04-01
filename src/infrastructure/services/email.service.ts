@@ -51,3 +51,4 @@ export const emailVerification = (email: string, token: string) => {
     }
   }
 };
+
