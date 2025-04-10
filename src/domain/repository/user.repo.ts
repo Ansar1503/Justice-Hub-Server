@@ -5,3 +5,4 @@ export interface IUserRepository {
   findByEmail(email: string): Promise<User | null>;
   update(user: Partial<User>): Promise<void>;
 }
+  

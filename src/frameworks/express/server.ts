@@ -1,6 +1,7 @@
 import express, { Application } from "express";
 import connectDB from "../../infrastructure/database/config";
 import authRoute from "../../interfaces/routes/auth.route";
+import clientRoute from "../../interfaces/routes/client.route";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import "dotenv/config";
@@ -14,13 +15,14 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: `${process.env.FRONTEND_URL}`,
     methods: ["PUT", "POST", "GET", "PATCH", "DELETE"],
-    credentials:true
+    credentials: true,
   })
 );
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/user/", authRoute);
+app.use("/api/client/",clientRoute);
 
 app.listen(PORT, () =>
   console.log(`🚀 Server running on port http://localhost:${PORT}`)

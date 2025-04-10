@@ -19,6 +19,7 @@ export const authenticateUser = (
   }
   try {
     const decode = verifyAccessToken(token);
+    console.log(decode)
     next();
   } catch (error: any) {
     switch (error.message) {

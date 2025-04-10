@@ -15,12 +15,14 @@ const router = express.Router();
 
 router.post("/signup", validateUser, handleValidationErrors, registerUser);
 router.post("/login", userLogin);
-router.get("/dashboard", authenticateUser, () => {
-  console.log("auth sucess");
-});
+// router.get("/dashboard", authenticateUser, () => {
+//   console.log("auth sucess");
+// });
 router.get("/refresh", handleRefreshToken);
 router.get("/verify-email",verifyMail)
 router.post("/verify-otp",verifyEmailOtp)
 router.post("/resend-otp",ResendOtp)
+
+
 
 export default router;
