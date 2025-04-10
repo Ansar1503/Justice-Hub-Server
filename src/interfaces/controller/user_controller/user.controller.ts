@@ -5,8 +5,11 @@ import { UserUseCase } from "../../../domain/usecases/user.usecase";
 import { UserRepository } from "../../../infrastructure/database/repo/user.repo";
 import { v4 as uuidv4 } from "uuid";
 import "dotenv/config";
+import { ClientRepository } from "../../../infrastructure/database/repo/client.repo";
 
-const userusecase = new UserUseCase(new UserRepository());
+
+const userusecase = new UserUseCase(new UserRepository(),new ClientRepository());
+
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
@@ -15,6 +18,7 @@ export const registerUser = async (req: Request, res: Response) => {
 
     const user = await userusecase.createUser(userData);
     const userResponse = new ResposeUserDto(user);
+    
     res.status(STATUS_CODES.CREATED).json({
       success: true,
       message: "registration success",
