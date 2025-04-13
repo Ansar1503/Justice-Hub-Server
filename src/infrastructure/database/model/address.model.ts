@@ -8,7 +8,7 @@ const AddressSchema = new Schema(
     state: { type: String, required: false },
     city: { type: String, required: false },
     locality: { type: String, required: false },
-    pincode: { type: Number, required: false },
+    pincode: { type: String, required: false },
   },
   { timestamps: true }
 );

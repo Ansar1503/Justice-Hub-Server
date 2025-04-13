@@ -4,28 +4,31 @@ import {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
-} from "../../infrastructure/services/jwt.service";
+} from "../services/jwt.service";
 import { ResposeUserDto } from "../dtos/user.dto";
-import { User } from "../entities/User.entity";
+import { User } from "../../domain/entities/User.entity";
 import bcrypt from "bcryptjs";
 import {
   emailVerification,
   sendVerificationEmail,
-} from "../../infrastructure/services/email.service";
-import { generateOtp } from "../../infrastructure/services/otp.service";
+} from "../services/email.service";
+import { generateOtp } from "../services/otp.service";
 import { ClientRepository } from "../../infrastructure/database/repo/client.repo";
-import { Client } from "../entities/Client.entity";
+import { Client } from "../../domain/entities/Client.entity";
 import { OtpRepository } from "../../infrastructure/database/repo/otp.repo";
+import { IUserRepository } from "../../domain/repository/user.repo";
+import { IClientRepository } from "../../domain/repository/client.repo";
+import { IotpRepository } from "../../domain/repository/otp.repo";
 
 export class UserUseCase {
-  private userRepository: UserRepository;
-  private clientRepository: ClientRepository;
-  private otpRepository: OtpRepository;
+  private userRepository: IUserRepository;
+  private clientRepository: IClientRepository;
+  private otpRepository: IotpRepository;
 
   constructor(
-    userRepository: UserRepository,
-    otpRepo: OtpRepository,
-    clientRepo: ClientRepository
+    userRepository: IUserRepository,
+    otpRepo: IotpRepository,
+    clientRepo: IClientRepository
   ) {
     this.userRepository = userRepository;
     this.otpRepository = otpRepo;
@@ -138,6 +141,7 @@ export class UserUseCase {
       }
       emailVerification(email, token);
       await this.userRepository.update({ email, is_verified: true });
+      await this.otpRepository.delete(email);
       return;
     } catch (error: any) {
       console.log("catched");
@@ -158,10 +162,7 @@ export class UserUseCase {
         throw new Error("USER_BLOCKED");
       }
       const otpdata = await this.otpRepository.findOtp(email);
-      if (!otpdata) {
-        throw new Error("INVALID_EMAIL");
-      }
-      if (otp !== otpdata.otp) {
+      if (!otpdata || otp !== otpdata.otp) {
         throw new Error("INVALID");
       }
       if (Date.now() > otpdata.expiresAt.getTime()) {
@@ -190,8 +191,8 @@ export class UserUseCase {
     try {
       await sendVerificationEmail(user.email, user.user_id, otp);
       console.log("email send successfully");
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      console.log(error.message);
       throw new Error("MAIL_SEND_ERROR");
     }
     try {

@@ -10,10 +10,10 @@ const UserSchema: Schema = new Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, required: true, enum: ["lawyer", "client"] },
-    mobile: { type: String, required: false, unique: true },
+    mobile: { type: String, required: false },
     is_blocked: { type: Boolean, required: true, default: false },
     is_verified: { type: Boolean, required: true, default: false },
-    client_id: { type: mongoose.Types.ObjectId, required:false },
+    client_id: { type: mongoose.Types.ObjectId, required: false }, 
   },
   { timestamps: true }
 );

@@ -1,15 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import { verifyAccessToken } from "../../../infrastructure/services/jwt.service";
+import { verifyAccessToken } from "../../../application/services/jwt.service";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
 
 export const authenticateUser = (
-  req: Request,
+  req: Request & { user?: any },
   res: Response,
   next: NextFunction
 ) => {
   const token = req.headers.authorization
     ? req.headers.authorization.split(" ")[1]
     : null;
+  console.log("token in authenticateUser", token);
   if (!token) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
@@ -19,9 +20,10 @@ export const authenticateUser = (
   }
   try {
     const decode = verifyAccessToken(token);
-    console.log(decode)
+    req.user = decode;
     next();
   } catch (error: any) {
+    console.log("error in authenticateUser",error)
     switch (error.message) {
       case "TOKEN_EXPIRED":
         res.status(STATUS_CODES.UNAUTHORIZED).json({
@@ -50,4 +52,3 @@ export const authenticateUser = (
     }
   }
 };
-

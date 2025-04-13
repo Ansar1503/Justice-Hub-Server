@@ -5,5 +5,5 @@ export interface Client {
   profile_image?: string;
   dob?: string;
   gender?: string;
-  address?: Address;
+  address?: string;
 }

@@ -1,15 +1,18 @@
 import e, { Request, Response } from "express";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
-import { ResposeUserDto, RegisterUserDto } from "../../../domain/dtos/user.dto";
-import { UserUseCase } from "../../../domain/usecases/user.usecase";
+import { ResposeUserDto, RegisterUserDto } from "../../../application/dtos/user.dto";
+import { UserUseCase } from "../../../application/usecases/user.usecase";
 import { UserRepository } from "../../../infrastructure/database/repo/user.repo";
 import { v4 as uuidv4 } from "uuid";
 import "dotenv/config";
 import { ClientRepository } from "../../../infrastructure/database/repo/client.repo";
+import { OtpRepository } from "../../../infrastructure/database/repo/otp.repo";
 
-
-const userusecase = new UserUseCase(new UserRepository(),new ClientRepository());
-
+const userusecase = new UserUseCase(
+  new UserRepository(),
+  new OtpRepository(),
+  new ClientRepository()
+);
 
 export const registerUser = async (req: Request, res: Response) => {
   try {
@@ -17,8 +20,9 @@ export const registerUser = async (req: Request, res: Response) => {
     const userData = new RegisterUserDto({ user_id, ...req.body });
 
     const user = await userusecase.createUser(userData);
+
     const userResponse = new ResposeUserDto(user);
-    
+
     res.status(STATUS_CODES.CREATED).json({
       success: true,
       message: "registration success",
@@ -26,7 +30,7 @@ export const registerUser = async (req: Request, res: Response) => {
     });
     return;
   } catch (error: any) {
-    console.log(error);
+    console.log(error.message);
     switch (error.message) {
       case "USER_EXISTS":
         res.status(STATUS_CODES.BAD_REQUEST).json({
@@ -127,6 +131,7 @@ export const userLogin = async (req: Request, res: Response) => {
 export const handleRefreshToken = (req: Request, res: Response) => {
   try {
     const token = req.cookies?.refresh;
+    // console.log('refresh :: ',token)
     if (!token) {
       res.status(STATUS_CODES.BAD_REQUEST).json({
         success: false,
@@ -140,10 +145,11 @@ export const handleRefreshToken = (req: Request, res: Response) => {
       message: "refresh token handled success",
       token: accesstoken,
     });
+    return;
   } catch (error: any) {
     switch (error.message) {
       case "TOKEN_EXPIRED":
-        res.status(STATUS_CODES.UNAUTHORIZED).json({
+        res.status(STATUS_CODES.FORBIDDEN).json({
           success: false,
           message: "Token has expired. Please refresh your token.",
         });
@@ -227,7 +233,7 @@ export const verifyMail = async (req: Request, res: Response) => {
 
 export const verifyEmailOtp = async (req: Request, res: Response) => {
   const { otpValue: otp, email } = req.body;
-  // console.log(req.body);
+
   if (!otp || !email) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
