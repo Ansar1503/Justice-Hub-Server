@@ -1,7 +1,9 @@
 import express from "express";
 import {
   fetchClientData,
+  sendVerifyMail,
   updateBasicInfo,
+  updatePersonalInfo,
 } from "../controller/user_controller/client.controller";
 import multer from "multer";
 import { storage } from "../middelwares/multer";
@@ -17,7 +19,8 @@ router.put(
   authenticateUser,
   upload.single("image"),
   updateBasicInfo
-)
-
+);
+router.put("/profile/personal", authenticateUser, updatePersonalInfo);
+router.post("/profile/verifyMail", authenticateUser, sendVerifyMail);
 
 export default router;

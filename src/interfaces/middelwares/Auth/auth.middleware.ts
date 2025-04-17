@@ -10,7 +10,7 @@ export const authenticateUser = (
   const token = req.headers.authorization
     ? req.headers.authorization.split(" ")[1]
     : null;
-  console.log("token in authenticateUser", token);
+  // console.log("token in authenticateUser", token);
   if (!token) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
@@ -23,7 +23,7 @@ export const authenticateUser = (
     req.user = decode;
     next();
   } catch (error: any) {
-    console.log("error in authenticateUser",error)
+    // console.log("error in authenticateUser",error)
     switch (error.message) {
       case "TOKEN_EXPIRED":
         res.status(STATUS_CODES.UNAUTHORIZED).json({

@@ -139,7 +139,7 @@ export class UserUseCase {
       if (user.is_verified) {
         throw new Error("USER_VERIFIED");
       }
-      emailVerification(email, token);
+      emailVerification(token);
       await this.userRepository.update({ email, is_verified: true });
       await this.otpRepository.delete(email);
       return;
@@ -205,4 +205,5 @@ export class UserUseCase {
       throw new Error("DB_ERROR");
     }
   }
+  
 }

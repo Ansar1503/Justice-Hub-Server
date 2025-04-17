@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { ClientUseCase } from "../../../application/usecases/client.usecase";
 import { ClientRepository } from "../../../infrastructure/database/repo/client.repo";
 import { UserRepository } from "../../../infrastructure/database/repo/user.repo";
+import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
 
 const clientusecase = new ClientUseCase(
   new ClientRepository(),
@@ -94,6 +95,95 @@ export const updateBasicInfo = async (
             message: "Internal Server Error",
           });
       }
+    }
+  }
+};
+
+export const updatePersonalInfo = async (
+  req: Request & { user?: any },
+  res: Response
+) => {
+  const { email } = req.body;
+  if (!email) {
+    res.status(400).json({
+      success: false,
+      message: "credentials not found",
+    });
+    return;
+  }
+
+  const user_id = req.user?.id;
+
+  try {
+    const responserUser = await clientusecase.changeEmail(email, user_id);
+
+    res.status(STATUS_CODES.ACCEPTED).json({
+      success: true,
+      message: "email change successfully",
+      data: responserUser,
+    });
+    return;
+  } catch (error: any) {
+    console.log(error);
+    if (error.message) {
+      switch (error.message) {
+        case "MAIL_SEND_ERROR":
+          res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: "email service error",
+          });
+          return;
+        case "NO_USER_FOUND":
+          res.status(STATUS_CODES.NOT_FOUND).json({
+            success: false,
+            message: "user not found",
+          });
+          return;
+        default:
+          res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "Internal Server Error",
+          });
+          return;
+      }
+    }
+  }
+};
+
+export const sendVerifyMail = async (
+  req: Request & { user?: any },
+  res: Response
+) => {
+  const { email } = req.body;
+  if (!email) {
+    res.status(400).json({
+      success: false,
+      message: "credentials not found",
+    });
+    return;
+  }
+  const user_id = req.user?.id;
+  try {
+    const response = await clientusecase.verifyMail(email, user_id);
+    res.status(STATUS_CODES.ACCEPTED).json({
+      success: true,
+      message: "verification mail send successfully",
+    });
+    return;
+  } catch (error: any) {
+    switch (error.message) {
+      case "MAIL_SEND_ERROR":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "mail send error, try again after some time",
+        });
+        return;
+      default:
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "Internal Server Error",
+        });
+        return;
     }
   }
 };

@@ -15,8 +15,14 @@ export class UserRepository implements IUserRepository {
     return await UserModel.findOne({ user_id });
   }
   async update(user: Partial<User>): Promise<User | null> {
+    let query: { user_id?: string; email?: string } = {};
+    if (user.user_id) {
+      query.user_id = user.user_id;
+    } else if (user.email) {
+      query.email = user.email;
+    }
     return await UserModel.findOneAndUpdate(
-      { email: user.email },
+      query,
       {
         $set: {
           is_verified: user.is_verified,
