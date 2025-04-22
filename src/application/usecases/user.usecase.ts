@@ -35,10 +35,6 @@ export class UserUseCase {
     this.clientRepository = clientRepo;
   }
 
-  private async hashPassword(password: string): Promise<string> {
-    return await bcrypt.hash(password, 10);
-  }
-
   private async createClient(clientData: Client) {
     return await this.clientRepository.create(clientData);
   }
@@ -48,7 +44,7 @@ export class UserUseCase {
     if (existingUser) {
       throw new Error("USER_EXISTS");
     }
-    userData.password = await this.hashPassword(userData.password);
+    userData.password = await bcrypt.hash(userData.password, 10);
     try {
       const user = await this.userRepository.create(userData);
       await this.createClient({ user_id: user.user_id });
@@ -205,5 +201,4 @@ export class UserUseCase {
       throw new Error("DB_ERROR");
     }
   }
-  
 }

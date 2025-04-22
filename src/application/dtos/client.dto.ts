@@ -24,6 +24,8 @@ export class ClientUpdateDto extends UserDto {
   address?: string;
   is_verified?: boolean;
   is_blocked?: boolean;
+  password?: string;
+  
   constructor({
     name,
     email,
@@ -36,6 +38,7 @@ export class ClientUpdateDto extends UserDto {
     profile_image,
     is_blocked,
     is_verified,
+    password,
   }: ClientUpdateDto) {
     super({ name, email, mobile, role });
     this.user_id = user_id;
@@ -45,5 +48,6 @@ export class ClientUpdateDto extends UserDto {
     this.profile_image = profile_image;
     this.is_blocked = is_blocked;
     this.is_verified = is_verified;
+    this.password = password;
   }
 }

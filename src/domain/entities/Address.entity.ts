@@ -1,6 +1,6 @@
 export interface Address {
-  state: string;
-  city: string;
-  locality: string;
-  pincode: string;
+  state?: string;
+  city?: string;
+  locality?: string;
+  pincode?: string;
 }

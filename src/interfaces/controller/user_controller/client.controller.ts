@@ -3,10 +3,12 @@ import { ClientUseCase } from "../../../application/usecases/client.usecase";
 import { ClientRepository } from "../../../infrastructure/database/repo/client.repo";
 import { UserRepository } from "../../../infrastructure/database/repo/user.repo";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
+import { AddressRepository } from "../../../infrastructure/database/repo/address.repo";
 
 const clientusecase = new ClientUseCase(
   new ClientRepository(),
-  new UserRepository()
+  new UserRepository(),
+  new AddressRepository()
 );
 
 export const fetchClientData = async (
@@ -15,7 +17,7 @@ export const fetchClientData = async (
 ) => {
   const user_id = req.user.id;
   if (!user_id) {
-    res.status(400).json({
+    res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
       message: "please provide credentials",
     });
@@ -24,7 +26,7 @@ export const fetchClientData = async (
   try {
     const clientDetails = await clientusecase.fetchClientData(user_id);
     // while(true){}
-    res.status(200).json({
+    res.status(STATUS_CODES.OK).json({
       success: true,
       message: "Client Data fetched Successfully",
       data: clientDetails,
@@ -33,13 +35,17 @@ export const fetchClientData = async (
     if (error.message) {
       switch (error.message) {
         case "USER_NOT_FOUND":
-          res.status(400).json({ success: false, message: "user not found" });
+          res
+            .status(STATUS_CODES.BAD_REQUEST)
+            .json({ success: false, message: "user not found" });
           return;
         case "CLIENT_NOT_FOUND":
-          res.status(400).json({ success: false, message: "client not found" });
+          res
+            .status(STATUS_CODES.BAD_REQUEST)
+            .json({ success: false, message: "client not found" });
           return;
         default:
-          res.status(500).json({
+          res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: "client data fetch failed!",
           });
@@ -56,7 +62,7 @@ export const updateBasicInfo = async (
   const { name, mobile, dob, gender } = req.body;
 
   if (!name) {
-    res.status(400).json({
+    res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
       message: "name field is required",
     });
@@ -74,7 +80,7 @@ export const updateBasicInfo = async (
       dob,
       gender,
     });
-    res.status(200).json({
+    res.status(STATUS_CODES.OK).json({
       success: true,
       message: "client details updated successfully",
       data: updateData,
@@ -84,13 +90,13 @@ export const updateBasicInfo = async (
     if (error.message) {
       switch (error.message) {
         case "USER_NOT_FOUND":
-          res.status(400).json({
+          res.status(STATUS_CODES.BAD_REQUEST).json({
             success: false,
             message: "client not found",
           });
           return;
         default:
-          res.status(500).json({
+          res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,
             message: "Internal Server Error",
           });
@@ -99,13 +105,13 @@ export const updateBasicInfo = async (
   }
 };
 
-export const updatePersonalInfo = async (
+export const updateEmail = async (
   req: Request & { user?: any },
   res: Response
 ) => {
   const { email } = req.body;
   if (!email) {
-    res.status(400).json({
+    res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
       message: "credentials not found",
     });
@@ -156,7 +162,7 @@ export const sendVerifyMail = async (
 ) => {
   const { email } = req.body;
   if (!email) {
-    res.status(400).json({
+    res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
       message: "credentials not found",
     });
@@ -165,7 +171,7 @@ export const sendVerifyMail = async (
   const user_id = req.user?.id;
   try {
     const response = await clientusecase.verifyMail(email, user_id);
-    res.status(STATUS_CODES.ACCEPTED).json({
+    res.status(STATUS_CODES.OK).json({
       success: true,
       message: "verification mail send successfully",
     });
@@ -184,6 +190,121 @@ export const sendVerifyMail = async (
           message: "Internal Server Error",
         });
         return;
+    }
+  }
+};
+
+export const updatePassword = async (
+  req: Request & { user?: any },
+  res: Response
+) => {
+  console.log(req.body);
+  const { password, currentPassword } = req.body;
+
+  if (!password) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "password not found",
+    });
+    return;
+  }
+
+  try {
+    const user_id = req.user?.id;
+    const payload = { currentPassword, password, user_id };
+    const response = await clientusecase.updatePassword(payload);
+    res.status(STATUS_CODES.ACCEPTED).json({
+      success: true,
+      message: "password updated successfully",
+      data: response,
+    });
+    return;
+  } catch (error: any) {
+    if (error.message) {
+      switch (error.message) {
+        case "USER_NOT_FOUND":
+          res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: "user not found",
+          });
+          return;
+        case "PASS_NOT_MATCH":
+          res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: "current password doesnot match",
+          });
+          return;
+        case "PASS_EXIST":
+          res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: "password already exist",
+          });
+          return;
+        case "USER_BLOCKED":
+          res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: "user is blocked",
+          });
+          return;
+        default:
+          res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "password update failed",
+          });
+          return;
+      }
+    }
+  }
+};
+
+export const updateAddress = async (
+  req: Request & { user?: any },
+  res: Response
+) => {
+  const user_id = req.user?.id;
+  const { state, city, locality, pincode } = req.body;
+  if (!state && !city && !locality && !pincode) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "no credentials found",
+    });
+    return;
+  }
+  try {
+    await clientusecase.updateAddress({
+      user_id,
+      city,
+      locality,
+      pincode,
+      state,
+    });
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "address added successfully",
+    });
+    return;
+  } catch (error: any) {
+    if (error.message) {
+      switch (error.message) {
+        case "USER_NOT_FOUND":
+          res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: "user is not found",
+          });
+          return;
+        case "USER_BLOCKED":
+          res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: "user is blocked!",
+          });
+          return;
+        default:
+          res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+            success: false,
+            message: "address update failed!",
+          });
+          return;
+      }
     }
   }
 };

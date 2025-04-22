@@ -18,6 +18,7 @@ export class ClientRepository implements IClientRepository {
           dob: clientData.dob || "",
           gender: clientData.gender || "",
           profile_image: clientData.profile_image || "",
+          address:clientData.address || ""
         },
       }
     );
