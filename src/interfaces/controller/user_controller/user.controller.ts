@@ -1,6 +1,9 @@
 import e, { Request, Response } from "express";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
-import { ResposeUserDto, RegisterUserDto } from "../../../application/dtos/user.dto";
+import {
+  ResposeUserDto,
+  RegisterUserDto,
+} from "../../../application/dtos/user.dto";
 import { UserUseCase } from "../../../application/usecases/user.usecase";
 import { UserRepository } from "../../../infrastructure/database/repo/user.repo";
 import { v4 as uuidv4 } from "uuid";
@@ -70,8 +73,9 @@ export const userLogin = async (req: Request, res: Response) => {
     });
     return;
   }
+
   try {
-    const responsedata = await userusecase.userLogin({ email, password });
+    const responsedata = await userusecase.userLogin({ email:email.toLowerCase(), password });
 
     res.cookie("refresh", responsedata.refreshtoken, {
       httpOnly: true,
@@ -184,10 +188,9 @@ export const verifyMail = async (req: Request, res: Response) => {
     );
     return;
   }
-
   try {
     // console.log("fronden", process.env.FRONTEND_URL);
-    await userusecase.verifyEmail(email as string, token as string);
+    await userusecase.verifyEmail((email as string).toLowerCase(), token as string);
     res.redirect(`${process.env.FRONTEND_URL}/email-verified`);
     return;
   } catch (error: any) {
@@ -242,7 +245,7 @@ export const verifyEmailOtp = async (req: Request, res: Response) => {
     return;
   }
   try {
-    await userusecase.verifyEmailByOtp(email, otp);
+    await userusecase.verifyEmailByOtp(email.toLowerCase(), otp);
     res.status(STATUS_CODES.ACCEPTED).json({
       success: true,
       message: "otp verified successfully",
@@ -302,7 +305,7 @@ export const ResendOtp = async (req: Request, res: Response) => {
     return;
   }
   try {
-    await userusecase.ResendOtp(email);
+    await userusecase.ResendOtp(email.toLowerCase());
     res.status(STATUS_CODES.ACCEPTED).json({
       success: false,
       message: "otp send successfully",

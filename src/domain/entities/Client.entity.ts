@@ -1,4 +1,3 @@
-import { Address } from "./Address.entity";
 
 export interface Client {
   user_id: string;

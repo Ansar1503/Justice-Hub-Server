@@ -4,9 +4,7 @@ export interface User {
   email: string;
   mobile?: string;
   password: string;
-  role: "lawyer" | "client";
+  role: "lawyer" | "client" | "admin";
   is_blocked?: boolean;
   is_verified?: boolean;
-  created_at?: Date;
-  updated_at?: Date;
 }

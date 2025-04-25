@@ -2,7 +2,7 @@ export class UserDto {
   name: string;
   email: string;
   mobile: string;
-  role: "lawyer" | "client";
+  role: "lawyer" | "client" | "admin";
 
   constructor({ name, email, mobile, role }: UserDto) {
     this.email = email;
@@ -33,7 +33,7 @@ export class ResposeUserDto {
   user_id: string;
   name: string;
   email: string;
-  role: "lawyer" | "client";
+  role: "lawyer" | "client" | "admin";
   constructor({ user_id, name, email, role }: ResposeUserDto) {
     this.user_id = user_id;
     this.name = name;
