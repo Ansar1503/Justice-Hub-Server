@@ -6,7 +6,7 @@ import {
   updateBasicInfo,
   updateEmail,
   updatePassword,
-} from "../controller/user_controller/client.controller";
+} from "../controller/client.controller";
 import multer from "multer";
 import { storage } from "../middelwares/multer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";

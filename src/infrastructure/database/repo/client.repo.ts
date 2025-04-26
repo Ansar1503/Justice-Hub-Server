@@ -1,6 +1,6 @@
 import { ClientDto, ClientUpdateDto } from "../../../application/dtos/client.dto";
 import { Client } from "../../../domain/entities/Client.entity";
-import { IClientRepository } from "../../../domain/repository/client.repo";
+import { IClientRepository } from "../../../domain/I_repository/I_client.repo";
 import ClientModel from "../model/client.model";
 
 export class ClientRepository implements IClientRepository {
@@ -22,5 +22,8 @@ export class ClientRepository implements IClientRepository {
         },
       }
     );
+  }
+  async findAll(): Promise<Client[]> {
+    return await ClientModel.find({});
   }
 }

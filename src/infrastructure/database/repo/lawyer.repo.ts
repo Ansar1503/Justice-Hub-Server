@@ -1,6 +1,6 @@
 import { lawyer } from "../../../domain/entities/Lawyer.entity";
-import { ILawyerRepository } from "../../../domain/repository/lawyer.repo";
-import lawyerMoel from "../model/lawyer.moel";
+import { ILawyerRepository } from "../../../domain/I_repository/I_lawyer.repo";
+import lawyerMoel from "../model/lawyer.model";
 
 export class LawyerRepository implements ILawyerRepository {
   async create(lawyer: lawyer): Promise<lawyer> {

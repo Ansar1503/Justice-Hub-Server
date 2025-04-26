@@ -1,15 +1,16 @@
-import e, { Request, Response } from "express";
-import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
+import  { Request, Response } from "express";
+import { STATUS_CODES } from "../../infrastructure/constant/status.codes"; 
+
 import {
   ResposeUserDto,
   RegisterUserDto,
-} from "../../../application/dtos/user.dto";
-import { UserUseCase } from "../../../application/usecases/user.usecase";
-import { UserRepository } from "../../../infrastructure/database/repo/user.repo";
+} from "../../application/dtos/user.dto";
+import { UserUseCase } from "../../application/usecases/user.usecase";
+import { UserRepository } from "../../infrastructure/database/repo/user.repo";
 import { v4 as uuidv4 } from "uuid";
 import "dotenv/config";
-import { ClientRepository } from "../../../infrastructure/database/repo/client.repo";
-import { OtpRepository } from "../../../infrastructure/database/repo/otp.repo";
+import { ClientRepository } from "../../infrastructure/database/repo/client.repo";
+import { OtpRepository } from "../../infrastructure/database/repo/otp.repo";
 
 const userusecase = new UserUseCase(
   new UserRepository(),

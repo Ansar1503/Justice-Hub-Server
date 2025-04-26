@@ -16,9 +16,9 @@ import { generateOtp } from "../services/otp.service";
 import { ClientRepository } from "../../infrastructure/database/repo/client.repo";
 import { Client } from "../../domain/entities/Client.entity";
 import { OtpRepository } from "../../infrastructure/database/repo/otp.repo";
-import { IUserRepository } from "../../domain/repository/user.repo";
-import { IClientRepository } from "../../domain/repository/client.repo";
-import { IotpRepository } from "../../domain/repository/otp.repo";
+import { IUserRepository } from "../../domain/I_repository/I_user.repo";
+import { IClientRepository } from "../../domain/I_repository/I_client.repo";
+import { IotpRepository } from "../../domain/I_repository/I_otp.repo";
 
 export class UserUseCase {
   private userRepository: IUserRepository;

@@ -7,4 +7,5 @@ export interface User {
   role: "lawyer" | "client" | "admin";
   is_blocked?: boolean;
   is_verified?: boolean;
+  createdAt?: Date;
 }

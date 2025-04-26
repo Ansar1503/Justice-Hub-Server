@@ -1,14 +1,14 @@
 import { ClientRepository } from "../../infrastructure/database/repo/client.repo";
 import { UserRepository } from "../../infrastructure/database/repo/user.repo";
 import { ClientDto, ClientUpdateDto } from "../dtos/client.dto";
-import { IUserRepository } from "../../domain/repository/user.repo";
-import { IClientRepository } from "../../domain/repository/client.repo";
+import { IUserRepository } from "../../domain/I_repository/I_user.repo";
+import { IClientRepository } from "../../domain/I_repository/I_client.repo";
 import { ResposeUserDto } from "../dtos/user.dto";
 import { sendVerificationEmail } from "../services/email.service";
 import bcrypt from "bcrypt";
 import { Address } from "../../domain/entities/Address.entity";
 import { AddressRepository } from "../../infrastructure/database/repo/address.repo";
-import { IAddressRepository } from "../../domain/repository/address.repo";
+import { IAddressRepository } from "../../domain/I_repository/I_address.repo";
 
 export class ClientUseCase {
   private userRepository: UserRepository;

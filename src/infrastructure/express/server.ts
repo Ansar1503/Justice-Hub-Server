@@ -2,6 +2,7 @@ import express, { Application } from "express";
 import connectDB from "../../infrastructure/database/config";
 import authRoute from "../../interfaces/routes/auth.route";
 import clientRoute from "../../interfaces/routes/client.route";
+import adminRoute from "../../interfaces/routes/admin.routes";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import "dotenv/config";
@@ -22,7 +23,8 @@ app.use(
 );
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/user/", authRoute);
-app.use("/api/client/",clientRoute);
+app.use("/api/client/", clientRoute);
+app.use("/api/admin/", adminRoute);
 
 app.listen(PORT, () =>
   console.log(`🚀 Server running on port http://localhost:${PORT}`)

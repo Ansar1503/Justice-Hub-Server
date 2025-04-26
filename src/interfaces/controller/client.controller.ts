@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import { ClientUseCase } from "../../../application/usecases/client.usecase";
-import { ClientRepository } from "../../../infrastructure/database/repo/client.repo";
-import { UserRepository } from "../../../infrastructure/database/repo/user.repo";
-import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
-import { AddressRepository } from "../../../infrastructure/database/repo/address.repo";
+import { ClientUseCase } from "../../application/usecases/client.usecase"; 
+import { ClientRepository } from "../../infrastructure/database/repo/client.repo"; 
+import { UserRepository } from "../../infrastructure/database/repo/user.repo"; 
+import { STATUS_CODES } from "../../infrastructure/constant/status.codes"; 
+import { AddressRepository } from "../../infrastructure/database/repo/address.repo"; 
 
 const clientusecase = new ClientUseCase(
   new ClientRepository(),

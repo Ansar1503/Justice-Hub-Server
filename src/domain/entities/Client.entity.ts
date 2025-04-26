@@ -5,4 +5,5 @@ export interface Client {
   dob?: string;
   gender?: string;
   address?: string;
+  createdAt?: Date;
 }

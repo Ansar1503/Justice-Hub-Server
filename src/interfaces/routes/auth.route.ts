@@ -6,7 +6,7 @@ import {
   userLogin,
   verifyEmailOtp,
   verifyMail,
-} from "../controller/user_controller/user.controller";
+} from "../controller/user.controller";
 import { validateUser } from "../middelwares/validator/user.validator";
 import { handleValidationErrors } from "../middelwares/validator/validation.middleware";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";

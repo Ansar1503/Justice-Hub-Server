@@ -1,5 +1,5 @@
 import { User } from "../../../domain/entities/User.entity";
-import { IUserRepository } from "../../../domain/repository/user.repo";
+import { IUserRepository } from "../../../domain/I_repository/I_user.repo";
 import UserModel, { IUserModel } from "../model/user.model";
 
 export class UserRepository implements IUserRepository {
@@ -36,5 +36,8 @@ export class UserRepository implements IUserRepository {
       },
       { new: true }
     );
+  }
+  async findByRole(role: "admin" | "lawyer" | "client"): Promise<User[]> {
+    return await UserModel.find({ role });
   }
 }
