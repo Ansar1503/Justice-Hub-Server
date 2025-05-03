@@ -8,7 +8,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export const storage = new CloudinaryStorage({
+export const profilestorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
     return {
@@ -18,5 +18,15 @@ export const storage = new CloudinaryStorage({
     };
   },
 });
+
+export const documentstorage = new CloudinaryStorage({
+  cloudinary,
+  params:async(req,file)=>{
+    return {
+      folder:"Justice_Hub/documents",
+      allowed_formats:["jpg", "jpeg", "png", "webp","pdf"],
+    }
+  }
+})
 
 export { cloudinary };

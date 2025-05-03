@@ -5,5 +5,5 @@ export interface IUserRepository {
   findByEmail(email: string): Promise<User | null>;
   update(user: Partial<User>): Promise<User | null>;
   findByuser_id(user_id: string): Promise<User | null>;
-  findByRole(role: "lawyer" | "client" ): Promise<User[]>;
+  findAll(query: any): Promise<User[]>;
 }

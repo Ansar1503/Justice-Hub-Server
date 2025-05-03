@@ -1,5 +1,5 @@
-import  { Request, Response } from "express";
-import { STATUS_CODES } from "../../infrastructure/constant/status.codes"; 
+import { Request, response, Response } from "express";
+import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
 
 import {
   ResposeUserDto,
@@ -11,11 +11,13 @@ import { v4 as uuidv4 } from "uuid";
 import "dotenv/config";
 import { ClientRepository } from "../../infrastructure/database/repo/client.repo";
 import { OtpRepository } from "../../infrastructure/database/repo/otp.repo";
+import { LawyerRepository } from "../../infrastructure/database/repo/lawyer.repo";
 
 const userusecase = new UserUseCase(
   new UserRepository(),
   new OtpRepository(),
-  new ClientRepository()
+  new ClientRepository(),
+  new LawyerRepository()
 );
 
 export const registerUser = async (req: Request, res: Response) => {
@@ -76,7 +78,10 @@ export const userLogin = async (req: Request, res: Response) => {
   }
 
   try {
-    const responsedata = await userusecase.userLogin({ email:email.toLowerCase(), password });
+    const responsedata = await userusecase.userLogin({
+      email: email.toLowerCase(),
+      password,
+    });
 
     res.cookie("refresh", responsedata.refreshtoken, {
       httpOnly: true,
@@ -191,7 +196,10 @@ export const verifyMail = async (req: Request, res: Response) => {
   }
   try {
     // console.log("fronden", process.env.FRONTEND_URL);
-    await userusecase.verifyEmail((email as string).toLowerCase(), token as string);
+    await userusecase.verifyEmail(
+      (email as string).toLowerCase(),
+      token as string
+    );
     res.redirect(`${process.env.FRONTEND_URL}/email-verified`);
     return;
   } catch (error: any) {
@@ -353,3 +361,20 @@ export const ResendOtp = async (req: Request, res: Response) => {
     }
   }
 };
+
+export async function GoogleRegistration(req: Request, res: Response) {
+  const { code, role } = req.body;
+  if (!code || !role) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "invalid credentials",
+    });
+    return
+  }
+  try {
+    const response = await userusecase.GoogleSign({code,role})
+  } catch (error) {
+    console.log(error)
+    
+  }
+}

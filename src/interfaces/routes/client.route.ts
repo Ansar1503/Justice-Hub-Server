@@ -1,6 +1,7 @@
 import express from "express";
 import {
   fetchClientData,
+  getLawyers,
   sendVerifyMail,
   updateAddress,
   updateBasicInfo,
@@ -8,10 +9,10 @@ import {
   updatePassword,
 } from "../controller/client.controller";
 import multer from "multer";
-import { storage } from "../middelwares/multer";
+import { profilestorage } from "../middelwares/multer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 
-const upload = multer({ storage });
+const upload = multer({ storage:profilestorage });
 
 const router = express.Router();
 
@@ -26,5 +27,6 @@ router.put("/profile/personal", authenticateUser, updateEmail);
 router.post("/profile/verifyMail", authenticateUser, sendVerifyMail);
 router.put("/profile/updatePassword", authenticateUser, updatePassword);
 router.post("/profile/address", authenticateUser, updateAddress);
+router.get("/lawyers",getLawyers)
 
 export default router;

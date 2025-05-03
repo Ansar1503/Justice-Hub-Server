@@ -19,3 +19,4 @@ const AddressSchema = new Schema(
 const AddressModel = mongoose.model("Address", AddressSchema);
 
 export default AddressModel;
+

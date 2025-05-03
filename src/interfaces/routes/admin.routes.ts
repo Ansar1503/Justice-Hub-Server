@@ -1,10 +1,17 @@
 import express from "express";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
-import { fetchAllUsers } from "../controller/admin.controller";
+import {
+  BlockUser,
+  changeLawyerVerificationStatus,
+  fetchAllLawyers,
+  fetchAllUsers,
+} from "../controller/admin.controller";
 
 const router = express.Router();
 
-router.get("/users", authenticateUser,fetchAllUsers);
-
+router.get("/users", authenticateUser, fetchAllUsers);
+router.get("/lawyers", authenticateUser, fetchAllLawyers);
+router.patch("/user", authenticateUser, BlockUser);
+router.patch("/lawyer",authenticateUser,changeLawyerVerificationStatus)
 
 export default router;

@@ -6,4 +6,5 @@ export interface IAddressRepository {
   update(
     payload: Address & { user_id: string }
   ): Promise<Address & { user_id: string; _id: string }>;
+  findAll():Promise<(Address & { user_id: string })[]>;
 }

@@ -19,24 +19,19 @@ import { OtpRepository } from "../../infrastructure/database/repo/otp.repo";
 import { IUserRepository } from "../../domain/I_repository/I_user.repo";
 import { IClientRepository } from "../../domain/I_repository/I_client.repo";
 import { IotpRepository } from "../../domain/I_repository/I_otp.repo";
+import { ILawyerRepository } from "../../domain/I_repository/I_lawyer.repo";
+import { verifyAuthCode } from "../services/google.service";
 
 export class UserUseCase {
-  private userRepository: IUserRepository;
-  private clientRepository: IClientRepository;
-  private otpRepository: IotpRepository;
-
   constructor(
-    userRepository: IUserRepository,
-    otpRepo: IotpRepository,
-    clientRepo: IClientRepository
-  ) {
-    this.userRepository = userRepository;
-    this.otpRepository = otpRepo;
-    this.clientRepository = clientRepo;
-  }
+    private userRepository: IUserRepository,
+    private otpRepo: IotpRepository,
+    private clientRepo: IClientRepository,
+    private lawyerRepo: ILawyerRepository
+  ) {}
 
   private async createClient(clientData: Client) {
-    return await this.clientRepository.create(clientData);
+    return await this.clientRepo.create(clientData);
   }
 
   async createUser(userData: User): Promise<ResposeUserDto> {
@@ -48,15 +43,19 @@ export class UserUseCase {
     try {
       const user = await this.userRepository.create(userData);
       await this.createClient({ user_id: user.user_id });
+      if (userData.role === "lawyer") {
+        await this.lawyerRepo.create({ user_id: userData.user_id });
+      }
+
       const otp = await generateOtp();
       try {
         await sendVerificationEmail(user.email, user.user_id, otp);
-        console.log("email send successfully");
+        console.log("email send successfully", otp);
       } catch (error) {
         console.log(error);
         throw new Error("MAIL_SEND_ERROR");
       }
-      await this.otpRepository.storeOtp({
+      await this.otpRepo.storeOtp({
         email: user.email,
         otp: otp,
         expiresAt: new Date(Date.now() + 60 * 1000),
@@ -66,6 +65,7 @@ export class UserUseCase {
       if (error.message === "MAIL_SEND_ERROR") {
         throw new Error(error.message);
       }
+      console.log(error);
       throw new Error("DB_ERROR");
     }
   }
@@ -127,6 +127,7 @@ export class UserUseCase {
     try {
       const user = await this.userRepository.findByEmail(email);
       if (!user) {
+        console.log("user not found", user);
         throw new Error("USER_NOT_FOUND");
       }
       if (user.is_blocked) {
@@ -137,7 +138,7 @@ export class UserUseCase {
       }
       emailVerification(token);
       await this.userRepository.update({ email, is_verified: true });
-      await this.otpRepository.delete(email);
+      await this.otpRepo.delete(email);
       return;
     } catch (error: any) {
       console.log("catched");
@@ -157,14 +158,14 @@ export class UserUseCase {
       if (user.is_blocked) {
         throw new Error("USER_BLOCKED");
       }
-      const otpdata = await this.otpRepository.findOtp(email);
+      const otpdata = await this.otpRepo.findOtp(email);
       if (!otpdata || otp !== otpdata.otp) {
         throw new Error("INVALID");
       }
       if (Date.now() > otpdata.expiresAt.getTime()) {
         throw new Error("OTP_EXPIRED");
       }
-      await this.otpRepository.delete(email);
+      await this.otpRepo.delete(email);
       await this.userRepository.update({ email, is_verified: true });
     } catch (error: any) {
       throw new Error(error.message);
@@ -192,7 +193,7 @@ export class UserUseCase {
       throw new Error("MAIL_SEND_ERROR");
     }
     try {
-      await this.otpRepository.storeOtp({
+      await this.otpRepo.storeOtp({
         email: user.email,
         otp: otp,
         expiresAt: new Date(Date.now() + 60 * 1000),
@@ -200,5 +201,26 @@ export class UserUseCase {
     } catch (error: any) {
       throw new Error("DB_ERROR");
     }
+  }
+  async GoogleSign(payload: { code: string; role: "lawyer" | "client" }) {
+    const googleResponse = await verifyAuthCode(payload.code);
+    console.log("gooe", googleResponse);
+    if (!googleResponse) {
+      throw new Error("INVALID_TOKEN");
+    }
+    const userDetails = await this.userRepository.findByEmail(
+      googleResponse.email || ""
+    );
+    if (userDetails) {
+      throw new Error("USER_EXIST");
+    }
+    // const newUser = await this.userRepository.create({
+    //   email: googleResponse.email || "",
+    //   name: googleResponse.name || "",
+    //   role:payload.role,
+    //   is_verified:true,
+    //   password:"",
+      
+    // });
   }
 }

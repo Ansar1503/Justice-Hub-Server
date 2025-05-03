@@ -37,7 +37,7 @@ export class UserRepository implements IUserRepository {
       { new: true }
     );
   }
-  async findByRole(role: "admin" | "lawyer" | "client"): Promise<User[]> {
-    return await UserModel.find({ role });
+  async findAll(query:any): Promise<User[]> {
+    return await UserModel.find(query);
   }
 }

@@ -22,4 +22,7 @@ export class AddressRepository implements IAddressRepository {
   async find(user_id: string): Promise<(Address & { user_id: string }) | null> {
     return await AddressModel.findOne({ user_id: user_id });
   }
+  async findAll(): Promise<(Address & { user_id: string })[]> {
+    return await AddressModel.find({});
+  }
 }

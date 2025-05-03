@@ -1,4 +1,7 @@
-import { ClientDto, ClientUpdateDto } from "../../../application/dtos/client.dto";
+import {
+  ClientDto,
+  ClientUpdateDto,
+} from "../../../application/dtos/client.dto";
 import { Client } from "../../../domain/entities/Client.entity";
 import { IClientRepository } from "../../../domain/I_repository/I_client.repo";
 import ClientModel from "../model/client.model";
@@ -12,18 +15,18 @@ export class ClientRepository implements IClientRepository {
   }
   async update(clientData: ClientUpdateDto): Promise<Client | null> {
     return await ClientModel.findOneAndUpdate(
-      { user_id: clientData.user_id  },
+      { user_id: clientData.user_id },
       {
         $set: {
           dob: clientData.dob || "",
           gender: clientData.gender || "",
           profile_image: clientData.profile_image || "",
-          address:clientData.address || ""
+          address: clientData.address || undefined,
         },
       }
     );
   }
   async findAll(): Promise<Client[]> {
-    return await ClientModel.find({});
+    return await ClientModel.find({}).populate("address");
   }
 }

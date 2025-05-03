@@ -1,5 +1,3 @@
-import { ClientRepository } from "../../infrastructure/database/repo/client.repo";
-import { UserRepository } from "../../infrastructure/database/repo/user.repo";
 import { ClientDto, ClientUpdateDto } from "../dtos/client.dto";
 import { IUserRepository } from "../../domain/I_repository/I_user.repo";
 import { IClientRepository } from "../../domain/I_repository/I_client.repo";
@@ -7,23 +5,20 @@ import { ResposeUserDto } from "../dtos/user.dto";
 import { sendVerificationEmail } from "../services/email.service";
 import bcrypt from "bcrypt";
 import { Address } from "../../domain/entities/Address.entity";
-import { AddressRepository } from "../../infrastructure/database/repo/address.repo";
 import { IAddressRepository } from "../../domain/I_repository/I_address.repo";
+import { ILawyerRepository } from "../../domain/I_repository/I_lawyer.repo";
+import { I_clientUsecase } from "./I_usecases/I_clientusecase";
+import { LawyerFilterParams } from "../../domain/entities/Lawyer.entity";
+import { LawyerResponseDto } from "../dtos/lawyer.dto";
 
-export class ClientUseCase {
-  private userRepository: UserRepository;
-  private clientRepository: ClientRepository;
-  private addressRepository: AddressRepository;
+export class ClientUseCase implements I_clientUsecase {
   constructor(
-    clientRepository: IClientRepository,
-    userRepo: IUserRepository,
-    addressRepo: IAddressRepository
-  ) {
-    this.clientRepository = clientRepository;
-    this.userRepository = userRepo;
-    this.addressRepository = addressRepo;
-  }
-  async fetchClientData(user_id: string) {
+    private userRepository: IUserRepository,
+    private clientRepository: IClientRepository,
+    private addressRepository: IAddressRepository,
+    private lawyerRepository: ILawyerRepository
+  ) {}
+  async fetchClientData(user_id: string): Promise<any> {
     try {
       const userDetails = await this.userRepository.findByuser_id(user_id);
       if (!userDetails) {
@@ -31,6 +26,11 @@ export class ClientUseCase {
       }
       const clientdetails = await this.clientRepository.findByUserId(user_id);
       const addressDetails = await this.addressRepository.find(user_id);
+      const lawyerData = await this.lawyerRepository.findUserId(user_id);
+      let lawyerVerfication;
+      if (userDetails.role === "lawyer") {
+        lawyerVerfication = lawyerData?.verification_status;
+      }
 
       if (!clientdetails) {
         throw new Error("CLIENT_NOT_FOUND");
@@ -54,9 +54,11 @@ export class ClientUseCase {
         is_blocked: userDetails.is_blocked,
         is_verified: userDetails.is_verified,
       });
+
       return {
         ...responseClientData,
         address,
+        lawyerVerfication,
       };
     } catch (error: any) {
       throw new Error(error.message);
@@ -65,7 +67,7 @@ export class ClientUseCase {
 
   async updateClientData(
     clientData: ClientDto & { name: string; mobile: string }
-  ) {
+  ): Promise<ClientUpdateDto> {
     try {
       const userDetails = await this.userRepository.findByuser_id(
         clientData.user_id
@@ -99,7 +101,7 @@ export class ClientUseCase {
     }
   }
 
-  async changeEmail(email: string, user_id: string) {
+  async changeEmail(email: string, user_id: string): Promise<ResposeUserDto> {
     try {
       const userDetails = await this.userRepository.findByuser_id(user_id);
       if (!userDetails) {
@@ -132,7 +134,7 @@ export class ClientUseCase {
     }
   }
 
-  async verifyMail(email: string, user_id: string) {
+  async verifyMail(email: string, user_id: string): Promise<void> {
     try {
       await sendVerificationEmail(email, user_id, "");
     } catch (error: any) {
@@ -144,7 +146,7 @@ export class ClientUseCase {
     currentPassword: string;
     user_id: string;
     password: string;
-  }) {
+  }): Promise<ClientUpdateDto> {
     const userDetails = await this.userRepository.findByuser_id(
       payload.user_id
     );
@@ -198,7 +200,7 @@ export class ClientUseCase {
     return updateData;
   }
 
-  async updateAddress(payload: Address & { user_id: string }) {
+  async updateAddress(payload: Address & { user_id: string }): Promise<void> {
     const userDetails = await this.userRepository.findByuser_id(
       payload.user_id
     );
@@ -226,5 +228,98 @@ export class ClientUseCase {
       gender: clientDetails?.gender || "",
     });
     await this.clientRepository.update(updateData);
+  }
+
+  
+  async getLawyers(
+    filter: LawyerFilterParams
+  ): Promise<LawyerResponseDto | any> {
+    const {
+      search,
+      practiceAreas,
+      specialisation,
+      experienceMin,
+      experienceMax,
+      feeMin,
+      feeMax,
+      sortBy,
+      page,
+      limit,
+    } = filter;
+
+    const matchStage: any = {
+      experience: { $gte: experienceMin, $lte: experienceMax },
+      consultation_fee: { $gte: feeMin, $lte: feeMax },
+      verification_status: "verified",
+    };
+
+    if (practiceAreas) {
+      matchStage.practice_areas = {
+        $in: Array.isArray(practiceAreas) ? practiceAreas : [practiceAreas],
+      };
+    }
+    if (specialisation) {
+      matchStage.specialisation = {
+        $in: Array.isArray(specialisation) ? specialisation : [specialisation],
+      };
+    }
+
+    const sortStage: any = {};
+    switch (sortBy) {
+      case "experience":
+        sortStage.experience = -1;
+        break;
+      case "rating":
+        sortStage.rating = -1;
+        break;
+      case "fee-low":
+        sortStage.consultation_fee = 1;
+        break;
+      case "fee-high":
+        sortStage.consultation_fee = -1;
+        break;
+      default:
+        sortStage.createdAt = -1;
+    }
+    // console.log("match:", matchStage);
+    // console.log("sortStage:", sortStage);
+    // console.log("search:", search);
+    // console.log("page:", page);
+    // console.log("limit:", limit);
+    const allLawyers = await this.lawyerRepository.findAllLawyersWithQuery({
+      matchStage,
+      sortStage,
+      search,
+      page,
+      limit,
+    });
+    const lawyers = allLawyers.map(
+      (lawyer: any) =>
+        new LawyerResponseDto(
+          lawyer.user_id,
+          lawyer.user.name,
+          lawyer.user.email,
+          lawyer.user.is_blocked,
+          lawyer.user.createdAt,
+          lawyer.user?.mobile,
+          lawyer.user.role,
+          lawyer.client?.profile_image,
+          lawyer.client?.dob,
+          lawyer.client?.gender,
+          {
+            city: lawyer?.address?.city,
+            locality: lawyer?.address?.locality,
+            pincode: lawyer?.address?.pincode,
+            state: lawyer?.address?.state,
+          },
+          lawyer.barcouncil_number,
+          lawyer.verification_status,
+          lawyer.practice_areas,
+          lawyer.experience,
+          lawyer.specialisation,
+          lawyer.consultation_fee
+        )
+    );
+    return lawyers
   }
 }

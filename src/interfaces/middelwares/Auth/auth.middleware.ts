@@ -10,7 +10,7 @@ export const authenticateUser = (
   const token = req.headers.authorization
     ? req.headers.authorization.split(" ")[1]
     : null;
-  // console.log("token in authenticateUser", token);
+
   if (!token) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
@@ -18,12 +18,40 @@ export const authenticateUser = (
     });
     return;
   }
+
   try {
     const decode = verifyAccessToken(token);
+
+    if (req.url.startsWith("/api/admin") && (decode as any).role !== "admin") {
+      res.status(STATUS_CODES.FORBIDDEN).json({
+        success: false,
+        message: "You are not authorized to access this resource",
+      });
+      return;
+    }
+
+    if (
+      req.url.startsWith("/api/lawyer") &&
+      (decode as any).role !== "lawyer"
+    ) {
+      res.status(STATUS_CODES.FORBIDDEN).json({
+        success: false,
+        message: "You are not authorized to access this resource",
+      });
+      return;
+    }
+
+    if (req.url.startsWith("/api/client") && (decode as any).role == "admin") {
+      res.status(STATUS_CODES.FORBIDDEN).json({
+        success: false,
+        message: "You are not authorized to access this resource",
+      });
+      return
+    }
+
     req.user = decode;
     next();
   } catch (error: any) {
-    // console.log("error in authenticateUser",error)
     switch (error.message) {
       case "TOKEN_EXPIRED":
         res.status(STATUS_CODES.UNAUTHORIZED).json({

@@ -1,14 +1,17 @@
 import { Request, Response } from "express";
-import { ClientUseCase } from "../../application/usecases/client.usecase"; 
-import { ClientRepository } from "../../infrastructure/database/repo/client.repo"; 
-import { UserRepository } from "../../infrastructure/database/repo/user.repo"; 
-import { STATUS_CODES } from "../../infrastructure/constant/status.codes"; 
-import { AddressRepository } from "../../infrastructure/database/repo/address.repo"; 
+import { ClientUseCase } from "../../application/usecases/client.usecase";
+import { ClientRepository } from "../../infrastructure/database/repo/client.repo";
+import { UserRepository } from "../../infrastructure/database/repo/user.repo";
+import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
+import { AddressRepository } from "../../infrastructure/database/repo/address.repo";
+import { LawyerRepository } from "../../infrastructure/database/repo/lawyer.repo";
+import { LawyerFilterParams } from "../../domain/entities/Lawyer.entity";
 
 const clientusecase = new ClientUseCase(
-  new ClientRepository(),
   new UserRepository(),
-  new AddressRepository()
+  new ClientRepository(),
+  new AddressRepository(),
+  new LawyerRepository()
 );
 
 export const fetchClientData = async (
@@ -68,6 +71,7 @@ export const updateBasicInfo = async (
     });
     return;
   }
+
   const profile_image = req.file?.path;
   const user_id = req.user.id;
   // console.log(profile_image);
@@ -87,6 +91,7 @@ export const updateBasicInfo = async (
     });
     return;
   } catch (error: any) {
+    console.log(error);
     if (error.message) {
       switch (error.message) {
         case "USER_NOT_FOUND":
@@ -306,5 +311,56 @@ export const updateAddress = async (
           return;
       }
     }
+  }
+};
+
+export const getLawyers = async (req: Request, res: Response) => {
+  const {
+    search = "",
+    practiceAreas,
+    specialisation,
+    experienceMin = 0,
+    experienceMax = 25,
+    feeMin = 0,
+    feeMax = 10000,
+    sortBy = "recommended",
+    page = 1,
+    limit = 10,
+  } = req.query;
+
+  const filters: LawyerFilterParams = {
+    search: String(search),
+    practiceAreas: practiceAreas
+      ? Array.isArray(practiceAreas)
+        ? practiceAreas.map(String)
+        : [String(practiceAreas)]
+      : undefined,
+    specialisation: specialisation
+      ? Array.isArray(specialisation)
+        ? specialisation.map(String)
+        : [String(specialisation)]
+      : undefined,
+    experienceMin: Number(experienceMin),
+    experienceMax: Number(experienceMax),
+    feeMin: Number(feeMin),
+    feeMax: Number(feeMax),
+    sortBy: String(sortBy) as LawyerFilterParams["sortBy"],
+    page: Number(page),
+    limit: Number(limit),
+  };
+  try {
+    const lawyers = await clientusecase.getLawyers(filters);
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "lawyers fetch success",
+      data: lawyers,
+    });
+    return;
+  } catch (error) {
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: "Internal server Error",
+    });
+    return;
   }
 };
