@@ -4,6 +4,7 @@ import { ClientDto, ClientUpdateDto } from "../../dtos/client.dto";
 import { ResposeUserDto } from "../../dtos/user.dto";
 import { LawyerFilterParams } from "../../../domain/entities/Lawyer.entity";
 import { LawyerResponseDto } from "../../dtos/lawyer.dto";
+import { Review } from "../../../domain/entities/Review.entity";
 
 export interface I_clientUsecase {
   fetchClientData(user_id: string): Promise<any>;
@@ -18,5 +19,7 @@ export interface I_clientUsecase {
     password: string;
   }): Promise<ClientUpdateDto>;
   updateAddress(payload: Address & { user_id: string }): Promise<void>;
-  getLawyers(filter:LawyerFilterParams):Promise<LawyerResponseDto>
+  getLawyers(filter: LawyerFilterParams): Promise<LawyerResponseDto[] | []>;
+  getLawyer(user_id: string): Promise<LawyerResponseDto | null>;
+  addreview(payload: Review): Promise<void>;
 }

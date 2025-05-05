@@ -2,7 +2,13 @@ import express from "express";
 import { documentstorage } from "../middelwares/multer";
 import multer from "multer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
-import { fetchLawyer, verifyLawyer } from "../controller/lawyer.controller";
+import {
+  addBlockedSchedule,
+  deleteBlockedSchedule,
+  fetchAllBlockedSchedule,
+  fetchLawyer,
+  verifyLawyer,
+} from "../controller/lawyer.controller";
 
 const upload = multer({ storage: documentstorage });
 
@@ -18,7 +24,9 @@ router.post(
   ]),
   verifyLawyer
 );
-router.get('/',authenticateUser,fetchLawyer)
+router.get("/", authenticateUser, fetchLawyer);
+router.post("/schedule/block", authenticateUser, addBlockedSchedule);
+router.get("/schedule/block", authenticateUser, fetchAllBlockedSchedule);
+router.delete("/schedule/block/:id", authenticateUser, deleteBlockedSchedule);
 
-
-export default router
+export default router;

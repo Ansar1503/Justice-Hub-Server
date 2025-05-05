@@ -24,6 +24,9 @@ export class LawyerResponseDto implements Partial<Client>, Partial<User> {
     public practice_areas?: string[],
     public experience?: number,
     public specialisation?: string[],
-    public consultation_fee?: number
+    public consultation_fee?: number,
+    public description?: string,
+    public certificate_of_practice_number?:string,
+    public enrollment_certificate_number?:string,
   ) {}
 }

@@ -6,12 +6,14 @@ import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
 import { AddressRepository } from "../../infrastructure/database/repo/address.repo";
 import { LawyerRepository } from "../../infrastructure/database/repo/lawyer.repo";
 import { LawyerFilterParams } from "../../domain/entities/Lawyer.entity";
+import { ReviewRepo } from "../../infrastructure/database/repo/review.repo";
 
 const clientusecase = new ClientUseCase(
   new UserRepository(),
   new ClientRepository(),
   new AddressRepository(),
-  new LawyerRepository()
+  new LawyerRepository(),
+  new ReviewRepo()
 );
 
 export const fetchClientData = async (
@@ -362,5 +364,137 @@ export const getLawyers = async (req: Request, res: Response) => {
       message: "Internal server Error",
     });
     return;
+  }
+};
+
+export const getLawyerDetail = async (req: Request, res: Response) => {
+  const user_id = req.params.id;
+  if (!user_id) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "invalid credentials",
+    });
+    return;
+  }
+
+  try {
+    const response = await clientusecase.getLawyer(user_id);
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "lawyer data fetch successfull",
+      data: response || {},
+    });
+    return;
+  } catch (error: any) {
+    switch (error.message) {
+      case "USER_NOT_FOUND":
+        res.status(STATUS_CODES.NOT_FOUND).json({
+          success: false,
+          message: "lawyer not found",
+        });
+        return;
+      case "USER_BLOCKED":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "Lawyer is blocked",
+        });
+        return;
+      case "LAWYER_UNAVAILABLE":
+        res.status(STATUS_CODES.NOT_FOUND).json({
+          success: false,
+          message: "lawyer is unavailable at the moment",
+        });
+        return;
+      case "LAWYER_UNVERIFIED":
+        res
+          .status(STATUS_CODES.BAD_REQUEST)
+          .json({ success: false, message: "lawyer is not verified" });
+        return;
+      default:
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          messsage: "Internal Server Error",
+        });
+        return;
+    }
+  }
+};
+
+export const addReview = async (
+  req: Request & { user?: any },
+  res: Response
+) => {
+  const client_id = req.user.id;
+  if (!client_id) {
+    res.status(STATUS_CODES.FORBIDDEN).json({
+      success: false,
+      message: "unauthorised acces",
+    });
+    return;
+  }
+  const lawyer_id = req.body.lawyerId;
+  if (!lawyer_id) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "lawyer not found",
+    });
+    return;
+  }
+  const { review, rating } = req.body;
+  if (!review || !rating) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "please provide a review",
+    });
+    return;
+  }
+
+  try {
+    await clientusecase.addreview({ client_id, lawyer_id, rating, review });
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "review added",
+    });
+    return;
+  } catch (error: any) {
+    console.log(error);
+    switch (error.message) {
+      case "USER_EMPTY":
+        res.status(STATUS_CODES.NOT_FOUND).json({
+          success: false,
+          message: "user is not found",
+        });
+        return;
+      case "USER_UNVERIFIED":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "user email is not verified.",
+        });
+        return;
+      case "USER_BLOCKED":
+        res.status(STATUS_CODES.FORBIDDEN).json({
+          success: false,
+          message: "user is blocked",
+        });
+        return;
+      case "LAWYER_EMPTY":
+        res.status(STATUS_CODES.NOT_FOUND).json({
+          success: false,
+          message: "lawyer not found",
+        });
+        return;
+      case "LAWYER_UNVERIFIED":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "lawyer is not verified",
+        });
+        return;
+      default:
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "Internal server error",
+        });
+        return;
+    }
   }
 };

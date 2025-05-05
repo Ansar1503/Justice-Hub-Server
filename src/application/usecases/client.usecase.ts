@@ -10,14 +10,18 @@ import { ILawyerRepository } from "../../domain/I_repository/I_lawyer.repo";
 import { I_clientUsecase } from "./I_usecases/I_clientusecase";
 import { LawyerFilterParams } from "../../domain/entities/Lawyer.entity";
 import { LawyerResponseDto } from "../dtos/lawyer.dto";
+import { Review } from "../../domain/entities/Review.entity";
+import { IreviewRepo } from "../../domain/I_repository/I_review.repo";
 
 export class ClientUseCase implements I_clientUsecase {
   constructor(
     private userRepository: IUserRepository,
     private clientRepository: IClientRepository,
     private addressRepository: IAddressRepository,
-    private lawyerRepository: ILawyerRepository
+    private lawyerRepository: ILawyerRepository,
+    private reviewRepository: IreviewRepo
   ) {}
+
   async fetchClientData(user_id: string): Promise<any> {
     try {
       const userDetails = await this.userRepository.findByuser_id(user_id);
@@ -230,10 +234,9 @@ export class ClientUseCase implements I_clientUsecase {
     await this.clientRepository.update(updateData);
   }
 
-  
   async getLawyers(
     filter: LawyerFilterParams
-  ): Promise<LawyerResponseDto | any> {
+  ): Promise<LawyerResponseDto[] | []> {
     const {
       search,
       practiceAreas,
@@ -320,6 +323,64 @@ export class ClientUseCase implements I_clientUsecase {
           lawyer.consultation_fee
         )
     );
-    return lawyers
+    return lawyers;
+  }
+
+  async getLawyer(user_id: string): Promise<LawyerResponseDto | null> {
+    const user = await this.userRepository.findByuser_id(user_id);
+    if (!user) throw new Error("USER_NOT_FOUND");
+    if (user.is_blocked) throw new Error("USER_BLOCKED");
+    const client = await this.clientRepository.findByUserId(user_id);
+    const address = await this.addressRepository.find(user_id);
+    const lawyer = await this.lawyerRepository.findUserId(user_id);
+    if (!lawyer) throw new Error("LAWYER_UNAVAILABLE");
+    if (lawyer.verification_status !== "verified")
+      throw new Error("LAWYER_UNVERIFIED");
+    const responseData: LawyerResponseDto = {
+      createdAt: user.createdAt as Date,
+      email: user.email,
+      is_blocked: user.is_blocked as boolean,
+      mobile: user.mobile || "",
+      name: user.name,
+      role: user.role,
+      user_id,
+      Address: {
+        city: address?.city,
+        locality: address?.city,
+        pincode: address?.pincode,
+        state: address?.state,
+      },
+      barcouncil_number: lawyer.barcouncil_number,
+      consultation_fee: lawyer.consultation_fee,
+      dob: client?.dob,
+      experience: lawyer.experience,
+      gender: client?.gender as "male" | "female" | "others",
+      practice_areas: lawyer.practice_areas,
+      profile_image: client?.profile_image,
+      specialisation: lawyer.specialisation,
+      verification_status: lawyer.verification_status,
+      description: lawyer.description || "",
+      certificate_of_practice_number:
+        lawyer.certificate_of_practice_number || "",
+      enrollment_certificate_number: lawyer.enrollment_certificate_number || "",
+    };
+    return responseData;
+  }
+  async addreview(payload: Review): Promise<void> {
+    const user = await this.userRepository.findByuser_id(payload.client_id);
+    if (!user) throw new Error("USER_EMPTY");
+    if (!user.is_verified) throw new Error("USER_UNVERIFIED");
+    if (user.is_blocked) throw new Error("USER_BLOCKED");
+    const lawyer = await this.lawyerRepository.findUserId(payload.lawyer_id);
+    if (!lawyer) throw new Error("LAWYER_EMPTY");
+    if (lawyer.verification_status !== "verified")
+      throw new Error("LAWYER_UNVERIFIED");
+
+    try {
+      await this.reviewRepository.create(payload);
+      console.log("reaview added")
+    } catch (error: any) {
+      throw new Error(error.message);
+    }
   }
 }
