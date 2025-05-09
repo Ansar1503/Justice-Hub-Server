@@ -12,7 +12,7 @@
     "@types/node": "^22.13.10",
     "nodemon": "^3.1.9",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -41,6 +41,7 @@
     "nodemailer": "^6.10.0",
     "passport": "^0.7.0",
     "react-google-login": "^5.2.2",
+    "rrule": "^2.8.1",
     "uuid": "^11.1.0"
   }
 }

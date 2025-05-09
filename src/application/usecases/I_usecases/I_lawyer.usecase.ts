@@ -1,5 +1,10 @@
 import { lawyer } from "../../../domain/entities/Lawyer.entity";
-import { BlockedSchedule } from "../../../domain/entities/Schedule.entity";
+import {
+  BlockedSchedule,
+  Daytype,
+  ReccuringSchedule,
+  ScheduleSettings,
+} from "../../../domain/entities/Schedule.entity";
 
 export interface Ilawyerusecase {
   verifyLawyer(payload: lawyer): Promise<lawyer>;
@@ -7,4 +12,24 @@ export interface Ilawyerusecase {
   addBlockedSchedule(payload: BlockedSchedule): Promise<void>;
   fetchAllBlockedSchedule(lawyer_id: string): Promise<BlockedSchedule[] | []>;
   removeBlockedSchedule(id: string): Promise<void>;
+  addRecurringSchedule({
+    lawyer_id,
+    day,
+  }: {
+    lawyer_id: string;
+    day: Daytype;
+  }): Promise<void>;
+  fetchAllRecurringSlot(lawyer_id: string): Promise<ReccuringSchedule | null>;
+  removeRecurringSlot(lawyer_id: string, id: string): Promise<void>;
+  updateRecurringSlot(payload: {
+    lawyer_id: string;
+    startTime?: string;
+    endTime?: string;
+    active?: boolean;
+  }): Promise<void>;
+  timeStringToMinutes(time: string): number;
+  timeStringToMinutes(time: string): number;
+  updateSlotSettings(payload: ScheduleSettings): Promise<void>;
+  fetchSlotSettings(lawyer_id: string): Promise<ScheduleSettings | null>;
+  addAvailableSlots(lawyer_id: string, date: string): Promise<void>;
 }
