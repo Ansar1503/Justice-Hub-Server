@@ -5,6 +5,10 @@ import { ResposeUserDto } from "../../dtos/user.dto";
 import { LawyerFilterParams } from "../../../domain/entities/Lawyer.entity";
 import { LawyerResponseDto } from "../../dtos/lawyer.dto";
 import { Review } from "../../../domain/entities/Review.entity";
+import {
+  BlockedSchedule,
+  TimeSlot,
+} from "../../../domain/entities/Schedule.entity";
 
 export interface I_clientUsecase {
   fetchClientData(user_id: string): Promise<any>;
@@ -22,4 +26,16 @@ export interface I_clientUsecase {
   getLawyers(filter: LawyerFilterParams): Promise<LawyerResponseDto[] | []>;
   getLawyer(user_id: string): Promise<LawyerResponseDto | null>;
   addreview(payload: Review): Promise<void>;
+  fetchLawyerSlots(
+    lawyer_id: string,
+    weekStart: Date
+  ): Promise<{ slots: TimeSlot[] | []; blocks: BlockedSchedule[] | [] }>;
+  createCheckoutSession(
+    lawyer_id: string,
+    date: string,
+    timeSlot: string,
+    user_id: string
+  ): Promise<any>;
+  handleStripeHook(body: any, signature: string | string[]): Promise<any>;
+  fetchStripeSessionDetails(id: string): Promise<any>;
 }

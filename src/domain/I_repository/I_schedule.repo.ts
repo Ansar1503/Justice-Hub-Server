@@ -14,6 +14,11 @@ export interface IScheduleRepo {
     date: string
   ): Promise<BlockedSchedule | null>;
   findAllBlockedSchedule(lawyer_id: string): Promise<BlockedSchedule[] | []>;
+  fetchBlockedScheduleByWeek(
+    lawyer_id: string,
+    startWeek: Date,
+    endWeek: Date
+  ): Promise<BlockedSchedule[] | []>;
   addRecurringShedule(payload: {
     lawyer_id: string;
     day: Daytype;
@@ -40,4 +45,26 @@ export interface IScheduleRepo {
     lawyer_id: string,
     date: string
   ): Promise<TimeSlot | null>;
+  addAvailableTimeSlot(payload: {
+    lawyer_id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }): Promise<void>;
+  removeOneAvailableSlot(payload: {
+    lawyer_id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }): Promise<void>;
+  removeAllAvailableSlots(lawyer_id: string, date: string): Promise<void>;
+  updateAvailbleSlot(payload: {
+    prev: { date: string; startTime: string; endTime: string };
+    update: { key: "startTime" | "endTime"; value: string };
+  }): Promise<void>;
+  fetchAvailableSlotsByWeek(payload: {
+    lawyer_id: string;
+    startWeek: Date;
+    endWeek: Date;
+  }): Promise<TimeSlot[] | []>;
 }

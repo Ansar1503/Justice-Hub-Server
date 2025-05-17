@@ -4,6 +4,7 @@ import {
   Daytype,
   ReccuringSchedule,
   ScheduleSettings,
+  TimeSlot,
 } from "../../../domain/entities/Schedule.entity";
 
 export interface Ilawyerusecase {
@@ -32,4 +33,18 @@ export interface Ilawyerusecase {
   updateSlotSettings(payload: ScheduleSettings): Promise<void>;
   fetchSlotSettings(lawyer_id: string): Promise<ScheduleSettings | null>;
   addAvailableSlots(lawyer_id: string, date: string): Promise<void>;
+  fetchAvailableSlot(lawyer_id: string, date: string): Promise<TimeSlot | null>;
+  removeOneAvailableSlot(payload: {
+    lawyer_id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }): Promise<void>;
+  updateAvailableSlot(payload: {
+    lawyer_id: string;
+    prev: { date: string; startTime: string; endTime: string };
+    update: { key: "startTime" | "endTime"; value: string };
+  }): Promise<void>;
+  fetchAvailableSlotsByWeek(lawyer_id: string,weekStart:Date): Promise<{slots:TimeSlot[]|[],blocks:BlockedSchedule[]|[]}>;
+  
 }

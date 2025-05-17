@@ -57,6 +57,12 @@ const timeSlots = new Schema({
     {
       startTime: { type: String, required: true },
       endTime: { type: String, required: true },
+      status: {
+        type: String,
+        required: true,
+        enum: ["available", "cancelled", "booked"],
+        default: "available",
+      },
     },
   ],
 });

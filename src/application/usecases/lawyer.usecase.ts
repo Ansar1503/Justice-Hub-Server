@@ -4,6 +4,7 @@ import {
   Daytype,
   ReccuringSchedule,
   ScheduleSettings,
+  TimeSlot,
 } from "../../domain/entities/Schedule.entity";
 import { IClientRepository } from "../../domain/I_repository/I_client.repo";
 import { IDocumentsRepository } from "../../domain/I_repository/I_documents.repo";
@@ -101,6 +102,13 @@ export class LawyerUsecase implements Ilawyerusecase {
     if (lawyer.verification_status !== "verified") {
       throw new Error("LAWYER_UNVERIFIED");
     }
+    const existingAvailableSlot = await this.scheduleRepo.findAvailableTimeSlot(
+      lawyer.user_id,
+      payload.date
+    );
+    // console.log("payloaddate", payload.date);
+    // console.log("existinav", existingAvailableSlot);
+    if (existingAvailableSlot?.date) throw new Error("AVAILABLESLOTEXIST");
     const existingBlock = await this.scheduleRepo.findBlockedSchedule(
       lawyer.user_id,
       payload.date
@@ -308,38 +316,219 @@ export class LawyerUsecase implements Ilawyerusecase {
       "friday",
       "saturday",
     ];
-    const index = new Date(date).getDay();
+    const index = new Date(
+      new Date(date).getTime() +
+        Math.abs(new Date(date).getTimezoneOffset() * 60000)
+    ).getDay();
     const day = days[index];
 
     const recurringSlots = await this.scheduleRepo.findRecurringSchedule(
       lawyer_id,
       day
     );
+    if (recurringSlots) {
+      const reschedule = recurringSlots?.schedule?.filter(
+        (slot) => slot.day == day
+      )[0];
+      if (!reschedule?.active) throw new Error("RECURRINGINACTIVE");
+    }
+
     if (!recurringSlots) throw new Error("NORECURRING");
-    
+
     let startTime: string;
     let endTime: string;
-    
+
     const schedule = recurringSlots.schedule.filter(
       (slot) => slot.day === day
     )[0];
-
+    if (!schedule.active) throw new Error("NOTACTIVE");
     const availableslots = await this.scheduleRepo.findAvailableTimeSlot(
       lawyer_id,
       date
     );
+    if (!availableslots?.date) {
+      startTime = schedule.startTime;
+      const minutes = this.timeStringToMinutes(startTime);
+      endTime = this.minutesToTimeString(minutes + slotSettings.slotDuration);
+      if (endTime > schedule.endTime) throw new Error("TIMEEXCEEDED");
+      await this.scheduleRepo.addAvailableTimeSlot({
+        date,
+        lawyer_id,
+        startTime,
+        endTime,
+      });
+    } else if (
+      availableslots.timeSlots &&
+      availableslots.timeSlots.length > 0
+    ) {
+      const lastTime =
+        availableslots.timeSlots[availableslots.timeSlots.length - 1].endTime;
+      const minutes =
+        this.timeStringToMinutes(lastTime) + (slotSettings?.bufferTime || 0);
+      startTime = this.minutesToTimeString(minutes);
+      endTime = this.minutesToTimeString(minutes + slotSettings.slotDuration);
+      if (endTime > schedule.endTime) throw new Error("TIMEEXCEEDED");
+      await this.scheduleRepo.addAvailableTimeSlot({
+        date,
+        lawyer_id,
+        startTime,
+        endTime,
+      });
+    }
+  }
 
-    
+  async fetchAvailableSlot(
+    lawyer_id: string,
+    date: string
+  ): Promise<TimeSlot | null> {
+    const user = await this.userRepo.findByuser_id(lawyer_id);
+    if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
+    const lawyer = await this.lawyerRepo.findUserId(lawyer_id);
+    if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (lawyer.verification_status !== "verified")
+      throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
+    const timeSlots = await this.scheduleRepo.findAvailableTimeSlot(
+      lawyer_id,
+      date
+    );
+    return timeSlots;
+  }
 
-    // if (availableslots?.timeSlots && availableslots.timeSlots.length > 0) {
-    //   const lastTime =
-    //     availableslots.timeSlots[availableslots.timeSlots.length - 1];
-    // } else {
-    //   startTime = schedule.startTime;
-    //   const minutes = this.timeStringToMinutes(startTime);
-    //   const endTime = this.minutesToTimeString(
-    //     minutes + slotSettings.slotDuration
-    //   );
-    // }
+  async removeOneAvailableSlot(payload: {
+    lawyer_id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
+  }): Promise<void> {
+    const user = await this.userRepo.findByuser_id(payload.lawyer_id);
+    if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
+    const lawyer = await this.lawyerRepo.findUserId(payload.lawyer_id);
+    if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (lawyer.verification_status !== "verified")
+      throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
+    await this.scheduleRepo.removeOneAvailableSlot(payload);
+    const updatedDoc = await this.scheduleRepo.findAvailableTimeSlot(
+      payload.lawyer_id,
+      payload.date
+    );
+
+    if (updatedDoc && updatedDoc.timeSlots.length === 0) {
+      await this.scheduleRepo.removeAllAvailableSlots(
+        payload.lawyer_id,
+        payload.date
+      );
+    }
+  }
+
+  async updateAvailableSlot(payload: {
+    lawyer_id: string;
+    prev: { date: string; startTime: string; endTime: string };
+    update: { key: "startTime" | "endTime"; value: string };
+  }): Promise<void> {
+    const user = await this.userRepo.findByuser_id(payload.lawyer_id);
+    if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
+    const lawyer = await this.lawyerRepo.findUserId(payload.lawyer_id);
+    if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (lawyer.verification_status !== "verified")
+      throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
+    const settings = await this.scheduleRepo.fetchScheduleSettings(
+      lawyer.user_id
+    );
+    if (!settings) throw new Error("NOSETTINGS");
+    const existingAvailableSlot = await this.scheduleRepo.findAvailableTimeSlot(
+      payload.lawyer_id,
+      payload.prev.date
+    );
+    if (!existingAvailableSlot) throw new Error("NOAVAILABLESLOT");
+    let slotExist = false;
+    for (let i = 0; i < existingAvailableSlot.timeSlots.length; i++) {
+      if (
+        existingAvailableSlot.timeSlots[i].startTime ==
+          payload.prev.startTime &&
+        existingAvailableSlot.timeSlots[i].endTime == payload.prev.endTime
+      ) {
+        slotExist = true;
+      }
+    }
+    if (!slotExist) throw new Error("NOAVAILABLESLOT");
+    const days: Daytype[] = [
+      "sunday",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+    ];
+    const index = new Date(payload.prev.date).getDay();
+    const day = days[index];
+    const recurringSlot = await this.scheduleRepo.findRecurringSchedule(
+      payload.lawyer_id,
+      day
+    );
+
+    if (!recurringSlot) throw new Error("NORECURRING");
+    const schedule = recurringSlot.schedule.filter(
+      (slot) => slot.day === day
+    )[0];
+    if (!schedule.active) throw new Error("NORECURRING");
+    const updateMinutes = this.timeStringToMinutes(payload.update.value);
+    const existingStrartMinutes = this.timeStringToMinutes(schedule.startTime);
+    const existingEndMinutes = this.timeStringToMinutes(schedule.endTime);
+    // console.log("update minutes :", updateMinutes);
+    // console.log("existing start minutes :", existingStrartMinutes);
+    // console.log("existing end minutes :", existingEndMinutes);
+    if (payload.update.key === "startTime") {
+      if (updateMinutes < existingStrartMinutes) {
+        throw new Error("RECURRINGSTART");
+      }
+      if (
+        Math.abs(updateMinutes - existingEndMinutes) != settings.slotDuration
+      ) {
+        throw new Error("SLOTDURATIONMAX");
+      }
+    }
+    if (payload.update.key === "endTime") {
+      if (updateMinutes > existingEndMinutes) {
+        throw new Error("RECURRINGEND");
+      }
+    }
+  }
+  async fetchAvailableSlotsByWeek(
+    lawyer_id: string,
+    weekStart: Date
+  ): Promise<{ slots: TimeSlot[] | []; blocks: BlockedSchedule[] | [] }> {
+    const user = await this.userRepo.findByuser_id(lawyer_id);
+    if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
+    const lawyer = await this.lawyerRepo.findUserId(lawyer_id);
+    if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (lawyer.verification_status !== "verified")
+      throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
+    const startOfWeek = new Date(
+      weekStart.getTime() + Math.abs(weekStart.getTimezoneOffset() * 60000)
+    );
+    const endOfWeek = new Date(
+      startOfWeek.getFullYear(),
+      startOfWeek.getMonth(),
+      startOfWeek.getDate() + 7
+    );
+    // console.log("start", startOfWeek);
+    // console.log("end", endOfWeek);
+    const slots = await this.scheduleRepo.fetchAvailableSlotsByWeek({
+      lawyer_id,
+      startWeek: startOfWeek,
+      endWeek: endOfWeek,
+    });
+
+    const blocks = await this.scheduleRepo.fetchBlockedScheduleByWeek(
+      lawyer_id,
+      startOfWeek,
+      endOfWeek
+    );
+    return { slots, blocks };
   }
 }

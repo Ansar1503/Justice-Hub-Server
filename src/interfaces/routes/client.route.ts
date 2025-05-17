@@ -1,9 +1,13 @@
 import express from "express";
 import {
   addReview,
+  createCheckoutSession,
   fetchClientData,
+  fetchStripeSessionDetails,
   getLawyerDetail,
   getLawyers,
+  getLawyerSlotDetais,
+  handleWebhooks,
   sendVerifyMail,
   updateAddress,
   updateBasicInfo,
@@ -31,6 +35,14 @@ router.put("/profile/updatePassword", authenticateUser, updatePassword);
 router.post("/profile/address", authenticateUser, updateAddress);
 router.get("/lawyers", authenticateUser, getLawyers);
 router.get("/lawyers/:id", authenticateUser, getLawyerDetail);
-router.post("/lawyers/review/",authenticateUser,addReview)
+router.post("/lawyers/review/", authenticateUser, addReview);
+router.get("/lawyers/slots/:id", authenticateUser, getLawyerSlotDetais);
+router.post(
+  "/lawyer/slots/checkout-session/",
+  authenticateUser,
+  createCheckoutSession
+);
+router.get("/stripe/success/:id", authenticateUser,fetchStripeSessionDetails);
+router.post("/stripe/webhooks", authenticateUser, handleWebhooks);
 
 export default router;

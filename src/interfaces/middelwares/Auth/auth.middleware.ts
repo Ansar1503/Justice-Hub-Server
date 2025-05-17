@@ -21,7 +21,6 @@ export const authenticateUser = (
 
   try {
     const decode = verifyAccessToken(token);
-
     if (req.url.startsWith("/api/admin") && (decode as any).role !== "admin") {
       res.status(STATUS_CODES.FORBIDDEN).json({
         success: false,
@@ -46,7 +45,7 @@ export const authenticateUser = (
         success: false,
         message: "You are not authorized to access this resource",
       });
-      return
+      return;
     }
 
     req.user = decode;

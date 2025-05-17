@@ -12,6 +12,18 @@ import { LawyerFilterParams } from "../../domain/entities/Lawyer.entity";
 import { LawyerResponseDto } from "../dtos/lawyer.dto";
 import { Review } from "../../domain/entities/Review.entity";
 import { IreviewRepo } from "../../domain/I_repository/I_review.repo";
+import {
+  TimeSlot,
+  BlockedSchedule,
+  Daytype,
+} from "../../domain/entities/Schedule.entity";
+import { ERRORS } from "../../infrastructure/constant/errors";
+import { IScheduleRepo } from "../../domain/I_repository/I_schedule.repo";
+import {
+  getSessionDetails,
+  getStripeSession,
+  handleStripeWebHook,
+} from "../services/stripe.service";
 
 export class ClientUseCase implements I_clientUsecase {
   constructor(
@@ -19,7 +31,8 @@ export class ClientUseCase implements I_clientUsecase {
     private clientRepository: IClientRepository,
     private addressRepository: IAddressRepository,
     private lawyerRepository: ILawyerRepository,
-    private reviewRepository: IreviewRepo
+    private reviewRepository: IreviewRepo,
+    private scheduleRepo: IScheduleRepo
   ) {}
 
   async fetchClientData(user_id: string): Promise<any> {
@@ -378,9 +391,128 @@ export class ClientUseCase implements I_clientUsecase {
 
     try {
       await this.reviewRepository.create(payload);
-      console.log("reaview added")
+      console.log("reaview added");
     } catch (error: any) {
       throw new Error(error.message);
     }
+  }
+  async fetchLawyerSlots(
+    lawyer_id: string,
+    weekStart: Date
+  ): Promise<{ slots: TimeSlot[] | []; blocks: BlockedSchedule[] | [] }> {
+    const user = await this.userRepository.findByuser_id(lawyer_id);
+    if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
+    const lawyer = await this.lawyerRepository.findUserId(lawyer_id);
+    if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (lawyer.verification_status !== "verified")
+      throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
+    const startOfWeek = new Date(
+      weekStart.getTime() + Math.abs(weekStart.getTimezoneOffset() * 60000)
+    );
+    const endOfWeek = new Date(
+      startOfWeek.getFullYear(),
+      startOfWeek.getMonth(),
+      startOfWeek.getDate() + 7
+    );
+    // console.log("start", startOfWeek);
+    // console.log("end", endOfWeek);
+    const slots = await this.scheduleRepo.fetchAvailableSlotsByWeek({
+      lawyer_id,
+      startWeek: startOfWeek,
+      endWeek: endOfWeek,
+    });
+
+    const blocks = await this.scheduleRepo.fetchBlockedScheduleByWeek(
+      lawyer_id,
+      startOfWeek,
+      endOfWeek
+    );
+    console.log("slots", { slots, blocks });
+    return { slots, blocks };
+  }
+  async createCheckoutSession(
+    lawyer_id: string,
+    date: string,
+    timeSlot: string,
+    user_id: string
+  ): Promise<any> {
+    const clientUser = await this.userRepository.findByuser_id(user_id);
+    if (!clientUser) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (clientUser.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
+    const user = await this.userRepository.findByuser_id(lawyer_id);
+    if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
+    const client = await this.clientRepository.findByUserId(lawyer_id);
+    const lawyer = await this.lawyerRepository.findUserId(lawyer_id);
+    if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (lawyer.verification_status !== "verified")
+      throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
+
+    const timeSlots = timeSlot.split("-");
+    const startTime = timeSlots[0];
+    const endTime = timeSlots[1];
+    const availableslots = await this.scheduleRepo.findAvailableTimeSlot(
+      lawyer_id,
+      date
+    );
+    if (!availableslots) throw new Error("SLOTSNOTAVAILABLE");
+    const avalableslot = availableslots.timeSlots.find(
+      (slot) => slot.startTime === startTime && slot.endTime === endTime
+    );
+    if (!avalableslot) throw new Error("SLOTSNOTAVAILABLE");
+    const blockeddate = await this.scheduleRepo.findBlockedSchedule(
+      lawyer_id,
+      date
+    );
+    if (blockeddate?.date) throw new Error("SLOTBLOCKED");
+    const days: Daytype[] = [
+      "sunday",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+    ];
+    const index = new Date(date).getDay();
+    const day = days[index];
+    const recurringSlots = await this.scheduleRepo.findRecurringSchedule(
+      lawyer_id,
+      day
+    );
+    if (recurringSlots) {
+      const schedule = recurringSlots.schedule.filter(
+        (slot) => slot.day == day
+      )[0];
+      if (schedule && !schedule.active) throw new Error("INACTIVESLOT");
+    }
+    const session = await getStripeSession({
+      amount: lawyer.consultation_fee,
+      lawyer_name: user.name,
+      profile_image: client?.profile_image || "",
+      date,
+      slot: timeSlot,
+      userEmail: clientUser.email,
+    });
+
+    return session;
+  }
+
+  async handleStripeHook(
+    body: any,
+    signature: string | string[]
+  ): Promise<any> {
+    await handleStripeWebHook(body, signature);
+  }
+  async fetchStripeSessionDetails(id: string): Promise<any> {
+    const sessionDetails = await getSessionDetails(id);
+    // console.log("sessionDetails", sessionDetails);
+    return {
+      lawyer: sessionDetails?.metadata?.lawyer_name,
+      slot: sessionDetails?.metadata?.slot,
+      date: sessionDetails?.metadata?.date,
+      amount: sessionDetails?.metadata?.amount,
+    };
   }
 }

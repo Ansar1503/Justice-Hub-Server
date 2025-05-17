@@ -21,12 +21,12 @@ export const profilestorage = new CloudinaryStorage({
 
 export const documentstorage = new CloudinaryStorage({
   cloudinary,
-  params:async(req,file)=>{
+  params: async (req, file) => {
     return {
-      folder:"Justice_Hub/documents",
-      allowed_formats:["jpg", "jpeg", "png", "webp","pdf"],
-    }
-  }
-})
+      folder: "Justice_Hub/documents",
+      allowed_formats: ["jpg", "jpeg", "png", "webp", "pdf"],
+    };
+  },
+});
 
 export { cloudinary };

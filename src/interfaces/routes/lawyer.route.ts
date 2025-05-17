@@ -8,10 +8,14 @@ import {
   addRecurringSchedule,
   deleteBlockedSchedule,
   fetchAllBlockedSchedule,
+  fetchAvailableSlot,
+  fetchAvailableSlotWeek,
   fetchLawyer,
   fetchSlotSettings,
   getAllRecurringSlot,
   removeBlockedSchedule,
+  removeOneAvailableSlot,
+  updateAvailableSlot,
   updateRecurringSchedule,
   updateSlotSettings,
   verifyLawyer,
@@ -46,5 +50,18 @@ router.patch("/schedule/recurring", authenticateUser, updateRecurringSchedule);
 router.patch("/schedule/settings", authenticateUser, updateSlotSettings);
 router.get("/schedule/settings", authenticateUser, fetchSlotSettings);
 router.post("/scheule/availableslot", authenticateUser, addAvailableSlot);
+router.get("/schedule/availableslot", authenticateUser, fetchAvailableSlot);
+router.patch(
+  "/schedule/availableslot/d",
+  authenticateUser,
+  removeOneAvailableSlot
+);
+router.patch("/schedule/availableslot", authenticateUser, updateAvailableSlot);
+router.get(
+  "/schedule/availableslot/week/:week",
+  authenticateUser,
+  fetchAvailableSlotWeek
+);
+
 
 export default router;

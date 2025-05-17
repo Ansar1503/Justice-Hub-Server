@@ -7,13 +7,16 @@ import { AddressRepository } from "../../infrastructure/database/repo/address.re
 import { LawyerRepository } from "../../infrastructure/database/repo/lawyer.repo";
 import { LawyerFilterParams } from "../../domain/entities/Lawyer.entity";
 import { ReviewRepo } from "../../infrastructure/database/repo/review.repo";
+import { ScheduleRepository } from "../../infrastructure/database/repo/schedule.repo";
+import { ERRORS } from "../../infrastructure/constant/errors";
 
 const clientusecase = new ClientUseCase(
   new UserRepository(),
   new ClientRepository(),
   new AddressRepository(),
   new LawyerRepository(),
-  new ReviewRepo()
+  new ReviewRepo(),
+  new ScheduleRepository()
 );
 
 export const fetchClientData = async (
@@ -30,7 +33,6 @@ export const fetchClientData = async (
   }
   try {
     const clientDetails = await clientusecase.fetchClientData(user_id);
-    // while(true){}
     res.status(STATUS_CODES.OK).json({
       success: true,
       message: "Client Data fetched Successfully",
@@ -376,7 +378,6 @@ export const getLawyerDetail = async (req: Request, res: Response) => {
     });
     return;
   }
-
   try {
     const response = await clientusecase.getLawyer(user_id);
     res.status(STATUS_CODES.OK).json({
@@ -498,3 +499,154 @@ export const addReview = async (
     }
   }
 };
+
+export async function getLawyerSlotDetais(req: Request, res: Response) {
+  const { id: lawyer_id } = req.params;
+  const { week } = req.query;
+
+  if (!lawyer_id || !week) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "Invalid Credentials",
+    });
+    return;
+  }
+
+  try {
+    const weekStart = new Date(
+      new Date(week as string).getTime() +
+        Math.abs(new Date(week as string).getTimezoneOffset() * 60000)
+    );
+    const result = await clientusecase.fetchLawyerSlots(lawyer_id, weekStart);
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "lawyer slots fetched successfully",
+      data: result,
+    });
+    return;
+  } catch (error: any) {
+    switch (error.message) {
+      case ERRORS.USER_NOT_FOUND:
+        res.status(STATUS_CODES.NOT_FOUND).json({
+          success: false,
+          message: "user not found",
+        });
+        return;
+      case ERRORS.USER_BLOCKED:
+        res.status(STATUS_CODES.FORBIDDEN).json({
+          success: false,
+          message: "user is blocked",
+        });
+        return;
+      case ERRORS.LAWYER_NOT_VERIFIED:
+        res
+          .status(STATUS_CODES.BAD_REQUEST)
+          .json({ success: false, message: "lawyer is not verified" });
+        return;
+      default:
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "Internal Server Error",
+        });
+        return;
+    }
+  }
+}
+
+export async function createCheckoutSession(
+  req: Request & { user?: any },
+  res: Response
+) {
+  const user_id = req.user.id;
+  // console.log("req.bod", req.body);
+  const { lawyer_id, date, timeSlot } = req.body;
+  if (!lawyer_id || !date || !timeSlot) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "Invalid Ceredentaiols",
+    });
+    return;
+  }
+  try {
+    const response = await clientusecase.createCheckoutSession(
+      lawyer_id,
+      date,
+      timeSlot,
+      user_id
+    );
+    res.status(STATUS_CODES.OK).json(response);
+    return;
+  } catch (error: any) {
+    console.log("error:", error);
+    switch (error.message) {
+      case ERRORS.USER_NOT_FOUND:
+        res.status(STATUS_CODES.NOT_FOUND).json({
+          success: false,
+          message: "user not found",
+        });
+        return;
+      case ERRORS.USER_BLOCKED:
+        res.status(STATUS_CODES.FORBIDDEN).json({
+          success: false,
+          message: "user is blocked",
+        });
+        return;
+      case ERRORS.LAWYER_NOT_VERIFIED:
+        res
+          .status(STATUS_CODES.BAD_REQUEST)
+          .json({ success: false, message: "lawyer is not verified" });
+        return;
+      default:
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "Internal Server Error",
+        });
+        return;
+    }
+  }
+}
+
+export async function handleWebhooks(req: Request, res: Response) {
+  const signature = req.headers["stripe-signature"];
+  if (!signature) return;
+  try {
+    const response = await clientusecase.handleStripeHook(req.body, signature);
+    res.status(200).send("Webhook received");
+    return;
+  } catch (error) {
+    console.error("Webhook error:", error);
+    res.status(400).send("Webhook error");
+    return;
+  }
+}
+
+export async function fetchStripeSessionDetails(req: Request, res: Response) {
+  const session_id = req.params.id;
+  console.log("sessionid", session_id);
+  if (!session_id) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "please provide session id",
+    });
+    return;
+  }
+  try {
+    const response = await clientusecase.fetchStripeSessionDetails(session_id);
+    res.status(STATUS_CODES.OK).json(response);
+    return;
+  } catch (error: any) {
+    switch (error.message) {
+      case "SECRETKEYNOTFOUND":
+        res
+          .status(STATUS_CODES.BAD_REQUEST)
+          .json({ success: false, message: "SecretKey Not Found" });
+        return;
+      default:
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "Internal Server Error",
+        });
+        return;
+    }
+  }
+}

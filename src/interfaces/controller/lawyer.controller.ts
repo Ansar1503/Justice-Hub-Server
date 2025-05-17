@@ -8,6 +8,8 @@ import { DocumentsRepo } from "../../infrastructure/database/repo/documents.repo
 import { lawyer, LawyerDocuments } from "../../domain/entities/Lawyer.entity";
 import { ScheduleRepository } from "../../infrastructure/database/repo/schedule.repo";
 import { Daytype } from "../../domain/entities/Schedule.entity";
+import { ERRORS } from "../../infrastructure/constant/errors";
+import { format } from "date-fns";
 
 const lawyerUseCase = new LawyerUsecase(
   new UserRepository(),
@@ -156,6 +158,8 @@ export const addBlockedSchedule = async (
     return;
   }
   try {
+    console.log("date;", date);
+    // return
     await lawyerUseCase.addBlockedSchedule({ date, lawyer_id, reason });
     res.status(STATUS_CODES.OK).json({
       success: true,
@@ -192,6 +196,12 @@ export const addBlockedSchedule = async (
         res.status(STATUS_CODES.FORBIDDEN).json({
           success: false,
           message: "user is blocked",
+        });
+        return;
+      case "AVAILABLESLOTEXIST":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "available slot exists, check the available slots",
         });
         return;
       default:
@@ -447,20 +457,43 @@ export const updateRecurringSchedule = async (
   req: Request & { user?: any },
   res: Response
 ) => {
-  const lawyer_id = req.user.id;
-  const { active, startTime, endTime, day } = req.body;
+  const lawyer_id = req.user?.id;
+  const { key, value, day } = req.body;
 
-  if (!day) {
+  if (!lawyer_id || !day) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
-      message: "Invalid Credentials",
+      message: "Invalid credentials",
     });
     return;
   }
-  if (active == undefined && !startTime && !endTime) {
+
+  let active: boolean | undefined;
+  let startTime: string | undefined;
+  let endTime: string | undefined;
+
+  switch (key) {
+    case "active":
+      active = value;
+      break;
+    case "startTime":
+      startTime = value;
+      break;
+    case "endTime":
+      endTime = value;
+      break;
+    default:
+      res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: "Invalid key provided",
+      });
+      return;
+  }
+
+  if (active === undefined && !startTime && !endTime) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
-      message: "invalid credentials",
+      message: "Invalid update parameters",
     });
     return;
   }
@@ -473,75 +506,59 @@ export const updateRecurringSchedule = async (
       startTime,
       endTime,
     });
+
     res.status(STATUS_CODES.OK).json({
       success: true,
-      message: "recurr slot updated",
+      message: "Recurring slot updated",
     });
     return;
   } catch (error: any) {
-    switch (error.message) {
-      case "LAWYER_NOT_FOUND":
-        res.status(STATUS_CODES.NOT_FOUND).json({
-          success: false,
-          message: "lawyer not found",
-        });
-        return;
-      case "LAWYER_UNVERIFIED":
-        res.status(STATUS_CODES.FORBIDDEN).json({
-          success: false,
-          message: "lawyer not verified",
-        });
-        return;
-      case "USER_NOT_FOUND":
-        res.status(STATUS_CODES.NOT_FOUND).json({
-          success: false,
-          message: "lawyer not found",
-        });
-        return;
-      case "USER_BLOCKED":
-        res.status(STATUS_CODES.FORBIDDEN).json({
-          success: false,
-          message: "user is blocked",
-        });
-        return;
-      case "SLOTSETTINGNOTEXIST":
-        res.status(STATUS_CODES.BAD_REQUEST).json({
-          success: false,
-          message: "slot settings doesnt exist please set settings first.",
-        });
-        return;
-      case "SLOTNOTEXIST":
-        res.status(STATUS_CODES.BAD_REQUEST).json({
-          success: false,
-          message: "slot doesnt exist",
-        });
-        return;
-      case "DURATION_NOT_ENOUGH":
-        res.status(STATUS_CODES.BAD_REQUEST).json({
-          success: false,
-          message:
-            "duration atleast meet settings slot duration + buffer period  ",
-        });
-        return;
-      case "STARTENDCONFLICT":
-        res.status(STATUS_CODES.BAD_REQUEST).json({
-          success: false,
-          message: "start time cannot be greater than end time",
-        });
-        return;
-      case "MINHOUR":
-        res.status(STATUS_CODES.BAD_REQUEST).json({
-          success: false,
-          message: "min 1 hour is required",
-        });
-        return;
-      default:
-        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-          success: false,
-          message: "Internal Server Error",
-        });
-        return;
-    }
+    const errorMap: Record<string, { status: number; message: string }> = {
+      LAWYER_NOT_FOUND: {
+        status: STATUS_CODES.NOT_FOUND,
+        message: "Lawyer not found",
+      },
+      USER_NOT_FOUND: {
+        status: STATUS_CODES.NOT_FOUND,
+        message: "Lawyer not found",
+      },
+      LAWYER_UNVERIFIED: {
+        status: STATUS_CODES.FORBIDDEN,
+        message: "Lawyer not verified",
+      },
+      USER_BLOCKED: {
+        status: STATUS_CODES.FORBIDDEN,
+        message: "User is blocked",
+      },
+      SLOTSETTINGNOTEXIST: {
+        status: STATUS_CODES.BAD_REQUEST,
+        message: "Slot settings do not exist. Please set settings first.",
+      },
+      SLOTNOTEXIST: {
+        status: STATUS_CODES.BAD_REQUEST,
+        message: "Slot does not exist",
+      },
+      DURATION_NOT_ENOUGH: {
+        status: STATUS_CODES.BAD_REQUEST,
+        message: "Duration must at least meet slot duration + buffer period.",
+      },
+      STARTENDCONFLICT: {
+        status: STATUS_CODES.BAD_REQUEST,
+        message: "Start time cannot be greater than end time",
+      },
+      MINHOUR: {
+        status: STATUS_CODES.BAD_REQUEST,
+        message: "Minimum 1 hour is required",
+      },
+    };
+
+    const mappedError = errorMap[error.message];
+
+    res.status(mappedError?.status || STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: mappedError?.message || "Internal Server Error",
+    });
+    return;
   }
 };
 
@@ -661,7 +678,325 @@ export const addAvailableSlot = async (
       });
       return;
     }
- 
+
     await lawyerUseCase.addAvailableSlots(lawyer_id, date);
-  } catch (error) {}
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "available time slot added",
+      data: { date },
+    });
+    return;
+  } catch (error: any) {
+    switch (error.message) {
+      case ERRORS.USER_NOT_FOUND:
+        res.status(STATUS_CODES.NOT_FOUND).json({
+          success: false,
+          message: "user not found",
+        });
+        return;
+      case ERRORS.USER_BLOCKED:
+        res.status(STATUS_CODES.FORBIDDEN).json({
+          success: false,
+          message: "user is blocked",
+        });
+        return;
+      case ERRORS.LAWYER_NOT_VERIFIED:
+        res
+          .status(STATUS_CODES.BAD_REQUEST)
+          .json({ success: false, message: "lawyer is not verified" });
+        return;
+      case "SLOTBLOCKED":
+        res
+          .status(STATUS_CODES.BAD_REQUEST)
+          .json({ success: false, message: "slot is blocked" });
+        return;
+      case "SLOTSETTINGSNOTEXIST":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "slot settings doesnt exist, add settings",
+        });
+        return;
+      case "NORECURRING":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "no recurring slots found, add recurring slots",
+        });
+        return;
+      case "NOTACTIVE":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "recurring day is not active",
+        });
+        return;
+      case "TIMEEXCEEDED":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          succeess: false,
+          message: "time limit is reached",
+        });
+        return;
+      default:
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "Internal Server Error",
+        });
+        return;
+    }
+  }
+};
+
+export const fetchAvailableSlot = async (
+  req: Request & { user?: any },
+  res: Response
+) => {
+  try {
+    const lawyer_id = req.user.id;
+    let { date } = req.query;
+    console.log("date in fetch slot contorleer", date);
+    if (!date) {
+      res.status(STATUS_CODES.BAD_REQUEST).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+      return;
+    }
+    const data = await lawyerUseCase.fetchAvailableSlot(
+      lawyer_id,
+      date as string
+    );
+    // console.log("data:", data);
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "fetch available slots",
+      data,
+    });
+    return;
+  } catch (error: any) {
+    switch (error.message) {
+      case ERRORS.USER_NOT_FOUND:
+        res.status(STATUS_CODES.NOT_FOUND).json({
+          success: false,
+          message: "user not found",
+        });
+        return;
+      case ERRORS.USER_BLOCKED:
+        res.status(STATUS_CODES.FORBIDDEN).json({
+          success: false,
+          message: "user is blocked",
+        });
+        return;
+      case ERRORS.LAWYER_NOT_VERIFIED:
+        res
+          .status(STATUS_CODES.BAD_REQUEST)
+          .json({ success: false, message: "lawyer is not verified" });
+        return;
+      default:
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "Internal Server Error",
+        });
+        return;
+    }
+  }
+};
+
+export const removeOneAvailableSlot = async (
+  req: Request & { user?: any },
+  res: Response
+) => {
+  const lawyer_id = req.user.id;
+  // console.log("req", req.body);
+  const { date, startTime, endTime } = req.body;
+  if (!date) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "date is required, select a date",
+    });
+    return;
+  }
+  if (!startTime || !endTime) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "Invalid credentials",
+    });
+    return;
+  }
+  try {
+    await lawyerUseCase.removeOneAvailableSlot({
+      lawyer_id,
+      date,
+      startTime,
+      endTime,
+    });
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "removed slot",
+    });
+    return;
+  } catch (error: any) {
+    switch (error.message) {
+      case ERRORS.USER_NOT_FOUND:
+        res.status(STATUS_CODES.NOT_FOUND).json({
+          success: false,
+          message: "user not found",
+        });
+        return;
+      case ERRORS.USER_BLOCKED:
+        res.status(STATUS_CODES.FORBIDDEN).json({
+          success: false,
+          message: "user is blocked",
+        });
+        return;
+      case ERRORS.LAWYER_NOT_VERIFIED:
+        res
+          .status(STATUS_CODES.BAD_REQUEST)
+          .json({ success: false, message: "lawyer is not verified" });
+        return;
+      default:
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "Internal Server Error",
+        });
+        return;
+    }
+  }
+};
+
+export const updateAvailableSlot = async (
+  req: Request & { user?: any },
+  res: Response
+) => {
+  const lawyer_id = req.user.id;
+  const { prev, update } = req.body;
+  if (
+    !prev?.date ||
+    !prev?.startTime ||
+    !prev?.endTime ||
+    !update?.key ||
+    !update?.value
+  ) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "Invalid credentials",
+    });
+    return;
+  }
+
+  try {
+    await lawyerUseCase.updateAvailableSlot({ lawyer_id, prev, update });
+  } catch (error: any) {
+    switch (error.message) {
+      case ERRORS.USER_NOT_FOUND:
+        res.status(STATUS_CODES.NOT_FOUND).json({
+          success: false,
+          message: "user not found",
+        });
+        return;
+      case ERRORS.USER_BLOCKED:
+        res.status(STATUS_CODES.FORBIDDEN).json({
+          success: false,
+          message: "user is blocked",
+        });
+        return;
+      case ERRORS.LAWYER_NOT_VERIFIED:
+        res
+          .status(STATUS_CODES.BAD_REQUEST)
+          .json({ success: false, message: "lawyer is not verified" });
+        return;
+      case "NOAVAILABLESLOT":
+        res.status(STATUS_CODES.NOT_FOUND).json({
+          success: false,
+          message: "no existing availble slot in this date",
+        });
+        return;
+      case "RECURRINGSTART":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "start time should be abov erecurring start time ",
+        });
+        return;
+      case "RECURRINGEND":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "end time should not be above recurring end Time",
+        });
+        return;
+      case "NOSETTINGS":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          messsage: "slot settings not available",
+        });
+        return;
+      case "SLOTDURATIONMAX":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "slot duration exceeded",
+        });
+        return;
+      default:
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "Internal Server Error",
+        });
+        return;
+    }
+  }
+};
+
+export const fetchAvailableSlotWeek = async (
+  req: Request & { user?: any },
+  res: Response
+) => {
+  const lawyer_id = req.user?.id;
+  const week = req.params.week;
+  console.log(req.query);
+  if (!week) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "Invalid credentials",
+    });
+    return;
+  }
+  try {
+    const weekStart = new Date(
+      new Date(week as string).getTime() +
+        Math.abs(new Date(week as string).getTimezoneOffset() * 60000)
+    );
+    // console.log("weekstart", weekStart);
+    const slots = await lawyerUseCase.fetchAvailableSlotsByWeek(
+      lawyer_id,
+      weekStart
+    );
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "available slots fetched successfully",
+      data: slots,
+    });
+    return;
+  } catch (error: any) {
+    switch (error.message) {
+      case ERRORS.USER_NOT_FOUND:
+        res.status(STATUS_CODES.NOT_FOUND).json({
+          success: false,
+          message: "user not found",
+        });
+        return;
+      case ERRORS.USER_BLOCKED:
+        res.status(STATUS_CODES.FORBIDDEN).json({
+          success: false,
+          message: "user is blocked",
+        });
+        return;
+      case ERRORS.LAWYER_NOT_VERIFIED:
+        res
+          .status(STATUS_CODES.BAD_REQUEST)
+          .json({ success: false, message: "lawyer is not verified" });
+        return;
+      default:
+        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "Internal Server Error",
+        }); 
+        return;
+    }
+  }
 };
