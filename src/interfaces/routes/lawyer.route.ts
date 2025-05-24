@@ -3,23 +3,14 @@ import { documentstorage } from "../middelwares/multer";
 import multer from "multer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 import {
-  addAvailableSlot,
-  addBlockedSchedule,
-  addRecurringSchedule,
-  deleteBlockedSchedule,
-  fetchAllBlockedSchedule,
-  fetchAvailableSlot,
-  fetchAvailableSlotWeek,
+  fetchAvailableSlots,
   fetchLawyer,
   fetchSlotSettings,
-  getAllRecurringSlot,
-  removeBlockedSchedule,
-  removeOneAvailableSlot,
   updateAvailableSlot,
-  updateRecurringSchedule,
   updateSlotSettings,
   verifyLawyer,
 } from "../controller/lawyer.controller";
+import { authenticateLawyer } from "../middelwares/Auth/authenticateLawyer";
 
 const upload = multer({ storage: documentstorage });
 
@@ -36,32 +27,25 @@ router.post(
   verifyLawyer
 );
 router.get("/", authenticateUser, fetchLawyer);
-router.post("/schedule/block", authenticateUser, addBlockedSchedule);
-router.get("/schedule/block", authenticateUser, fetchAllBlockedSchedule);
-router.delete("/schedule/block/:id", authenticateUser, deleteBlockedSchedule);
-router.post("/schedule/recurring", authenticateUser, addRecurringSchedule);
-router.get("/schedule/recurring", authenticateUser, getAllRecurringSlot);
-router.delete(
-  "/schedule/recurring/:day",
-  authenticateUser,
-  removeBlockedSchedule
-);
-router.patch("/schedule/recurring", authenticateUser, updateRecurringSchedule);
 router.patch("/schedule/settings", authenticateUser, updateSlotSettings);
-router.get("/schedule/settings", authenticateUser, fetchSlotSettings);
-router.post("/scheule/availableslot", authenticateUser, addAvailableSlot);
-router.get("/schedule/availableslot", authenticateUser, fetchAvailableSlot);
-router.patch(
-  "/schedule/availableslot/d",
-  authenticateUser,
-  removeOneAvailableSlot
-);
-router.patch("/schedule/availableslot", authenticateUser, updateAvailableSlot);
 router.get(
-  "/schedule/availableslot/week/:week",
+  "/schedule/settings",
   authenticateUser,
-  fetchAvailableSlotWeek
+  authenticateLawyer,
+  fetchSlotSettings
 );
 
+router.patch(
+  `/schedule/availability`,
+  authenticateUser,
+  authenticateLawyer,
+  updateAvailableSlot
+);
+router.get(
+  "/schedule/availability",
+  authenticateUser,
+  authenticateLawyer,
+  fetchAvailableSlots
+);
 
 export default router;

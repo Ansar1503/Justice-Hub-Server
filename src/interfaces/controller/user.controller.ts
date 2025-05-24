@@ -369,12 +369,11 @@ export async function GoogleRegistration(req: Request, res: Response) {
       success: false,
       message: "invalid credentials",
     });
-    return
+    return;
   }
   try {
-    const response = await userusecase.GoogleSign({code,role})
+    const response = await userusecase.GoogleSign({ code, role });
   } catch (error) {
-    console.log(error)
-    
+    console.log(error);
   }
 }
