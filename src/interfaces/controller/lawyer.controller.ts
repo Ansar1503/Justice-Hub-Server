@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import { ClientRepository } from "../../infrastructure/database/repo/client.repo";
 import { UserRepository } from "../../infrastructure/database/repo/user.repo";
 import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
@@ -7,9 +7,7 @@ import { LawyerRepository } from "../../infrastructure/database/repo/lawyer.repo
 import { DocumentsRepo } from "../../infrastructure/database/repo/documents.repo";
 import { lawyer, LawyerDocuments } from "../../domain/entities/Lawyer.entity";
 import { ScheduleRepository } from "../../infrastructure/database/repo/schedule.repo";
-import { Daytype } from "../../domain/entities/Schedule.entity";
-import { ERRORS } from "../../infrastructure/constant/errors";
-import { z } from "zod";
+import { zodOverrideSlotsSchema } from "../middelwares/validator/zod/zod.validate";
 
 const lawyerUseCase = new LawyerUsecase(
   new UserRepository(),
@@ -121,7 +119,7 @@ export const fetchLawyer = async (
   }
   try {
     const lawyers = await lawyerUseCase.fetchLawyerData(user_id);
-    console.log("lawyers", lawyers);
+    // console.log("lawyers", lawyers);
     res.status(STATUS_CODES.OK).json({
       success: true,
       message: "Lawyers fetched Successfully",
@@ -282,6 +280,101 @@ export async function fetchAvailableSlots(
     res.status(STATUS_CODES.OK).json({
       success: true,
       message: "data fetched",
+      data: response || {},
+    });
+    return;
+  } catch (error: any) {
+    res.status(error.code || STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+    return;
+  }
+}
+
+export async function addOverrideSlots(
+  req: Request & { user?: any },
+  res: Response
+) {
+  const lawyer_id = req.user.id;
+  const payload = zodOverrideSlotsSchema.safeParse(req.body);
+  if (!payload.success) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "Invalid ccredentials",
+    });
+    return;
+  }
+  if (Object.keys(payload.data).length === 0) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "Invalid ccredentials",
+    });
+    return;
+  }
+
+  try {
+    const response = await lawyerUseCase.addOverrideSlots(
+      payload.data,
+      lawyer_id
+    );
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "override slots added successfully",
+      data: response || {},
+    });
+    return;
+  } catch (error: any) {
+    console.log("error", error);
+    res.status(error.code || STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+    return;
+  }
+}
+
+export async function fetchOverrideSlots(
+  req: Request & { user?: any },
+  res: Response
+) {
+  const lawyer_id = req.user.id;
+
+  try {
+    const response = await lawyerUseCase.fetchOverrideSlots(lawyer_id);
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "override slots fetched successfully",
+      data: response || {},
+    });
+    return;
+  } catch (error: any) {
+    res.status(error.code || STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+    return;
+  }
+}
+
+export async function removeOverrideSlot(
+  req: Request & { user?: any },
+  res: Response
+) {
+  const lawyer_id = req.user?.id;
+  const { id } = req.params;
+  if (!id) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "Invalid credentials",
+    });
+    return;
+  }
+  try {
+    const response = await lawyerUseCase.removeOverrideSlots(lawyer_id, id);
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "override slot removed successfully",
       data: response || {},
     });
     return;

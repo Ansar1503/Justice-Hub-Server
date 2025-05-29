@@ -1,6 +1,10 @@
 import { lawyer } from "../../../domain/entities/Lawyer.entity";
 import {
   Availability,
+  OverrideDate,
+
+  OverrideSlots,
+
   ScheduleSettings,
 } from "../../../domain/entities/Schedule.entity";
 
@@ -18,5 +22,7 @@ export interface Ilawyerusecase {
     lawyer_id: string
   ): Promise<Availability | null>;
   fetchAvailableSlots(lawyer_id: string): Promise<Availability | null>;
-
+  addOverrideSlots(payload:OverrideDate[] ,lawyer_id: string): Promise<OverrideSlots  | null>;
+  fetchOverrideSlots(lawyer_id:string):Promise<OverrideSlots | null>;
+  removeOverrideSlots(lawyer_id: string, id: string): Promise<OverrideSlots | null>;
 }

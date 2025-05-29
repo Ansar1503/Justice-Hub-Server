@@ -34,6 +34,42 @@ export class ClientUseCase implements I_clientUsecase {
     private reviewRepository: IreviewRepo,
     private scheduleRepo: IScheduleRepo
   ) {}
+  timeStringToMinutes(time: string): number {
+    const [hours, minutes] = time.split(":").map(Number);
+    return hours * 60 + minutes;
+  }
+
+  minutesToTimeString(minutes: number): string {
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    const hoursStr = hours.toString().padStart(2, "0");
+    const minsStr = mins.toString().padStart(2, "0");
+
+    return `${hoursStr}:${minsStr}`;
+  }
+  generateTimeSlots(start: string, end: string, duration: number): string[] {
+    const slots: string[] = [];
+
+    const [startHour, startMinute] = start.split(":").map(Number);
+    const [endHour, endMinute] = end.split(":").map(Number);
+
+    const startDate = new Date();
+    startDate.setHours(startHour, startMinute, 0, 0);
+
+    const endDate = new Date();
+    endDate.setHours(endHour, endMinute, 0, 0);
+
+    const current = new Date(startDate);
+
+    while (current < endDate) {
+      const hours = String(current.getHours()).padStart(2, "0");
+      const minutes = String(current.getMinutes()).padStart(2, "0");
+      slots.push(`${hours}:${minutes}`);
+      current.setMinutes(current.getMinutes() + duration);
+    }
+
+    return slots;
+  }
 
   async fetchClientData(user_id: string): Promise<any> {
     try {
@@ -396,10 +432,8 @@ export class ClientUseCase implements I_clientUsecase {
       throw new Error(error.message);
     }
   }
-  async fetchLawyerSlots(
-    lawyer_id: string,
-    weekStart: Date
-  ): Promise<{ slots: TimeSlot[] | []; blocks: BlockedSchedule[] | [] }> {
+
+  async fetchLawyerSlots(lawyer_id: string, date: Date): Promise<any> {
     const user = await this.userRepository.findByuser_id(lawyer_id);
     if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
     if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
@@ -407,65 +441,30 @@ export class ClientUseCase implements I_clientUsecase {
     if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
     if (lawyer.verification_status !== "verified")
       throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
-    const startOfWeek = new Date(
-      weekStart.getTime() + Math.abs(weekStart.getTimezoneOffset() * 60000)
+    const slotSettings = await this.scheduleRepo.fetchScheduleSettings(
+      lawyer_id
     );
-    const endOfWeek = new Date(
-      startOfWeek.getFullYear(),
-      startOfWeek.getMonth(),
-      startOfWeek.getDate() + 7
-    );
-    // console.log("start", startOfWeek);
-    // console.log("end", endOfWeek);
-    const slots = await this.scheduleRepo.fetchAvailableSlotsByWeek({
-      lawyer_id,
-      startWeek: startOfWeek,
-      endWeek: endOfWeek,
-    });
+    if (!slotSettings) {
+      const error: any = new Error("slot settings not found for the lawyer");
+      error.code = 404;
+      throw error;
+    }
 
-    const blocks = await this.scheduleRepo.fetchBlockedScheduleByWeek(
-      lawyer_id,
-      startOfWeek,
-      endOfWeek
-    );
-    console.log("slots", { slots, blocks });
-    return { slots, blocks };
-  }
-  async createCheckoutSession(
-    lawyer_id: string,
-    date: string,
-    timeSlot: string,
-    user_id: string
-  ): Promise<any> {
-    const clientUser = await this.userRepository.findByuser_id(user_id);
-    if (!clientUser) throw new Error(ERRORS.USER_NOT_FOUND);
-    if (clientUser.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
-    const user = await this.userRepository.findByuser_id(lawyer_id);
-    if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
-    if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
-    const client = await this.clientRepository.findByUserId(lawyer_id);
-    const lawyer = await this.lawyerRepository.findUserId(lawyer_id);
-    if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
-    if (lawyer.verification_status !== "verified")
-      throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
+    const slotDuration = slotSettings.slotDuration;
 
-    const timeSlots = timeSlot.split("-");
-    const startTime = timeSlots[0];
-    const endTime = timeSlots[1];
-    const availableslots = await this.scheduleRepo.findAvailableTimeSlot(
+    const override = await this.scheduleRepo.fetcghOverrideSlotByDate(
       lawyer_id,
       date
     );
-    if (!availableslots) throw new Error("SLOTSNOTAVAILABLE");
-    const avalableslot = availableslots.timeSlots.find(
-      (slot) => slot.startTime === startTime && slot.endTime === endTime
+    const availableSlots = await this.scheduleRepo.findAvailableSlots(
+      lawyer_id
     );
-    if (!avalableslot) throw new Error("SLOTSNOTAVAILABLE");
-    const blockeddate = await this.scheduleRepo.findBlockedSchedule(
-      lawyer_id,
-      date
-    );
-    if (blockeddate?.date) throw new Error("SLOTBLOCKED");
+
+    if (!availableSlots) {
+      const error: any = new Error("No available slots found for the lawyer");
+      error.code = 404;
+      throw error;
+    }
     const days: Daytype[] = [
       "sunday",
       "monday",
@@ -477,26 +476,206 @@ export class ClientUseCase implements I_clientUsecase {
     ];
     const index = new Date(date).getDay();
     const day = days[index];
-    const recurringSlots = await this.scheduleRepo.findRecurringSchedule(
-      lawyer_id,
-      day
-    );
-    if (recurringSlots) {
-      const schedule = recurringSlots.schedule.filter(
-        (slot) => slot.day == day
-      )[0];
-      if (schedule && !schedule.active) throw new Error("INACTIVESLOT");
+    if (!availableSlots[day]) {
+      const error: any = new Error(
+        "No available slots found for the selected date"
+      );
+      error.code = 404;
+      throw error;
     }
-    const session = await getStripeSession({
-      amount: lawyer.consultation_fee,
-      lawyer_name: user.name,
-      profile_image: client?.profile_image || "",
-      date,
-      slot: timeSlot,
-      userEmail: clientUser.email,
+
+    if (override && override.overrideDates.length > 0) {
+      const overrideSlot = override.overrideDates[0];
+      // console.log("overrideSlot", overrideSlot);
+      if (overrideSlot.isUnavailable) {
+        return {
+          slots: [],
+          isAvailable: false,
+        };
+      }
+      if (overrideSlot.timeRanges && overrideSlot.timeRanges.length > 0) {
+        const overrideTimeRanges = overrideSlot.timeRanges[0];
+        const lastoverrideTimeRange =
+          overrideSlot.timeRanges[overrideSlot.timeRanges.length - 1];
+        const allSlots = this.generateTimeSlots(
+          overrideTimeRanges.start,
+          lastoverrideTimeRange.end,
+          slotDuration
+        );
+        return {
+          slots: allSlots,
+          isAvailable: true,
+        };
+      }
+    }
+    if (!availableSlots[day].enabled) {
+      return {
+        slots: [],
+        isAvailable: false,
+      };
+    }
+    const firstTimeRange = availableSlots[day].timeSlots[0];
+    const lastTimeRange =
+      availableSlots[day].timeSlots[availableSlots[day].timeSlots.length - 1];
+    const allSlots = this.generateTimeSlots(
+      firstTimeRange.start,
+      lastTimeRange.end,
+      slotDuration
+    );
+    return {
+      slots: allSlots,
+      isAvailable: true,
+    };
+  }
+
+  async createCheckoutSession(
+    lawyer_id: string,
+    date: Date,
+    timeSlot: string,
+    user_id: string,
+    documentlink?:string
+  ): Promise<any> {
+    const clientUser = await this.userRepository.findByuser_id(user_id);
+    if (!clientUser) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (clientUser.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
+    const client = await this.clientRepository.findByUserId(lawyer_id);
+    const user = await this.userRepository.findByuser_id(lawyer_id);
+    if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
+    const lawyer = await this.lawyerRepository.findUserId(lawyer_id);
+    if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (lawyer.verification_status !== "verified")
+      throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
+    const slotSettings = await this.scheduleRepo.fetchScheduleSettings(
+      lawyer_id
+    );
+    if (!slotSettings) {
+      const error: any = new Error("slot settings not found for the lawyer");
+      error.code = 404;
+      throw error;
+    }
+    const slotDuration = slotSettings.slotDuration;
+    const availableSlots = await this.scheduleRepo.findAvailableSlots(
+      lawyer_id
+    );
+    if (!availableSlots) {
+      const error: any = new Error("No available slots found for the lawyer");
+      error.code = 404;
+      throw error;
+    }
+    const override = await this.scheduleRepo.fetcghOverrideSlotByDate(
+      lawyer_id,
+      date
+    );
+    if (override && Object.keys(override).length > 0) {
+      const overrideDate = override.overrideDates[0];
+      const availability = overrideDate.isUnavailable;
+      if (availability) {
+        const error: any = new Error(
+          "Slots are not available for the selected date"
+        );
+        error.code = 404;
+        throw error;
+      }
+      if (!overrideDate.timeRanges || overrideDate.timeRanges.length === 0) {
+        const error: any = new Error(
+          "No time ranges found for the override date"
+        );
+        error.code = 404;
+        throw error;
+      }
+      if (overrideDate.timeRanges.length > 0) {
+        const timeRanges = overrideDate.timeRanges;
+        const bookTimeMins = this.timeStringToMinutes(timeSlot);
+        if (isNaN(bookTimeMins)) {
+          const error: any = new Error("Invalid time slot format");
+          error.code = 400;
+          throw error;
+        }
+        const isValidTime = timeRanges.some((range) => {
+          const startMins = this.timeStringToMinutes(range.start);
+          const endMins = this.timeStringToMinutes(range.end);
+          if (isNaN(startMins) || isNaN(endMins)) {
+            console.warn("Invalid time range:", range);
+            return false;
+          }
+          return bookTimeMins >= startMins && bookTimeMins <= endMins;
+        });
+        console.log("isValidTime:", isValidTime, "bookTimeMins:", bookTimeMins);
+        if (!isValidTime) {
+          const error: any = new Error(
+            "Time slots are not available for the selected date"
+          );
+          error.code = 404;
+          throw error;
+        }
+      }
+    }
+    const days: Daytype[] = [
+      "sunday",
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+    ];
+    const index = date.getDay();
+    const day = days[index];
+    if (!availableSlots[day]) {
+      const error: any = new Error(
+        "No available slots found for the selected date"
+      );
+      error.code = 404;
+      throw error;
+    }
+    if (!availableSlots[day].enabled) {
+      const error: any = new Error(
+        "Slots are not available for the selected date"
+      );
+      error.code = 404;
+      throw error;
+    }
+    const timeSlots: TimeSlot[] = availableSlots[day].timeSlots;
+    if (!timeSlots || timeSlots.length === 0) {
+      const error: any = new Error(
+        "Slots are not available for the selected date"
+      );
+      error.code = 404;
+      throw error;
+    }
+
+    const bookTimeMins = this.timeStringToMinutes(timeSlot);
+    const isValidTime = timeSlots.some((range) => {
+      const startMins = this.timeStringToMinutes(range.start);
+      const endMins = this.timeStringToMinutes(range.end);
+      if (isNaN(startMins) || isNaN(endMins)) {
+        console.warn("Invalid time range:", range);
+        return false;
+      }
+      return bookTimeMins >= startMins && bookTimeMins <= endMins;
     });
 
-    return session;
+    if (!isValidTime) {
+      const error: any = new Error(
+        "Time slot is not available for the selected date"
+      );
+      error.code = 404;
+      throw error;
+    }
+
+    
+     
+    const stripe = await getStripeSession({
+      amount: lawyer.consultation_fee,
+      date: String(date),
+      lawyer_name: user.name,
+      profile_image: client?.profile_image || "",
+      slot: timeSlot,
+      userEmail: user.email,
+      lawyer_id,
+    });
+    return stripe;
   }
 
   async handleStripeHook(
@@ -507,7 +686,7 @@ export class ClientUseCase implements I_clientUsecase {
   }
   async fetchStripeSessionDetails(id: string): Promise<any> {
     const sessionDetails = await getSessionDetails(id);
-    // console.log("sessionDetails", sessionDetails);
+    console.log("sessionDetails", sessionDetails);
     return {
       lawyer: sessionDetails?.metadata?.lawyer_name,
       slot: sessionDetails?.metadata?.slot,

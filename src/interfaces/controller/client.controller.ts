@@ -502,22 +502,19 @@ export const addReview = async (
 
 export async function getLawyerSlotDetais(req: Request, res: Response) {
   const { id: lawyer_id } = req.params;
-  const { week } = req.query;
+  const { date } = req.query;
 
-  if (!lawyer_id || !week) {
+  if (!lawyer_id || !date) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
       message: "Invalid Credentials",
     });
     return;
   }
-
   try {
-    const weekStart = new Date(
-      new Date(week as string).getTime() +
-        Math.abs(new Date(week as string).getTimezoneOffset() * 60000)
-    );
-    const result = await clientusecase.fetchLawyerSlots(lawyer_id, weekStart);
+    const dateObj = new Date(String(date));
+    const result = await clientusecase.fetchLawyerSlots(lawyer_id, dateObj);
+
     res.status(STATUS_CODES.OK).json({
       success: true,
       message: "lawyer slots fetched successfully",
@@ -544,9 +541,9 @@ export async function getLawyerSlotDetais(req: Request, res: Response) {
           .json({ success: false, message: "lawyer is not verified" });
         return;
       default:
-        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        res.status(error.code || STATUS_CODES.INTERNAL_SERVER_ERROR).json({
           success: false,
-          message: "Internal Server Error",
+          message: error.message || "Internal Server Error",
         });
         return;
     }
@@ -558,8 +555,9 @@ export async function createCheckoutSession(
   res: Response
 ) {
   const user_id = req.user.id;
-  // console.log("req.bod", req.body);
+
   const { lawyer_id, date, timeSlot } = req.body;
+  const document = req.file?.path;
   if (!lawyer_id || !date || !timeSlot) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
@@ -567,12 +565,16 @@ export async function createCheckoutSession(
     });
     return;
   }
+
   try {
     const response = await clientusecase.createCheckoutSession(
       lawyer_id,
-      date,
+      new Date(
+        new Date(date).getTime() - new Date(date).getTimezoneOffset() * 60000
+      ),
       timeSlot,
-      user_id
+      user_id,
+      document
     );
     res.status(STATUS_CODES.OK).json(response);
     return;
@@ -597,9 +599,9 @@ export async function createCheckoutSession(
           .json({ success: false, message: "lawyer is not verified" });
         return;
       default:
-        res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        res.status(error.code || STATUS_CODES.INTERNAL_SERVER_ERROR).json({
           success: false,
-          message: "Internal Server Error",
+          message: error.message || "Internal Server Error",
         });
         return;
     }

@@ -3,9 +3,12 @@ import { documentstorage } from "../middelwares/multer";
 import multer from "multer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 import {
+  addOverrideSlots,
   fetchAvailableSlots,
   fetchLawyer,
+  fetchOverrideSlots,
   fetchSlotSettings,
+  removeOverrideSlot,
   updateAvailableSlot,
   updateSlotSettings,
   verifyLawyer,
@@ -47,5 +50,8 @@ router.get(
   authenticateLawyer,
   fetchAvailableSlots
 );
+router.get('/schedule/override',authenticateUser,authenticateLawyer,fetchOverrideSlots)
+router.post(`/schedule/override`,authenticateUser,authenticateLawyer,addOverrideSlots)
+router.delete("/schedule/override/:id",authenticateUser,authenticateLawyer,removeOverrideSlot)
 
 export default router;

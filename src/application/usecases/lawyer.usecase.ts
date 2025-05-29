@@ -3,6 +3,8 @@ import {
   Availability,
   BlockedSchedule,
   Daytype,
+  OverrideDate,
+  OverrideSlots,
   ScheduleSettings,
   TimeSlot,
 } from "../../domain/entities/Schedule.entity";
@@ -153,9 +155,23 @@ export class LawyerUsecase implements Ilawyerusecase {
       }));
 
       for (const slot of slots) {
+        if (slot.startMin < 0 || slot.endMin > 1440) {
+          const error: any = new Error(
+            "Time should be between 00:00 and 23:59."
+          );
+          error.code = STATUS_CODES.BAD_REQUEST;
+          throw error;
+        }
         if (slot.startMin >= slot.endMin) {
           const error: any = new Error(
             "Start time should be less than end time."
+          );
+          error.code = STATUS_CODES.BAD_REQUEST;
+          throw error;
+        }
+        if (Math.abs(slot.startMin - slot.endMin) < settings.slotDuration) {
+          const error: any = new Error(
+            `Slot duration should be at least ${settings.slotDuration} minutes.`
           );
           error.code = STATUS_CODES.BAD_REQUEST;
           throw error;
@@ -185,5 +201,127 @@ export class LawyerUsecase implements Ilawyerusecase {
   async fetchAvailableSlots(lawyer_id: string): Promise<Availability | null> {
     const availability = await this.scheduleRepo.findAvailableSlots(lawyer_id);
     return availability;
+  }
+  async addOverrideSlots(
+    payload: OverrideDate[],
+    lawyer_id: string
+  ): Promise<OverrideSlots | null> {
+    payload.forEach(oveerride => {
+      oveerride.date = new Date(oveerride.date.getTime() - oveerride.date.getTimezoneOffset() * 60000);
+    })
+    const slotSettings = await this.scheduleRepo.fetchScheduleSettings(
+      lawyer_id
+    );
+    if (!slotSettings) {
+      const error: any = new Error(
+        "Settings not found, please create settings."
+      );
+      error.code = STATUS_CODES.NOT_FOUND;
+      throw error;
+    }
+    const map: any = new Map();
+    for (const override of payload) {
+      if (map.has(override.date)) {
+        const error: any = new Error(
+          `Duplicate override date found: ${override.date}`
+        );
+        error.code = STATUS_CODES.BAD_REQUEST;
+        throw error;
+      } else {
+        map.set(override.date);
+      }
+    }
+    map.clear();
+    const timeRanges = payload[0].timeRanges;
+    if (timeRanges && timeRanges.length > 0) {
+      const slots = timeRanges.map((time) => ({
+        ...time,
+        startMin: this.timeStringToMinutes(time.start),
+        endMin: this.timeStringToMinutes(time.end),
+      }));
+
+      for (const slot of slots) {
+        if (slot.startMin < 0 || slot.endMin > 1440) {
+          const error: any = new Error(
+            "Time should be between 00:00 and 23:59."
+          );
+          error.code = STATUS_CODES.BAD_REQUEST;
+          throw error;
+        }
+        if (slot.startMin >= slot.endMin) {
+          const error: any = new Error(
+            "Start time should be less than end time."
+          );
+          error.code = STATUS_CODES.BAD_REQUEST;
+          throw error;
+        }
+        if (Math.abs(slot.startMin - slot.endMin) < slotSettings.slotDuration) {
+          const error: any = new Error(
+            `Slot duration should be at least ${slotSettings.slotDuration} minutes.`
+          );
+          error.code = STATUS_CODES.BAD_REQUEST;
+          throw error;
+        }
+      }
+
+      const sorted = slots.sort((a, b) => a.startMin - b.startMin);
+
+      for (let i = 0; i < sorted.length - 1; i++) {
+        const current = sorted[i];
+        const next = sorted[i + 1];
+        if (current.endMin > next.startMin) {
+          const error: any = new Error(
+            `Time slot ${current.start}-${current.end} overlaps with ${next.start}-${next.end}`
+          );
+          error.code = STATUS_CODES.BAD_REQUEST;
+          throw error;
+        }
+      }
+    }
+
+    const updatedOverrideSlots = await this.scheduleRepo.addOverrideSlots(
+      payload,
+      lawyer_id
+    );
+
+    return updatedOverrideSlots;
+  }
+  async fetchOverrideSlots(lawyer_id: string): Promise<OverrideSlots | null> {
+    const existingOverrideSlots = await this.scheduleRepo.fetchOverrideSlots(
+      lawyer_id
+    );
+    return existingOverrideSlots;
+  }
+  async removeOverrideSlots(
+    lawyer_id: string,
+    id: string
+  ): Promise<OverrideSlots | null> {
+    const existingOverrideSlots = await this.scheduleRepo.fetchOverrideSlots(
+      lawyer_id
+    );
+    if (!existingOverrideSlots) {
+      const error: any = new Error("Override slots not found");
+      error.code = STATUS_CODES.NOT_FOUND;
+      throw error;
+    }
+    if (existingOverrideSlots.overrideDates.length === 0) {
+      const error: any = new Error("No override slots available");
+      error.code = STATUS_CODES.NOT_FOUND;
+      throw error;
+    }
+    if (
+      existingOverrideSlots.overrideDates.find(
+        (override) => override?._id?.toString() === id
+      ) === undefined
+    ) {
+      const error: any = new Error("Override slot not found");
+      error.code = STATUS_CODES.NOT_FOUND;
+      throw error;
+    }
+    const updatedOverrideSlots = await this.scheduleRepo.removeOverrideSlots(
+      lawyer_id,
+      id
+    );
+    return updatedOverrideSlots;
   }
 }

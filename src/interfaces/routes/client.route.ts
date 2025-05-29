@@ -15,10 +15,11 @@ import {
   updatePassword,
 } from "../controller/client.controller";
 import multer from "multer";
-import { profilestorage } from "../middelwares/multer";
+import { documentstorage, profilestorage } from "../middelwares/multer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 
 const upload = multer({ storage: profilestorage });
+const documentUpload = multer({ storage: documentstorage });
 
 const router = express.Router();
 
@@ -39,10 +40,12 @@ router.post("/lawyers/review/", authenticateUser, addReview);
 router.get("/lawyers/slots/:id", authenticateUser, getLawyerSlotDetais);
 router.post(
   "/lawyer/slots/checkout-session/",
+  documentUpload.single("caseDocument"),
   authenticateUser,
   createCheckoutSession
 );
-router.get("/stripe/success/:id", authenticateUser,fetchStripeSessionDetails);
+router.get("/stripe/session/:id", authenticateUser, fetchStripeSessionDetails);
+// router.get("/stripe/success/:id", authenticateUser,fetchStripeSessionDetails);
 router.post("/stripe/webhooks", authenticateUser, handleWebhooks);
 
 export default router;

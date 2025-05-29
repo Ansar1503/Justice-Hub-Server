@@ -11,6 +11,9 @@ import {
 } from "../../../domain/entities/Schedule.entity";
 
 export interface I_clientUsecase {
+  timeStringToMinutes(time: string): number;
+  timeStringToMinutes(time: string): number;
+
   fetchClientData(user_id: string): Promise<any>;
   updateClientData(
     clientData: ClientDto & { name: string; mobile: string }
@@ -26,16 +29,15 @@ export interface I_clientUsecase {
   getLawyers(filter: LawyerFilterParams): Promise<LawyerResponseDto[] | []>;
   getLawyer(user_id: string): Promise<LawyerResponseDto | null>;
   addreview(payload: Review): Promise<void>;
-  fetchLawyerSlots(
-    lawyer_id: string,
-    weekStart: Date
-  ): Promise<{ slots: TimeSlot[] | []; blocks: BlockedSchedule[] | [] }>;
+  fetchLawyerSlots(lawyer_id: string, date: Date): Promise<any>;
   createCheckoutSession(
     lawyer_id: string,
-    date: string,
+    date: Date,
     timeSlot: string,
-    user_id: string
+    user_id: string,
+    documentlink?:string
   ): Promise<any>;
   handleStripeHook(body: any, signature: string | string[]): Promise<any>;
   fetchStripeSessionDetails(id: string): Promise<any>;
+  generateTimeSlots(start: string, end: string, duration: number): string[];
 }

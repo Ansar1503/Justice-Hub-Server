@@ -13,8 +13,6 @@ export type Daytype =
   | "saturday"
   | "sunday";
 
-
-
 export interface BlockedSchedule {
   lawyer_id: string;
   date: string;
@@ -39,4 +37,16 @@ export interface TimeSlot {
   lawyer_id: string;
   date: string;
   timeSlots: { startTime: string; endTime: string }[];
+}
+
+export interface OverrideDate {
+  _id?:string;
+  date: Date;
+  isUnavailable: boolean;
+  timeRanges?: { start: string; end: string }[];
+}
+
+export interface OverrideSlots {
+  lawyer_id: string;
+  overrideDates: OverrideDate[];
 }

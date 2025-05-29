@@ -2,6 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 import {
   Availability,
   DayAvailability,
+  OverrideSlots,
   ScheduleSettings,
   TimeSlot,
 } from "../../../domain/entities/Schedule.entity";
@@ -10,6 +11,7 @@ export interface IscheduleSettingsModel extends ScheduleSettings, Document {}
 export interface IAvailabilityModel extends Availability, Document {
   lawyer_id: string;
 }
+export interface IOverrideSlotsModel extends OverrideSlots, Document {}
 
 const timeSlotSchema = new Schema<TimeSlot>(
   {
@@ -68,6 +70,25 @@ const schedulesettings = new Schema<IscheduleSettingsModel>({
   maxDaysInAdvance: { type: Number, required: true, min: 15, max: 60 },
   autoConfirm: { type: Boolean, required: true, default: false },
 });
+
+const overrideDateSchema = new Schema({
+  date: { type: Date, required: true },
+  isUnavailable: { type: Boolean, required: true },
+  timeRanges: [timeSlotSchema],
+});
+
+const overrideSlotSchema = new Schema(
+  {
+    lawyer_id: { type: String, required: true, unique: true },
+    overrideDates: [overrideDateSchema],
+  },
+  { timestamps: true,  }
+);
+
+export const  overrideSlotsModel = mongoose.model<IOverrideSlotsModel>(
+  "override_slots",
+  overrideSlotSchema
+);
 
 export const availableSlotsModel = mongoose.model<IAvailabilityModel>(
   "available_schedule",

@@ -10,11 +10,13 @@ type payloadType = {
   date: string;
   slot: string;
   amount: number;
+  lawyer_id: string;
 };
 
 export async function getStripeSession(payload: payloadType) {
   if (!process.env.STRIPE_SECRET_KEY) throw new Error("SECRETKEYNOTFOUND");
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const formattedDate = format(payload.date, 'MMMM d yyyy');
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],
     customer_email: payload.userEmail,
@@ -24,7 +26,7 @@ export async function getStripeSession(payload: payloadType) {
           currency: "inr",
           product_data: {
             name: `Lawyer Consultation: ${payload.lawyer_name}`,
-            description: `Slot:${format(payload.date, "yyyy-mm-dd")} Time:${
+            description: `Slot:${formattedDate} Time:${
               payload.slot
             }`,
             images: ["noimage"],
@@ -35,8 +37,8 @@ export async function getStripeSession(payload: payloadType) {
       },
     ],
     mode: "payment",
-    success_url: `${process.env.FRONTEND_URL}/client/payment-status?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: "http://localhost:5000/",
+    success_url: `${process.env.FRONTEND_URL}/client/lawyers/payment_success/?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.FRONTEND_URL}/client/lawyers/${payload.lawyer_id}`,
     metadata: {
       lawyer_name: payload.lawyer_name,
       slot: payload.slot,
