@@ -26,7 +26,12 @@ export interface I_clientUsecase {
     password: string;
   }): Promise<ClientUpdateDto>;
   updateAddress(payload: Address & { user_id: string }): Promise<void>;
-  getLawyers(filter: LawyerFilterParams): Promise<LawyerResponseDto[] | []>;
+  getLawyers(filter: LawyerFilterParams): Promise<{
+    data: any[];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  }>;
   getLawyer(user_id: string): Promise<LawyerResponseDto | null>;
   addreview(payload: Review): Promise<void>;
   fetchLawyerSlots(lawyer_id: string, date: Date): Promise<any>;
@@ -35,7 +40,7 @@ export interface I_clientUsecase {
     date: Date,
     timeSlot: string,
     user_id: string,
-    documentlink?:string
+    documentlink?: string
   ): Promise<any>;
   handleStripeHook(body: any, signature: string | string[]): Promise<any>;
   fetchStripeSessionDetails(id: string): Promise<any>;

@@ -31,7 +31,7 @@ export interface LawyerFilterParams {
   experienceMax: number;
   feeMin: number;
   feeMax: number;
-  sortBy: "rating" | "experience" | "fee-low" | "fee-high" | "recommended";
+  sortBy: "rating" | "experience" | "fee-low" | "fee-high" ;
   page: number;
   limit: number;
 }

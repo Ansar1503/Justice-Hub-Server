@@ -1,7 +1,6 @@
-import { match } from "assert";
 import { User } from "../../../domain/entities/User.entity";
 import { IUserRepository } from "../../../domain/I_repository/I_user.repo";
-import UserModel, { IUserModel } from "../model/user.model";
+import UserModel from "../model/user.model";
 
 export class UserRepository implements IUserRepository {
   async create(user: User): Promise<User> {
@@ -219,7 +218,7 @@ export class UserRepository implements IUserRepository {
     const sortStage: Record<string, any> = {
       [sort]: sortBy === "asc" ? 1 : -1,
     };
-    
+
     if (search) {
       matchStage["$or"] = [
         { name: { $regex: search, $options: "i" } },
@@ -287,10 +286,10 @@ export class UserRepository implements IUserRepository {
         matchStage2["lawyerData.verification_status"] = "requested";
       }
     }
-    
-    if(sort === "experience"){
+
+    if (sort === "experience") {
       sortStage["lawyerData.experience"] = sortBy === "asc" ? 1 : -1;
-    }else if (sort === "consultation_fee"){
+    } else if (sort === "consultation_fee") {
       sortStage["lawyerData.consultation_fee"] = sortBy === "asc" ? 1 : -1;
     }
 
@@ -307,7 +306,7 @@ export class UserRepository implements IUserRepository {
       { $match: matchStage2 },
       { $count: "total" }
     );
-    
+
     const [lawyers, countResult] = await Promise.all([
       UserModel.aggregate(dataPipeline),
       UserModel.aggregate(countPipeline),

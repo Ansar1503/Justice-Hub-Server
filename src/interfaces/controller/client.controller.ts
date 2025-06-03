@@ -327,7 +327,7 @@ export const getLawyers = async (req: Request, res: Response) => {
     experienceMax = 25,
     feeMin = 0,
     feeMax = 10000,
-    sortBy = "recommended",
+    sortBy = "experience",
     page = 1,
     limit = 10,
   } = req.query;
