@@ -17,25 +17,28 @@ export const fetchAllUsers = async (
   req: Request & { user?: any },
   res: Response
 ) => {
-  const { role, search } = req.query;
-
-  if (!role) {
+  const { role, search, page, limit, sort, order, status } = req.query;
+  if (typeof role !== "string" || (role !== "lawyer" && role !== "client")) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
-      message: "please provide credentials",
+      message: "Invalid credentials",
     });
     return;
   }
   try {
-    const allUsers = await adminUsecase.fetchUsers({ role });
-    // console.log('users', allUsers);
-    if (!allUsers || allUsers.length === 0) {
-      res.status(STATUS_CODES.NOT_FOUND).json({
-        success: false,
-        message: "No users found",
-      });
-      return;
-    }
+    const allUsers = await adminUsecase.fetchUsers({
+      role: role as "lawyer" | "client",
+      limit: typeof limit === "string" ? parseInt(limit) : undefined,
+      order: typeof order === "string" ? order : undefined,
+      page: typeof page === "string" ? parseInt(page) : undefined,
+      search: typeof search === "string" ? search : undefined,
+      sort: typeof sort === "string" ? sort : undefined,
+      status:
+        typeof status === "string" &&
+        ["all", "verified", "blocked"].includes(status)
+          ? (status as "all" | "verified" | "blocked")
+          : "all",
+    });
     res.status(STATUS_CODES.OK).json({
       success: true,
       message: "Users fetched Successfully",
@@ -43,6 +46,7 @@ export const fetchAllUsers = async (
     });
     return;
   } catch (error) {
+    console.log("errpr", error);
     res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
       success: false,
       message: "Users fetch failed!",
@@ -55,9 +59,34 @@ export const fetchAllLawyers = async (
   req: Request & { user?: any },
   res: Response
 ) => {
+  const { limit, page, sort, order:sortBy, search, status } = req.query;
+
+  const allowedSortValues = [
+    "name",
+    "experience",
+    "consultation_fee",
+    "createdAt",
+  ] as const;
+  const sortValue =
+    typeof sort === "string" && allowedSortValues.includes(sort as any)
+      ? (sort as (typeof allowedSortValues)[number])
+      : "name";
   try {
-    const response = await adminUsecase.fetchLawyers();
-    console.log("res", response);
+    const response = await adminUsecase.fetchLawyers({
+      limit: Number(limit) || 10,
+      page: Number(page) || 1,
+      sort: sortValue,
+      sortBy:
+        typeof sortBy === "string" && (sortBy === "asc" || sortBy === "desc")
+          ? sortBy
+          : "asc",
+      search: typeof search === "string" ? search : undefined,
+      status:
+        typeof status === "string" &&
+        ["verified", "rejected", "pending", "requested"].includes(status)
+          ? (status as "verified" | "rejected" | "pending" | "requested")
+          : undefined,
+    });
     res.status(STATUS_CODES.OK).json({
       success: true,
       message: "Lawyers fetched Successfully",

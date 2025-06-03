@@ -10,8 +10,8 @@ import {
 const router = express.Router();
 
 router.get("/users", authenticateUser, fetchAllUsers);
-router.get("/lawyers", authenticateUser, fetchAllLawyers);
+router.get("/lawyers", fetchAllLawyers);
 router.patch("/user", authenticateUser, BlockUser);
-router.patch("/lawyer",authenticateUser,changeLawyerVerificationStatus)
+router.patch("/lawyer", authenticateUser, changeLawyerVerificationStatus);
 
 export default router;

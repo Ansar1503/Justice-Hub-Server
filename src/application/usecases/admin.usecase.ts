@@ -15,90 +15,38 @@ export class AdminUseCase implements IAdminUseCase {
     private addressRepo: IAddressRepository,
     private LawyerRepo: ILawyerRepository
   ) {}
-  async fetchUsers(query: any): Promise<Client[]> {
+  async fetchUsers(query: {
+    role: "lawyer" | "client";
+    search?: string;
+    page?: number;
+    limit?: number;
+    sort?: string;
+    order?: string;
+    status: "all" | "verified" | "blocked";
+  }): Promise<{
+    data: any[];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  }> {
     const users = await this.userRepo.findAll(query);
-    const addresses = await this.addressRepo.findAll();
-    const clients = await this.clientRepo.findAll();
-    const clientMap = new Map(
-      clients.map((client) => [client.user_id, client])
-    );
-    const addressMap = new Map(
-      addresses.map((address) => [address.user_id, address])
-    );
-
-    const responseData = users
-      .map((user) => {
-        const client = clientMap.get(user.user_id);
-        const address = addressMap.get(user.user_id);
-        if (!client) return null;
-        return {
-          user_id: user.user_id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          is_verified: user.is_verified,
-          is_blocked: user.is_blocked,
-          createdAt: user.createdAt,
-          profile_image: client.profile_image || null,
-          dob: client.dob || null,
-          gender: client.gender || null,
-          address: address,
-        };
-      })
-      .filter(Boolean);
-
-    return responseData as Client[];
+    return users;
   }
-  async fetchLawyers(): Promise<lawyer[] | []> {
-    const [users, clients, lawyers] = await Promise.all([
-      this.userRepo.findAll({ role: "lawyer" }),
-      this.clientRepo.findAll(),
-      this.LawyerRepo.findAll(),
-    ]);
-    
-    if(!users || !clients || !lawyers){
-      throw new Error("USER_NOT_FOUND");
-    }
-    console.log("lawyers", lawyers);
-
-    const clientMap = new Map(
-      clients.map((client) => [client.user_id, client])
-    );
-    const lawyerMap = new Map(lawyers.map((lawyer) => [lawyer.user_id, lawyer]));
-
-    const responseData = users.map((user) => {
-      const client = clientMap.get(user.user_id);
-      const lawyerData= lawyerMap.get(user.user_id);
-      // console.log("lawyer:", lawyerData);
-      return {
-        user_id: user.user_id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        is_verified: user.is_verified,
-        is_blocked: user.is_blocked,
-        createdAt: user.createdAt,
-        profile_image: client?.profile_image || null,
-        dob: client?.dob || null,
-        gender: client?.gender || null,
-        address: client?.address || null,
-        mobile: user.mobile || null,
-        barcouncil_number: lawyerData?.barcouncil_number || null,
-        description: lawyerData?.description || null,
-        practice_areas: lawyerData?.practice_areas || [],
-        verification_status: lawyerData?.verification_status || "pending",
-        experience: lawyerData?.experience || 0,
-        specialisation: lawyerData?.specialisation || [],
-        consultation_fee: lawyerData?.consultation_fee || 0,
-        enrollment_certificate_number:
-          lawyerData?.enrollment_certificate_number || null,
-        certificate_of_practice_number:
-          lawyerData?.certificate_of_practice_number || null,
-        documents: lawyerData?.documents || null,
-      };
-    });
-
-    return responseData as lawyer[] | [];
+  async fetchLawyers(query: {
+    search?: string;
+    status?: "verified" | "rejected" | "pending" | "requested";
+    sort: "name" | "experience" | "consultation_fee" | "createdAt";
+    sortBy: "asc" | "desc";
+    limit: number;
+    page: number;
+  }): Promise<{
+    lawyers: any[];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  }> {
+    const response = await this.userRepo.findLawyersByQuery({...query})
+    return response
   }
 
   async blockUser(user_id: string): Promise<User> {
