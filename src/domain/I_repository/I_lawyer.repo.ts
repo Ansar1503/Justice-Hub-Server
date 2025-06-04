@@ -11,5 +11,10 @@ export interface ILawyerRepository {
     search: string;
     page: number;
     limit: number;
-  }): Promise<any>;
+  }): Promise<{
+    data: any[];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  }>;
 }

@@ -283,9 +283,12 @@ export class ClientUseCase implements I_clientUsecase {
     await this.clientRepository.update(updateData);
   }
 
-  async getLawyers(
-    filter: LawyerFilterParams
-  ): Promise<LawyerResponseDto[] | []> {
+  async getLawyers(filter: LawyerFilterParams): Promise<{
+    data: any[];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  }> {
     const {
       search,
       practiceAreas,
@@ -310,6 +313,7 @@ export class ClientUseCase implements I_clientUsecase {
         $in: Array.isArray(practiceAreas) ? practiceAreas : [practiceAreas],
       };
     }
+
     if (specialisation) {
       matchStage.specialisation = {
         $in: Array.isArray(specialisation) ? specialisation : [specialisation],
@@ -338,14 +342,15 @@ export class ClientUseCase implements I_clientUsecase {
     // console.log("search:", search);
     // console.log("page:", page);
     // console.log("limit:", limit);
-    const allLawyers = await this.lawyerRepository.findAllLawyersWithQuery({
+    const response = await this.lawyerRepository.findAllLawyersWithQuery({
       matchStage,
       sortStage,
       search,
       page,
       limit,
     });
-    const lawyers = allLawyers.map(
+    console.log("response:", response);
+    const lawyers = response?.data?.map(
       (lawyer: any) =>
         new LawyerResponseDto(
           lawyer.user_id,
@@ -372,7 +377,10 @@ export class ClientUseCase implements I_clientUsecase {
           lawyer.consultation_fee
         )
     );
-    return lawyers;
+    return {
+      ...response,
+      data: lawyers,
+    };
   }
 
   async getLawyer(user_id: string): Promise<LawyerResponseDto | null> {
@@ -533,7 +541,7 @@ export class ClientUseCase implements I_clientUsecase {
     date: Date,
     timeSlot: string,
     user_id: string,
-    documentlink?:string
+    documentlink?: string
   ): Promise<any> {
     const clientUser = await this.userRepository.findByuser_id(user_id);
     if (!clientUser) throw new Error(ERRORS.USER_NOT_FOUND);
@@ -664,8 +672,6 @@ export class ClientUseCase implements I_clientUsecase {
       throw error;
     }
 
-    
-     
     const stripe = await getStripeSession({
       amount: lawyer.consultation_fee,
       date: String(date),
