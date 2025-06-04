@@ -127,6 +127,7 @@ export class LawyerUsecase implements Ilawyerusecase {
     );
     return updatedSettings || null;
   }
+  
   async fetchSlotSettings(lawyer_id: string): Promise<ScheduleSettings | null> {
     return await this.scheduleRepo.fetchScheduleSettings(lawyer_id);
   }
@@ -136,7 +137,6 @@ export class LawyerUsecase implements Ilawyerusecase {
     lawyer_id: string
   ): Promise<Availability | null> {
     const settings = await this.scheduleRepo.fetchScheduleSettings(lawyer_id);
-
     if (!settings) {
       const error: any = new Error(
         "Settings not found, please create settings."
@@ -179,7 +179,7 @@ export class LawyerUsecase implements Ilawyerusecase {
       }
 
       const sorted = slots.sort((a, b) => a.startMin - b.startMin);
-      // console.log("sorted", sorted);
+
       for (let i = 0; i < sorted.length - 1; i++) {
         const current = sorted[i];
         const next = sorted[i + 1];
@@ -196,6 +196,7 @@ export class LawyerUsecase implements Ilawyerusecase {
       payload,
       lawyer_id
     );
+    
     return updatedAvailability;
   }
   async fetchAvailableSlots(lawyer_id: string): Promise<Availability | null> {
@@ -206,9 +207,11 @@ export class LawyerUsecase implements Ilawyerusecase {
     payload: OverrideDate[],
     lawyer_id: string
   ): Promise<OverrideSlots | null> {
-    payload.forEach(oveerride => {
-      oveerride.date = new Date(oveerride.date.getTime() - oveerride.date.getTimezoneOffset() * 60000);
-    })
+    payload.forEach((oveerride) => {
+      oveerride.date = new Date(
+        oveerride.date.getTime() - oveerride.date.getTimezoneOffset() * 60000
+      );
+    });
     const slotSettings = await this.scheduleRepo.fetchScheduleSettings(
       lawyer_id
     );

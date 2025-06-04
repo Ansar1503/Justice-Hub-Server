@@ -250,6 +250,7 @@ export const updateAvailableSlot = async (
     });
     return;
   }
+
   try {
     const availability = await lawyerUseCase.updateAvailableSlot(
       req.body,
