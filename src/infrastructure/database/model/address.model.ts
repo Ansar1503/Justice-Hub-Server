@@ -11,7 +11,7 @@ const AddressSchema = new Schema(
     city: { type: String, required: false },
     locality: { type: String, required: false },
     pincode: { type: String, required: false },
-    user_id: { type: String, required: false },
+    user_id: { type: String, required: false, unique: true },
   },
   { timestamps: true }
 );
@@ -19,4 +19,3 @@ const AddressSchema = new Schema(
 const AddressModel = mongoose.model("Address", AddressSchema);
 
 export default AddressModel;
-

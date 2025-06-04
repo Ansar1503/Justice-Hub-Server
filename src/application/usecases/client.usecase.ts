@@ -349,7 +349,7 @@ export class ClientUseCase implements I_clientUsecase {
       page,
       limit,
     });
-    console.log("response:", response);
+    // console.log("response:", response);
     const lawyers = response?.data?.map(
       (lawyer: any) =>
         new LawyerResponseDto(
@@ -457,13 +457,13 @@ export class ClientUseCase implements I_clientUsecase {
       error.code = 404;
       throw error;
     }
-
     const slotDuration = slotSettings.slotDuration;
-
+    
     const override = await this.scheduleRepo.fetcghOverrideSlotByDate(
       lawyer_id,
       date
     );
+
     const availableSlots = await this.scheduleRepo.findAvailableSlots(
       lawyer_id
     );
@@ -488,6 +488,11 @@ export class ClientUseCase implements I_clientUsecase {
       const error: any = new Error(
         "No available slots found for the selected date"
       );
+      error.code = 404;
+      throw error;
+    }
+    if (!availableSlots[day].enabled) {
+      const error: any = new Error("Lawyer not available on the selected date");
       error.code = 404;
       throw error;
     }

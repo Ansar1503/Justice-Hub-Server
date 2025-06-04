@@ -30,7 +30,12 @@ router.post(
   verifyLawyer
 );
 router.get("/", authenticateUser, fetchLawyer);
-router.patch("/schedule/settings", authenticateUser, updateSlotSettings);
+router.patch(
+  "/schedule/settings",
+  authenticateUser,
+  authenticateLawyer,
+  updateSlotSettings
+);
 router.get(
   "/schedule/settings",
   authenticateUser,
@@ -50,8 +55,23 @@ router.get(
   authenticateLawyer,
   fetchAvailableSlots
 );
-router.get('/schedule/override',authenticateUser,authenticateLawyer,fetchOverrideSlots)
-router.post(`/schedule/override`,authenticateUser,authenticateLawyer,addOverrideSlots)
-router.delete("/schedule/override/:id",authenticateUser,authenticateLawyer,removeOverrideSlot)
+router.get(
+  "/schedule/override",
+  authenticateUser,
+  authenticateLawyer,
+  fetchOverrideSlots
+);
+router.post(
+  `/schedule/override`,
+  authenticateUser,
+  authenticateLawyer,
+  addOverrideSlots
+);
+router.delete(
+  "/schedule/override/:id",
+  authenticateUser,
+  authenticateLawyer,
+  removeOverrideSlot
+);
 
 export default router;

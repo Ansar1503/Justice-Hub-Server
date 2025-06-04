@@ -37,7 +37,7 @@ router.post("/profile/address", authenticateUser, updateAddress);
 router.get("/lawyers", authenticateUser, getLawyers);
 router.get("/lawyers/:id", authenticateUser, getLawyerDetail);
 router.post("/lawyers/review/", authenticateUser, addReview);
-router.get("/lawyers/slots/:id", authenticateUser, getLawyerSlotDetais);
+router.get("/lawyers/slots/:id", getLawyerSlotDetais);
 router.post(
   "/lawyer/slots/checkout-session/",
   documentUpload.single("caseDocument"),

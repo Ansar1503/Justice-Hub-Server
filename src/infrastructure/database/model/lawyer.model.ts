@@ -7,7 +7,7 @@ export interface ILawyerModel extends Document, lawyer {
 
 const LawyerSchema = new Schema(
   {
-    user_id: { type: String, required: true },
+    user_id: { type: String, required: true, unique: true },
     description: { type: String, required: false },
     documents: {
       ref: "LawyerDocuments",

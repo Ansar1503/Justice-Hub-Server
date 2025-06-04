@@ -108,13 +108,6 @@ export class LawyerUsecase implements Ilawyerusecase {
   async updateSlotSettings(
     payload: ScheduleSettings
   ): Promise<ScheduleSettings | null> {
-    const user = await this.userRepo.findByuser_id(payload.lawyer_id);
-    if (!user) throw new Error("USERNOTFOUND");
-    if (user.is_blocked) throw new Error("USERBLOCKED");
-    const lawyer = await this.lawyerRepo.findUserId(payload.lawyer_id);
-    if (!lawyer) throw new Error("USERNOTFOUND");
-    if (lawyer.verification_status !== "verified")
-      throw new Error("USERUNVERIFIED");
     if (Number(payload.slotDuration) > 120 || Number(payload.slotDuration < 15))
       throw new Error("INVALIDDURATION");
     if (
@@ -127,7 +120,7 @@ export class LawyerUsecase implements Ilawyerusecase {
     );
     return updatedSettings || null;
   }
-  
+
   async fetchSlotSettings(lawyer_id: string): Promise<ScheduleSettings | null> {
     return await this.scheduleRepo.fetchScheduleSettings(lawyer_id);
   }
@@ -196,7 +189,7 @@ export class LawyerUsecase implements Ilawyerusecase {
       payload,
       lawyer_id
     );
-    
+
     return updatedAvailability;
   }
   async fetchAvailableSlots(lawyer_id: string): Promise<Availability | null> {

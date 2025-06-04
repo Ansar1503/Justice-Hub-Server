@@ -33,7 +33,7 @@ const dayScheduleSchema = new Schema<DayAvailability>(
 );
 
 const AvailabilitySchema = new Schema<IAvailabilityModel>({
-  lawyer_id: { type: String, required: true },
+  lawyer_id: { type: String, required: true, unique: true },
   monday: {
     type: dayScheduleSchema,
     required: true,
@@ -65,7 +65,7 @@ const AvailabilitySchema = new Schema<IAvailabilityModel>({
 });
 
 const schedulesettings = new Schema<IscheduleSettingsModel>({
-  lawyer_id: { type: String, required: true },
+  lawyer_id: { type: String, required: true, unique: true },
   slotDuration: { type: Number, required: true, min: 15, max: 120 },
   maxDaysInAdvance: { type: Number, required: true, min: 15, max: 60 },
   autoConfirm: { type: Boolean, required: true, default: false },
@@ -82,10 +82,10 @@ const overrideSlotSchema = new Schema(
     lawyer_id: { type: String, required: true, unique: true },
     overrideDates: [overrideDateSchema],
   },
-  { timestamps: true,  }
+  { timestamps: true }
 );
 
-export const  overrideSlotsModel = mongoose.model<IOverrideSlotsModel>(
+export const overrideSlotsModel = mongoose.model<IOverrideSlotsModel>(
   "override_slots",
   overrideSlotSchema
 );

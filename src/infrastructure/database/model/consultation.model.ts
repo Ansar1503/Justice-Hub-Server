@@ -24,10 +24,7 @@ const appointmentSchema = new Schema(
       default: "pending",
     },
   },
-  { timestamps: true, optimisticConcurrency: true ,}
+  { timestamps: true, optimisticConcurrency: true }
 );
 
-appointmentSchema.index(
-  { lawyer_id: 1, date: 1, time: 1 },
-  { unique: true }
-);
+appointmentSchema.index({ lawyer_id: 1, date: 1, time: 1 }, { unique: true });
