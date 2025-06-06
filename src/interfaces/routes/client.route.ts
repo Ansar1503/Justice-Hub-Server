@@ -7,6 +7,7 @@ import {
   getLawyerDetail,
   getLawyers,
   getLawyerSlotDetais,
+  getLawyerslotSettings,
   handleWebhooks,
   sendVerifyMail,
   updateAddress,
@@ -15,11 +16,11 @@ import {
   updatePassword,
 } from "../controller/client.controller";
 import multer from "multer";
-import { documentstorage, profilestorage } from "../middelwares/multer";
+import { profilestorage } from "../middelwares/multer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
+import { authenticateClient } from "../middelwares/Auth/authenticateClient";
 
 const upload = multer({ storage: profilestorage });
-const documentUpload = multer({ storage: documentstorage });
 
 const router = express.Router();
 
@@ -37,15 +38,24 @@ router.post("/profile/address", authenticateUser, updateAddress);
 router.get("/lawyers", authenticateUser, getLawyers);
 router.get("/lawyers/:id", authenticateUser, getLawyerDetail);
 router.post("/lawyers/review/", authenticateUser, addReview);
-router.get("/lawyers/slots/:id", getLawyerSlotDetais);
+router.get(
+  "/lawyers/settings/:id",
+  authenticateUser,
+  authenticateClient,
+  getLawyerslotSettings
+);
+router.get("/lawyers/slots/:id", authenticateUser, getLawyerSlotDetais);
 router.post(
   "/lawyer/slots/checkout-session/",
-  documentUpload.single("caseDocument"),
   authenticateUser,
   createCheckoutSession
 );
 router.get("/stripe/session/:id", authenticateUser, fetchStripeSessionDetails);
 // router.get("/stripe/success/:id", authenticateUser,fetchStripeSessionDetails);
-router.post("/stripe/webhooks", authenticateUser, handleWebhooks);
+router.post(
+  "/stripe/webhooks",
+  express.raw({ type: "application/json" }),
+  handleWebhooks
+);
 
 export default router;

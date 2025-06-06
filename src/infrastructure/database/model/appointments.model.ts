@@ -9,7 +9,7 @@ const appointmentSchema = new Schema(
     client_id: { type: String, required: true },
     date: { type: Date, required: true },
     time: { type: String, required: true },
-    document: { type: String, required: false },
+    duration: { type: Number, required: true },
     reason: { type: String, required: true },
     payment_status: {
       type: String,
@@ -24,7 +24,12 @@ const appointmentSchema = new Schema(
       default: "pending",
     },
   },
-  { timestamps: true, optimisticConcurrency: true }
+  { timestamps: true }
 );
 
 appointmentSchema.index({ lawyer_id: 1, date: 1, time: 1 }, { unique: true });
+
+export const AppointmentModel = mongoose.model<IAppointmentModel>(
+  "appointments",
+  appointmentSchema
+);

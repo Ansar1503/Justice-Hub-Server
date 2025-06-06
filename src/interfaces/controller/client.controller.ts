@@ -9,6 +9,7 @@ import { LawyerFilterParams } from "../../domain/entities/Lawyer.entity";
 import { ReviewRepo } from "../../infrastructure/database/repo/review.repo";
 import { ScheduleRepository } from "../../infrastructure/database/repo/schedule.repo";
 import { ERRORS } from "../../infrastructure/constant/errors";
+import { AppointmentsRepository } from "../../infrastructure/database/repo/appointments.repo";
 
 const clientusecase = new ClientUseCase(
   new UserRepository(),
@@ -16,7 +17,8 @@ const clientusecase = new ClientUseCase(
   new AddressRepository(),
   new LawyerRepository(),
   new ReviewRepo(),
-  new ScheduleRepository()
+  new ScheduleRepository(),
+  new AppointmentsRepository()
 );
 
 export const fetchClientData = async (
@@ -500,11 +502,41 @@ export const addReview = async (
   }
 };
 
-export async function getLawyerSlotDetais(req: Request, res: Response) {
+export async function getLawyerslotSettings(req: Request, res: Response) {
+  const { id: lawyer_id } = req.params;
+  if (!lawyer_id.trim()) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "Invalid credentials",
+    });
+    return;
+  }
+  try {
+    const slotSettings = await clientusecase.fetchLawyerSlotSettings(lawyer_id);
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "slot settings fetched successfully",
+      data: slotSettings,
+    });
+    return;
+  } catch (error: any) {
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: error.message,
+    });
+    return;
+  }
+}
+
+export async function getLawyerSlotDetais(
+  req: Request & { user?: any },
+  res: Response
+) {
   const { id: lawyer_id } = req.params;
   const { date } = req.query;
+  const client_id = req.user?.id;
 
-  if (!lawyer_id || !date) {
+  if (!lawyer_id || !date || !client_id) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
       message: "Invalid Credentials",
@@ -512,8 +544,15 @@ export async function getLawyerSlotDetais(req: Request, res: Response) {
     return;
   }
   try {
-    const dateObj = new Date(String(date));
-    const result = await clientusecase.fetchLawyerSlots(lawyer_id, dateObj);
+    const dateObj = new Date(
+      new Date(String(date)).getTime() -
+        new Date(String(date)).getTimezoneOffset() * 60000
+    );
+    const result = await clientusecase.fetchLawyerSlots({
+      lawyer_id,
+      date: dateObj,
+      client_id,
+    });
 
     res.status(STATUS_CODES.OK).json({
       success: true,
@@ -555,26 +594,25 @@ export async function createCheckoutSession(
   res: Response
 ) {
   const user_id = req.user.id;
-
-  const { lawyer_id, date, timeSlot } = req.body;
-  const document = req.file?.path;
-  if (!lawyer_id || !date || !timeSlot) {
+  const { lawyer_id, date, timeSlot, duration, reason } = req.body;
+  if (!lawyer_id || !date || !timeSlot || !user_id || !duration || !reason) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
-      message: "Invalid Ceredentaiols",
+      message: "Invalid Ceredentials",
     });
     return;
   }
 
   try {
     const response = await clientusecase.createCheckoutSession(
+      user_id,
       lawyer_id,
       new Date(
         new Date(date).getTime() - new Date(date).getTimezoneOffset() * 60000
       ),
       timeSlot,
-      user_id,
-      document
+      duration,
+      reason
     );
     res.status(STATUS_CODES.OK).json(response);
     return;

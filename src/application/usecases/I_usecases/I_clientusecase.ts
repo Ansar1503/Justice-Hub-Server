@@ -7,6 +7,7 @@ import { LawyerResponseDto } from "../../dtos/lawyer.dto";
 import { Review } from "../../../domain/entities/Review.entity";
 import {
   BlockedSchedule,
+  ScheduleSettings,
   TimeSlot,
 } from "../../../domain/entities/Schedule.entity";
 
@@ -34,13 +35,19 @@ export interface I_clientUsecase {
   }>;
   getLawyer(user_id: string): Promise<LawyerResponseDto | null>;
   addreview(payload: Review): Promise<void>;
-  fetchLawyerSlots(lawyer_id: string, date: Date): Promise<any>;
+  fetchLawyerSlotSettings(lawyer_id: string): Promise<ScheduleSettings | null>;
+  fetchLawyerSlots(payload: {
+    lawyer_id: string;
+    date: Date;
+    client_id: string;
+  }): Promise<any>;
   createCheckoutSession(
+    client_id: string,
     lawyer_id: string,
     date: Date,
     timeSlot: string,
-    user_id: string,
-    documentlink?: string
+    duration: number,
+    reason: string
   ): Promise<any>;
   handleStripeHook(body: any, signature: string | string[]): Promise<any>;
   fetchStripeSessionDetails(id: string): Promise<any>;

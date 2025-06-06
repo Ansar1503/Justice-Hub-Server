@@ -1,11 +1,16 @@
 export interface Appointment {
   lawyer_id: string;
   client_id: string;
-  date: string;
+  date: Date;
   time: string;
-  document?:string;
-  reason:string;
+  duration: number;
+  reason: string;
   payment_status: "pending" | "success" | "failed";
-  status: "pending" | "confirmed" | "completed" | "cancelled" | "rejected";
+  status:
+    | "pending"
+    | "confirmed"
+    | "completed"
+    | "cancelled"
+    | "rejected"
   createdAt?: string;
 }
