@@ -553,7 +553,6 @@ export async function getLawyerSlotDetais(
       date: dateObj,
       client_id,
     });
-
     res.status(STATUS_CODES.OK).json({
       success: true,
       message: "lawyer slots fetched successfully",
@@ -662,7 +661,7 @@ export async function handleWebhooks(req: Request, res: Response) {
 
 export async function fetchStripeSessionDetails(req: Request, res: Response) {
   const session_id = req.params.id;
-  console.log("sessionid", session_id);
+  // console.log("sessionid", session_id);
   if (!session_id) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
@@ -687,6 +686,111 @@ export async function fetchStripeSessionDetails(req: Request, res: Response) {
           message: "Internal Server Error",
         });
         return;
+    }
+  }
+}
+
+export async function removeFailedSession(req: Request, res: Response) {
+  const session_id = req.params.id;
+  if (!session_id) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "session id not foundd",
+    });
+    return;
+  }
+  try {
+    const response = await clientusecase.getSessionMetadata(
+      session_id as string
+    );
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "success",
+      data: response,
+    });
+    return;
+  } catch (error: any) {
+    res.status(error.code || STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
+    return;
+  }
+}
+
+export async function fetchAppointmentDetails(
+  req: Request & { user?: any },
+  res: Response
+) {
+  const { search, appointmentStatus, sortField, sortOrder, page, limit } =
+    req.query;
+  const appointmentType = req.query.appointmentType;
+  const normalizedAppointmentType =
+    typeof appointmentType === "string" &&
+    ["all", "consultation", "follow-up"].includes(appointmentType)
+      ? (appointmentType as "all" | "consultation" | "follow-up")
+      : "all";
+  const client_id = req.user.id;
+  type appointmentstatustype =
+    | "all"
+    | "confirmed"
+    | "pending"
+    | "completed"
+    | "cancelled"
+    | "rejected";
+  const allowedStatuses: appointmentstatustype[] = [
+    "all",
+    "confirmed",
+    "pending",
+    "completed",
+    "cancelled",
+    "rejected",
+  ];
+  try {
+    const result = await clientusecase.fetchAppointmentDetails({
+      appointmentStatus:
+        typeof appointmentStatus === "string" &&
+        allowedStatuses.includes(appointmentStatus as appointmentstatustype)
+          ? (appointmentStatus as appointmentstatustype)
+          : "all",
+      appointmentType: normalizedAppointmentType,
+      client_id,
+      limit: Number(limit) || 5,
+      page: Number(page) || 1,
+      sortField:
+        typeof sortField === "string" &&
+        ["name", "consultation_fee", "date", "created_at"].includes(sortField)
+          ? (sortField as "name" | "consultation_fee" | "date" | "created_at")
+          : "date",
+      sortOrder:
+        typeof sortOrder === "string" &&
+        (sortOrder === "asc" || sortOrder === "desc")
+          ? sortOrder
+          : "asc",
+      search: String(search) || "",
+    });
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "success",
+      data: result.data,
+      currentPage: result.currentPage,
+      totalPage: result.totalPage,
+      totalCount: result.totalCount,
+    });
+    return;
+  } catch (error: any) {
+    if (error?.code && error.code >= 100 && error.code < 600) {
+      res.status(error.code || STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message || "some errro occured",
+      });
+      return;
+    } else {
+      res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Internal SErver ERror",
+      });
+      return;
     }
   }
 }

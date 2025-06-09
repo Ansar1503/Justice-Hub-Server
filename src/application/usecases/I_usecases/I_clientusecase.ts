@@ -50,6 +50,29 @@ export interface I_clientUsecase {
     reason: string
   ): Promise<any>;
   handleStripeHook(body: any, signature: string | string[]): Promise<any>;
+  getSessionMetadata(sessionid: string): Promise<any>;
   fetchStripeSessionDetails(id: string): Promise<any>;
   generateTimeSlots(start: string, end: string, duration: number): string[];
+  fetchAppointmentDetails(payload: {
+    client_id: string;
+    search: string;
+    appointmentStatus:
+      | "all"
+      | "confirmed"
+      | "pending"
+      | "completed"
+      | "cancelled"
+      | "rejected";
+    appointmentType: "all" | "consultation" | "follow-up";
+    sortField: "name" | "date" | "consultation_fee" | "created_at";
+    sortOrder: "asc" | "desc";
+    page: number;
+    limit: number;
+  }): Promise<{
+    data: any;
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }>;
+  timeStringToDate(baseDate: Date, hhmm: string): Date;
 }

@@ -48,8 +48,9 @@ export async function getStripeSession(payload: payloadType) {
     ],
     mode: "payment",
     success_url: `${process.env.FRONTEND_URL}/client/lawyers/payment_success/?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${process.env.FRONTEND_URL}/client/lawyers/${payload.lawyer_id}`,
+    cancel_url: `${process.env.FRONTEND_URL}/client/lawyers/${payload.lawyer_id}?session_id={CHECKOUT_SESSION_ID}`,
     metadata: {
+      lawyer_name: payload.lawyer_name,
       lawyer_id: payload.lawyer_id,
       time: payload.slot,
       date: payload.date,
@@ -119,6 +120,18 @@ export async function getSessionDetails(sessionId: string) {
   if (!process.env.STRIPE_SECRET_KEY) throw new Error("SECRETKEYNOTFOUND");
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   return await stripe.checkout.sessions.retrieve(sessionId);
+}
+
+export async function getSessionMetaData(sessionId: string) {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    const error: any = new Error("secret key not found");
+    error.code = 400;
+    throw error;
+  }
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+  const metadata = pluckMeta(session.metadata);
+  return metadata;
 }
 
 function pluckMeta(md: Stripe.Metadata | null | undefined) {

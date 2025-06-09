@@ -2,6 +2,7 @@ import express from "express";
 import {
   addReview,
   createCheckoutSession,
+  fetchAppointmentDetails,
   fetchClientData,
   fetchStripeSessionDetails,
   getLawyerDetail,
@@ -9,6 +10,7 @@ import {
   getLawyerSlotDetais,
   getLawyerslotSettings,
   handleWebhooks,
+  removeFailedSession,
   sendVerifyMail,
   updateAddress,
   updateBasicInfo,
@@ -35,9 +37,15 @@ router.put("/profile/personal", authenticateUser, updateEmail);
 router.post("/profile/verifyMail", authenticateUser, sendVerifyMail);
 router.put("/profile/updatePassword", authenticateUser, updatePassword);
 router.post("/profile/address", authenticateUser, updateAddress);
+router.get(
+  "/profile/appointments",
+  authenticateUser,
+  authenticateClient,
+  fetchAppointmentDetails
+);
 router.get("/lawyers", authenticateUser, getLawyers);
 router.get("/lawyers/:id", authenticateUser, getLawyerDetail);
-router.post("/lawyers/review/", authenticateUser, addReview);
+router.post("/lawyers/review", authenticateUser, addReview);
 router.get(
   "/lawyers/settings/:id",
   authenticateUser,
@@ -50,7 +58,18 @@ router.post(
   authenticateUser,
   createCheckoutSession
 );
-router.get("/stripe/session/:id", authenticateUser, fetchStripeSessionDetails);
+router.get(
+  "/stripe/session/:id",
+  authenticateUser,
+  authenticateClient,
+  fetchStripeSessionDetails
+);
+router.delete(
+  "/lawyer/slots/session/:id",
+  authenticateUser,
+  authenticateClient,
+  removeFailedSession
+);
 // router.get("/stripe/success/:id", authenticateUser,fetchStripeSessionDetails);
 router.post(
   "/stripe/webhooks",

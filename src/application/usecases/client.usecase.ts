@@ -22,10 +22,12 @@ import { ERRORS } from "../../infrastructure/constant/errors";
 import { IScheduleRepo } from "../../domain/I_repository/I_schedule.repo";
 import {
   getSessionDetails,
+  getSessionMetaData,
   getStripeSession,
   handleStripeWebHook,
 } from "../services/stripe.service";
 import { IAppointmentsRepository } from "../../domain/I_repository/I_Appointments.repo";
+import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
 
 export class ClientUseCase implements I_clientUsecase {
   constructor(
@@ -37,6 +39,13 @@ export class ClientUseCase implements I_clientUsecase {
     private scheduleRepo: IScheduleRepo,
     private appointmentRepo: IAppointmentsRepository
   ) {}
+  timeStringToDate(baseDate: Date, hhmm: string): Date {
+    const [h, m] = hhmm.split(":").map(Number);
+    const d = new Date(baseDate);
+    d.setHours(h, m, 0, 0);
+    return d;
+  }
+
   timeStringToMinutes(time: string): number {
     const [hours, minutes] = time.split(":").map(Number);
     return hours * 60 + minutes;
@@ -460,6 +469,24 @@ export class ClientUseCase implements I_clientUsecase {
     date: Date;
     client_id: string;
   }): Promise<any> {
+    const isToday = (someDate: Date) => {
+      const today = new Date();
+      return (
+        someDate.getDate() === today.getDate() &&
+        someDate.getMonth() === today.getMonth() &&
+        someDate.getFullYear() === today.getFullYear()
+      );
+    };
+
+    const isSlotInFuture = (slotTime: string) => {
+      const now = new Date();
+      const [hours, minutes] = slotTime.split(":").map(Number);
+      const slotDate = new Date(date);
+      slotDate.setHours(hours, minutes, 0, 0);
+
+      return slotDate > now;
+    };
+
     const filterBookedSlots = (slots: string[]) =>
       slots.filter((t) => !booked.has(t));
     const user = await this.userRepository.findByuser_id(lawyer_id);
@@ -469,22 +496,27 @@ export class ClientUseCase implements I_clientUsecase {
     if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
     if (lawyer.verification_status !== "verified")
       throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
+
     const slotSettings = await this.scheduleRepo.fetchScheduleSettings(
       lawyer_id
     );
 
-    const existingAppointment = await this.appointmentRepo.findByDate({
-      date,
-      lawyer_id,
-    });
-
-    const booked = new Set<string>();
-    existingAppointment?.forEach((a) => booked.add(a.time));
     if (!slotSettings) {
       const error: any = new Error("slot settings not found for the lawyer");
       error.code = 404;
       throw error;
     }
+    const existingAppointment =
+      await this.appointmentRepo.findByDateandLawyer_id({
+        date,
+        lawyer_id,
+      });
+
+    const booked = new Set<string>();
+    existingAppointment?.forEach(
+      (a) => a.payment_status !== "failed" && booked.add(a.time)
+    );
+
     const slotDuration = slotSettings.slotDuration;
 
     const override = await this.scheduleRepo.fetcghOverrideSlotByDate(
@@ -543,9 +575,14 @@ export class ClientUseCase implements I_clientUsecase {
           allSlots.push(...timeSlot);
         }
         allSlots = filterBookedSlots(allSlots);
+
+        if (isToday(date)) {
+          allSlots = allSlots.filter(isSlotInFuture);
+        }
+
         return {
           slots: allSlots,
-          isAvailable: true,
+          isAvailable: allSlots.length > 0,
         };
       }
     }
@@ -564,10 +601,14 @@ export class ClientUseCase implements I_clientUsecase {
       );
     }
     daySlots = filterBookedSlots(daySlots);
-    // console.log("slots from available", daySlots);
+
+    if (isToday(date)) {
+      daySlots = daySlots.filter(isSlotInFuture);
+    }
+
     return {
       slots: daySlots,
-      isAvailable: true,
+      isAvailable: daySlots.length > 0,
     };
   }
 
@@ -587,6 +628,12 @@ export class ClientUseCase implements I_clientUsecase {
     if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
     if (lawyer.verification_status !== "verified")
       throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
+    const slotDateTime = this.timeStringToDate(date, timeSlot);
+    if (slotDateTime <= new Date()) {
+      const err: any = new Error("Selected time slot is in the past");
+      err.code = STATUS_CODES.BAD_REQUEST;
+      throw err;
+    }
     const slotSettings = await this.scheduleRepo.fetchScheduleSettings(
       lawyer_id
     );
@@ -595,7 +642,6 @@ export class ClientUseCase implements I_clientUsecase {
       error.code = 404;
       throw error;
     }
-    const slotDuration = slotSettings.slotDuration;
     const availableSlots = await this.scheduleRepo.findAvailableSlots(
       lawyer_id
     );
@@ -608,11 +654,10 @@ export class ClientUseCase implements I_clientUsecase {
       lawyer_id,
       date
     );
-    const appointment = await this.appointmentRepo.findByDate({
+    const appointment = await this.appointmentRepo.findByDateandLawyer_id({
       lawyer_id,
       date,
     });
-
     const timeSlotExist = appointment?.some(
       (appointment) =>
         appointment.time === timeSlot && appointment.payment_status !== "failed"
@@ -621,6 +666,17 @@ export class ClientUseCase implements I_clientUsecase {
     if (timeSlotExist) {
       const error: any = new Error("slot already booked");
       error.code = 404;
+      throw error;
+    }
+    const existingApointmentonDate =
+      await this.appointmentRepo.findByDateandClientId({ client_id, date });
+    const bookingExist = existingApointmentonDate?.some(
+      (appointment) =>
+        appointment.time === timeSlot && appointment.payment_status !== "failed"
+    );
+    if (bookingExist) {
+      const error: any = new Error("booking exist on same time");
+      error.code = STATUS_CODES.BAD_REQUEST;
       throw error;
     }
     if (override && Object.keys(override).length > 0) {
@@ -667,6 +723,7 @@ export class ClientUseCase implements I_clientUsecase {
           reason,
           status: "pending",
           time: timeSlot,
+          type: "consultation",
         });
         const stripe = await getStripeSession({
           amount: lawyer.consultation_fee,
@@ -740,6 +797,7 @@ export class ClientUseCase implements I_clientUsecase {
       reason,
       status: "pending",
       time: timeSlot,
+      type: "consultation",
     });
 
     const stripe = await getStripeSession({
@@ -764,8 +822,15 @@ export class ClientUseCase implements I_clientUsecase {
 
     const { lawyer_id, client_id, date, time, duration, payment_status } =
       result;
-    if(!client_id || !lawyer_id || !date || !time || !duration || !payment_status){
-      throw new Error("")
+    if (
+      !client_id ||
+      !lawyer_id ||
+      !date ||
+      !time ||
+      !duration ||
+      !payment_status
+    ) {
+      throw new Error("no metadata found");
     }
     await this.appointmentRepo.Update({
       lawyer_id,
@@ -778,13 +843,53 @@ export class ClientUseCase implements I_clientUsecase {
     });
   }
 
+  async getSessionMetadata(sessionid: string): Promise<any> {
+    const metadata = await getSessionMetaData(sessionid);
+    const { client_id, date, duration, lawyer_id, time } = metadata;
+    if (!client_id || !date || !duration || !lawyer_id || !time) {
+      const error: any = new Error("metatdata not found");
+      error.code = 404;
+      throw error;
+    }
+    return await this.appointmentRepo.delete({
+      client_id,
+      date: new Date(date),
+      duration: Number(duration),
+      time,
+      lawyer_id,
+    });
+  }
+
   async fetchStripeSessionDetails(id: string): Promise<any> {
     const sessionDetails = await getSessionDetails(id);
     return {
       lawyer: sessionDetails?.metadata?.lawyer_name,
-      slot: sessionDetails?.metadata?.slot,
+      slot: sessionDetails?.metadata?.time,
       date: sessionDetails?.metadata?.date,
       amount: sessionDetails?.metadata?.amount,
     };
+  }
+  async fetchAppointmentDetails(payload: {
+    client_id: string;
+    search: string;
+    appointmentStatus:
+      | "all"
+      | "confirmed"
+      | "pending"
+      | "completed"
+      | "cancelled"
+      | "rejected";
+    appointmentType: "all" | "consultation" | "follow-up";
+    sortField: "name" | "date" | "consultation_fee" | "created_at";
+    sortOrder: "asc" | "desc";
+    page: number;
+    limit: number;
+  }): Promise<{
+    data: any;
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }> {
+    return await this.appointmentRepo.findForClientsUsingAggregation(payload);
   }
 }

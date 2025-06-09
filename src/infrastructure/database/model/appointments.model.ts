@@ -11,6 +11,11 @@ const appointmentSchema = new Schema(
     time: { type: String, required: true },
     duration: { type: Number, required: true },
     reason: { type: String, required: true },
+    type: {
+      type: String,
+      required: true,
+      enum: ["consultation", "follow-up"],
+    },
     payment_status: {
       type: String,
       required: true,

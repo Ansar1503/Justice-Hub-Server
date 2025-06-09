@@ -42,7 +42,7 @@ export class AppointmentsRepository implements IAppointmentsRepository {
     throw error;
   }
 
-  async findByDate(payload: {
+  async findByDateandLawyer_id(payload: {
     lawyer_id: string;
     date: Date;
   }): Promise<Appointment[] | null> {
@@ -53,7 +53,17 @@ export class AppointmentsRepository implements IAppointmentsRepository {
       date: { $gte: startOfDay, $lte: endOfDay },
     });
   }
-
+  async findByDateandClientId(payload: {
+    client_id: string;
+    date: Date;
+  }): Promise<Appointment[] | null> {
+    const startOfDay = new Date(payload.date).setUTCHours(0, 0, 0, 0);
+    const endOfDay = new Date(payload.date).setUTCHours(23, 59, 59, 999);
+    return await AppointmentModel.find({
+      client_id: payload.client_id,
+      date: { $gte: startOfDay, $lte: endOfDay },
+    });
+  }
   async Update(payload: Partial<Appointment>): Promise<Appointment | null> {
     if (!payload.date) {
       return null;
@@ -64,7 +74,7 @@ export class AppointmentsRepository implements IAppointmentsRepository {
       {
         client_id: payload.client_id,
         lawyer_id: payload.lawyer_id,
-        date: payload.date,
+        date: { $gte: startOfDay, $lte: endOfDay },
         time: payload.time,
         duration: payload.duration,
       },
@@ -76,5 +86,132 @@ export class AppointmentsRepository implements IAppointmentsRepository {
       }
     );
     return updated;
+  }
+  async delete(payload: Partial<Appointment>): Promise<Appointment | null> {
+    if (!payload.date) {
+      return null;
+    }
+    const startOfDay = new Date(payload?.date).setUTCHours(0, 0, 0, 0);
+    const endOfDay = new Date(payload?.date).setUTCHours(23, 59, 59, 999);
+    const afterDelete = await AppointmentModel.findOneAndDelete({
+      client_id: payload.client_id,
+      lawyer_id: payload.lawyer_id,
+      date: { $gte: startOfDay, $lte: endOfDay },
+      time: payload.time,
+      duration: payload.duration,
+    });
+    return afterDelete;
+  }
+  async findForClientsUsingAggregation(payload: {
+    client_id: string;
+    search: string;
+    appointmentStatus:
+      | "all"
+      | "confirmed"
+      | "pending"
+      | "completed"
+      | "cancelled"
+      | "rejected";
+    appointmentType: "all" | "consultation" | "follow-up";
+    sortField: "name" | "date" | "consultation_fee" | "created_at";
+    sortOrder: "asc" | "desc";
+    page: number;
+    limit: number;
+  }): Promise<{
+    data: any;
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }> {
+    const {
+      client_id,
+      search = "",
+      appointmentStatus = "all",
+      appointmentType = "all",
+      sortField = "created_at",
+      sortOrder = "desc",
+      page = 1,
+      limit = 10,
+    } = payload;
+    const matchStage: Record<string, any> = { client_id };
+    const sortStage: Record<string, any> = {
+      [sortField]: sortOrder === "asc" ? 1 : -1,
+    };
+    if (sortField == "name") {
+      sortStage["userData.name"] = sortOrder === "asc" ? 1 : -1;
+    } else if (sortField === "consultation_fee") {
+      sortStage["lawyerData.consultation_fee"] = sortOrder === "asc" ? 1 : -1;
+    }
+    const matchStage2: Record<string, any> = {};
+    if (appointmentStatus && appointmentStatus !== "all") {
+      matchStage["status"] = appointmentStatus;
+    }
+    if (appointmentType && appointmentType !== "all") {
+      matchStage["type"] = appointmentType;
+    }
+    const countPipeline: any[] = [{ $match: matchStage }];
+    const dataPipeline: any[] = [{ $match: matchStage }];
+    const lookups = [
+      {
+        $lookup: {
+          from: "users",
+          localField: "lawyer_id",
+          foreignField: "user_id",
+          as: "userData",
+        },
+      },
+      {
+        $lookup: {
+          from: "clients",
+          localField: "lawyer_id",
+          foreignField: "user_id",
+          as: "clientData",
+        },
+      },
+      {
+        $lookup: {
+          from: "lawyers",
+          localField: "lawyer_id",
+          foreignField: "user_id",
+          as: "lawyerData",
+        },
+      },
+      {
+        $addFields: {
+          userData: { $arrayElemAt: ["$userData", 0] },
+          clientData: { $arrayElemAt: ["$clientData", 0] },
+          lawyerData: { $arrayElemAt: ["$lawyerData", 0] },
+        },
+      },
+    ];
+
+    matchStage2["$or"] = [
+      { "userData.name": { $regex: search, $options: "i" } },
+      { "userData.email": { $regex: search, $options: "i" } },
+    ];
+
+    dataPipeline.push(
+      ...lookups,
+      { $match: matchStage2 },
+      { $project: { "userData.password": 0, "lawyerData.documents": 0 } },
+      { $sort: sortStage },
+      { $skip: (page - 1) * limit },
+      { $limit: limit }
+    );
+
+    countPipeline.push(...lookups, { $count: "total" });
+    const [dataResult, countResult] = await Promise.all([
+      AppointmentModel.aggregate(dataPipeline),
+      AppointmentModel.aggregate(countPipeline),
+    ]);
+    console.log("dataResult", dataResult);
+    const totalCount = countResult[0]?.total || 0;
+    const totalPage = Math.ceil(totalCount / limit);
+    return {
+      data: dataResult,
+      totalCount,
+      currentPage: page,
+      totalPage,
+    };
   }
 }

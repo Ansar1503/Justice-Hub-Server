@@ -6,11 +6,7 @@ export interface Appointment {
   duration: number;
   reason: string;
   payment_status: "pending" | "success" | "failed";
-  status:
-    | "pending"
-    | "confirmed"
-    | "completed"
-    | "cancelled"
-    | "rejected"
+  type: "consultation" | "follow-up";
+  status: "pending" | "confirmed" | "completed" | "cancelled" | "rejected";
   createdAt?: string;
 }
