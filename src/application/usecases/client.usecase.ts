@@ -28,6 +28,7 @@ import {
 } from "../services/stripe.service";
 import { IAppointmentsRepository } from "../../domain/I_repository/I_Appointments.repo";
 import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
+import { Appointment } from "../../domain/entities/Appointment.entity";
 
 export class ClientUseCase implements I_clientUsecase {
   constructor(
@@ -620,7 +621,7 @@ export class ClientUseCase implements I_clientUsecase {
     duration: number,
     reason: string
   ): Promise<any> {
-    const client = await this.clientRepository.findByUserId(lawyer_id);
+    // const client = await this.clientRepository.findByUserId(lawyer_id);
     const user = await this.userRepository.findByuser_id(lawyer_id);
     if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
     if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
@@ -662,7 +663,6 @@ export class ClientUseCase implements I_clientUsecase {
       (appointment) =>
         appointment.time === timeSlot && appointment.payment_status !== "failed"
     );
-
     if (timeSlotExist) {
       const error: any = new Error("slot already booked");
       error.code = 404;
@@ -718,6 +718,7 @@ export class ClientUseCase implements I_clientUsecase {
           client_id,
           date,
           duration,
+          amount: lawyer.consultation_fee,
           lawyer_id,
           payment_status: "pending",
           reason,
@@ -793,6 +794,7 @@ export class ClientUseCase implements I_clientUsecase {
       date,
       duration,
       lawyer_id,
+      amount: lawyer.consultation_fee,
       payment_status: "pending",
       reason,
       status: "pending",
@@ -832,6 +834,18 @@ export class ClientUseCase implements I_clientUsecase {
     ) {
       throw new Error("no metadata found");
     }
+    const scheduleSettings = await this.scheduleRepo.fetchScheduleSettings(
+      lawyer_id
+    );
+    let status:
+      | "confirmed"
+      | "pending"
+      | "completed"
+      | "cancelled"
+      | "rejected" = "pending";
+    if (scheduleSettings && scheduleSettings.autoConfirm) {
+      status = "confirmed";
+    }
     await this.appointmentRepo.Update({
       lawyer_id,
       client_id,
@@ -839,7 +853,7 @@ export class ClientUseCase implements I_clientUsecase {
       time,
       duration: Number(duration),
       payment_status,
-      status: "pending",
+      status,
     });
   }
 
@@ -891,5 +905,44 @@ export class ClientUseCase implements I_clientUsecase {
     totalPage: number;
   }> {
     return await this.appointmentRepo.findForClientsUsingAggregation(payload);
+  }
+
+  async cancellAppointment(payload: {
+    id: string;
+    status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
+  }): Promise<Appointment | null> {
+    const appointment = await this.appointmentRepo.findById(payload.id);
+    if (!appointment) {
+      const error: any = new Error("appointment not found");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+    if (appointment.status === "cancelled") {
+      const error: any = new Error("already cancelled");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+    if (appointment.status === "completed") {
+      const error: any = new Error("appointment completed");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+    if (appointment.status === "rejected") {
+      const error: any = new Error("appointment already rejected by lawyer");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+    const slotDateTime = this.timeStringToDate(
+      appointment.date,
+      appointment.time
+    );
+
+    if (slotDateTime <= new Date()) {
+      const error: any = new Error("Date and time has reached or exceeded");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+    const response = await this.appointmentRepo.updateWithId(payload);
+    return response;
   }
 }

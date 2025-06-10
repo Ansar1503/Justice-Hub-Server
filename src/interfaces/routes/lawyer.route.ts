@@ -4,10 +4,13 @@ import multer from "multer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 import {
   addOverrideSlots,
+  confirmClientAppointment,
+  fetchAppointmentDetails,
   fetchAvailableSlots,
   fetchLawyer,
   fetchOverrideSlots,
   fetchSlotSettings,
+  rejectClientAppointment,
   removeOverrideSlot,
   updateAvailableSlot,
   updateSlotSettings,
@@ -72,6 +75,25 @@ router.delete(
   authenticateUser,
   authenticateLawyer,
   removeOverrideSlot
+);
+
+router.get(
+  "/profile/appointments",
+  authenticateUser,
+  authenticateLawyer,
+  fetchAppointmentDetails
+);
+router.patch(
+  "/profile/appointments/reject",
+  authenticateUser,
+  authenticateLawyer,
+  rejectClientAppointment
+);
+router.patch(
+  "/profile/appointments/approve",
+  authenticateUser,
+  authenticateLawyer,
+  confirmClientAppointment
 );
 
 export default router;

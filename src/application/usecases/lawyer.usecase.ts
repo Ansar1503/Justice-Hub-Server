@@ -1,3 +1,4 @@
+import { Appointment } from "../../domain/entities/Appointment.entity";
 import { lawyer } from "../../domain/entities/Lawyer.entity";
 import {
   Availability,
@@ -8,12 +9,13 @@ import {
   ScheduleSettings,
   TimeSlot,
 } from "../../domain/entities/Schedule.entity";
+import { IAppointmentsRepository } from "../../domain/I_repository/I_Appointments.repo";
 import { IClientRepository } from "../../domain/I_repository/I_client.repo";
 import { IDocumentsRepository } from "../../domain/I_repository/I_documents.repo";
 import { ILawyerRepository } from "../../domain/I_repository/I_lawyer.repo";
 import { IScheduleRepo } from "../../domain/I_repository/I_schedule.repo";
+import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
 import { IUserRepository } from "../../domain/I_repository/I_user.repo";
-import { ERRORS } from "../../infrastructure/constant/errors";
 import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
 import { Ilawyerusecase } from "./I_usecases/I_lawyer.usecase";
 
@@ -23,8 +25,16 @@ export class LawyerUsecase implements Ilawyerusecase {
     private clientRepo: IClientRepository,
     private lawyerRepo: ILawyerRepository,
     private scheduleRepo: IScheduleRepo,
-    private documentsRepo: IDocumentsRepository
+    private documentsRepo: IDocumentsRepository,
+    private appointRepo: IAppointmentsRepository,
+    private sessionsRepo: ISessionsRepo
   ) {}
+  timeStringToDate(baseDate: Date, hhmm: string): Date {
+    const [h, m] = hhmm.split(":").map(Number);
+    const d = new Date(baseDate);
+    d.setHours(h, m, 0, 0);
+    return d;
+  }
   timeStringToMinutes(time: string): number {
     const [hours, minutes] = time.split(":").map(Number);
     return hours * 60 + minutes;
@@ -319,5 +329,118 @@ export class LawyerUsecase implements Ilawyerusecase {
       id
     );
     return updatedOverrideSlots;
+  }
+  async fetchAppointmentDetailsforLawyers(payload: {
+    lawyer_id: string;
+    search: string;
+    appointmentStatus:
+      | "all"
+      | "confirmed"
+      | "pending"
+      | "completed"
+      | "cancelled"
+      | "rejected";
+    appointmentType: "all" | "consultation" | "follow-up";
+    sortField: "name" | "date" | "consultation_fee" | "created_at";
+    sortOrder: "asc" | "desc";
+    page: number;
+    limit: number;
+  }): Promise<{
+    data: any;
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }> {
+    return await this.appointRepo.findForLawyersUsingAggregation(payload);
+  }
+  async rejectClientAppointmen(payload: {
+    id: string;
+    status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
+  }): Promise<Appointment | null> {
+    const appointment = await this.appointRepo.findById(payload.id);
+    if (!appointment) {
+      const error: any = new Error("appointment not found");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+    if (appointment.status === "cancelled") {
+      const error: any = new Error("already rejected");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+    if (appointment.status === "completed") {
+      const error: any = new Error("appointment completed");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+    if (appointment.status === "rejected") {
+      const error: any = new Error("appointment already rejected by lawyer");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+    const slotDateTime = this.timeStringToDate(
+      appointment.date,
+      appointment.time
+    );
+
+    if (slotDateTime <= new Date()) {
+      const error: any = new Error("Date and time has reached or exceeded");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+
+    const response = await this.appointRepo.updateWithId(payload);
+    return response;
+  }
+  async confirmClientAppointment(payload: {
+    id: string;
+    status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
+  }): Promise<Appointment | null> {
+    const appointment = await this.appointRepo.findById(payload.id);
+    if (!appointment) {
+      const error: any = new Error("appointment not found");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+    if (appointment.status === "cancelled") {
+      const error: any = new Error("already rejected");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+    if (appointment.status === "completed") {
+      const error: any = new Error("appointment completed");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+    if (appointment.status === "rejected") {
+      const error: any = new Error("appointment already rejected by lawyer");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+    const slotDateTime = this.timeStringToDate(
+      appointment.date,
+      appointment.time
+    );
+
+    if (slotDateTime <= new Date()) {
+      const error: any = new Error("Date and time has reached or exceeded");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+
+    await this.sessionsRepo.create({
+      amount: appointment.amount,
+      appointment_id: payload.id,
+      client_id: appointment.client_id,
+      duration: appointment.duration,
+      lawyer_id: appointment.lawyer_id,
+      reason: appointment.reason,
+      scheduled_at: appointment.date,
+      status: "upcoming",
+      type: appointment.type,
+    });
+
+    const response = await this.appointRepo.updateWithId(payload);
+    return response;
   }
 }

@@ -10,11 +10,12 @@ import {
   ScheduleSettings,
   TimeSlot,
 } from "../../../domain/entities/Schedule.entity";
+import { Appointment } from "../../../domain/entities/Appointment.entity";
 
 export interface I_clientUsecase {
   timeStringToMinutes(time: string): number;
   timeStringToMinutes(time: string): number;
-
+  timeStringToDate(baseDate: Date, hhmm: string): Date;
   fetchClientData(user_id: string): Promise<any>;
   updateClientData(
     clientData: ClientDto & { name: string; mobile: string }
@@ -74,5 +75,8 @@ export interface I_clientUsecase {
     currentPage: number;
     totalPage: number;
   }>;
-  timeStringToDate(baseDate: Date, hhmm: string): Date;
+  cancellAppointment(payload: {
+    id: string;
+    status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
+  }): Promise<Appointment | null>;
 }

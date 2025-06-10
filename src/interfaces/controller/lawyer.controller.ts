@@ -8,13 +8,17 @@ import { DocumentsRepo } from "../../infrastructure/database/repo/documents.repo
 import { lawyer, LawyerDocuments } from "../../domain/entities/Lawyer.entity";
 import { ScheduleRepository } from "../../infrastructure/database/repo/schedule.repo";
 import { zodOverrideSlotsSchema } from "../middelwares/validator/zod/zod.validate";
+import { AppointmentsRepository } from "../../infrastructure/database/repo/appointments.repo";
+import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
 
 const lawyerUseCase = new LawyerUsecase(
   new UserRepository(),
   new ClientRepository(),
   new LawyerRepository(),
   new ScheduleRepository(),
-  new DocumentsRepo()
+  new DocumentsRepo(),
+  new AppointmentsRepository(),
+  new SessionsRepository()
 );
 
 export const verifyLawyer = async (
@@ -385,5 +389,153 @@ export async function removeOverrideSlot(
       message: error.message || "Internal Server Error",
     });
     return;
+  }
+}
+
+export async function fetchAppointmentDetails(
+  req: Request & { user?: any },
+  res: Response
+) {
+  const lawyer_id = req.user?.id;
+  const { search, appointmentStatus, sortField, sortOrder, page, limit } =
+    req.query;
+  const appointmentType = req.query.appointmentType;
+  const normalizedAppointmentType =
+    typeof appointmentType === "string" &&
+    ["all", "consultation", "follow-up"].includes(appointmentType)
+      ? (appointmentType as "all" | "consultation" | "follow-up")
+      : "all";
+  type appointmentstatustype =
+    | "all"
+    | "confirmed"
+    | "pending"
+    | "completed"
+    | "cancelled"
+    | "rejected";
+  const allowedStatuses: appointmentstatustype[] = [
+    "all",
+    "confirmed",
+    "pending",
+    "completed",
+    "cancelled",
+    "rejected",
+  ];
+  try {
+    const result = await lawyerUseCase.fetchAppointmentDetailsforLawyers({
+      appointmentStatus:
+        typeof appointmentStatus === "string" &&
+        allowedStatuses.includes(appointmentStatus as appointmentstatustype)
+          ? (appointmentStatus as appointmentstatustype)
+          : "all",
+      appointmentType: normalizedAppointmentType,
+      lawyer_id,
+      limit: Number(limit) || 5,
+      page: Number(page) || 1,
+      sortField:
+        typeof sortField === "string" &&
+        ["name", "consultation_fee", "date", "created_at"].includes(sortField)
+          ? (sortField as "name" | "consultation_fee" | "date" | "created_at")
+          : "date",
+      sortOrder:
+        typeof sortOrder === "string" &&
+        (sortOrder === "asc" || sortOrder === "desc")
+          ? sortOrder
+          : "asc",
+      search: String(search) || "",
+    });
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "success",
+      data: result.data,
+      currentPage: result.currentPage,
+      totalPage: result.totalPage,
+      totalCount: result.totalCount,
+    });
+    return;
+  } catch (error: any) {
+    if (error?.code && error.code >= 100 && error.code < 600) {
+      res.status(error.code || STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message || "some errro occured",
+      });
+      return;
+    } else {
+      res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Internal SErver ERror",
+      });
+      return;
+    }
+  }
+}
+
+export async function rejectClientAppointment(
+  req: Request & { user?: any },
+  res: Response
+) {
+  const { id, status } = req.body;
+  if (!id || !status) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "Invalid credentials",
+    });
+    return;
+  }
+  try {
+    const result = await lawyerUseCase.rejectClientAppointmen({ id, status });
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "rejected appointnment",
+      data: result,
+    });
+    return;
+  } catch (error: any) {
+    if (error?.code && error.code >= 100 && error.code < 600) {
+      res.status(error.code || STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message || "some errro occured",
+      });
+      return;
+    } else {
+      res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Internal SErver ERror",
+      });
+      return;
+    }
+  }
+}
+
+export async function confirmClientAppointment(req: Request, res: Response) {
+  const { id, status } = req.body;
+  if (!id || !status) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "Invalid credentials",
+    });
+    return;
+  }
+  try {
+    const result = await lawyerUseCase.confirmClientAppointment({ id, status });
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "session created",
+      data: result,
+    });
+    return;
+  } catch (error: any) {
+    if (error?.code && error.code >= 100 && error.code < 600) {
+      res.status(error.code || STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: error.message || "some errro occured",
+      });
+      return;
+    } else {
+      res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Internal SErver ERror",
+      });
+      return;
+    }
   }
 }

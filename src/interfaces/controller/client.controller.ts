@@ -779,18 +779,54 @@ export async function fetchAppointmentDetails(
     });
     return;
   } catch (error: any) {
-    if (error?.code && error.code >= 100 && error.code < 600) {
-      res.status(error.code || STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: error.message || "some errro occured",
-      });
-      return;
-    } else {
-      res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
-        success: false,
-        message: "Internal SErver ERror",
-      });
-      return;
-    }
+    const statusCode =
+      typeof error?.code === "number" && error.code >= 100 && error.code < 600
+        ? error.code
+        : STATUS_CODES.INTERNAL_SERVER_ERROR;
+
+    res.status(statusCode).json({
+      success: false,
+      message: error?.message || "An unexpected error occurred.",
+    });
+  }
+}
+
+export async function cancellAppoinment(
+  req: Request & { user?: any },
+  res: Response
+) {
+  const client_id = req.user?.id;
+  if (!client_id) {
+    res
+      .status(STATUS_CODES.BAD_REQUEST)
+      .json({ success: false, message: "user id not found" });
+    return;
+  }
+  const { id, status } = req.body;
+  if (!id || !status) {
+    res
+      .status(STATUS_CODES.BAD_REQUEST)
+      .json({ success: false, messsage: "Invalid Credentials" });
+    return;
+  }
+  try {
+    const result = await clientusecase.cancellAppointment({ id, status });
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "appointment cancelled",
+      data: result,
+    });
+    return;
+  } catch (error: any) {
+    const statusCode =
+      typeof error?.code === "number" && error.code >= 100 && error.code < 600
+        ? error.code
+        : STATUS_CODES.INTERNAL_SERVER_ERROR;
+
+    res.status(statusCode).json({
+      success: false,
+      message: error?.message || "An unexpected error occurred.",
+    });
+    return;
   }
 }

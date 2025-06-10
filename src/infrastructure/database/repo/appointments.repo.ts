@@ -214,4 +214,130 @@ export class AppointmentsRepository implements IAppointmentsRepository {
       totalPage,
     };
   }
+  async findForLawyersUsingAggregation(payload: {
+    lawyer_id: string;
+    search: string;
+    appointmentStatus:
+      | "all"
+      | "confirmed"
+      | "pending"
+      | "completed"
+      | "cancelled"
+      | "rejected";
+    appointmentType: "all" | "consultation" | "follow-up";
+    sortField: "name" | "date" | "consultation_fee" | "created_at";
+    sortOrder: "asc" | "desc";
+    page: number;
+    limit: number;
+  }): Promise<{
+    data: any;
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }> {
+    const {
+      lawyer_id,
+      search = "",
+      appointmentStatus = "all",
+      appointmentType = "all",
+      sortField = "created_at",
+      sortOrder = "desc",
+      page = 1,
+      limit = 10,
+    } = payload;
+    const matchStage: Record<string, any> = { lawyer_id };
+    const sortStage: Record<string, any> = {
+      [sortField]: sortOrder === "asc" ? 1 : -1,
+    };
+    if (sortField == "name") {
+      sortStage["userData.name"] = sortOrder === "asc" ? 1 : -1;
+    } else if (sortField === "consultation_fee") {
+      sortStage["lawyerData.consultation_fee"] = sortOrder === "asc" ? 1 : -1;
+    }
+    const matchStage2: Record<string, any> = {};
+    if (appointmentStatus && appointmentStatus !== "all") {
+      matchStage["status"] = appointmentStatus;
+    }
+    if (appointmentType && appointmentType !== "all") {
+      matchStage["type"] = appointmentType;
+    }
+    const countPipeline: any[] = [{ $match: matchStage }];
+    const dataPipeline: any[] = [{ $match: matchStage }];
+    const lookups = [
+      {
+        $lookup: {
+          from: "users",
+          localField: "client_id",
+          foreignField: "user_id",
+          as: "userData",
+        },
+      },
+      {
+        $lookup: {
+          from: "clients",
+          localField: "client_id",
+          foreignField: "user_id",
+          as: "clientData",
+        },
+      },
+      {
+        $lookup: {
+          from: "lawyers",
+          localField: "client_id",
+          foreignField: "user_id",
+          as: "lawyerData",
+        },
+      },
+      {
+        $addFields: {
+          userData: { $arrayElemAt: ["$userData", 0] },
+          clientData: { $arrayElemAt: ["$clientData", 0] },
+          lawyerData: { $arrayElemAt: ["$lawyerData", 0] },
+        },
+      },
+    ];
+
+    matchStage2["$or"] = [
+      { "userData.name": { $regex: search, $options: "i" } },
+      { "userData.email": { $regex: search, $options: "i" } },
+    ];
+
+    dataPipeline.push(
+      ...lookups,
+      { $match: matchStage2 },
+      { $project: { "userData.password": 0, "lawyerData.documents": 0 } },
+      { $sort: sortStage },
+      { $skip: (page - 1) * limit },
+      { $limit: limit }
+    );
+
+    countPipeline.push(...lookups, { $count: "total" });
+    const [dataResult, countResult] = await Promise.all([
+      AppointmentModel.aggregate(dataPipeline),
+      AppointmentModel.aggregate(countPipeline),
+    ]);
+    // console.log("dataResult", dataResult);
+    const totalCount = countResult[0]?.total || 0;
+    const totalPage = Math.ceil(totalCount / limit);
+    return {
+      data: dataResult,
+      totalCount,
+      currentPage: page,
+      totalPage,
+    };
+  }
+  async updateWithId(payload: {
+    id: string;
+    status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
+  }): Promise<Appointment | null> {
+    return await AppointmentModel.findOneAndUpdate(
+      { _id: payload.id },
+      { $set: { status: payload.status } },
+      { new: true }
+    );
+  }
+  async findById(id: string): Promise<Appointment | null> {
+    return await AppointmentModel.findOne({ _id: id });
+  }
 }
+ 

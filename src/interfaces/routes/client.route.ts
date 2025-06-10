@@ -1,6 +1,7 @@
 import express from "express";
 import {
   addReview,
+  cancellAppoinment,
   createCheckoutSession,
   fetchAppointmentDetails,
   fetchClientData,
@@ -26,6 +27,7 @@ const upload = multer({ storage: profilestorage });
 
 const router = express.Router();
 
+// profile area
 router.get("/profile", authenticateUser, fetchClientData);
 router.put(
   "/profile/basic",
@@ -37,15 +39,25 @@ router.put("/profile/personal", authenticateUser, updateEmail);
 router.post("/profile/verifyMail", authenticateUser, sendVerifyMail);
 router.put("/profile/updatePassword", authenticateUser, updatePassword);
 router.post("/profile/address", authenticateUser, updateAddress);
+router.patch(
+  "/profile/appointments",
+  authenticateUser,
+  authenticateClient,
+  cancellAppoinment
+);
 router.get(
   "/profile/appointments",
   authenticateUser,
   authenticateClient,
   fetchAppointmentDetails
 );
+
+// lawyers finding and booking areas
 router.get("/lawyers", authenticateUser, getLawyers);
 router.get("/lawyers/:id", authenticateUser, getLawyerDetail);
 router.post("/lawyers/review", authenticateUser, addReview);
+
+// slot area
 router.get(
   "/lawyers/settings/:id",
   authenticateUser,
@@ -71,6 +83,8 @@ router.delete(
   removeFailedSession
 );
 // router.get("/stripe/success/:id", authenticateUser,fetchStripeSessionDetails);
+
+// stripe  webjook
 router.post(
   "/stripe/webhooks",
   express.raw({ type: "application/json" }),

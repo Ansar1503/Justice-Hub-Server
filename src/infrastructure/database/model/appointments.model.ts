@@ -11,6 +11,7 @@ const appointmentSchema = new Schema(
     time: { type: String, required: true },
     duration: { type: Number, required: true },
     reason: { type: String, required: true },
+    amount: { type: Number, required: true, min: 10 },
     type: {
       type: String,
       required: true,
