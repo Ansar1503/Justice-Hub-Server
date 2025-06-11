@@ -10,6 +10,7 @@ import { ReviewRepo } from "../../infrastructure/database/repo/review.repo";
 import { ScheduleRepository } from "../../infrastructure/database/repo/schedule.repo";
 import { ERRORS } from "../../infrastructure/constant/errors";
 import { AppointmentsRepository } from "../../infrastructure/database/repo/appointments.repo";
+import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
 
 const clientusecase = new ClientUseCase(
   new UserRepository(),
@@ -18,7 +19,8 @@ const clientusecase = new ClientUseCase(
   new LawyerRepository(),
   new ReviewRepo(),
   new ScheduleRepository(),
-  new AppointmentsRepository()
+  new AppointmentsRepository(),
+  new SessionsRepository()
 );
 
 export const fetchClientData = async (
@@ -725,6 +727,7 @@ export async function fetchAppointmentDetails(
   const { search, appointmentStatus, sortField, sortOrder, page, limit } =
     req.query;
   const appointmentType = req.query.appointmentType;
+  console.log("req.query", req.query);
   const normalizedAppointmentType =
     typeof appointmentType === "string" &&
     ["all", "consultation", "follow-up"].includes(appointmentType)
@@ -815,6 +818,70 @@ export async function cancellAppoinment(
       success: true,
       message: "appointment cancelled",
       data: result,
+    });
+    return;
+  } catch (error: any) {
+    const statusCode =
+      typeof error?.code === "number" && error.code >= 100 && error.code < 600
+        ? error.code
+        : STATUS_CODES.INTERNAL_SERVER_ERROR;
+
+    res.status(statusCode).json({
+      success: false,
+      message: error?.message || "An unexpected error occurred.",
+    });
+    return;
+  }
+}
+
+export async function fetchSessions(
+  req: Request & { user?: any },
+  res: Response
+) {
+  const user_id = req.user?.id;
+  const { search, status, sort, order, consultation_type, page, limit } =
+    req.query;
+  try {
+    const result = await clientusecase.fetchSessions({
+      user_id,
+      search: typeof search === "string" ? search : "",
+      status:
+        typeof status === "string" &&
+        ["completed", "cancelled", "upcoming", "ongoing", "missed"].includes(
+          status
+        )
+          ? (status as
+              | "completed"
+              | "cancelled"
+              | "upcoming"
+              | "ongoing"
+              | "missed")
+          : undefined,
+      sort:
+        typeof sort === "string" &&
+        ["name", "date", "consultation_fee"].includes(sort)
+          ? (sort as "name" | "date" | "consultation_fee")
+          : "name",
+      order:
+        typeof order === "string" && (order === "asc" || order === "desc")
+          ? (order as "asc" | "desc")
+          : "asc",
+      consultation_type:
+        typeof consultation_type === "string" &&
+        (consultation_type === "consultation" ||
+          consultation_type === "follow-up")
+          ? (consultation_type as "consultation" | "follow-up")
+          : undefined,
+      page: page ? Number(page) : 1,
+      limit: limit ? Number(limit) : 10,
+    });
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "success",
+      data: result.data,
+      currentPage: result.currentPage,
+      totalPage: result.totalPage,
+      totalCount: result.totalCount,
     });
     return;
   } catch (error: any) {

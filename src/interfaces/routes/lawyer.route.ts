@@ -9,6 +9,7 @@ import {
   fetchAvailableSlots,
   fetchLawyer,
   fetchOverrideSlots,
+  fetchSessions,
   fetchSlotSettings,
   rejectClientAppointment,
   removeOverrideSlot,
@@ -94,6 +95,12 @@ router.patch(
   authenticateUser,
   authenticateLawyer,
   confirmClientAppointment
+);
+router.get(
+  "/profile/sessions",
+  authenticateUser,
+  authenticateLawyer,
+  fetchSessions
 );
 
 export default router;

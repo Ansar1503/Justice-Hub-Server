@@ -443,4 +443,24 @@ export class LawyerUsecase implements Ilawyerusecase {
     const response = await this.appointRepo.updateWithId(payload);
     return response;
   }
+  async fetchSessions(payload: {
+    user_id: string;
+    search: string;
+    sort: "name" | "date" | "consultation_fee";
+    order: "asc" | "desc";
+    status?: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
+    consultation_type?: "consultation" | "follow-up";
+    page: number;
+    limit: number;
+  }): Promise<{
+    data: any;
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }> {
+    return this.sessionsRepo.aggregate({
+      ...payload,
+      role: "lawyer",
+    });
+  }
 }

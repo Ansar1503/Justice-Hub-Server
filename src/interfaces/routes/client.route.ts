@@ -5,6 +5,7 @@ import {
   createCheckoutSession,
   fetchAppointmentDetails,
   fetchClientData,
+  fetchSessions,
   fetchStripeSessionDetails,
   getLawyerDetail,
   getLawyers,
@@ -50,6 +51,12 @@ router.get(
   authenticateUser,
   authenticateClient,
   fetchAppointmentDetails
+);
+router.get(
+  "/profile/sessions",
+  authenticateUser,
+  authenticateClient,
+  fetchSessions
 );
 
 // lawyers finding and booking areas

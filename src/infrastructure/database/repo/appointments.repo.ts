@@ -128,7 +128,7 @@ export class AppointmentsRepository implements IAppointmentsRepository {
       search = "",
       appointmentStatus = "all",
       appointmentType = "all",
-      sortField = "created_at",
+      sortField = "name",
       sortOrder = "desc",
       page = 1,
       limit = 10,
@@ -204,7 +204,7 @@ export class AppointmentsRepository implements IAppointmentsRepository {
       AppointmentModel.aggregate(dataPipeline),
       AppointmentModel.aggregate(countPipeline),
     ]);
-    console.log("dataResult", dataResult);
+    // console.log("dataResult", dataResult);
     const totalCount = countResult[0]?.total || 0;
     const totalPage = Math.ceil(totalCount / limit);
     return {
@@ -253,6 +253,10 @@ export class AppointmentsRepository implements IAppointmentsRepository {
       sortStage["userData.name"] = sortOrder === "asc" ? 1 : -1;
     } else if (sortField === "consultation_fee") {
       sortStage["lawyerData.consultation_fee"] = sortOrder === "asc" ? 1 : -1;
+    } else if (sortField === "date") {
+      sortStage["date"] = sortOrder === "asc" ? 1 : -1;
+    } else if (sortField === "created_at") {
+      sortStage["created_at"] = sortOrder === "asc" ? 1 : -1;
     }
     const matchStage2: Record<string, any> = {};
     if (appointmentStatus && appointmentStatus !== "all") {
@@ -340,4 +344,3 @@ export class AppointmentsRepository implements IAppointmentsRepository {
     return await AppointmentModel.findOne({ _id: id });
   }
 }
- 

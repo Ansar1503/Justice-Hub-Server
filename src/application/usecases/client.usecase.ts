@@ -29,6 +29,7 @@ import {
 import { IAppointmentsRepository } from "../../domain/I_repository/I_Appointments.repo";
 import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
 import { Appointment } from "../../domain/entities/Appointment.entity";
+import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
 
 export class ClientUseCase implements I_clientUsecase {
   constructor(
@@ -38,7 +39,8 @@ export class ClientUseCase implements I_clientUsecase {
     private lawyerRepository: ILawyerRepository,
     private reviewRepository: IreviewRepo,
     private scheduleRepo: IScheduleRepo,
-    private appointmentRepo: IAppointmentsRepository
+    private appointmentRepo: IAppointmentsRepository,
+    private sessionRepo: ISessionsRepo
   ) {}
   timeStringToDate(baseDate: Date, hhmm: string): Date {
     const [h, m] = hhmm.split(":").map(Number);
@@ -944,5 +946,22 @@ export class ClientUseCase implements I_clientUsecase {
     }
     const response = await this.appointmentRepo.updateWithId(payload);
     return response;
+  }
+  async fetchSessions(payload: {
+    user_id: string;
+    search: string;
+    sort: "name" | "date" | "consultation_fee";
+    order: "asc" | "desc";
+    status?: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
+    consultation_type?: "consultation" | "follow-up";
+    page: number;
+    limit: number;
+  }): Promise<{
+    data: any;
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }> {
+    return await this.sessionRepo.aggregate({ ...payload, role: "client" });
   }
 }
