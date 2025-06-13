@@ -934,6 +934,12 @@ export class ClientUseCase implements I_clientUsecase {
       error.code = STATUS_CODES.BAD_REQUEST;
       throw error;
     }
+    if (appointment.status === "confirmed") {
+      const error: any = new Error("appointment already confirmed");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+
     const slotDateTime = this.timeStringToDate(
       appointment.date,
       appointment.time

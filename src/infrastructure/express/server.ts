@@ -8,6 +8,11 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cors from "cors";
 import "dotenv/config";
+import {
+  errorMiddleware,
+  NotFoundErrorHandler,
+} from "../../interfaces/middelwares/Error/ErrorHandler";
+import { AppError } from "../../interfaces/middelwares/Error/CustomError";
 
 const PORT = process.env.PORT || 4000;
 const app: Application = express();
@@ -34,7 +39,8 @@ app.use("/api/client/", clientRoute);
 app.use("/api/admin/", adminRoute);
 app.use("/api/lawyer/", lawyerRoute);
 
-
+app.use(NotFoundErrorHandler);
+app.use(errorMiddleware);
 
 app.listen(PORT, () =>
   console.log(`🚀 Server running on port http://localhost:${PORT}`)

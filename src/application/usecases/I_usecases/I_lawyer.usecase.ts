@@ -60,19 +60,5 @@ export interface Ilawyerusecase {
     id: string;
     status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
   }): Promise<Appointment | null>;
-  fetchSessions(payload: {
-    user_id: string;
-    search: string;
-    sort: "name" | "date" | "consultation_fee";
-    order: "asc" | "desc";
-    status?: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
-    consultation_type?: "consultation" | "follow-up";
-    page: number;
-    limit: number;
-  }): Promise<{
-    data: any;
-    totalCount: number;
-    currentPage: number;
-    totalPage: number;
-  }>;
+ 
 }
