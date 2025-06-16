@@ -71,6 +71,8 @@ router.patch(
 // lawyers finding and booking areas
 router.get("/lawyers", authenticateUser, getLawyers);
 router.get("/lawyers/:id", authenticateUser, getLawyerDetail);
+
+// reviews
 router.post("/lawyers/review", authenticateUser, addReview);
 
 // slot area

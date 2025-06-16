@@ -452,7 +452,7 @@ export const addReview = async (
     });
     return;
   }
-  const { review, rating } = req.body;
+  const { review, rating, session_id } = req.body;
   if (!review || !rating) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
@@ -460,9 +460,21 @@ export const addReview = async (
     });
     return;
   }
-
+  if (!session_id) {
+    res.status(STATUS_CODES.BAD_REQUEST).json({
+      success: false,
+      message: "You had no session with this lawyer",
+    });
+    return;
+  }
   try {
-    await clientusecase.addreview({ client_id, lawyer_id, rating, review });
+    await clientusecase.addreview({
+      client_id,
+      lawyer_id,
+      rating,
+      review,
+      session_id,
+    });
     res.status(STATUS_CODES.OK).json({
       success: true,
       message: "review added",
@@ -499,6 +511,12 @@ export const addReview = async (
         res.status(STATUS_CODES.BAD_REQUEST).json({
           success: false,
           message: "lawyer is not verified",
+        });
+        return;
+      case "REVIEW_ALREADY_EXISTS":
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          success: false,
+          message: "review already exists",
         });
         return;
       default:

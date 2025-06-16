@@ -176,9 +176,9 @@ export class ClientUseCase implements I_clientUsecase {
       if (!userDetails) {
         throw new Error("NO_USER_FOUND");
       }
-      const userExist = await this.userRepository.findByEmail(email)
-      if(userDetails?.email){
-        throw new Error("EMAIL_ALREADY_EXIST")
+      const userExist = await this.userRepository.findByEmail(email);
+      if (userDetails?.email) {
+        throw new Error("EMAIL_ALREADY_EXIST");
       }
 
       await this.userRepository.update({
@@ -453,9 +453,16 @@ export class ClientUseCase implements I_clientUsecase {
     if (lawyer.verification_status !== "verified")
       throw new Error("LAWYER_UNVERIFIED");
 
+    const existingReview = await this.reviewRepository.findBySession_id(
+      payload.session_id
+    );
+    
+    if (existingReview) {
+      throw new Error("REVIEW_ALREADY_EXISTS");
+    }
+
     try {
       await this.reviewRepository.create(payload);
-      console.log("reaview added");
     } catch (error: any) {
       throw new Error(error.message);
     }
