@@ -159,6 +159,12 @@ export const updateEmail = async (
             message: "user not found",
           });
           return;
+        case "EMAIL_ALREADY_EXIST":
+          res.status(STATUS_CODES.BAD_REQUEST).json({
+            success: false,
+            message: "email already exist",
+          });
+          return;
         default:
           res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json({
             success: false,

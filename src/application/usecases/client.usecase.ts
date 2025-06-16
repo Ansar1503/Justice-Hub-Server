@@ -176,6 +176,10 @@ export class ClientUseCase implements I_clientUsecase {
       if (!userDetails) {
         throw new Error("NO_USER_FOUND");
       }
+      const userExist = await this.userRepository.findByEmail(email)
+      if(userDetails?.email){
+        throw new Error("EMAIL_ALREADY_EXIST")
+      }
 
       await this.userRepository.update({
         email: email || userDetails.email,
