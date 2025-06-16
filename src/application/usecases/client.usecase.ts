@@ -30,6 +30,7 @@ import { IAppointmentsRepository } from "../../domain/I_repository/I_Appointment
 import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
 import { Appointment } from "../../domain/entities/Appointment.entity";
 import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
+import { Session } from "../../domain/entities/Session.entity";
 
 export class ClientUseCase implements I_clientUsecase {
   constructor(
@@ -969,5 +970,14 @@ export class ClientUseCase implements I_clientUsecase {
     totalPage: number;
   }> {
     return await this.sessionRepo.aggregate({ ...payload, role: "client" });
+  }
+  async cancelSession(payload: {
+    session_id: string;
+  }): Promise<Session | null> {
+    const session = await this.sessionRepo.update({
+      session_id: payload.session_id,
+      status: "cancelled",
+    });
+    return session;
   }
 }

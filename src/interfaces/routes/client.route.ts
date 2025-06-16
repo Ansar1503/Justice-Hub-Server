@@ -2,6 +2,7 @@ import express from "express";
 import {
   addReview,
   cancellAppoinment,
+  cancelSession,
   createCheckoutSession,
   fetchAppointmentDetails,
   fetchClientData,
@@ -52,11 +53,19 @@ router.get(
   authenticateClient,
   fetchAppointmentDetails
 );
+
+// profile sessions
 router.get(
   "/profile/sessions",
   authenticateUser,
   authenticateClient,
   fetchSessions
+);
+router.patch(
+  "/profile/sessions/cancel",
+  authenticateUser,
+  authenticateClient,
+  cancelSession
 );
 
 // lawyers finding and booking areas

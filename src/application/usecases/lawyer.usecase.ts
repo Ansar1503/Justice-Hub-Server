@@ -2,13 +2,11 @@ import { Appointment } from "../../domain/entities/Appointment.entity";
 import { lawyer } from "../../domain/entities/Lawyer.entity";
 import {
   Availability,
-  BlockedSchedule,
-  Daytype,
   OverrideDate,
   OverrideSlots,
   ScheduleSettings,
-  TimeSlot,
 } from "../../domain/entities/Schedule.entity";
+import { Session } from "../../domain/entities/Session.entity";
 import { IAppointmentsRepository } from "../../domain/I_repository/I_Appointments.repo";
 import { IClientRepository } from "../../domain/I_repository/I_client.repo";
 import { IDocumentsRepository } from "../../domain/I_repository/I_documents.repo";
@@ -17,6 +15,7 @@ import { IScheduleRepo } from "../../domain/I_repository/I_schedule.repo";
 import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
 import { IUserRepository } from "../../domain/I_repository/I_user.repo";
 import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
+import { NotFoundError } from "../../interfaces/middelwares/Error/CustomError";
 import { Ilawyerusecase } from "./I_usecases/I_lawyer.usecase";
 
 export class LawyerUsecase implements Ilawyerusecase {
@@ -443,6 +442,7 @@ export class LawyerUsecase implements Ilawyerusecase {
     const response = await this.appointRepo.updateWithId(payload);
     return response;
   }
+
   async fetchSessions(payload: {
     user_id: string;
     search: string;
@@ -462,5 +462,31 @@ export class LawyerUsecase implements Ilawyerusecase {
       ...payload,
       role: "lawyer",
     });
+  }
+
+  async cancelSession(payload: {
+    session_id: string;
+    status?: string;
+    start_time?: Date;
+    end_time?: Date;
+    client_joined_at?: Date;
+    lawyer_joined_at?: Date;
+    notes?: string;
+    summary?: string;
+    follow_up_suggested?: boolean;
+    follow_up_session_id?: string;
+  }): Promise<Session | null> {
+    const sessionExist = await this.sessionsRepo.findById({
+      session_id: payload.session_id,
+    });
+    if (!sessionExist) {
+      throw new NotFoundError("Session not found");
+    }
+    console.log("sessionExist", sessionExist);
+    const updated = await this.sessionsRepo.update({
+      session_id: payload.session_id,
+      status: "cancelled",
+    });
+    return updated;
   }
 }

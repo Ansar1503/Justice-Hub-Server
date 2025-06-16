@@ -1,3 +1,4 @@
+
 import { Appointment } from "../../../domain/entities/Appointment.entity";
 import { lawyer } from "../../../domain/entities/Lawyer.entity";
 import {
@@ -6,6 +7,7 @@ import {
   OverrideSlots,
   ScheduleSettings,
 } from "../../../domain/entities/Schedule.entity";
+import { Session } from "../../../domain/entities/Session.entity";
 
 export interface Ilawyerusecase {
   verifyLawyer(payload: lawyer): Promise<lawyer>;
@@ -60,5 +62,7 @@ export interface Ilawyerusecase {
     id: string;
     status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
   }): Promise<Appointment | null>;
- 
+  cancelSession(payload: {
+    session_id: string;
+  }): Promise<Session | null>;
 }

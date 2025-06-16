@@ -166,4 +166,68 @@ export class SessionsRepository implements ISessionsRepo {
       _id: savedSession._id?.toString(),
     } as Session;
   }
+
+  async update(payload: {
+    session_id: string;
+    status?: Session["status"];
+    start_time?: Date;
+    end_time?: Date;
+    client_joined_at?: Date;
+    lawyer_joined_at?: Date;
+    notes?: string;
+    summary?: string;
+    follow_up_suggested?: boolean;
+    follow_up_session_id?: string;
+  }): Promise<Session | null> {
+    const update: any = {};
+    if (payload.status) {
+      update.status = payload.status;
+    }
+    if (payload.start_time) {
+      update.start_time = payload.start_time;
+    }
+    if (payload.end_time) {
+      update.end_time = payload.end_time;
+    }
+    if (payload.client_joined_at) {
+      update.client_joined_at = payload.client_joined_at;
+    }
+    if (payload.lawyer_joined_at) {
+      update.lawyer_joined_at = payload.lawyer_joined_at;
+    }
+    if (payload.notes) {
+      update.notes = payload.notes;
+    }
+    if (payload.summary) {
+      update.summary = payload.summary;
+    }
+    if (payload.follow_up_suggested) {
+      update.follow_up_suggested = payload.follow_up_suggested;
+    }
+    if (payload.follow_up_session_id) {
+      update.follow_up_session_id = payload.follow_up_session_id;
+    }
+    if (Object.keys(update).length === 0) {
+      return null;
+    }
+
+    const sessions = await SessionModel.findOneAndUpdate(
+      {
+        _id: payload.session_id,
+      },
+      { $set: update },
+      { new: true }
+    );
+
+    return sessions
+      ? { ...sessions.toObject(), _id: sessions._id?.toString() }
+      : null;
+  }
+
+  async findById(payload: { session_id: string }): Promise<Session | null> {
+    const sessions = await SessionModel.findById(payload.session_id);
+    return sessions
+      ? { ...sessions.toObject(), _id: sessions._id?.toString() }
+      : null;
+  }
 }

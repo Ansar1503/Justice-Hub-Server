@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { ClientUseCase } from "../../application/usecases/client.usecase";
 import { ClientRepository } from "../../infrastructure/database/repo/client.repo";
 import { UserRepository } from "../../infrastructure/database/repo/user.repo";
@@ -11,6 +11,7 @@ import { ScheduleRepository } from "../../infrastructure/database/repo/schedule.
 import { ERRORS } from "../../infrastructure/constant/errors";
 import { AppointmentsRepository } from "../../infrastructure/database/repo/appointments.repo";
 import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
+import { ValidationError } from "../middelwares/Error/CustomError";
 
 const clientusecase = new ClientUseCase(
   new UserRepository(),
@@ -895,5 +896,28 @@ export async function fetchSessions(
       message: error?.message || "An unexpected error occurred.",
     });
     return;
+  }
+}
+
+export async function cancelSession(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { id } = req.body;
+  try {
+    if (!id) {
+      throw new ValidationError("session id is required");
+    }
+
+    const result = await clientusecase.cancelSession({ session_id: id });
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "success",
+      data: result,
+    });
+    return;
+  } catch (error) {
+    next(error);
   }
 }

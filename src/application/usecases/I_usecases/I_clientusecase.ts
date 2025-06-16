@@ -11,6 +11,7 @@ import {
   TimeSlot,
 } from "../../../domain/entities/Schedule.entity";
 import { Appointment } from "../../../domain/entities/Appointment.entity";
+import { Session } from "../../../domain/entities/Session.entity";
 
 export interface I_clientUsecase {
   timeStringToMinutes(time: string): number;
@@ -94,4 +95,7 @@ export interface I_clientUsecase {
     currentPage: number;
     totalPage: number;
   }>;
+  cancelSession(payload: {
+    session_id: string;
+  }): Promise<Session | null>;
 }

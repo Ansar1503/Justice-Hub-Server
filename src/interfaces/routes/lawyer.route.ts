@@ -4,6 +4,7 @@ import multer from "multer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 import {
   addOverrideSlots,
+  cancelSession,
   confirmClientAppointment,
   fetchAppointmentDetails,
   fetchAvailableSlots,
@@ -78,6 +79,7 @@ router.delete(
   removeOverrideSlot
 );
 
+// profiles
 router.get(
   "/profile/appointments",
   authenticateUser,
@@ -96,11 +98,14 @@ router.patch(
   authenticateLawyer,
   confirmClientAppointment
 );
+// profile sesisons
 router.get(
   "/profile/sessions",
   authenticateUser,
   authenticateLawyer,
   fetchSessions
 );
+
+router.patch(`/profile/sessions/cancel`,authenticateUser,authenticateLawyer ,cancelSession);
 
 export default router;

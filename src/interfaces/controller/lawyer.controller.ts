@@ -1,4 +1,4 @@
-import e, { Request, Response } from "express";
+import e, { NextFunction, Request, Response } from "express";
 import { ClientRepository } from "../../infrastructure/database/repo/client.repo";
 import { UserRepository } from "../../infrastructure/database/repo/user.repo";
 import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
@@ -10,6 +10,10 @@ import { ScheduleRepository } from "../../infrastructure/database/repo/schedule.
 import { zodOverrideSlotsSchema } from "../middelwares/validator/zod/zod.validate";
 import { AppointmentsRepository } from "../../infrastructure/database/repo/appointments.repo";
 import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
+import {
+  NotFoundError,
+  ValidationError,
+} from "../middelwares/Error/CustomError";
 
 const lawyerUseCase = new LawyerUsecase(
   new UserRepository(),
@@ -592,5 +596,26 @@ export async function fetchSessions(
       message: error?.message || "An unexpected error occurred.",
     });
     return;
+  }
+}
+
+export async function cancelSession(
+  req: Request & { user?: any },
+  res: Response,
+  next: NextFunction
+) {
+  const { id } = req.body;
+  try {
+    if (!id) {
+      throw new ValidationError("Session id is required");
+    }
+    const result = await lawyerUseCase.cancelSession({ session_id: id });
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "success",
+      data: result,
+    });
+  } catch (error) {
+    next(error);
   }
 }
