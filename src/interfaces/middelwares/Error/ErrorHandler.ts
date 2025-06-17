@@ -3,12 +3,7 @@ import { NextFunction, Request, Response } from "express";
 import { AppError } from "./CustomError";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
 
-export const errorMiddleware = (
-  err: AppError,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const errorMiddleware = (err: AppError, req: Request, res: Response) => {
   console.log("error :", err);
   console.log("orignal Url:", req.originalUrl);
 
@@ -23,15 +18,13 @@ export const errorMiddleware = (
     success: false,
     message: message,
   });
+  return;
 };
 
-export const NotFoundErrorHandler = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const NotFoundErrorHandler = (req: Request, res: Response) => {
   res.status(STATUS_CODES.NOT_FOUND).json({
     success: false,
     message: "Resource Not Found",
   });
+  return;
 };

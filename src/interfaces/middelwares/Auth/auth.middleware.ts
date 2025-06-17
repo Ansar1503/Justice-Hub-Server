@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { verifyAccessToken } from "../../../application/services/jwt.service";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
+import { ValidationError } from "../Error/CustomError";
+import { ExtendedError } from "socket.io";
 
 export const authenticateUser = (
   req: Request & { user?: any },
@@ -79,3 +81,5 @@ export const authenticateUser = (
     }
   }
 };
+
+

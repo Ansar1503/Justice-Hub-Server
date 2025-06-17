@@ -5,6 +5,7 @@ import clientRoute from "../../interfaces/routes/client.route";
 import adminRoute from "../../interfaces/routes/admin.routes";
 import lawyerRoute from "../../interfaces/routes/lawyer.route";
 import cookieParser from "cookie-parser";
+import { createServer } from "http";
 import morgan from "morgan";
 import cors from "cors";
 import "dotenv/config";
@@ -12,10 +13,12 @@ import {
   errorMiddleware,
   NotFoundErrorHandler,
 } from "../../interfaces/middelwares/Error/ErrorHandler";
-import { AppError } from "../../interfaces/middelwares/Error/CustomError";
+import { InitialiseSocketServer } from "../socket/config";
 
 const PORT = process.env.PORT || 4000;
 const app: Application = express();
+const server = createServer(app);
+const io = InitialiseSocketServer(server);
 
 connectDB();
 app.use(
@@ -42,6 +45,6 @@ app.use("/api/lawyer/", lawyerRoute);
 app.use(NotFoundErrorHandler);
 app.use(errorMiddleware);
 
-app.listen(PORT, () =>
+server.listen(PORT, () =>
   console.log(`🚀 Server running on port http://localhost:${PORT}`)
 );

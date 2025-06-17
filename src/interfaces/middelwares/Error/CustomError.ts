@@ -30,7 +30,7 @@ export class UnauthorizedError extends AppError {
   }
 }
 
-export class DatabaseError extends AppError {
+export class InternalError extends AppError {
   constructor(message: string) {
     super(message, STATUS_CODES.INTERNAL_SERVER_ERROR);
   }

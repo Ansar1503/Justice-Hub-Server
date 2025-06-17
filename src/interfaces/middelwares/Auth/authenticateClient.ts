@@ -10,15 +10,15 @@ export async function authenticateClient(
   res: Response,
   next: NextFunction
 ) {
-  const lawyer_id = req.user.id;
-  if (!lawyer_id) {
+  const client_id = req.user.id;
+  if (!client_id) {
     res.status(STATUS_CODES.FORBIDDEN).json({
       success: false,
       message: "Unauthorized",
     });
     return;
   }
-  const user = await userRepo.findByuser_id(lawyer_id);
+  const user = await userRepo.findByuser_id(client_id);
   if (!user) {
     res.status(STATUS_CODES.NOT_FOUND).json({
       success: false,
