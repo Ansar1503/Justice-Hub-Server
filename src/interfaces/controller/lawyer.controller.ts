@@ -14,6 +14,7 @@ import {
   NotFoundError,
   ValidationError,
 } from "../middelwares/Error/CustomError";
+import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
 
 const lawyerUseCase = new LawyerUsecase(
   new UserRepository(),
@@ -22,7 +23,8 @@ const lawyerUseCase = new LawyerUsecase(
   new ScheduleRepository(),
   new DocumentsRepo(),
   new AppointmentsRepository(),
-  new SessionsRepository()
+  new SessionsRepository(),
+  new ChatRepo()
 );
 
 export const verifyLawyer = async (

@@ -14,6 +14,7 @@ import { ILawyerRepository } from "../../domain/I_repository/I_lawyer.repo";
 import { IScheduleRepo } from "../../domain/I_repository/I_schedule.repo";
 import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
 import { IUserRepository } from "../../domain/I_repository/I_user.repo";
+import { IChatRepo } from "../../domain/I_repository/IChatRepo";
 import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
 import { NotFoundError } from "../../interfaces/middelwares/Error/CustomError";
 import { Ilawyerusecase } from "./I_usecases/I_lawyer.usecase";
@@ -26,7 +27,8 @@ export class LawyerUsecase implements Ilawyerusecase {
     private scheduleRepo: IScheduleRepo,
     private documentsRepo: IDocumentsRepository,
     private appointRepo: IAppointmentsRepository,
-    private sessionsRepo: ISessionsRepo
+    private sessionsRepo: ISessionsRepo,
+    private chatRepo: IChatRepo
   ) {}
   timeStringToDate(baseDate: Date, hhmm: string): Date {
     const [h, m] = hhmm.split(":").map(Number);
@@ -427,7 +429,7 @@ export class LawyerUsecase implements Ilawyerusecase {
       throw error;
     }
 
-    await this.sessionsRepo.create({
+    const newsession = await this.sessionsRepo.create({
       amount: appointment.amount,
       appointment_id: payload.id,
       client_id: appointment.client_id,
@@ -439,7 +441,21 @@ export class LawyerUsecase implements Ilawyerusecase {
       type: appointment.type,
     });
 
+    if (!newsession || !newsession._id) {
+      const error: any = new Error("failed to create session");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
+
     const response = await this.appointRepo.updateWithId(payload);
+    await this.chatRepo.create({
+      last_message: "",
+      participants: {
+        client_id: newsession.client_id,
+        lawyer_id: newsession.lawyer_id,
+      },
+      session_id: newsession?._id,
+    });
     return response;
   }
 
@@ -482,7 +498,7 @@ export class LawyerUsecase implements Ilawyerusecase {
     if (!sessionExist) {
       throw new NotFoundError("Session not found");
     }
-    console.log("sessionExist", sessionExist);
+    // console.log("sessionExist", sessionExist);
     const updated = await this.sessionsRepo.update({
       session_id: payload.session_id,
       status: "cancelled",

@@ -752,7 +752,7 @@ export async function fetchAppointmentDetails(
   const { search, appointmentStatus, sortField, sortOrder, page, limit } =
     req.query;
   const appointmentType = req.query.appointmentType;
-  console.log("req.query", req.query);
+  // console.log("req.query", req.query);
   const normalizedAppointmentType =
     typeof appointmentType === "string" &&
     ["all", "consultation", "follow-up"].includes(appointmentType)
@@ -910,6 +910,7 @@ export async function fetchSessions(
     });
     return;
   } catch (error: any) {
+    console.log("fetchsessionerror:", error);
     const statusCode =
       typeof error?.code === "number" && error.code >= 100 && error.code < 600
         ? error.code
@@ -945,3 +946,4 @@ export async function cancelSession(
     next(error);
   }
 }
+

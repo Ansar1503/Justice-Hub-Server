@@ -1,17 +1,15 @@
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
 
 export class AppError extends Error {
-  public readonly statusCode: number;
-  public readonly isOperational: boolean = true;
-
-  constructor(message: string, statusCode: number) {
+  constructor(message: string, public statusCode: number) {
     super(message);
+    this.name = this.constructor.name;
     this.statusCode = statusCode;
+    this.message = message;
     this.name = this.constructor.name;
     Error.captureStackTrace(this, this.constructor);
   }
 }
-
 export class ValidationError extends AppError {
   constructor(message: string) {
     super(message, STATUS_CODES.BAD_REQUEST);

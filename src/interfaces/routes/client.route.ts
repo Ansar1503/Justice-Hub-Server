@@ -24,6 +24,11 @@ import multer from "multer";
 import { profilestorage } from "../middelwares/multer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 import { authenticateClient } from "../middelwares/Auth/authenticateClient";
+import { ChatController } from "../controller/chat.controller";
+import { ChatUseCase } from "../../application/usecases/chat.usecase";
+import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
+
+const chatcontroller = new ChatController(new ChatUseCase(new ChatRepo()));
 
 const upload = multer({ storage: profilestorage });
 
@@ -66,6 +71,14 @@ router.patch(
   authenticateUser,
   authenticateClient,
   cancelSession
+);
+
+// chats
+router.get(
+  "/profile/chats",
+  authenticateUser,
+  authenticateClient,
+  chatcontroller.getChats.bind(chatcontroller)
 );
 
 // lawyers finding and booking areas

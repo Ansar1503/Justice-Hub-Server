@@ -982,6 +982,8 @@ export class ClientUseCase implements I_clientUsecase {
   }> {
     return await this.sessionRepo.aggregate({ ...payload, role: "client" });
   }
+
+
   async cancelSession(payload: {
     session_id: string;
   }): Promise<Session | null> {
@@ -991,4 +993,6 @@ export class ClientUseCase implements I_clientUsecase {
     });
     return session;
   }
+
+
 }

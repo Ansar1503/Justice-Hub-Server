@@ -95,7 +95,5 @@ export interface I_clientUsecase {
     currentPage: number;
     totalPage: number;
   }>;
-  cancelSession(payload: {
-    session_id: string;
-  }): Promise<Session | null>;
+  cancelSession(payload: { session_id: string }): Promise<Session | null>;
 }

@@ -2,6 +2,7 @@ import { Server as HTTPServer } from "http";
 import { Server as SocketIOServer, Socket, ExtendedError } from "socket.io";
 import "dotenv/config";
 import { authenticateClientSocket } from "../../interfaces/middelwares/socket/client.socket.auth";
+import { SocketEventEnum } from "../constant/SocketEventEnum";
 
 export function InitialiseSocketServer(server: HTTPServer): SocketIOServer {
   const FRONTEND_URL = process.env.FRONTEND_URL;
@@ -16,8 +17,5 @@ export function InitialiseSocketServer(server: HTTPServer): SocketIOServer {
   });
   io.use(authenticateClientSocket);
 
-  io.on("error", (err) => {
-    console.log("error in socekt server", err);
-  });
   return io;
 }

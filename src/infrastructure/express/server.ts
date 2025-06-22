@@ -14,6 +14,7 @@ import {
   NotFoundErrorHandler,
 } from "../../interfaces/middelwares/Error/ErrorHandler";
 import { InitialiseSocketServer } from "../socket/config";
+import { setUpChatSocket } from "../../interfaces/socket/chatSocket";
 
 const PORT = process.env.PORT || 4000;
 const app: Application = express();
@@ -44,6 +45,8 @@ app.use("/api/lawyer/", lawyerRoute);
 
 app.use(NotFoundErrorHandler);
 app.use(errorMiddleware);
+
+setUpChatSocket(io);
 
 server.listen(PORT, () =>
   console.log(`🚀 Server running on port http://localhost:${PORT}`)
