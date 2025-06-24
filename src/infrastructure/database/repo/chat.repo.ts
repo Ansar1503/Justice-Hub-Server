@@ -193,4 +193,27 @@ export class ChatRepo implements IChatRepo {
       session_id: newmessage.session_id.toString(),
     };
   }
+  async findMessagesBySessionId(
+    id: string,
+    page: number
+  ): Promise<{ data: ChatMessage[]; nextCursor?: number }> {
+    const limit = 10;
+    const skip = (page - 1) * limit;
+
+    const messages = await MessageModel.find({ session_id: id })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit + 1);
+    const hasNextPage = messages.length > limit;
+    const data = hasNextPage ? messages.slice(0, limit) : messages;
+
+    return {
+      data: data.map((msg) => ({
+        ...msg.toObject(),
+        session_id: msg.session_id.toString(),
+        _id: msg?._id?.toString(),
+      })),
+      nextCursor: hasNextPage ? page + 1 : undefined,
+    };
+  }
 }

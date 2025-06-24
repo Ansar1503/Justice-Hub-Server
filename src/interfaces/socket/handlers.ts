@@ -31,13 +31,25 @@ export class SocketHandlers {
     return chatUsecase.getChatSessionById(sessionId);
   }
 
-  async handleSendMessage(data: ChatMessage) {
-    const chatSend = await chatUsecase.createChatMessage(data);
-    this.handleEmiter(
-      chatSend?.receiverId || "",
-      this.eventEnum.MESSAGE_RECEIVED_EVENT,
-      chatSend
-    );
+  async handleSendMessage(
+    newMessage: ChatMessage,
+    cb: (payload: {
+      success: boolean;
+      savedMessage?: ChatMessage;
+      error?: string;
+    }) => {}
+  ) {
+    try {
+      const chatSend = await chatUsecase.createChatMessage(newMessage);
+      cb({ success: true, savedMessage: chatSend || undefined });
+      this.handleEmiter(
+        chatSend?.receiverId || "",
+        this.eventEnum.MESSAGE_RECEIVED_EVENT,
+        chatSend
+      ); 
+    } catch (error: any) {
+      cb({ success: false, error: error.message });
+    }
   }
 
   async handleSocketJoin(data: { sessionId: string }) {

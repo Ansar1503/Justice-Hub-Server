@@ -39,23 +39,26 @@ const chatSchema = new Schema<IChatModel>(
   { timestamps: true }
 );
 
-const messageSchema = new Schema<IMessageModel>({
-  session_id: {
-    type: Schema.Types.ObjectId,
-    ref: "Chats",
-    required: true,
-  },
-  senderId: { type: String, required: true },
-  receiverId: { type: String, required: true },
-  content: { type: String, required: true },
-  read: { type: Boolean, required: true, default: false },
-  attachments: [
-    {
-      url: { type: String, required: false },
-      type: { type: String, required: false },
+const messageSchema = new Schema<IMessageModel>(
+  {
+    session_id: {
+      type: Schema.Types.ObjectId,
+      ref: "Chats",
+      required: true,
     },
-  ],
-});
+    senderId: { type: String, required: true },
+    receiverId: { type: String, required: true },
+    content: { type: String, required: true },
+    read: { type: Boolean, required: true, default: false },
+    attachments: [
+      {
+        url: { type: String, required: false },
+        type: { type: String, required: false },
+      },
+    ],
+  },
+  { timestamps: true }
+);
 
 export const ChatModel = mongoose.model<IChatModel>("Chat", chatSchema);
 export const MessageModel = mongoose.model<IMessageModel>(

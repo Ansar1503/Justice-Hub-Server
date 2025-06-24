@@ -81,6 +81,13 @@ router.get(
   chatcontroller.getChats.bind(chatcontroller)
 );
 
+router.get(
+  "/profile/chats/messages",
+  authenticateUser,
+  authenticateClient,
+  chatcontroller.getMessages.bind(chatcontroller)
+);
+
 // lawyers finding and booking areas
 router.get("/lawyers", authenticateUser, getLawyers);
 router.get("/lawyers/:id", authenticateUser, getLawyerDetail);

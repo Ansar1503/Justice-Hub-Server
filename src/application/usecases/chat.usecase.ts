@@ -21,4 +21,13 @@ export class ChatUseCase implements IChatusecase {
   async createChatMessage(message: ChatMessage): Promise<ChatMessage | null> {
     return await this.chatRepo.createMessage(message);
   }
+  async fetchChatMessages(payload: {
+    session_id: string;
+    page: number;
+  }): Promise<{ data: ChatMessage[]; nextCursor?: number }> {
+    return await this.chatRepo.findMessagesBySessionId(
+      payload.session_id,
+      payload.page
+    );
+  }
 }

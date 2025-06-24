@@ -9,4 +9,8 @@ export interface IChatusecase {
   }): Promise<any>;
   getChatSessionById(sessionId: string): Promise<ChatSession | null>;
   createChatMessage(message: ChatMessage): Promise<ChatMessage | null>;
+  fetchChatMessages(payload: {
+    session_id: string;
+    page: number;
+  }): Promise<{ data: ChatMessage[]; nextCursor?: number }>;
 }

@@ -53,8 +53,11 @@ export async function setUpChatSocket(io: SocketIOServer) {
     );
 
     // sendmessage listender
-    socket.on(SocketEventEnum.SEND_MESSAGE_EVENT, async (data: ChatMessage) => {
-      socketHandler.handleSendMessage(data);
-    });
+    socket.on(
+      SocketEventEnum.SEND_MESSAGE_EVENT,
+      async (data: ChatMessage, cb: any) => {
+        socketHandler.handleSendMessage(data, cb);
+      }
+    );
   });
 }
