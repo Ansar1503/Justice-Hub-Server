@@ -3,7 +3,8 @@ export interface Session {
   appointment_id: string;
   lawyer_id: string;
   client_id: string;
-  scheduled_at: Date;
+  scheduled_date: Date;
+  scheduled_time: string;
   duration: number;
   reason: string;
   amount: number;

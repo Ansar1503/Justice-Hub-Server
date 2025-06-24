@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
-import { ChatSession } from "../../../domain/entities/Chat.entity";
+import { ChatMessage, ChatSession } from "../../../domain/entities/Chat.entity";
 import { IChatRepo } from "../../../domain/I_repository/IChatRepo";
-import { ChatModel } from "../model/chat.model";
+import { ChatModel, MessageModel } from "../model/chat.model";
 
 export class ChatRepo implements IChatRepo {
   async create(payload: ChatSession): Promise<ChatSession> {
@@ -178,6 +178,19 @@ export class ChatRepo implements IChatRepo {
     return {
       data,
       nextCursor: hasNextPage ? page + 1 : undefined,
+    };
+  }
+
+  async findById(id: string): Promise<ChatSession | null> {
+    return ChatModel.findOne({ _id: id });
+  }
+  async createMessage(payload: ChatMessage): Promise<ChatMessage | null> {
+    const newmessage = new MessageModel(payload);
+    await newmessage.save();
+    return {
+      ...newmessage.toObject(),
+      _id: newmessage._id?.toString(),
+      session_id: newmessage.session_id.toString(),
     };
   }
 }

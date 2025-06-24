@@ -7,4 +7,6 @@ export interface IChatusecase {
     page: number;
     role: "lawyer" | "client";
   }): Promise<any>;
+  getChatSessionById(sessionId: string): Promise<ChatSession | null>;
+  createChatMessage(message: ChatMessage): Promise<ChatMessage | null>;
 }

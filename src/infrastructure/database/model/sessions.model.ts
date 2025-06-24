@@ -17,8 +17,12 @@ const sessionSchema = new Schema(
       type: String,
       required: true,
     },
-    scheduled_at: {
+    scheduled_date: {
       type: Date,
+      required: true,
+    },
+    scheduled_time: {
+      type: String,
       required: true,
     },
     duration: {
@@ -86,9 +90,9 @@ const sessionSchema = new Schema(
 );
 
 sessionSchema.index({ appointment_id: 1 }, { unique: true });
-sessionSchema.virtual("scheduled_end").get(function () {
-  return new Date(this.scheduled_at.getTime() + this.duration * 60000);
-});
+// sessionSchema.virtual("scheduled_end").get(function () {
+//   return new Date(this.scheduled_date.getTime() + this.duration * 60000);
+// });
 
 export const SessionModel = mongoose.model<ISessionModel>(
   "sessions",

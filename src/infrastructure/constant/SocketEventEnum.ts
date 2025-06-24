@@ -8,5 +8,6 @@ export enum SocketEventEnum {
   ERROR = "error",
   TYPING_EVENT = "typing",
   MESSAGE_DELETE_EVENT = "messageDeleted",
-  CHECKONLINE_STATUS = "onlineStatus"
+  CHECKONLINE_STATUS = "onlineStatus",
+  SEND_MESSAGE_EVENT = "sendMessage",
 }

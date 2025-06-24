@@ -27,4 +27,6 @@ export class ChatController implements InterfaceChatController {
       next(error);
     }
   }
+  
+  
 }

@@ -436,7 +436,8 @@ export class LawyerUsecase implements Ilawyerusecase {
       duration: appointment.duration,
       lawyer_id: appointment.lawyer_id,
       reason: appointment.reason,
-      scheduled_at: appointment.date,
+      scheduled_date: appointment.date,
+      scheduled_time: appointment.time,
       status: "upcoming",
       type: appointment.type,
     });

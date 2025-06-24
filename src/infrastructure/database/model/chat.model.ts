@@ -1,5 +1,4 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
-import { ChatSession } from "../../../domain/entities/Chat.entity";
 
 export interface IChatModel extends Document {
   participants: {
@@ -12,11 +11,23 @@ export interface IChatModel extends Document {
   updatedAt?: Date;
 }
 
+export interface IMessageModel extends Document {
+  session_id: Types.ObjectId;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  read: boolean;
+  attachments?: {
+    url: string;
+    type: string;
+  }[];
+}
+
 const chatSchema = new Schema<IChatModel>(
   {
     participants: {
-      lawyer_id: { type: String, unique: true, required: true },
-      client_id: { type: String, unique: true, required: true },
+      lawyer_id: { type: String, required: true },
+      client_id: { type: String, required: true },
     },
     session_id: { type: Schema.Types.ObjectId, unique: true, required: true },
     last_message: {
@@ -28,5 +39,26 @@ const chatSchema = new Schema<IChatModel>(
   { timestamps: true }
 );
 
-export const ChatModel = mongoose.model<IChatModel>("Chat", chatSchema);
+const messageSchema = new Schema<IMessageModel>({
+  session_id: {
+    type: Schema.Types.ObjectId,
+    ref: "Chats",
+    required: true,
+  },
+  senderId: { type: String, required: true },
+  receiverId: { type: String, required: true },
+  content: { type: String, required: true },
+  read: { type: Boolean, required: true, default: false },
+  attachments: [
+    {
+      url: { type: String, required: false },
+      type: { type: String, required: false },
+    },
+  ],
+});
 
+export const ChatModel = mongoose.model<IChatModel>("Chat", chatSchema);
+export const MessageModel = mongoose.model<IMessageModel>(
+  "Message",
+  messageSchema
+);
