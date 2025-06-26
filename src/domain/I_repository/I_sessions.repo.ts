@@ -1,4 +1,4 @@
-import { Session } from "../entities/Session.entity";
+import { Session, SessionDocument } from "../entities/Session.entity";
 
 export interface ISessionsRepo {
   create(payload: Session): Promise<Session>;
@@ -31,4 +31,11 @@ export interface ISessionsRepo {
     follow_up_session_id?: string;
   }): Promise<Session | null>;
   findById(payload: { session_id: string }): Promise<Session | null>;
+
+  // sessiolnDocuments
+  createDocument(payload: SessionDocument): Promise<SessionDocument | null>;
+  findDocumentBySessionId(payload: {
+    session_id: string;
+  }): Promise<SessionDocument | null>;
+  startSessionWithRoomId(sessionId: string): Promise<SessionDocument | null>;
 }

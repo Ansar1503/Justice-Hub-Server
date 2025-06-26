@@ -1,4 +1,4 @@
-import express, { Application } from "express";
+import express, { Application, NextFunction, Request, Response } from "express";
 import connectDB from "../../infrastructure/database/config";
 import authRoute from "../../interfaces/routes/auth.route";
 import clientRoute from "../../interfaces/routes/client.route";
@@ -38,6 +38,7 @@ app.use(
   })
 );
 app.use(express.urlencoded({ extended: true }));
+
 app.use("/api/user/", authRoute);
 app.use("/api/client/", clientRoute);
 app.use("/api/admin/", adminRoute);

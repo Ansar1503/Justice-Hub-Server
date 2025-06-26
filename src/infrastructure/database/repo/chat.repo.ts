@@ -156,6 +156,7 @@ export class ChatRepo implements IChatRepo {
     ];
 
     if (search.trim() !== "") {
+      console.log("search", search);
       pipeline.push({
         $match: {
           $or: [
@@ -181,9 +182,31 @@ export class ChatRepo implements IChatRepo {
     };
   }
 
+  async update(payload: {
+    last_message: string;
+    id: string;
+  }): Promise<ChatSession | null> {
+    const { last_message, id } = payload;
+    const updatedChatSession = await ChatModel.findOneAndUpdate(
+      { _id: id },
+      { last_message: new Types.ObjectId(last_message) },
+      { new: true }
+    );
+    if (!updatedChatSession) return null;
+
+    return {
+      ...updatedChatSession?.toObject(),
+      _id: updatedChatSession?._id?.toString(),
+      session_id: updatedChatSession?.session_id.toString(),
+      last_message: updatedChatSession?.last_message?.toString() || "",
+    };
+  }
+
   async findById(id: string): Promise<ChatSession | null> {
     return ChatModel.findOne({ _id: id });
   }
+
+  // messages
   async createMessage(payload: ChatMessage): Promise<ChatMessage | null> {
     const newmessage = new MessageModel(payload);
     await newmessage.save();
@@ -206,9 +229,9 @@ export class ChatRepo implements IChatRepo {
       .limit(limit + 1);
     const hasNextPage = messages.length > limit;
     const data = hasNextPage ? messages.slice(0, limit) : messages;
-
+    // console.log("messages", messages);
     return {
-      data: data.map((msg) => ({
+      data: data.reverse().map((msg) => ({
         ...msg.toObject(),
         session_id: msg.session_id.toString(),
         _id: msg?._id?.toString(),

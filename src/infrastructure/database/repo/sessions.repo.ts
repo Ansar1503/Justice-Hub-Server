@@ -1,6 +1,9 @@
-import { Session } from "../../../domain/entities/Session.entity";
+import {
+  Session,
+  SessionDocument,
+} from "../../../domain/entities/Session.entity";
 import { ISessionsRepo } from "../../../domain/I_repository/I_sessions.repo";
-import { SessionModel } from "../model/sessions.model";
+import { SessionDocumentModel, SessionModel } from "../model/sessions.model";
 export class SessionsRepository implements ISessionsRepo {
   async aggregate(payload: {
     user_id: string;
@@ -229,5 +232,34 @@ export class SessionsRepository implements ISessionsRepo {
     return sessions
       ? { ...sessions.toObject(), _id: sessions._id?.toString() }
       : null;
+  }
+
+  // session Document
+  async createDocument(
+    payload: SessionDocument
+  ): Promise<SessionDocument | null> {
+    const newSession = new SessionDocumentModel(payload);
+    await newSession.save();
+    if (!newSession) return null;
+    return {
+      ...newSession.toObject(),
+      _id: (newSession._id as any).toString(),
+      session_id: newSession.session_id?.toString(),
+    };
+  }
+
+  
+  async findDocumentBySessionId(payload: {
+    session_id: string;
+  }): Promise<SessionDocument | null> {
+    const document = await SessionDocumentModel.findOne({
+      session_id: payload.session_id,
+    });
+    if (!document) return null;
+    return {
+      ...document.toObject(),
+      _id: document._id?.toString(),
+      session_id: document.session_id?.toString(),
+    };
   }
 }

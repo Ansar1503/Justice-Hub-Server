@@ -9,6 +9,12 @@ export interface IChatRepo {
     role: "lawyer" | "client";
   }): Promise<{ data: any[]; nextCursor?: number }>;
   findById(id: string): Promise<ChatSession | null>;
+  update(payload: {
+    last_message: string;
+    id: string;
+  }): Promise<ChatSession | null>;
+
+  // messages
   createMessage(payload: ChatMessage): Promise<ChatMessage | null>;
   findMessagesBySessionId(
     id: string,

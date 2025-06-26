@@ -1,7 +1,15 @@
-import mongoose, { Schema, Document } from "mongoose";
-import { Session } from "../../../domain/entities/Session.entity";
+import mongoose, { Schema, Document, Types } from "mongoose";
+import {
+  Session,
+  SessionDocument,
+} from "../../../domain/entities/Session.entity";
 
 export interface ISessionModel extends Document, Omit<Session, "_id"> {}
+export interface ISessionDocumentModel
+  extends Document,
+    Omit<SessionDocument, "_id" | "session_id" | "createdAt" | "updateAt"> {
+  session_id: Types.ObjectId;
+}
 
 const sessionSchema = new Schema(
   {
@@ -50,6 +58,10 @@ const sessionSchema = new Schema(
       enum: ["upcoming", "ongoing", "completed", "cancelled", "missed"],
       default: "upcoming",
     },
+    room_id: {
+      type: String,
+      required: false,
+    },
     start_time: {
       type: Date,
       required: false,
@@ -89,12 +101,33 @@ const sessionSchema = new Schema(
   }
 );
 
+const documentSchema = new Schema({
+  name: { type: String, required: true },
+  type: { type: String, required: true },
+  url: { type: String, required: true },
+});
+
+const sessionDocumentSchema = new Schema<ISessionDocumentModel>(
+  {
+    session_id: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "sessions",
+    },
+    client_id: { type: String, required: true, ref: "clients" },
+    document: [documentSchema],
+  },
+  { timestamps: true }
+);
+
 sessionSchema.index({ appointment_id: 1 }, { unique: true });
-// sessionSchema.virtual("scheduled_end").get(function () {
-//   return new Date(this.scheduled_date.getTime() + this.duration * 60000);
-// });
 
 export const SessionModel = mongoose.model<ISessionModel>(
   "sessions",
   sessionSchema
+);
+
+export const SessionDocumentModel = mongoose.model<ISessionDocumentModel>(
+  "session_documents",
+  sessionDocumentSchema
 );

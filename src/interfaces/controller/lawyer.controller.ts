@@ -621,3 +621,17 @@ export async function cancelSession(
     next(error);
   }
 }
+
+export async function startSessionWithRoomID(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { sessionId } = req.body;
+  try {
+    if (!sessionId) throw new ValidationError("Session id is required");
+    
+  } catch (error) {
+    next(error);
+  }
+}

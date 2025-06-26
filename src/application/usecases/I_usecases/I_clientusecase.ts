@@ -11,7 +11,10 @@ import {
   TimeSlot,
 } from "../../../domain/entities/Schedule.entity";
 import { Appointment } from "../../../domain/entities/Appointment.entity";
-import { Session } from "../../../domain/entities/Session.entity";
+import {
+  Session,
+  SessionDocument,
+} from "../../../domain/entities/Session.entity";
 
 export interface I_clientUsecase {
   timeStringToMinutes(time: string): number;
@@ -96,4 +99,12 @@ export interface I_clientUsecase {
     totalPage: number;
   }>;
   cancelSession(payload: { session_id: string }): Promise<Session | null>;
+
+  uploadNewDocument(payload: {
+    sessionId: string;
+    document: { name: string; type: string; url: string }[];
+  }): Promise<SessionDocument | null>;
+  findExistingSessionDocument(
+    sessionId: string
+  ): Promise<SessionDocument | null>;
 }

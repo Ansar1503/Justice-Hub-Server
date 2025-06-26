@@ -1,4 +1,3 @@
-
 import { Appointment } from "../../../domain/entities/Appointment.entity";
 import { lawyer } from "../../../domain/entities/Lawyer.entity";
 import {
@@ -62,7 +61,6 @@ export interface Ilawyerusecase {
     id: string;
     status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
   }): Promise<Appointment | null>;
-  cancelSession(payload: {
-    session_id: string;
-  }): Promise<Session | null>;
+  cancelSession(payload: { session_id: string }): Promise<Session | null>;
+  startSession(payload: { sessionId: string }): Promise<Session>;
 }

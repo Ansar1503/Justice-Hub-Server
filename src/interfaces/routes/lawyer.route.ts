@@ -14,6 +14,7 @@ import {
   fetchSlotSettings,
   rejectClientAppointment,
   removeOverrideSlot,
+  startSessionWithRoomID,
   updateAvailableSlot,
   updateSlotSettings,
   verifyLawyer,
@@ -105,6 +106,7 @@ router.get(
   authenticateLawyer,
   fetchSessions
 );
+router.patch("/profile/sessions",authenticateUser,authenticateLawyer,startSessionWithRoomID)
 
 router.patch(`/profile/sessions/cancel`,authenticateUser,authenticateLawyer ,cancelSession);
 

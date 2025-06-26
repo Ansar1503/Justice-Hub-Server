@@ -12,6 +12,7 @@ import { ERRORS } from "../../infrastructure/constant/errors";
 import { AppointmentsRepository } from "../../infrastructure/database/repo/appointments.repo";
 import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
 import { ValidationError } from "../middelwares/Error/CustomError";
+import { SessionDocument } from "../../domain/entities/Session.entity";
 
 const clientusecase = new ClientUseCase(
   new UserRepository(),
@@ -947,3 +948,76 @@ export async function cancelSession(
   }
 }
 
+export async function uploadDocuments(
+  req: Request & { user?: any },
+  res: Response,
+  next: NextFunction
+) {
+  const files = req.files;
+  const sessionId = req.body.session_id;
+  try {
+    if (!sessionId) {
+      throw new ValidationError("session id is required");
+    }
+    if (!files || !Array.isArray(files)) {
+      throw new ValidationError("files are required");
+    }
+    const documents: SessionDocument["document"] = [];
+
+    files.forEach((file) => {
+      const [type, subtype] = file.mimetype.split("/");
+      let fileType = "";
+
+      if (type === "image") {
+        fileType = "image";
+      } else if (subtype === "pdf") {
+        fileType = "pdf";
+      } else if (
+        subtype ===
+        "vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ) {
+        fileType = "docx";
+      } else {
+        fileType = "unknown";
+      }
+
+      documents.push({
+        name: file.originalname,
+        url: file.path,
+        type: fileType,
+      });
+    });
+    const result = await clientusecase.uploadNewDocument({
+      sessionId,
+      document: documents,
+    });
+    res.status(200).json({
+      success: true,
+      message: "document uploaded successfully",
+      data: result,
+    });
+    return;
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function fetchSessionDocuments(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { id: session_id } = req.params;
+  try {
+    if (!session_id) throw new ValidationError("session_id is required");
+    const result = await clientusecase.findExistingSessionDocument(session_id);
+    res.status(200).json({
+      success: true,
+      message: "document uploaded successfully",
+      data: result,
+    });
+    return;
+  } catch (error) {
+    next(error);
+  }
+}

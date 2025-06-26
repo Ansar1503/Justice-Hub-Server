@@ -30,7 +30,8 @@ import { IAppointmentsRepository } from "../../domain/I_repository/I_Appointment
 import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
 import { Appointment } from "../../domain/entities/Appointment.entity";
 import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
-import { Session } from "../../domain/entities/Session.entity";
+import { Session, SessionDocument } from "../../domain/entities/Session.entity";
+import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
 
 export class ClientUseCase implements I_clientUsecase {
   constructor(
@@ -456,7 +457,7 @@ export class ClientUseCase implements I_clientUsecase {
     const existingReview = await this.reviewRepository.findBySession_id(
       payload.session_id
     );
-    
+
     if (existingReview) {
       throw new Error("REVIEW_ALREADY_EXISTS");
     }
@@ -983,7 +984,6 @@ export class ClientUseCase implements I_clientUsecase {
     return await this.sessionRepo.aggregate({ ...payload, role: "client" });
   }
 
-
   async cancelSession(payload: {
     session_id: string;
   }): Promise<Session | null> {
@@ -994,5 +994,59 @@ export class ClientUseCase implements I_clientUsecase {
     return session;
   }
 
+  async uploadNewDocument(payload: {
+    sessionId: string;
+    document: { name: string; type: string; url: string }[];
+  }): Promise<SessionDocument | null> {
+    const session = await this.sessionRepo.findById({
+      session_id: payload.sessionId,
+    });
+    const SessionDocument = await this.sessionRepo.findDocumentBySessionId({
+      session_id: payload.sessionId,
+    });
+    if (SessionDocument) {
+      if (SessionDocument.document.length > 0) {
+        throw new ValidationError(
+          "Session is already has document. remove existing document and upload new "
+        );
+      }
+    }
 
+    if (!session) {
+      throw new ValidationError("Session not found");
+    }
+    switch (session.status) {
+      case "cancelled":
+        throw new ValidationError("Session is cancelled");
+      case "completed":
+        throw new ValidationError("Session is completed");
+      case "missed":
+        throw new ValidationError("Session is missed");
+      case "ongoing":
+        throw new ValidationError("Session is ongoing");
+      default:
+        break;
+    }
+    const slotDateTime = this.timeStringToDate(
+      session.scheduled_date,
+      session.scheduled_time
+    );
+    if (slotDateTime <= new Date()) {
+      throw new ValidationError("Session is already begun");
+    }
+
+    const newDocument = await this.sessionRepo.createDocument({
+      client_id: session.client_id,
+      session_id: session._id as string,
+      document: payload.document,
+    });
+    return newDocument;
+  }
+  async findExistingSessionDocument(
+    sessionId: string
+  ): Promise<SessionDocument | null> {
+    return await this.sessionRepo.findDocumentBySessionId({
+      session_id: sessionId,
+    });
+  }
 }

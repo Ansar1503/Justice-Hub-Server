@@ -6,6 +6,7 @@ import {
   createCheckoutSession,
   fetchAppointmentDetails,
   fetchClientData,
+  fetchSessionDocuments,
   fetchSessions,
   fetchStripeSessionDetails,
   getLawyerDetail,
@@ -19,9 +20,14 @@ import {
   updateBasicInfo,
   updateEmail,
   updatePassword,
+  uploadDocuments,
 } from "../controller/client.controller";
 import multer from "multer";
-import { profilestorage } from "../middelwares/multer";
+import {
+  documentstorage,
+  handleMulterErrors,
+  profilestorage,
+} from "../middelwares/multer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 import { authenticateClient } from "../middelwares/Auth/authenticateClient";
 import { ChatController } from "../controller/chat.controller";
@@ -31,6 +37,10 @@ import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
 const chatcontroller = new ChatController(new ChatUseCase(new ChatRepo()));
 
 const upload = multer({ storage: profilestorage });
+const documentUpload = multer({
+  storage: documentstorage,
+  limits: { fileSize: 10 * 1024 * 1024, files: 3 },
+});
 
 const router = express.Router();
 
@@ -65,6 +75,20 @@ router.get(
   authenticateUser,
   authenticateClient,
   fetchSessions
+);
+router.patch("/profile/sessions", authenticateUser, authenticateClient);
+router.get(
+  "/profile/sessions/document/:id",
+  authenticateUser,
+  authenticateClient,
+  fetchSessionDocuments
+);
+router.post(
+  "/profile/sessions/document",
+  authenticateUser,
+  authenticateClient,
+  handleMulterErrors(documentUpload.array("documents", 3)),
+  uploadDocuments
 );
 router.patch(
   "/profile/sessions/cancel",
