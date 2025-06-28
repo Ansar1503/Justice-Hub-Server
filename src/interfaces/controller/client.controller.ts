@@ -1037,7 +1037,7 @@ export async function removeSessionDocument(
     res.status(200).json({
       success: true,
       message: "document removed successfully",
-      // data: result,
+      data: result,
     });
     return;
   } catch (error) {

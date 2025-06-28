@@ -15,6 +15,7 @@ import {
   getLawyerslotSettings,
   handleWebhooks,
   removeFailedSession,
+  removeSessionDocument,
   sendVerifyMail,
   updateAddress,
   updateBasicInfo,
@@ -94,7 +95,7 @@ router.delete(
   "/profile/sessions/document/:id",
   authenticateUser,
   authenticateClient,
-  
+  removeSessionDocument
 );
 router.patch(
   "/profile/sessions/cancel",

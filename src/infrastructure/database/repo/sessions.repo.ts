@@ -281,4 +281,8 @@ export class SessionsRepository implements ISessionsRepo {
       }
     );
   }
+
+  async removeAllDocuments(id: string): Promise<void> {
+    await SessionDocumentModel.findOneAndDelete({ _id: id });
+  }
 }

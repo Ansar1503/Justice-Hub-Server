@@ -39,4 +39,5 @@ export interface ISessionsRepo {
     session_id: string;
   }): Promise<SessionDocument | null>;
   removeDocument(documentId: string): Promise<SessionDocument | null>;
+  removeAllDocuments(id: string): Promise<void>;
 }
