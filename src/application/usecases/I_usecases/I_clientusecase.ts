@@ -107,4 +107,7 @@ export interface I_clientUsecase {
   findExistingSessionDocument(
     sessionId: string
   ): Promise<SessionDocument | null>;
+  removeSessionDocument(payload: {
+    documentId: string;
+  }): Promise<SessionDocument | null>;
 }

@@ -21,6 +21,7 @@ export interface ISessionsRepo {
   update(payload: {
     session_id: string;
     status?: Session["status"];
+    roomId?: string;
     start_time?: Date;
     end_time?: Date;
     client_joined_at?: Date;
@@ -37,5 +38,5 @@ export interface ISessionsRepo {
   findDocumentBySessionId(payload: {
     session_id: string;
   }): Promise<SessionDocument | null>;
-  startSessionWithRoomId(sessionId: string): Promise<SessionDocument | null>;
+  removeDocument(documentId: string): Promise<SessionDocument | null>;
 }

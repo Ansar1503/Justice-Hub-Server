@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { Appointment } from "../../domain/entities/Appointment.entity";
 import { lawyer } from "../../domain/entities/Lawyer.entity";
 import {
@@ -16,7 +17,10 @@ import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
 import { IUserRepository } from "../../domain/I_repository/I_user.repo";
 import { IChatRepo } from "../../domain/I_repository/IChatRepo";
 import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
-import { NotFoundError } from "../../interfaces/middelwares/Error/CustomError";
+import {
+  NotFoundError,
+  ValidationError,
+} from "../../interfaces/middelwares/Error/CustomError";
 import { Ilawyerusecase } from "./I_usecases/I_lawyer.usecase";
 
 export class LawyerUsecase implements Ilawyerusecase {
@@ -503,6 +507,40 @@ export class LawyerUsecase implements Ilawyerusecase {
     const updated = await this.sessionsRepo.update({
       session_id: payload.session_id,
       status: "cancelled",
+    });
+    return updated;
+  }
+  async startSession(payload: { sessionId: string }): Promise<Session | null> {
+    const existingSession = await this.sessionsRepo.findById({
+      session_id: payload.sessionId,
+    });
+    if (!existingSession) throw new ValidationError("session not found");
+
+    switch (existingSession.status) {
+      case "cancelled":
+        throw new ValidationError("Session is cancelled");
+      case "completed":
+        throw new ValidationError("Session is completed");
+      case "missed":
+        throw new ValidationError("Session is missed");
+      default:
+        break;
+    }
+    const slotDateTime = this.timeStringToDate(
+      existingSession.scheduled_date,
+      existingSession.scheduled_time
+    );
+    if (slotDateTime <= new Date()) {
+      throw new ValidationError("Session is already begun");
+    }
+    const newDate = new Date();
+    const roomId = `Room_${randomUUID()}`;
+    const updated = await this.sessionsRepo.update({
+      session_id: existingSession._id || "",
+      status: "ongoing",
+      start_time: newDate,
+      lawyer_joined_at: newDate,
+      roomId,
     });
     return updated;
   }

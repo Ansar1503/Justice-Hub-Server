@@ -630,7 +630,13 @@ export async function startSessionWithRoomID(
   const { sessionId } = req.body;
   try {
     if (!sessionId) throw new ValidationError("Session id is required");
-    
+    const result = await lawyerUseCase.startSession({ sessionId });
+    res.status(STATUS_CODES.OK).json({
+      success: true,
+      message: "session initiated",
+      data: result,
+    });
+    return
   } catch (error) {
     next(error);
   }

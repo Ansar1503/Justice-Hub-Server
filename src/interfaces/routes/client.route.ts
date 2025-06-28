@@ -90,6 +90,12 @@ router.post(
   handleMulterErrors(documentUpload.array("documents", 3)),
   uploadDocuments
 );
+router.delete(
+  "/profile/sessions/document/:id",
+  authenticateUser,
+  authenticateClient,
+  
+);
 router.patch(
   "/profile/sessions/cancel",
   authenticateUser,

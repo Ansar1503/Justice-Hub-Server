@@ -106,8 +106,7 @@ router.get(
   authenticateLawyer,
   fetchSessions
 );
-router.patch("/profile/sessions",authenticateUser,authenticateLawyer,startSessionWithRoomID)
-
+router.patch("/profile/sessions/startSession",authenticateUser,authenticateLawyer,startSessionWithRoomID)
 router.patch(`/profile/sessions/cancel`,authenticateUser,authenticateLawyer ,cancelSession);
 
 export default router;

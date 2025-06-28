@@ -62,5 +62,5 @@ export interface Ilawyerusecase {
     status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
   }): Promise<Appointment | null>;
   cancelSession(payload: { session_id: string }): Promise<Session | null>;
-  startSession(payload: { sessionId: string }): Promise<Session>;
+  startSession(payload: { sessionId: string }): Promise<Session | null>;
 }

@@ -1011,10 +1011,33 @@ export async function fetchSessionDocuments(
   try {
     if (!session_id) throw new ValidationError("session_id is required");
     const result = await clientusecase.findExistingSessionDocument(session_id);
+    // console.log("resul", result);
     res.status(200).json({
       success: true,
       message: "document uploaded successfully",
       data: result,
+    });
+    return;
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function removeSessionDocument(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { id: documentId } = req.params;
+  try {
+    if (!documentId) throw new ValidationError("documentId is required");
+    const result = await clientusecase.removeSessionDocument({
+      documentId: documentId,
+    });
+    res.status(200).json({
+      success: true,
+      message: "document removed successfully",
+      // data: result,
     });
     return;
   } catch (error) {

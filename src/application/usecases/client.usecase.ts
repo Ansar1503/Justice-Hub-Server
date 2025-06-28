@@ -1049,4 +1049,10 @@ export class ClientUseCase implements I_clientUsecase {
       session_id: sessionId,
     });
   }
+
+  async removeSessionDocument(payload: {
+    documentId: string;
+  }): Promise<SessionDocument | null> {
+   return await this.sessionRepo.removeDocument(payload.documentId);
+  }
 }

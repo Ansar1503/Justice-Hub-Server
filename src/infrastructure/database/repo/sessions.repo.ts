@@ -173,6 +173,7 @@ export class SessionsRepository implements ISessionsRepo {
   async update(payload: {
     session_id: string;
     status?: Session["status"];
+    roomId?: string;
     start_time?: Date;
     end_time?: Date;
     client_joined_at?: Date;
@@ -210,6 +211,10 @@ export class SessionsRepository implements ISessionsRepo {
     if (payload.follow_up_session_id) {
       update.follow_up_session_id = payload.follow_up_session_id;
     }
+    if (payload.roomId) {
+      update.room_id = payload.roomId;
+    }
+
     if (Object.keys(update).length === 0) {
       return null;
     }
@@ -248,7 +253,6 @@ export class SessionsRepository implements ISessionsRepo {
     };
   }
 
-  
   async findDocumentBySessionId(payload: {
     session_id: string;
   }): Promise<SessionDocument | null> {
@@ -261,5 +265,20 @@ export class SessionsRepository implements ISessionsRepo {
       _id: document._id?.toString(),
       session_id: document.session_id?.toString(),
     };
+  }
+
+  async removeDocument(documentId: string): Promise<SessionDocument | null> {
+    return await SessionDocumentModel.findOneAndUpdate(
+      {
+        "document._id": documentId,
+      },
+      {
+        $pull: {
+          document: {
+            _id: documentId,
+          },
+        },
+      }
+    );
   }
 }
