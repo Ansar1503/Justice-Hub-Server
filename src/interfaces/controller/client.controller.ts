@@ -998,6 +998,7 @@ export async function uploadDocuments(
     });
     return;
   } catch (error) {
+    // console.log("error", error);
     next(error);
   }
 }

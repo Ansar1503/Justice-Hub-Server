@@ -39,6 +39,7 @@ export function handleMulterErrors(
 ): (req: Request, res: Response, next: NextFunction) => void {
   return (req, res, next) => {
     multerMiddleware(req, res, function (err: any) {
+      console.log("upload error ", err);
       if (err instanceof multer.MulterError) {
         if (err.code === "LIMIT_FILE_SIZE") {
           return res
