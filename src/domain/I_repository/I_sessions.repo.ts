@@ -6,7 +6,7 @@ export interface ISessionsRepo {
     user_id: string;
     role: "lawyer" | "client";
     search: string;
-    sort: "name" | "date" | "consultation_fee";
+    sort: "name" | "date" | "amount" | "created_at";
     order: "asc" | "desc";
     status?: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
     consultation_type?: "consultation" | "follow-up";

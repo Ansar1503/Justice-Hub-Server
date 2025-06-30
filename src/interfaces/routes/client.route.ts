@@ -41,6 +41,24 @@ const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
   storage: documentstorage,
   limits: { fileSize: 10 * 1024 * 1024, files: 3 },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+      "image/webp",
+    ];
+
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new Error("Invalid file type. Only PDF, DOCX, and images are allowed.")
+      );
+    }
+  },
 });
 
 const router = express.Router();

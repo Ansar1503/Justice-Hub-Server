@@ -32,6 +32,7 @@ import { Appointment } from "../../domain/entities/Appointment.entity";
 import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
 import { Session, SessionDocument } from "../../domain/entities/Session.entity";
 import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
+import { ICloudinaryService } from "../services/cloudinary.service";
 
 export class ClientUseCase implements I_clientUsecase {
   constructor(
@@ -42,7 +43,8 @@ export class ClientUseCase implements I_clientUsecase {
     private reviewRepository: IreviewRepo,
     private scheduleRepo: IScheduleRepo,
     private appointmentRepo: IAppointmentsRepository,
-    private sessionRepo: ISessionsRepo
+    private sessionRepo: ISessionsRepo,
+    private cloudinaryService: ICloudinaryService
   ) {}
   timeStringToDate(baseDate: Date, hhmm: string): Date {
     const [h, m] = hhmm.split(":").map(Number);
@@ -969,7 +971,7 @@ export class ClientUseCase implements I_clientUsecase {
   async fetchSessions(payload: {
     user_id: string;
     search: string;
-    sort: "name" | "date" | "consultation_fee";
+    sort: "name" | "date" | "amount" | "created_at";
     order: "asc" | "desc";
     status?: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
     consultation_type?: "consultation" | "follow-up";
@@ -1052,11 +1054,28 @@ export class ClientUseCase implements I_clientUsecase {
 
   async removeSessionDocument(payload: {
     documentId: string;
+    sessionId: string;
   }): Promise<SessionDocument | null> {
-    const deleted = await this.sessionRepo.removeDocument(payload.documentId);
-    if (!deleted?.document) {
-      await this.sessionRepo.removeAllDocuments(deleted?._id || "");
+    const existingDoc = await this.sessionRepo.findDocumentBySessionId({
+      session_id: payload.sessionId,
+    });
+    if (!existingDoc) {
+      throw new ValidationError("Session not found");
     }
-    return null;
+
+    const urltoDelete = existingDoc?.document?.filter(
+      (doc) => doc?._id == payload.documentId
+    )[0].url;
+
+    this.cloudinaryService.deleteFile(urltoDelete);
+
+    const deleted = await this.sessionRepo.removeDocument(payload.documentId);
+    // console.log("deleted", deleted);
+    if (!deleted?.document?.length) {
+      // console.log("working....");
+      await this.sessionRepo.removeAllDocuments(deleted?._id || "");
+      return null;
+    }
+    return deleted;
   }
 }

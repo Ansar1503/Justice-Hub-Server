@@ -13,6 +13,7 @@ import { AppointmentsRepository } from "../../infrastructure/database/repo/appoi
 import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
 import { ValidationError } from "../middelwares/Error/CustomError";
 import { SessionDocument } from "../../domain/entities/Session.entity";
+import { CloudinaryService } from "../../application/services/cloudinary.service";
 
 const clientusecase = new ClientUseCase(
   new UserRepository(),
@@ -22,7 +23,8 @@ const clientusecase = new ClientUseCase(
   new ReviewRepo(),
   new ScheduleRepository(),
   new AppointmentsRepository(),
-  new SessionsRepository()
+  new SessionsRepository(),
+  new CloudinaryService()
 );
 
 export const fetchClientData = async (
@@ -885,8 +887,8 @@ export async function fetchSessions(
           : undefined,
       sort:
         typeof sort === "string" &&
-        ["name", "date", "consultation_fee"].includes(sort)
-          ? (sort as "name" | "date" | "consultation_fee")
+        ["name", "date", "amount", "created_at"].includes(sort)
+          ? (sort as "name" | "date" | "amount" | "created_at")
           : "name",
       order:
         typeof order === "string" && (order === "asc" || order === "desc")
@@ -1015,7 +1017,7 @@ export async function fetchSessionDocuments(
     // console.log("resul", result);
     res.status(200).json({
       success: true,
-      message: "document uploaded successfully",
+      message: "document fetched successfully",
       data: result,
     });
     return;
@@ -1030,10 +1032,13 @@ export async function removeSessionDocument(
   next: NextFunction
 ) {
   const { id: documentId } = req.params;
+  const { session } = req.query;
   try {
     if (!documentId) throw new ValidationError("documentId is required");
+    if (!session) throw new ValidationError("session is required");
     const result = await clientusecase.removeSessionDocument({
       documentId: documentId,
+      sessionId: String(session),
     });
     res.status(200).json({
       success: true,

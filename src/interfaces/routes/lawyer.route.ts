@@ -10,6 +10,7 @@ import {
   fetchAvailableSlots,
   fetchLawyer,
   fetchOverrideSlots,
+  fetchSessionDocuments,
   fetchSessions,
   fetchSlotSettings,
   rejectClientAppointment,
@@ -20,6 +21,7 @@ import {
   verifyLawyer,
 } from "../controller/lawyer.controller";
 import { authenticateLawyer } from "../middelwares/Auth/authenticateLawyer";
+import { authenticateClient } from "../middelwares/Auth/authenticateClient";
 
 const upload = multer({ storage: documentstorage });
 
@@ -106,7 +108,24 @@ router.get(
   authenticateLawyer,
   fetchSessions
 );
-router.patch("/profile/sessions/startSession",authenticateUser,authenticateLawyer,startSessionWithRoomID)
-router.patch(`/profile/sessions/cancel`,authenticateUser,authenticateLawyer ,cancelSession);
+router.get(
+  "/profile/sessions/document/:id",
+  authenticateUser,
+  authenticateClient,
+  authenticateLawyer,
+  fetchSessionDocuments
+);
+router.patch(
+  "/profile/sessions/startSession",
+  authenticateUser,
+  authenticateLawyer,
+  startSessionWithRoomID
+);
+router.patch(
+  `/profile/sessions/cancel`,
+  authenticateUser,
+  authenticateLawyer,
+  cancelSession
+);
 
 export default router;

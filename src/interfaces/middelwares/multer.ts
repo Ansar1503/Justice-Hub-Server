@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
+import path from "path";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -13,7 +14,7 @@ export const profilestorage = new CloudinaryStorage({
   params: async (req, file) => {
     return {
       folder: "Justice_Hub/profile",
-      allowed_formats: ["jpg", "jpeg", "png", "webp", "pdf", "docx"],
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
       transformation: [{ width: 500, height: 500, crop: "limit" }],
     };
   },
@@ -22,9 +23,17 @@ export const profilestorage = new CloudinaryStorage({
 export const documentstorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
+    const ext = path.extname(file.originalname);
+    const filename = path.basename(file.originalname, ext);
+    const isRaw =
+      file.mimetype === "application/pdf" ||
+      file.mimetype ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
     return {
       folder: "Justice_Hub/documents",
-      allowed_formats: ["jpg", "jpeg", "png", "webp", "pdf", "docx"],
+      public_id: `${filename}-${Date.now()}${ext}`,
+      resource_type: isRaw ? "raw" : "auto",
     };
   },
 });
@@ -39,7 +48,7 @@ export function handleMulterErrors(
 ): (req: Request, res: Response, next: NextFunction) => void {
   return (req, res, next) => {
     multerMiddleware(req, res, function (err: any) {
-      console.log("upload error ", err);
+      // console.log("upload error ", err);
       if (err instanceof multer.MulterError) {
         if (err.code === "LIMIT_FILE_SIZE") {
           return res

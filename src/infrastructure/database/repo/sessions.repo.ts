@@ -9,7 +9,7 @@ export class SessionsRepository implements ISessionsRepo {
     user_id: string;
     role: "lawyer" | "client";
     search: string;
-    sort: "name" | "date" | "consultation_fee";
+    sort: "name" | "date" | "amount" | "created_at";
     order: "asc" | "desc";
     status?: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
     consultation_type?: "consultation" | "follow-up";
@@ -41,10 +41,12 @@ export class SessionsRepository implements ISessionsRepo {
     const sortStage: Record<string, any> = {};
     if (sort === "name") {
       sortStage["userData.name"] = order === "asc" ? 1 : -1;
-    } else if (sort === "consultation_fee") {
+    } else if (sort === "amount") {
       sortStage["amount"] = order === "asc" ? 1 : -1;
     } else if (sort === "date") {
-      sortStage["schedule_at"] = order === "asc" ? 1 : -1;
+      sortStage["scheduled_date"] = order === "asc" ? 1 : -1;
+    } else {
+      sortStage["created_at"] = order === "asc" ? 1 : -1;
     }
     if (
       status &&
@@ -278,7 +280,8 @@ export class SessionsRepository implements ISessionsRepo {
             _id: documentId,
           },
         },
-      }
+      },
+      { new: true }
     );
   }
 

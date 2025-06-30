@@ -6,7 +6,10 @@ import {
   OverrideSlots,
   ScheduleSettings,
 } from "../../../domain/entities/Schedule.entity";
-import { Session } from "../../../domain/entities/Session.entity";
+import {
+  Session,
+  SessionDocument,
+} from "../../../domain/entities/Session.entity";
 
 export interface Ilawyerusecase {
   verifyLawyer(payload: lawyer): Promise<lawyer>;
@@ -63,4 +66,7 @@ export interface Ilawyerusecase {
   }): Promise<Appointment | null>;
   cancelSession(payload: { session_id: string }): Promise<Session | null>;
   startSession(payload: { sessionId: string }): Promise<Session | null>;
+  findExistingSessionDocument(
+    sessionId: string
+  ): Promise<SessionDocument | null>;
 }

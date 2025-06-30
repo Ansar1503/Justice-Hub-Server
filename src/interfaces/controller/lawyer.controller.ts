@@ -562,8 +562,8 @@ export async function fetchSessions(
           : undefined,
       sort:
         typeof sort === "string" &&
-        ["name", "date", "consultation_fee"].includes(sort)
-          ? (sort as "name" | "date" | "consultation_fee")
+        ["name", "date", "amount", "created_at"].includes(sort)
+          ? (sort as "name" | "date" | "amount" | "created_at")
           : "name",
       order:
         typeof order === "string" && (order === "asc" || order === "desc")
@@ -636,7 +636,28 @@ export async function startSessionWithRoomID(
       message: "session initiated",
       data: result,
     });
-    return
+    return;
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function fetchSessionDocuments(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { id: session_id } = req.params;
+  try {
+    if (!session_id) throw new ValidationError("session_id is required");
+    const result = await lawyerUseCase.findExistingSessionDocument(session_id);
+    // console.log("resul", result);
+    res.status(200).json({
+      success: true,
+      message: "document fetched successfully",
+      data: result,
+    });
+    return;
   } catch (error) {
     next(error);
   }

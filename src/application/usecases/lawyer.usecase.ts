@@ -7,7 +7,7 @@ import {
   OverrideSlots,
   ScheduleSettings,
 } from "../../domain/entities/Schedule.entity";
-import { Session } from "../../domain/entities/Session.entity";
+import { Session, SessionDocument } from "../../domain/entities/Session.entity";
 import { IAppointmentsRepository } from "../../domain/I_repository/I_Appointments.repo";
 import { IClientRepository } from "../../domain/I_repository/I_client.repo";
 import { IDocumentsRepository } from "../../domain/I_repository/I_documents.repo";
@@ -467,7 +467,7 @@ export class LawyerUsecase implements Ilawyerusecase {
   async fetchSessions(payload: {
     user_id: string;
     search: string;
-    sort: "name" | "date" | "consultation_fee";
+    sort: "name" | "date" | "amount" | "created_at";
     order: "asc" | "desc";
     status?: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
     consultation_type?: "consultation" | "follow-up";
@@ -543,5 +543,13 @@ export class LawyerUsecase implements Ilawyerusecase {
       roomId,
     });
     return updated;
+  }
+
+  async findExistingSessionDocument(
+    sessionId: string
+  ): Promise<SessionDocument | null> {
+    return await this.sessionsRepo.findDocumentBySessionId({
+      session_id: sessionId,
+    });
   }
 }
