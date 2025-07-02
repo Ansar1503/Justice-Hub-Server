@@ -10,4 +10,5 @@ export enum SocketEventEnum {
   MESSAGE_DELETE_EVENT = "messageDeleted",
   CHECKONLINE_STATUS = "onlineStatus",
   SEND_MESSAGE_EVENT = "sendMessage",
+  CHANGE_CHAT_NAME_EVENT = "changeChatName",
 }

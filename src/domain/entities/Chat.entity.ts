@@ -1,5 +1,6 @@
 export interface ChatSession {
   _id?: string;
+  name: string;
   participants: { lawyer_id: string; client_id: string };
   last_message: string;
   session_id: string;

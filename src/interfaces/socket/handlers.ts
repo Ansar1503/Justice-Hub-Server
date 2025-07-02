@@ -46,7 +46,7 @@ export class SocketHandlers {
         chatSend?.receiverId || "",
         this.eventEnum.MESSAGE_RECEIVED_EVENT,
         chatSend
-      ); 
+      );
     } catch (error: any) {
       cb({ success: false, error: error.message });
     }
@@ -99,5 +99,34 @@ export class SocketHandlers {
     this.socket.join(sessionId);
 
     console.log(`User ${userId} joined chat session ${sessionId}`);
+  }
+
+  async handleChangeChatName(
+    data: { chatId: string; chatName: string; userId: string },
+    cb: (response: {
+      success: boolean;
+      updatedChat?: any;
+      error?: string;
+    }) => void
+  ) {
+    try {
+      const updatedChat = await chatUsecase.updateChatName({
+        chatId: data.chatId,
+        chatName: data.chatName,
+      });
+      if (updatedChat) {
+        cb({ success: true, updatedChat });
+        this.handleEmiter(
+          data.userId,
+          SocketEventEnum.CHANGE_CHAT_NAME_EVENT,
+          updatedChat
+        );
+      } else {
+        cb({ success: false, error: "Chat not found or update failed" });
+      }
+    } catch (error: any) {
+      console.error("Error updating chat name:", error);
+      cb({ success: false, error: error?.message || "Internal server error" });
+    }
   }
 }

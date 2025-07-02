@@ -3,7 +3,6 @@ import { Server as SocketIOServer, Socket, ExtendedError } from "socket.io";
 import "dotenv/config";
 import { authenticateClientSocket } from "../../interfaces/middelwares/socket/client.socket.auth";
 
-
 export function InitialiseSocketServer(server: HTTPServer): SocketIOServer {
   const FRONTEND_URL = process.env.FRONTEND_URL;
   const io = new SocketIOServer(server, {

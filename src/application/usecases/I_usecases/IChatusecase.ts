@@ -13,4 +13,8 @@ export interface IChatusecase {
     session_id: string;
     page: number;
   }): Promise<{ data: ChatMessage[]; nextCursor?: number }>;
+  updateChatName(payload: {
+    chatId: string;
+    chatName: string;
+  }): Promise<ChatSession | null>;
 }

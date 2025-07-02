@@ -5,6 +5,7 @@ export interface IChatModel extends Document {
     lawyer_id: string;
     client_id: string;
   };
+  name: string;
   session_id: Types.ObjectId;
   last_message?: Types.ObjectId;
   createdAt?: Date;
@@ -29,6 +30,7 @@ const chatSchema = new Schema<IChatModel>(
       lawyer_id: { type: String, required: true },
       client_id: { type: String, required: true },
     },
+    name: { type: String, required: true },
     session_id: { type: Schema.Types.ObjectId, unique: true, required: true },
     last_message: {
       type: Schema.Types.ObjectId,

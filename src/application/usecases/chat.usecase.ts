@@ -36,4 +36,15 @@ export class ChatUseCase implements IChatusecase {
       payload.page
     );
   }
+  async updateChatName(payload: {
+    chatId: string;
+    chatName: string;
+  }): Promise<ChatSession | null> {
+    const { chatId, chatName } = payload;
+    const updatedChat = await this.chatRepo.update({
+      name: chatName,
+      id: chatId,
+    });
+    return updatedChat;
+  }
 }

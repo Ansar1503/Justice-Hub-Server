@@ -451,10 +451,12 @@ export class LawyerUsecase implements Ilawyerusecase {
       error.code = STATUS_CODES.BAD_REQUEST;
       throw error;
     }
-
+    const client = await this.userRepo.findByuser_id(newsession.client_id);
+    const lawyer = await this.userRepo.findByuser_id(newsession.lawyer_id);
     const response = await this.appointRepo.updateWithId(payload);
     await this.chatRepo.create({
       last_message: "",
+      name: `${client?.name} - ${lawyer?.name} session`,
       participants: {
         client_id: newsession.client_id,
         lawyer_id: newsession.lawyer_id,

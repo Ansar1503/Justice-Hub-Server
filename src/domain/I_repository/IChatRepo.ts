@@ -10,7 +10,8 @@ export interface IChatRepo {
   }): Promise<{ data: any[]; nextCursor?: number }>;
   findById(id: string): Promise<ChatSession | null>;
   update(payload: {
-    last_message: string;
+    name?:string;
+    last_message?: string;
     id: string;
   }): Promise<ChatSession | null>;
 

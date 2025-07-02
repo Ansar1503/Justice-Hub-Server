@@ -7,6 +7,7 @@ export class ChatRepo implements IChatRepo {
   async create(payload: ChatSession): Promise<ChatSession> {
     const createPayload = {
       participants: payload.participants,
+      name: payload.name,
       session_id:
         payload.session_id && Types.ObjectId.isValid(payload.session_id)
           ? new Types.ObjectId(payload.session_id)
@@ -183,13 +184,21 @@ export class ChatRepo implements IChatRepo {
   }
 
   async update(payload: {
-    last_message: string;
+    name?: string;
+    last_message?: string;
     id: string;
   }): Promise<ChatSession | null> {
-    const { last_message, id } = payload;
+    const update: any = {};
+    if (payload.name) {
+      update.name = payload.name;
+    }
+    if (payload.last_message) {
+      update.last_message = new Types.ObjectId(payload.last_message);
+    }
+
     const updatedChatSession = await ChatModel.findOneAndUpdate(
-      { _id: id },
-      { last_message: new Types.ObjectId(last_message) },
+      { _id: payload.id },
+      update,
       { new: true }
     );
     if (!updatedChatSession) return null;

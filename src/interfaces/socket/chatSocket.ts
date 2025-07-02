@@ -59,5 +59,12 @@ export async function setUpChatSocket(io: SocketIOServer) {
         socketHandler.handleSendMessage(data, cb);
       }
     );
+
+    socket.on(
+      SocketEventEnum.CHANGE_CHAT_NAME_EVENT,
+      (data: { chatId: string; chatName: string; userId: string }, cb: any) => {
+        socketHandler.handleChangeChatName(data, cb);
+      }
+    );
   });
 }
