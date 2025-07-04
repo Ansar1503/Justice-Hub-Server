@@ -17,4 +17,8 @@ export interface IChatusecase {
     chatId: string;
     chatName: string;
   }): Promise<ChatSession | null>;
+  deleteMessage(payload: {
+    messageId: string;
+    sessionId: string;
+  }): Promise<ChatMessage | null>;
 }

@@ -1,5 +1,6 @@
 import { ChatMessage, ChatSession } from "../../domain/entities/Chat.entity";
 import { IChatRepo } from "../../domain/I_repository/IChatRepo";
+import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
 import { IChatusecase } from "./I_usecases/IChatusecase";
 
 export class ChatUseCase implements IChatusecase {
@@ -46,5 +47,28 @@ export class ChatUseCase implements IChatusecase {
       id: chatId,
     });
     return updatedChat;
+  }
+
+  async deleteMessage(payload: {
+    messageId: string;
+    sessionId: string;
+  }): Promise<ChatMessage | null> {
+    if (!payload.messageId) throw new ValidationError("MessageId not found");
+    console.log("payload:pa", payload);
+    await this.chatRepo.deleteMessage({ messageId: payload.messageId });
+    const messages = await this.chatRepo.findMessagesBySessionId(
+      payload.sessionId,
+      1
+    );
+    const lastMessage: ChatMessage | null =
+      messages.data.length > 0
+        ? messages?.data[messages?.data?.length - 1]
+        : null;
+    // console.log("lastmessage:", lastMessage);
+    await this.chatRepo.update({
+      id: payload.sessionId,
+      last_message: lastMessage?._id || "",
+    });
+    return lastMessage;
   }
 }

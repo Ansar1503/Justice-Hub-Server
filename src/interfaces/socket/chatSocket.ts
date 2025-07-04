@@ -30,21 +30,13 @@ export async function setUpChatSocket(io: SocketIOServer) {
 
     // listen for disconnect event
     socket.on(SocketEventEnum.DISCONNECT_EVENT, () => {
-      console.log("user has disconnected 🚫. userId: " + socket.data.user?.id);
-      if (socket.data.user?.id) {
-        for (const room of socket.rooms) {
-          if (room !== socket.id) {
-            socket.leave(room);
-          }
-        }
-      }
+      socketHandler.handleSocketDisconnect();
     });
 
     // typing listener
     socket.on(
       SocketEventEnum.TYPING_EVENT,
       (data: { session_id: string; userId: string }) => {
-        // console.log("data", data);
         socket.to(data.session_id).emit(SocketEventEnum.TYPING_EVENT, {
           session_id: data.session_id,
           userId: data.userId,
@@ -64,6 +56,13 @@ export async function setUpChatSocket(io: SocketIOServer) {
       SocketEventEnum.CHANGE_CHAT_NAME_EVENT,
       (data: { chatId: string; chatName: string; userId: string }, cb: any) => {
         socketHandler.handleChangeChatName(data, cb);
+      }
+    );
+
+    socket.on(
+      SocketEventEnum.MESSAGE_DELETE_EVENT,
+      (data: { messageId: string; sessionId: string }, cb: any) => {
+        socketHandler.handleDeleteMessage(data, cb);
       }
     );
   });

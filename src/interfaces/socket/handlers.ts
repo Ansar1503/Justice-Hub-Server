@@ -12,21 +12,15 @@ export class SocketHandlers {
   constructor(private socket: Socket, private io: SocketIOServer) {}
   handleEmiter(id: string, event: SocketEventEnum, payload: any) {
     this.socket.to(id).emit(event, payload);
+    console.log(`Emitting ${event} to user ${id}`, payload);
   }
-  handleCheckOnline(targetId: string) {
-    const isOnline = socketStore.onlineStatus.has(targetId);
-    this.socket.emit(this.eventEnum.CHECKONLINE_STATUS, {
-      userId: targetId,
-      isOnline,
-    });
-  }
-  handleDisconnect(sessionId: string) {
-    socketStore.onlineStatus.delete(sessionId);
-    this.io.emit(this.eventEnum.CHECKONLINE_STATUS, {
-      sessionId,
-      isOnline: false,
-    });
-  }
+  // handleCheckOnline(targetId: string) {
+  //   const isOnline = socketStore.onlineStatus.has(targetId);
+  //   this.socket.emit(this.eventEnum.CHECKONLINE_STATUS, {
+  //     userId: targetId,
+  //     isOnline,
+  //   });
+  // }
   getChatSessionDetails(sessionId: string) {
     return chatUsecase.getChatSessionById(sessionId);
   }
@@ -52,16 +46,38 @@ export class SocketHandlers {
     }
   }
 
+  handleSocketDisconnect() {
+    console.log(
+      "user has disconnected 🚫. userId: " + this.socket.data.user?.id
+    );
+    const userId = this.socket.data.user?.id;
+    if (userId) {
+      for (const room of this.socket.rooms) {
+        if (room !== this.socket.id) {
+          this.socket.leave(room);
+        }
+      }
+      this.socket.disconnect();
+      if (socketStore.onlineStatus.has(userId)) {
+        socketStore.onlineStatus.delete(userId);
+        this.io.emit(this.eventEnum.USER_OFFLINE_EVENT, { userId });
+      }
+    }
+  }
+
   async handleSocketJoin(data: { sessionId: string }) {
     const sessionId = data?.sessionId;
     const userId = this.socket.data.user?.id;
 
     if (!sessionId || !userId) return;
     this.socket.join(userId);
-
+    socketStore.onlineStatus.add(userId);
+    this.io.emit(SocketEventEnum.USER_ONLINE_EVENT, { userId });
     const chatSessionDetails = await this.getChatSessionDetails(sessionId);
     if (!chatSessionDetails) {
-      console.log("Session not found");
+      this.handleEmiter(userId, SocketEventEnum.SOCKET_ERROR_EVENT, {
+        message: "Chat Session not found",
+      });
       return;
     }
 
@@ -87,7 +103,6 @@ export class SocketHandlers {
       console.log("User already in chat session room");
       return;
     }
-
     const uniqueUserIds = new Set(socketsInRoom.map((s) => s.data.userId));
     if (uniqueUserIds.size >= 2) {
       this.handleEmiter(userId, SocketEventEnum.SOCKET_ERROR_EVENT, {
@@ -95,9 +110,10 @@ export class SocketHandlers {
       });
       return;
     }
-
     this.socket.join(sessionId);
-
+    this.socket.emit(SocketEventEnum.CONNECTED_EVENT, {
+      isConnected: true,
+    });
     console.log(`User ${userId} joined chat session ${sessionId}`);
   }
 
@@ -127,6 +143,29 @@ export class SocketHandlers {
     } catch (error: any) {
       console.error("Error updating chat name:", error);
       cb({ success: false, error: error?.message || "Internal server error" });
+    }
+  }
+
+  async handleDeleteMessage(
+    payload: { messageId: string; sessionId: string },
+    cb: any
+  ) {
+    try {
+      const lastMessage = await chatUsecase.deleteMessage(payload);
+      if (lastMessage) {
+        this.handleEmiter(
+          lastMessage.receiverId,
+          this.eventEnum.MESSAGE_DELETE_EVENT,
+          { ...payload, lastMessage }
+        );
+      }
+      cb({ success: true, message: "successfully deleted", lastMessage });
+    } catch (error: any) {
+      cb({
+        success: false,
+        message: error.message || "message delete failed",
+        lastMessage: null,
+      });
     }
   }
 }

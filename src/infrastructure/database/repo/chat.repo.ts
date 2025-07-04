@@ -248,4 +248,7 @@ export class ChatRepo implements IChatRepo {
       nextCursor: hasNextPage ? page + 1 : undefined,
     };
   }
+  async deleteMessage(payload: { messageId: string }): Promise<void> {
+    await MessageModel.findOneAndDelete({ _id: payload.messageId });
+  }
 }
