@@ -54,7 +54,7 @@ export class ChatUseCase implements IChatusecase {
     sessionId: string;
   }): Promise<ChatMessage | null> {
     if (!payload.messageId) throw new ValidationError("MessageId not found");
-    console.log("payload:pa", payload);
+    // console.log("payload:pa", payload);
     await this.chatRepo.deleteMessage({ messageId: payload.messageId });
     const messages = await this.chatRepo.findMessagesBySessionId(
       payload.sessionId,

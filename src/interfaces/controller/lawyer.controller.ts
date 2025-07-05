@@ -524,6 +524,7 @@ export async function confirmClientAppointment(req: Request, res: Response) {
     });
     return;
   } catch (error: any) {
+    // console.log("error in confirm appointment", error);
     const statusCode =
       typeof error?.code === "number" && error.code >= 100 && error.code < 600
         ? error.code

@@ -41,6 +41,9 @@ export class ChatRepo implements IChatRepo {
       [role === "client" ? "participants.client_id" : "participants.lawyer_id"]:
         user_id,
     };
+    if (search.trim()) {
+      matchStage["name"] = search;
+    }
 
     const pipeline: any[] = [
       { $match: matchStage },
@@ -156,17 +159,17 @@ export class ChatRepo implements IChatRepo {
       { $unwind: { path: "$lastMessage", preserveNullAndEmptyArrays: true } },
     ];
 
-    if (search.trim() !== "") {
-      console.log("search", search);
-      pipeline.push({
-        $match: {
-          $or: [
-            { "clientData.name": { $regex: search, $options: "i" } },
-            { "lawyerData.name": { $regex: search, $options: "i" } },
-          ],
-        },
-      });
-    }
+    // if (search.trim() !== "") {
+    //   console.log("search", search);
+    //   pipeline.push({
+    //     $match: {
+    //       $or: [
+    //         { "clientData.name": { $regex: search, $options: "i" } },
+    //         { "lawyerData.name": { $regex: search, $options: "i" } },
+    //       ],
+    //     },
+    //   });
+    // }
 
     pipeline.push({ $sort: { updatedAt: -1 } });
     pipeline.push({ $skip: skip });

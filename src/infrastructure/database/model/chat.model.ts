@@ -34,7 +34,6 @@ const chatSchema = new Schema<IChatModel>(
     session_id: { type: Schema.Types.ObjectId, unique: true, required: true },
     last_message: {
       type: Schema.Types.ObjectId,
-      unique: true,
       required: false,
     },
   },
