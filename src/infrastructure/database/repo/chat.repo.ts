@@ -129,7 +129,6 @@ export class ChatRepo implements IChatRepo {
           userDetails: 0,
           lawyerProfile: 0,
           lawyerClientProfile: 0,
-
           "lawyerData.password": 0,
         },
       },
@@ -233,15 +232,14 @@ export class ChatRepo implements IChatRepo {
     page: number
   ): Promise<{ data: ChatMessage[]; nextCursor?: number }> {
     const limit = 10;
-    const skip = (page - 1) * limit;
-
+    const skip = page > 0 ? (page - 1) * limit : 0;
     const messages = await MessageModel.find({ session_id: id })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit + 1);
     const hasNextPage = messages.length > limit;
     const data = hasNextPage ? messages.slice(0, limit) : messages;
-    // console.log("messages", messages);
+
     return {
       data: data.reverse().map((msg) => ({
         ...msg.toObject(),

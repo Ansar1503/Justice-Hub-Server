@@ -153,11 +153,12 @@ export class SocketHandlers {
     try {
       const lastMessage = await chatUsecase.deleteMessage(payload);
       if (lastMessage) {
-        this.handleEmiter(
-          lastMessage.receiverId,
-          this.eventEnum.MESSAGE_DELETE_EVENT,
-          { ...payload, lastMessage }
-        );
+        this.io
+          .in(lastMessage.receiverId)
+          .emit(this.eventEnum.MESSAGE_DELETE_EVENT, {
+            ...payload,
+            lastMessage,
+          });
       }
       cb({ success: true, message: "successfully deleted", lastMessage });
     } catch (error: any) {
