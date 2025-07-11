@@ -146,27 +146,59 @@ export class SocketHandlers {
     }
   }
 
-  async handleDeleteMessage(
-    payload: { messageId: string; sessionId: string },
-    cb: any
-  ) {
+  async handleDeleteMessage(payload: { messageId: string; sessionId: string }) {
     try {
       const lastMessage = await chatUsecase.deleteMessage(payload);
       if (lastMessage) {
         this.io
           .in(lastMessage.receiverId)
+          .in(lastMessage.senderId)
           .emit(this.eventEnum.MESSAGE_DELETE_EVENT, {
             ...payload,
             lastMessage,
           });
       }
-      cb({ success: true, message: "successfully deleted", lastMessage });
     } catch (error: any) {
-      cb({
-        success: false,
-        message: error.message || "message delete failed",
-        lastMessage: null,
+      console.log("error occured while deleting message: " + " " + error);
+    }
+  }
+
+  async handleReportMessage(
+    payload: {
+      messageId: string;
+      sessionId: string;
+      reason: string;
+      reportedBy: string;
+    },
+    cb: (response: {
+      success: boolean;
+      reportedMessage?: ChatMessage | null;
+      error?: string;
+    }) => void
+  ) {
+    try {
+      const { messageId, reason, reportedBy, sessionId } = payload;
+      if (!messageId) {
+        cb({ success: false, error: "messageId Not found" });
+        return;
+      }
+      if (!reason?.trim()) {
+        cb({ success: false, error: "no reason found" });
+        return;
+      }
+      if (!reportedBy) {
+        cb({ success: false, error: "reported user Id required" });
+      }
+      const reportedMessage = await chatUsecase.reportMessage({
+        messageId,
+        reason,
+        reportedAt: new Date(),
       });
+
+      cb({ success: true, reportedMessage });
+    } catch (error: any) {
+      console.log("error :", error);
+      cb({ success: false, error: error?.message });
     }
   }
 }

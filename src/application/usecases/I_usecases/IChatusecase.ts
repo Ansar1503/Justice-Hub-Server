@@ -21,4 +21,9 @@ export interface IChatusecase {
     messageId: string;
     sessionId: string;
   }): Promise<ChatMessage | null>;
+  reportMessage(payload: {
+    messageId: string;
+    reason: string;
+    reportedAt: Date;
+  }): Promise<ChatMessage | null>;
 }

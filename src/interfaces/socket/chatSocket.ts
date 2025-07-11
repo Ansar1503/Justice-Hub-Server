@@ -61,8 +61,27 @@ export async function setUpChatSocket(io: SocketIOServer) {
 
     socket.on(
       SocketEventEnum.MESSAGE_DELETE_EVENT,
-      (data: { messageId: string; sessionId: string }, cb: any) => {
-        socketHandler.handleDeleteMessage(data, cb);
+      (data: { messageId: string; sessionId: string }) => {
+        socketHandler.handleDeleteMessage(data);
+      }
+    );
+
+    socket.on(
+      SocketEventEnum.REPORT_MESSAGE,
+      (
+        data: {
+          messageId: string;
+          sessionId: string;
+          reason: string;
+          reportedBy: string;
+        },
+        cb: (response: {
+          success: boolean;
+          reportedMessage?: ChatMessage | null;
+          error?: string;
+        }) => void
+      ) => {
+        socketHandler.handleReportMessage(data, cb);
       }
     );
   });

@@ -71,4 +71,13 @@ export class ChatUseCase implements IChatusecase {
     });
     return lastMessage;
   }
+  async reportMessage(payload: {
+    messageId: string;
+    reason: string;
+    reportedAt: Date;
+  }): Promise<ChatMessage | null> {
+    const chatExists = await this.chatRepo.findMessageById(payload.messageId);
+    if (!chatExists) throw new Error("message doesnt exist");
+    return await this.chatRepo.updateMessage(payload);
+  }
 }

@@ -22,4 +22,11 @@ export interface IChatRepo {
     page: number
   ): Promise<{ data: ChatMessage[]; nextCursor?: number }>;
   deleteMessage(payload: { messageId: string }): Promise<void>;
+  updateMessage(payload: {
+    messageId: string;
+    reason?: string;
+    reportedAt?: Date;
+    read?: boolean;
+  }): Promise<ChatMessage | null>;
+  findMessageById(messageId: string): Promise<ChatMessage | null>;
 }

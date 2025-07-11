@@ -252,4 +252,38 @@ export class ChatRepo implements IChatRepo {
   async deleteMessage(payload: { messageId: string }): Promise<void> {
     await MessageModel.findOneAndDelete({ _id: payload.messageId });
   }
+
+  async updateMessage(payload: {
+    messageId: string;
+    reason?: string;
+    reportedAt?: Date;
+    read?: boolean;
+  }): Promise<ChatMessage | null> {
+    const { messageId, reason, reportedAt, read } = payload;
+
+    const update: {
+      read?: boolean;
+      report?: { reason?: string; reportedAt?: Date };
+    } = {};
+
+    if (reason || reportedAt) {
+      update.report = {};
+      if (reason) update.report.reason = reason;
+      if (reportedAt) update.report.reportedAt = reportedAt;
+    }
+
+    if (typeof read === "boolean") {
+      update.read = read;
+    }
+
+    return await MessageModel.findOneAndUpdate(
+      { _id: messageId },
+      { $set: update },
+      { new: true }
+    );
+  }
+
+  async findMessageById(messageId: string): Promise<ChatMessage | null> {
+    return await MessageModel.findOne({ _id: messageId });
+  }
 }

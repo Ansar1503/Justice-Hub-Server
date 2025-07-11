@@ -19,6 +19,10 @@ export interface ChatMessage {
     url: string;
     type: string;
   }[];
+  report?: {
+    reason: string;
+    reportedAt: Date;
+  };
   createdAt?: Date;
   updatedAt?: Date;
 }

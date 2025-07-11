@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
+import { ChatMessage } from "../../../domain/entities/Chat.entity";
 
 export interface IChatModel extends Document {
   participants: {
@@ -12,16 +13,10 @@ export interface IChatModel extends Document {
   updatedAt?: Date;
 }
 
-export interface IMessageModel extends Document {
+export interface IMessageModel
+  extends Document,
+    Omit<ChatMessage, "_id" | "session_id" | "createdAt" | "updatedAt"> {
   session_id: Types.ObjectId;
-  senderId: string;
-  receiverId: string;
-  content: string;
-  read: boolean;
-  attachments?: {
-    url: string;
-    type: string;
-  }[];
 }
 
 const chatSchema = new Schema<IChatModel>(
@@ -57,6 +52,10 @@ const messageSchema = new Schema<IMessageModel>(
         type: { type: String, required: false },
       },
     ],
+    report: {
+      reportedAt: { type: Date },
+      reason: { type: String },
+    },
   },
   { timestamps: true }
 );
