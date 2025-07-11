@@ -10,6 +10,11 @@ export async function setUpChatSocket(io: SocketIOServer) {
     const user = socket.data?.user;
     const userId = user?.id;
     // console.log(`user : ${user}`);
+    socket.join(userId);
+    socketStore.onlineUsers.add(userId);
+    io.emit(SocketEventEnum.ONLINE_USERS, {
+      users: Array.from(socketStore.onlineUsers),
+    });
 
     // join listener
     socket.on(

@@ -1,7 +1,6 @@
 export enum SocketEventEnum {
   CONNECTED_EVENT = "user_connected",
-  USER_ONLINE_EVENT = "user_online",
-  USER_OFFLINE_EVENT = "user_offline",
+  ONLINE_USERS = "user_online",
   DISCONNECT_EVENT = "disconnect",
   JOIN_CHAT_EVENT = "joinChat",
   MESSAGE_RECEIVED_EVENT = "messageReceived",

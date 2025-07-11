@@ -62,11 +62,12 @@ export class SocketHandlers {
         }
       }
       this.socket.disconnect();
-      if (socketStore.onlineStatus.has(userId)) {
-        socketStore.onlineStatus.delete(userId);
-        this.io.emit(this.eventEnum.USER_OFFLINE_EVENT, { userId });
+      if (socketStore.onlineUsers.has(userId)) {
+        socketStore.onlineUsers.delete(userId);
+        this.io.emit(this.eventEnum.ONLINE_USERS, {
+          users: Array.from(socketStore.onlineUsers),
+        });
       }
-      this.io.emit(SocketEventEnum.USER_ONLINE_EVENT, { userId, online: false });
     }
   }
 
@@ -76,8 +77,10 @@ export class SocketHandlers {
 
     if (!sessionId || !userId) return;
     this.socket.join(userId);
-    socketStore.onlineStatus.add(userId);
-    this.io.emit(SocketEventEnum.USER_ONLINE_EVENT, { userId, online: true });
+    socketStore.onlineUsers.add(userId);
+    this.io.emit(SocketEventEnum.ONLINE_USERS, {
+      users: Array.from(socketStore.onlineUsers),
+    });
     const chatSessionDetails = await this.getChatSessionDetails(sessionId);
     const sessions = await this.getSessionDetails(sessionId);
     if (!sessions) {
