@@ -159,22 +159,10 @@ export class SocketHandlers {
   async handleDeleteMessage(payload: { messageId: string; sessionId: string }) {
     try {
       const lastMessage = await chatUsecase.deleteMessage(payload);
-      if (lastMessage) {
-        this.io
-          .in(lastMessage.receiverId)
-          .in(lastMessage.senderId)
-          .emit(this.eventEnum.MESSAGE_DELETE_EVENT, {
-            ...payload,
-            lastMessage,
-          });
-      } else {
-        this.io
-          .in(payload.sessionId)
-          .emit(this.eventEnum.MESSAGE_DELETE_EVENT, {
-            ...payload,
-            lastMessage: null,
-          });
-      }
+      this.io.in(payload.sessionId).emit(this.eventEnum.MESSAGE_DELETE_EVENT, {
+        ...payload,
+        lastMessage: lastMessage,
+      });
     } catch (error: any) {
       console.log("error occured while deleting message: " + " " + error);
     }
