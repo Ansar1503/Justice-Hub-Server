@@ -4,8 +4,9 @@ import { ChatUseCase } from "../../application/usecases/chat.usecase";
 import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
 import { SocketEventEnum } from "../../infrastructure/constant/SocketEventEnum";
 import { ChatMessage } from "../../domain/entities/Chat.entity";
+import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
 
-const chatUsecase = new ChatUseCase(new ChatRepo());
+const chatUsecase = new ChatUseCase(new ChatRepo(), new SessionsRepository());
 
 export class SocketHandlers {
   private eventEnum = SocketEventEnum;
@@ -23,6 +24,9 @@ export class SocketHandlers {
   // }
   getChatSessionDetails(sessionId: string) {
     return chatUsecase.getChatSessionById(sessionId);
+  }
+  getSessionDetails(sessionId: string) {
+    return chatUsecase.getSessionDetails(sessionId);
   }
 
   async handleSendMessage(
@@ -74,6 +78,12 @@ export class SocketHandlers {
     socketStore.onlineStatus.add(userId);
     this.io.emit(SocketEventEnum.USER_ONLINE_EVENT, { userId });
     const chatSessionDetails = await this.getChatSessionDetails(sessionId);
+    const sessions = await this.getSessionDetails(sessionId);
+    if (!sessions) {
+      this.handleEmiter(userId, SocketEventEnum.SOCKET_ERROR_EVENT, {
+        message: "sessions not found",
+      });
+    }
     if (!chatSessionDetails) {
       this.handleEmiter(userId, SocketEventEnum.SOCKET_ERROR_EVENT, {
         message: "Chat Session not found",
@@ -156,6 +166,13 @@ export class SocketHandlers {
           .emit(this.eventEnum.MESSAGE_DELETE_EVENT, {
             ...payload,
             lastMessage,
+          });
+      } else {
+        this.io
+          .in(payload.sessionId)
+          .emit(this.eventEnum.MESSAGE_DELETE_EVENT, {
+            ...payload,
+            lastMessage: null,
           });
       }
     } catch (error: any) {

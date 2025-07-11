@@ -1,10 +1,15 @@
 import { ChatMessage, ChatSession } from "../../domain/entities/Chat.entity";
+import { Session } from "../../domain/entities/Session.entity";
+import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
 import { IChatRepo } from "../../domain/I_repository/IChatRepo";
 import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
 import { IChatusecase } from "./I_usecases/IChatusecase";
 
 export class ChatUseCase implements IChatusecase {
-  constructor(private chatRepo: IChatRepo) {}
+  constructor(
+    private chatRepo: IChatRepo,
+    private sessionRepo: ISessionsRepo
+  ) {}
   async fetchChats(payload: {
     user_id: string;
     search: string;
@@ -37,6 +42,7 @@ export class ChatUseCase implements IChatusecase {
       payload.page
     );
   }
+  
   async updateChatName(payload: {
     chatId: string;
     chatName: string;
@@ -64,13 +70,13 @@ export class ChatUseCase implements IChatusecase {
       messages.data.length > 0
         ? messages?.data[messages?.data?.length - 1]
         : null;
-    // console.log("lastmessage:", lastMessage);
     await this.chatRepo.update({
       id: payload.sessionId,
       last_message: lastMessage?._id || "",
     });
     return lastMessage;
   }
+
   async reportMessage(payload: {
     messageId: string;
     reason: string;
@@ -79,5 +85,8 @@ export class ChatUseCase implements IChatusecase {
     const chatExists = await this.chatRepo.findMessageById(payload.messageId);
     if (!chatExists) throw new Error("message doesnt exist");
     return await this.chatRepo.updateMessage(payload);
+  }
+  async getSessionDetails(sessionId: string): Promise<Session | null> {
+    return await this.sessionRepo.findById({ session_id: sessionId });
   }
 }

@@ -1,4 +1,5 @@
 import { ChatSession, ChatMessage } from "../../../domain/entities/Chat.entity";
+import { Session } from "../../../domain/entities/Session.entity";
 
 export interface IChatusecase {
   fetchChats(payload: {
@@ -8,6 +9,7 @@ export interface IChatusecase {
     role: "lawyer" | "client";
   }): Promise<any>;
   getChatSessionById(sessionId: string): Promise<ChatSession | null>;
+  getSessionDetails(sessionId: string): Promise<Session | null>;
   createChatMessage(message: ChatMessage): Promise<ChatMessage | null>;
   fetchChatMessages(payload: {
     session_id: string;
