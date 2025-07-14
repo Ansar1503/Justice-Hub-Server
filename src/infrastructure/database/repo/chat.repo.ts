@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { ChatMessage, ChatSession } from "../../../domain/entities/Chat.entity";
 import { IChatRepo } from "../../../domain/I_repository/IChatRepo";
 import { ChatModel, MessageModel } from "../model/chat.model";
+import { Client } from "../../../domain/entities/Client.entity";
 
 export class ChatRepo implements IChatRepo {
   async create(payload: ChatSession): Promise<ChatSession> {
@@ -285,5 +286,178 @@ export class ChatRepo implements IChatRepo {
 
   async findMessageById(messageId: string): Promise<ChatMessage | null> {
     return await MessageModel.findOne({ _id: messageId });
+  }
+
+  async fetchDisputesAggregation(payload: {
+    search: string;
+    sortBy: "All" | "session_date" | "reported_date";
+    sortOrder: "asc" | "desc";
+    limit: number;
+    page: number;
+  }): Promise<{
+    data:
+      | (ChatMessage &
+          {
+            chatSession: ChatSession & {
+              clientData: Client;
+              lawyerData: Client;
+            };
+          }[])
+      | [];
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }> {
+    const { search, sortBy, sortOrder, limit, page } = payload;
+    const skip = (page - 1) * limit;
+    const order = sortOrder === "asc" ? 1 : -1;
+    const matchStageFilter1: Record<string, any> = {
+      report: { $exists: true, $ne: null },
+      "report.reason": { $exists: true, $ne: "" },
+    };
+    const matchStageFilter2: Record<string, any> = {};
+    if (search.trim()) {
+      matchStageFilter2["$or"] = [
+        { "clientData.name": search },
+        { "lawyerData.name": search },
+        { "chatSession.name": search },
+      ];
+    }
+    const sortStageFilter: Record<string, any> = { createdAt: -1 };
+    if (sortBy !== "All") {
+      if (sortBy === "session_date") {
+        sortStageFilter["chatSession.createdAt"] = order;
+      } else if (sortBy === "reported_date") {
+        sortStageFilter["report.reportedAt"] = order;
+      }
+    }
+    const pipline: any[] = [
+      { $match: matchStageFilter1 },
+      {
+        $lookup: {
+          from: "chats",
+          localField: "session_id",
+          foreignField: "_id",
+          pipeline: [
+            {
+              $lookup: {
+                from: "users",
+                localField: "participants.client_id",
+                foreignField: "user_id",
+                as: "clientUserData",
+              },
+            },
+            {
+              $unwind: {
+                path: "$clientUserData",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $lookup: {
+                from: "clients",
+                localField: "participants.client_id",
+                foreignField: "user_id",
+                as: "clientClientData",
+              },
+            },
+            {
+              $unwind: {
+                path: "$clientClientData",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $addFields: {
+                clientData: {
+                  $mergeObjects: ["$clientUserData", "$clientClientData"],
+                },
+              },
+            },
+            {
+              $project: {
+                "clientData.password": 0,
+                clientUserData: 0,
+                clientClientData: 0,
+              },
+            },
+            // lawyers querys
+            {
+              $lookup: {
+                from: "users",
+                localField: "participants.lawyer_id",
+                foreignField: "user_id",
+                as: "lawyerUserData",
+              },
+            },
+            {
+              $unwind: {
+                path: "$lawyerUserData",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $lookup: {
+                from: "clients",
+                localField: "participants.lawyer_id",
+                foreignField: "user_id",
+                as: "lawyerClientData",
+              },
+            },
+            {
+              $unwind: {
+                path: "$lawyerClientData",
+                preserveNullAndEmptyArrays: true,
+              },
+            },
+            {
+              $addFields: {
+                lawyerData: {
+                  $mergeObjects: ["$lawyerUserData", "$lawyerClientData"],
+                },
+              },
+            },
+            {
+              $project: {
+                "lawyerData.password": 0,
+                lawyerUserData: 0,
+                lawyerClientData: 0,
+              },
+            },
+          ],
+          as: "chatSession",
+        },
+      },
+      {
+        $unwind: {
+          path: "$chatSession",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      { $match: matchStageFilter2 },
+      { $sort: sortStageFilter },
+      { $skip: skip },
+      { $limit: limit },
+    ];
+    const [{ data, count }] = await MessageModel.aggregate([
+      {
+        $facet: {
+          data: pipline,
+          count: [
+            { $match: matchStageFilter1 },
+            { $match: matchStageFilter2 },
+            { $count: "count" },
+          ],
+        },
+      },
+    ]);
+    const totalCount = count[0]?.count || 0;
+    const totalPage = Math.ceil(totalCount / limit);
+    return {
+      currentPage: page,
+      totalPage,
+      totalCount,
+      data,
+    };
   }
 }

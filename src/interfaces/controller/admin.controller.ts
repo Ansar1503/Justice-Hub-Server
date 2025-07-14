@@ -7,11 +7,14 @@ import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
 import { LawyerRepository } from "../../infrastructure/database/repo/lawyer.repo";
 import {
   zodAppointmentQuerySchema,
+  zodChatDisputesQuerySchema,
   zodSessionQuerySchema,
 } from "../middelwares/validator/zod/zod.validate";
 import { ValidationError } from "../middelwares/Error/CustomError";
 import { AppointmentsRepository } from "../../infrastructure/database/repo/appointments.repo";
 import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
+import { ChatUseCase } from "../../application/usecases/chat.usecase";
+import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
 
 const adminUsecase = new AdminUseCase(
   new ClientRepository(),
@@ -21,6 +24,8 @@ const adminUsecase = new AdminUseCase(
   new AppointmentsRepository(),
   new SessionsRepository()
 );
+
+const chatUseCase = new ChatUseCase(new ChatRepo(), new SessionsRepository());
 
 export const fetchAllUsers = async (
   req: Request & { user?: any },
@@ -262,6 +267,25 @@ export const fetchSessionDetails = async (
       throw new ValidationError("Invalid credentials");
     }
     const result = await adminUsecase.fetchSessions(parsedData.data);
+    res.status(STATUS_CODES.OK).json(result);
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const fetchChatDisputes = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const parsedData = zodChatDisputesQuerySchema.safeParse(req.query);
+    if (!parsedData.success) {
+      console.log("parsed Error :", parsedData.error);
+      throw new ValidationError("Invalid Credentials");
+    }
+    const result = await chatUseCase.fetchDisputes(parsedData.data);
     res.status(STATUS_CODES.OK).json(result);
     return;
   } catch (error) {

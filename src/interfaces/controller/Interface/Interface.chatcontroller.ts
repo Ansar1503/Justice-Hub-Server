@@ -6,4 +6,9 @@ export interface InterfaceChatController {
     res: Response,
     next: NextFunction
   ): Promise<void>;
+  getMessages(
+    req: Request & { user?: any },
+    res: Response,
+    next: NextFunction
+  ): Promise<void>;
 }

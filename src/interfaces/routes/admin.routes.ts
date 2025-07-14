@@ -6,8 +6,10 @@ import {
   fetchAllLawyers,
   fetchAllUsers,
   fetchAppointmentDetails,
+  fetchChatDisputes,
   fetchSessionDetails,
 } from "../controller/admin.controller";
+
 
 const router = express.Router();
 
@@ -16,7 +18,9 @@ router.get("/lawyers", fetchAllLawyers);
 router.patch("/user", authenticateUser, BlockUser);
 router.patch("/lawyer", authenticateUser, changeLawyerVerificationStatus);
 
-router.get("/appointments",authenticateUser,fetchAppointmentDetails)
-router.get("/sessions", authenticateUser,fetchSessionDetails);
+router.get("/appointments", authenticateUser, fetchAppointmentDetails);
+router.get("/sessions", authenticateUser, fetchSessionDetails);
 
+// disputes
+router.get("/disputes/chat", authenticateUser, fetchChatDisputes);
 export default router;

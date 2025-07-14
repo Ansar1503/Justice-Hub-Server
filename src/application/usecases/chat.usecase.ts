@@ -1,4 +1,5 @@
 import { ChatMessage, ChatSession } from "../../domain/entities/Chat.entity";
+import { Client } from "../../domain/entities/Client.entity";
 import { Session } from "../../domain/entities/Session.entity";
 import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
 import { IChatRepo } from "../../domain/I_repository/IChatRepo";
@@ -42,7 +43,7 @@ export class ChatUseCase implements IChatusecase {
       payload.page
     );
   }
-  
+
   async updateChatName(payload: {
     chatId: string;
     chatName: string;
@@ -88,5 +89,27 @@ export class ChatUseCase implements IChatusecase {
   }
   async getSessionDetails(sessionId: string): Promise<Session | null> {
     return await this.sessionRepo.findById({ session_id: sessionId });
+  }
+  async fetchDisputes(payload: {
+    search: string;
+    sortBy: "All" | "session_date" | "reported_date";
+    sortOrder: "asc" | "desc";
+    limit: number;
+    page: number;
+  }): Promise<{
+    data:
+      | (ChatMessage &
+          {
+            chatSession: ChatSession & {
+              clientData: Client;
+              lawyerData: Client;
+            };
+          }[])
+      | [];
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }> {
+    return await this.chatRepo.fetchDisputesAggregation(payload);
   }
 }
