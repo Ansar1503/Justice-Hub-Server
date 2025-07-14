@@ -10,6 +10,7 @@ import { ILawyerRepository } from "../../domain/I_repository/I_lawyer.repo";
 import { IAppointmentsRepository } from "../../domain/I_repository/I_Appointments.repo";
 import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
 import { Appointment } from "../../domain/entities/Appointment.entity";
+import { Session } from "../../domain/entities/Session.entity";
 
 export class AdminUseCase implements IAdminUseCase {
   constructor(
@@ -138,5 +139,27 @@ export class AdminUseCase implements IAdminUseCase {
     totalPage: number;
   }> {
     return await this.AppointmentRepo.findAllAggregate(payload);
+  }
+  async fetchSessions(payload: {
+    search?: string;
+    limit: number;
+    page: number;
+    sortBy?: "date" | "amount" | "lawyer_name" | "client_name";
+    sortOrder?: "asc" | "desc";
+    status?:
+      | "upcoming"
+      | "ongoing"
+      | "completed"
+      | "cancelled"
+      | "missed"
+      | "all";
+    type?: "consultation" | "follow-up" | "all";
+  }): Promise<{
+    data: (Session & { clientData: Client; lawyerData: Client }[]) | [];
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }> {
+    return await this.SessionRepo.findSessionsAggregate(payload);
   }
 }

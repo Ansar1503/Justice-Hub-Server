@@ -39,3 +39,28 @@ export const zodAppointmentQuerySchema = z.object({
   ]),
   type: z.enum(["consultation", "follow-up", "all"]),
 });
+
+export const zodSessionQuerySchema = z.object({
+  search: z.string().default(""),
+  page: z
+    .string()
+    .transform((val) => parseInt(val))
+    .default("1"),
+  limit: z
+    .string()
+    .transform((val) => parseInt(val))
+    .default("10"),
+  sortBy: z
+    .enum(["date", "amount", "client_name", "lawyer_name"])
+    .default("date"),
+  sortOrder: z.enum(["asc", "desc"]).default("asc"),
+  status: z.enum([
+    "upcoming",
+    "ongoing",
+    "completed",
+    "cancelled",
+    "missed",
+    "all",
+  ]),
+  type: z.enum(["consultation", "follow-up", "all"]),
+});

@@ -1,3 +1,4 @@
+import { Client } from "../../../domain/entities/Client.entity";
 import {
   Session,
   SessionDocument,
@@ -287,5 +288,165 @@ export class SessionsRepository implements ISessionsRepo {
 
   async removeAllDocuments(id: string): Promise<void> {
     await SessionDocumentModel.findOneAndDelete({ _id: id });
+  }
+
+  async findSessionsAggregate(payload: {
+    search?: string;
+    limit: number;
+    page: number;
+    sortBy?: "date" | "amount" | "lawyer_name" | "client_name";
+    sortOrder?: "asc" | "desc";
+    status?:
+      | "upcoming"
+      | "ongoing"
+      | "completed"
+      | "cancelled"
+      | "missed"
+      | "all";
+    type?: "consultation" | "follow-up" | "all";
+  }): Promise<{
+    data: (Session & { clientData: Client; lawyerData: Client }[]) | [];
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }> {
+    const { search, limit, page, sortBy, sortOrder, status, type } = payload;
+    const skip = (page - 1) * limit;
+    const order = sortOrder === "asc" ? 1 : -1;
+    const matchStage: Record<string, any> = {};
+    if (status && status !== "all") {
+      matchStage["status"] = status;
+    }
+    if (type && type !== "all") {
+      matchStage["type"] = type;
+    }
+    const matchStage2: Record<string, any> = {
+      $or: [
+        { "clientData.name": { $regex: search, $options: "i" } },
+        { "clientData.email": { $regex: search, $options: "i" } },
+        { "lawyerData.name": { $regex: search, $options: "i" } },
+        { "lawyerData.email": { $regex: search, $options: "i" } },
+      ],
+    };
+    const sortStage: Record<string, any> = {};
+    switch (sortBy) {
+      case "amount":
+        sortStage[sortBy] = order;
+      case "date":
+        sortStage[sortBy] = order;
+      case "client_name":
+        sortStage["clientData.name"] = order;
+      case "lawyer_name":
+        sortStage["lawyerData.name"] = order;
+    }
+    const pipeline: any[] = [
+      { $match: matchStage },
+      {
+        $lookup: {
+          from: "users",
+          localField: "client_id",
+          foreignField: "user_id",
+          as: "clientsUserData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$clientsUserData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "clients",
+          localField: "client_id",
+          foreignField: "user_id",
+          as: "clientsClientData",
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$clientsClientData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          clientData: {
+            $mergeObjects: ["$clientsUserData", "$clientsClientData"],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "lawyer_id",
+          foreignField: "user_id",
+          as: "lawyersUserData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$lawyersUserData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "clients",
+          localField: "lawyer_id",
+          foreignField: "user_id",
+          as: "lawyersClientData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$lawyersClientData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          lawyerData: {
+            $mergeObjects: ["$lawyersUserData", "$lawyersClientData"],
+          },
+        },
+      },
+      {
+        $project: {
+          clientsUserData: 0,
+          clientsClientData: 0,
+          lawyersUserData: 0,
+          lawyersClientData: 0,
+          "clientData.password": 0,
+          "lawyerData.password": 0,
+        },
+      },
+    ];
+    const [dataResult, countResult] = await Promise.all([
+      SessionModel.aggregate([
+        ...pipeline,
+        { $match: matchStage2 },
+        { $sort: sortStage },
+        { $skip: skip },
+        { $limit: limit },
+      ]),
+      SessionModel.aggregate([
+        ...pipeline,
+        { $match: matchStage2 },
+        { $sort: sortStage },
+        { $count: "total" },
+      ]),
+    ]);
+    const totalCount = countResult[0]?.total || 0;
+    const totalPage = Math.ceil(totalCount / limit);
+    return {
+      data: dataResult as
+        | (Session & { clientData: Client; lawyerData: Client }[])
+        | [],
+      totalCount,
+      currentPage: page,
+      totalPage,
+    };
   }
 }

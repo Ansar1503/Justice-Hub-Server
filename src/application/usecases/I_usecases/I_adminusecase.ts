@@ -1,6 +1,7 @@
 import { Appointment } from "../../../domain/entities/Appointment.entity";
 import { Client } from "../../../domain/entities/Client.entity";
 import { lawyer } from "../../../domain/entities/Lawyer.entity";
+import { Session } from "../../../domain/entities/Session.entity";
 import { User } from "../../../domain/entities/User.entity";
 
 export interface IAdminUseCase {
@@ -52,6 +53,26 @@ export interface IAdminUseCase {
     type?: "consultation" | "follow-up" | "all";
   }): Promise<{
     data: (Appointment & { clientData: Client; lawyerData: Client }[]) | [];
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }>;
+  fetchSessions(payload: {
+    search?: string;
+    limit: number;
+    page: number;
+    sortBy?: "date" | "amount" | "lawyer_name" | "client_name";
+    sortOrder?: "asc" | "desc";
+    status?:
+      | "upcoming"
+      | "ongoing"
+      | "completed"
+      | "cancelled"
+      | "missed"
+      | "all";
+    type?: "consultation" | "follow-up" | "all";
+  }): Promise<{
+    data: (Session & { clientData: Client; lawyerData: Client }[]) | [];
     totalCount: number;
     currentPage: number;
     totalPage: number;
