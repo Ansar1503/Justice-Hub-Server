@@ -1,3 +1,4 @@
+import { Appointment } from "../../../domain/entities/Appointment.entity";
 import { Client } from "../../../domain/entities/Client.entity";
 import { lawyer } from "../../../domain/entities/Lawyer.entity";
 import { User } from "../../../domain/entities/User.entity";
@@ -35,4 +36,24 @@ export interface IAdminUseCase {
     user_id: string;
     status: "verified" | "rejected" | "pending" | "requested";
   }): Promise<lawyer>;
+  fetchAppointments(payload: {
+    search?: string;
+    limit: number;
+    page: number;
+    sortBy?: "date" | "amount" | "lawyer_name" | "client_name";
+    sortOrder?: "asc" | "desc";
+    status?:
+      | "pending"
+      | "confirmed"
+      | "completed"
+      | "cancelled"
+      | "rejected"
+      | "all";
+    type?: "consultation" | "follow-up" | "all";
+  }): Promise<{
+    data: (Appointment & { clientData: Client; lawyerData: Client }[]) | [];
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }>;
 }

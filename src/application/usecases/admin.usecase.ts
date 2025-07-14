@@ -7,13 +7,18 @@ import { IUserRepository } from "../../domain/I_repository/I_user.repo";
 import { IAdminUseCase } from "./I_usecases/I_adminusecase";
 import { lawyer } from "../../domain/entities/Lawyer.entity";
 import { ILawyerRepository } from "../../domain/I_repository/I_lawyer.repo";
+import { IAppointmentsRepository } from "../../domain/I_repository/I_Appointments.repo";
+import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
+import { Appointment } from "../../domain/entities/Appointment.entity";
 
 export class AdminUseCase implements IAdminUseCase {
   constructor(
     private clientRepo: IClientRepository,
     private userRepo: IUserRepository,
     private addressRepo: IAddressRepository,
-    private LawyerRepo: ILawyerRepository
+    private LawyerRepo: ILawyerRepository,
+    private AppointmentRepo: IAppointmentsRepository,
+    private SessionRepo: ISessionsRepo
   ) {}
   async fetchUsers(query: {
     role: "lawyer" | "client";
@@ -45,8 +50,8 @@ export class AdminUseCase implements IAdminUseCase {
     currentPage: number;
     totalPages: number;
   }> {
-    const response = await this.userRepo.findLawyersByQuery({...query})
-    return response
+    const response = await this.userRepo.findLawyersByQuery({ ...query });
+    return response;
   }
 
   async blockUser(user_id: string): Promise<User> {
@@ -111,5 +116,27 @@ export class AdminUseCase implements IAdminUseCase {
       throw new Error("FAILED_TO_UPDATE_VERIFICATION_STATUS");
     }
     return updatedlawyer;
+  }
+  async fetchAppointments(payload: {
+    search: string;
+    limit: number;
+    page: number;
+    sortBy: "date" | "amount" | "lawyer_name" | "client_name";
+    sortOrder: "asc" | "desc";
+    status:
+      | "pending"
+      | "confirmed"
+      | "completed"
+      | "cancelled"
+      | "rejected"
+      | "all";
+    type: "consultation" | "follow-up" | "all";
+  }): Promise<{
+    data: (Appointment & { clientData: Client; lawyerData: Client }[]) | [];
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }> {
+    return await this.AppointmentRepo.findAllAggregate(payload);
   }
 }

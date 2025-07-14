@@ -1,4 +1,5 @@
 import { Appointment } from "../entities/Appointment.entity";
+import { Client } from "../entities/Client.entity";
 
 export interface IAppointmentsRepository {
   findByDateandLawyer_id(payload: {
@@ -59,4 +60,25 @@ export interface IAppointmentsRepository {
     status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
   }): Promise<Appointment | null>;
   findById(id: string): Promise<Appointment | null>;
+  findAllAggregate(payload: {
+    search: string;
+    limit: number;
+    page: number;
+    sortBy: "date" | "amount" | "lawyer_name" | "client_name";
+    sortOrder: "asc" | "desc";
+    status:
+      | "pending"
+      | "confirmed"
+      | "completed"
+      | "cancelled"
+      | "rejected"
+      | "all";
+    type: "consultation" | "follow-up" | "all";
+  }): Promise<{
+    data: (Appointment & { clientData: Client; lawyerData: Client }[]) | [];
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }>;
 }
+ 

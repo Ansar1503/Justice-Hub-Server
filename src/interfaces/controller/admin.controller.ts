@@ -2,15 +2,21 @@ import { AdminUseCase } from "../../application/usecases/admin.usecase";
 import { AddressRepository } from "../../infrastructure/database/repo/address.repo";
 import { ClientRepository } from "../../infrastructure/database/repo/client.repo";
 import { UserRepository } from "../../infrastructure/database/repo/user.repo";
-import { query, Request, response, Response } from "express";
+import { NextFunction, query, Request, response, Response } from "express";
 import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
 import { LawyerRepository } from "../../infrastructure/database/repo/lawyer.repo";
+import { zodAppointmentQuerySchema } from "../middelwares/validator/zod/zod.validate";
+import { ValidationError } from "../middelwares/Error/CustomError";
+import { AppointmentsRepository } from "../../infrastructure/database/repo/appointments.repo";
+import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
 
 const adminUsecase = new AdminUseCase(
   new ClientRepository(),
   new UserRepository(),
   new AddressRepository(),
-  new LawyerRepository()
+  new LawyerRepository(),
+  new AppointmentsRepository(),
+  new SessionsRepository()
 );
 
 export const fetchAllUsers = async (
@@ -59,7 +65,7 @@ export const fetchAllLawyers = async (
   req: Request & { user?: any },
   res: Response
 ) => {
-  const { limit, page, sort, order:sortBy, search, status } = req.query;
+  const { limit, page, sort, order: sortBy, search, status } = req.query;
 
   const allowedSortValues = [
     "name",
@@ -219,5 +225,24 @@ export const changeLawyerVerificationStatus = async (
           return;
       }
     }
+  }
+};
+
+export const fetchAppointmentDetails = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const parsedData = zodAppointmentQuerySchema.safeParse(req.query);
+    if (!parsedData.success) {
+      console.log("parsed Error :", parsedData.error);
+      throw new ValidationError("Invalid credentials");
+    }
+    const result = await adminUsecase.fetchAppointments(parsedData.data);
+    res.status(STATUS_CODES.OK).json(result);
+    return;
+  } catch (error) {
+    next(error);
   }
 };

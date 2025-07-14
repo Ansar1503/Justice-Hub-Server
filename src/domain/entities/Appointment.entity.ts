@@ -9,5 +9,6 @@ export interface Appointment {
   payment_status: "pending" | "success" | "failed";
   type: "consultation" | "follow-up";
   status: "pending" | "confirmed" | "completed" | "cancelled" | "rejected";
-  createdAt?: string;
+  createdAt?: Date;
+  updateAt?: Date;
 }
