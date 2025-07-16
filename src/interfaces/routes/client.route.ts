@@ -6,6 +6,8 @@ import {
   createCheckoutSession,
   fetchAppointmentDetails,
   fetchClientData,
+  fetchReviews,
+  fetchReviewsBySession,
   fetchSessionDocuments,
   fetchSessions,
   fetchStripeSessionDetails,
@@ -34,8 +36,11 @@ import { authenticateClient } from "../middelwares/Auth/authenticateClient";
 import { ChatController } from "../controller/chat.controller";
 import { ChatUseCase } from "../../application/usecases/chat.usecase";
 import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
+import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
 
-const chatcontroller = new ChatController(new ChatUseCase(new ChatRepo()));
+const chatcontroller = new ChatController(
+  new ChatUseCase(new ChatRepo(), new SessionsRepository())
+);
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -143,6 +148,18 @@ router.get("/lawyers/:id", authenticateUser, getLawyerDetail);
 
 // reviews
 router.post("/lawyers/review", authenticateUser, addReview);
+router.get(
+  "/lawyers/reviews/:id",
+  authenticateUser,
+  authenticateClient,
+  fetchReviews
+);
+router.get(
+  "/profile/sessions/reviews/:id",
+  authenticateUser,
+  authenticateClient,
+  fetchReviewsBySession
+);
 
 // slot area
 router.get(

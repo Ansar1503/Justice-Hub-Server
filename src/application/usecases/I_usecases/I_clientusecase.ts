@@ -111,4 +111,13 @@ export interface I_clientUsecase {
     documentId: string;
     sessionId: string;
   }): Promise<SessionDocument | null>;
+  fetchReviews(payload: {
+    lawyer_id: string;
+    page: number;
+  }): Promise<{ data: Review[]; nextCursor?: number }>;
+  fetchReviewsBySession(payload: {
+    session_id: string;
+  }): Promise<
+    (Review & { reviewedBy: { name: string; profile_image: string } })[] | []
+  >;
 }

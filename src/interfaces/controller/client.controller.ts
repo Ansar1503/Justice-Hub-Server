@@ -435,6 +435,48 @@ export const getLawyerDetail = async (req: Request, res: Response) => {
   }
 };
 
+export const fetchReviews = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const lawyer_id = req.params.id;
+  const { cursor } = req.query;
+  try {
+    if (!lawyer_id || !cursor) {
+      throw new ValidationError("Invalid credentials");
+    }
+    const result = await clientusecase.fetchReviews({
+      lawyer_id: lawyer_id,
+      page: Number(cursor),
+    });
+    res.status(STATUS_CODES.OK).json(result);
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const fetchReviewsBySession = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const sessionId = req.params.id;
+  // console.log("sessionId", sessionId);
+  try {
+    if (!sessionId) throw new ValidationError("Invalid credentials");
+    const result = await clientusecase.fetchReviewsBySession({
+      session_id: sessionId,
+    });
+    console.log("result ;", result);
+    res.status(STATUS_CODES.OK).json(result);
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const addReview = async (
   req: Request & { user?: any },
   res: Response
@@ -455,15 +497,15 @@ export const addReview = async (
     });
     return;
   }
-  const { review, rating, session_id } = req.body;
-  if (!review || !rating) {
+  const { review, rating, sessionId, heading } = req.body;
+  if (!review || !rating || !heading) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
       message: "please provide a review",
     });
     return;
   }
-  if (!session_id) {
+  if (!sessionId) {
     res.status(STATUS_CODES.BAD_REQUEST).json({
       success: false,
       message: "You had no session with this lawyer",
@@ -476,7 +518,8 @@ export const addReview = async (
       lawyer_id,
       rating,
       review,
-      session_id,
+      session_id: sessionId,
+      heading,
     });
     res.status(STATUS_CODES.OK).json({
       success: true,
@@ -516,10 +559,10 @@ export const addReview = async (
           message: "lawyer is not verified",
         });
         return;
-      case "REVIEW_ALREADY_EXISTS":
+      case "REVIEW_LIMIT_EXCEEDED":
         res.status(STATUS_CODES.BAD_REQUEST).json({
           success: false,
-          message: "review already exists",
+          message: "review limit exceeded ",
         });
         return;
       default:

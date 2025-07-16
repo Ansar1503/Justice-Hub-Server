@@ -447,6 +447,7 @@ export class ClientUseCase implements I_clientUsecase {
     return responseData;
   }
   async addreview(payload: Review): Promise<void> {
+    // console.log(payload);
     const user = await this.userRepository.findByuser_id(payload.client_id);
     if (!user) throw new Error("USER_EMPTY");
     if (!user.is_verified) throw new Error("USER_UNVERIFIED");
@@ -459,9 +460,9 @@ export class ClientUseCase implements I_clientUsecase {
     const existingReview = await this.reviewRepository.findBySession_id(
       payload.session_id
     );
-
-    if (existingReview) {
-      throw new Error("REVIEW_ALREADY_EXISTS");
+    // console.log(existingReview);
+    if (existingReview && existingReview.length > 5) {
+      throw new Error("REVIEW_LIMIT_EXCEEDED");
     }
 
     try {
@@ -1077,5 +1078,25 @@ export class ClientUseCase implements I_clientUsecase {
       return null;
     }
     return deleted;
+  }
+
+  async fetchReviews(payload: {
+    lawyer_id: string;
+    page: number;
+  }): Promise<{ data: Review[]; nextCursor?: number }> {
+    const reviews = await this.reviewRepository.findByLawyer_id(payload);
+    return reviews;
+  }
+  async fetchReviewsBySession(payload: {
+    session_id: string;
+  }): Promise<
+    (Review & { reviewedBy: { name: string; profile_image: string } })[] | []
+  > {
+    const session = await this.sessionRepo.findById(payload);
+    if (!session) throw new ValidationError("Session not found");
+    const reviews = await this.reviewRepository.findBySession_id(
+      payload.session_id
+    );
+    return reviews;
   }
 }
