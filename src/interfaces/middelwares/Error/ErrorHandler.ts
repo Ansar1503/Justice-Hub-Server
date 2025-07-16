@@ -3,9 +3,14 @@ import { NextFunction, Request, Response } from "express";
 import { AppError } from "./CustomError";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
 
-export const errorMiddleware = (err: AppError, req: Request, res: Response) => {
+export const errorMiddleware = (
+  err: AppError,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   console.log("error :", err);
-  console.log("orignal Url:", req.originalUrl);
+  // console.log("original Url:", req.originalUrl);
 
   const statusCode =
     err.statusCode >= 100 && err.statusCode < 600
@@ -18,7 +23,6 @@ export const errorMiddleware = (err: AppError, req: Request, res: Response) => {
     success: false,
     message: message,
   });
-  return;
 };
 
 export const NotFoundErrorHandler = (req: Request, res: Response) => {

@@ -124,4 +124,11 @@ export interface I_clientUsecase {
     review_id: string;
     updates: Partial<Review>;
   }): Promise<Review | null>;
+  deleteReview(payload: { review_id: string }): Promise<Review | null>;
+  reportReview(payload: {
+    review_id: string;
+    reason: string;
+    reportedBy: string;
+    reportedUser: string;
+  }): Promise<void>;
 }

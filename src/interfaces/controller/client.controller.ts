@@ -14,6 +14,7 @@ import { SessionsRepository } from "../../infrastructure/database/repo/sessions.
 import { ValidationError } from "../middelwares/Error/CustomError";
 import { SessionDocument } from "../../domain/entities/Session.entity";
 import { CloudinaryService } from "../../application/services/cloudinary.service";
+import { DisputesRepo } from "../../infrastructure/database/repo/Disputes";
 
 const clientusecase = new ClientUseCase(
   new UserRepository(),
@@ -24,7 +25,8 @@ const clientusecase = new ClientUseCase(
   new ScheduleRepository(),
   new AppointmentsRepository(),
   new SessionsRepository(),
-  new CloudinaryService()
+  new CloudinaryService(),
+  new DisputesRepo()
 );
 
 export const fetchClientData = async (
@@ -483,7 +485,7 @@ export const updateReviews = async (
   next: NextFunction
 ) => {
   const reviewId = req.params.id;
-  const updates  = req.body;
+  const updates = req.body;
 
   try {
     if (!reviewId) throw new ValidationError("review id not found");
@@ -493,6 +495,24 @@ export const updateReviews = async (
       updates: updates,
     });
     console.log("updated result", result);
+    res.status(STATUS_CODES.OK).json(result);
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteReview = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const reviewId = req.params.id;
+  try {
+    if (!reviewId) throw new ValidationError("review id not found");
+    const result = await clientusecase.deleteReview({
+      review_id: reviewId,
+    });
     res.status(STATUS_CODES.OK).json(result);
     return;
   } catch (error) {
@@ -595,6 +615,34 @@ export const addReview = async (
         });
         return;
     }
+  }
+};
+
+export const reportReview = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const reviewId = req.params.id;
+  const { reason, reportedBy, reportedUser } = req.body;
+  try {
+    if (!reviewId.trim()) throw new ValidationError("reviewId required");
+    if (!reason.trim()) throw new ValidationError("reason required");
+    if (!reportedBy.trim()) throw new ValidationError("reportedBy required");
+    if (!reportedUser.trim())
+      throw new ValidationError("reportedUser required");
+
+    const result = await clientusecase.reportReview({
+      reason: reason,
+      review_id: reviewId,
+      reportedBy,
+      reportedUser,
+    });
+    res
+      .status(STATUS_CODES.OK)
+      .json({ success: true, message: "review Reported" });
+  } catch (error) {
+    next(error);
   }
 };
 

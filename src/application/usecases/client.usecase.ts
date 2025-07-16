@@ -33,6 +33,7 @@ import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
 import { Session, SessionDocument } from "../../domain/entities/Session.entity";
 import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
 import { ICloudinaryService } from "../services/cloudinary.service";
+import { IDisputes } from "../../domain/I_repository/IDisputes";
 
 export class ClientUseCase implements I_clientUsecase {
   constructor(
@@ -44,7 +45,8 @@ export class ClientUseCase implements I_clientUsecase {
     private scheduleRepo: IScheduleRepo,
     private appointmentRepo: IAppointmentsRepository,
     private sessionRepo: ISessionsRepo,
-    private cloudinaryService: ICloudinaryService
+    private cloudinaryService: ICloudinaryService,
+    private disputesRepo: IDisputes
   ) {}
   timeStringToDate(baseDate: Date, hhmm: string): Date {
     const [h, m] = hhmm.split(":").map(Number);
@@ -1110,5 +1112,40 @@ export class ClientUseCase implements I_clientUsecase {
     if (!review) throw new ValidationError("review not found");
     const updated = await this.reviewRepository.update(payload);
     return updated;
+  }
+  async deleteReview(payload: { review_id: string }): Promise<Review | null> {
+    const deletingReview = await this.reviewRepository.findByReview_id(
+      payload.review_id
+    );
+    if (!deletingReview) throw new ValidationError("review not found");
+    await this.reviewRepository.delete(payload.review_id);
+    return deletingReview;
+  }
+  async reportReview(payload: {
+    review_id: string;
+    reason: string;
+    reportedBy: string;
+    reportedUser: string;
+  }): Promise<void> {
+    const review = await this.reviewRepository.findByReview_id(
+      payload.review_id
+    );
+    if (!review) throw new ValidationError("review not found");
+
+    const exists = await this.disputesRepo.findByContentId({
+      contentId: payload.review_id,
+    });
+
+    if (exists && Object.keys(exists).length > 0)
+      throw new ValidationError("content already reported");
+
+    const newReported = await this.disputesRepo.create({
+      contentId: payload.review_id,
+      disputeType: "reviews",
+      reason: payload.reason,
+      status: "pending",
+      reportedBy: payload.reportedBy,
+      reportedUser: payload.reportedUser,
+    });
   }
 }

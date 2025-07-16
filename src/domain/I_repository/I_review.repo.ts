@@ -14,6 +14,6 @@ export interface IreviewRepo {
   ): Promise<
     (Review & { reviewedBy: { name: string; profile_image: string } })[] | []
   >;
-  delete(id: string): Promise<Review>;
+  delete(id: string): Promise<void>;
   findByReview_id(id: string): Promise<Review | null>;
 }

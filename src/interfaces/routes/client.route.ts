@@ -4,6 +4,7 @@ import {
   cancellAppoinment,
   cancelSession,
   createCheckoutSession,
+  deleteReview,
   fetchAppointmentDetails,
   fetchClientData,
   fetchReviews,
@@ -18,6 +19,7 @@ import {
   handleWebhooks,
   removeFailedSession,
   removeSessionDocument,
+  reportReview,
   sendVerifyMail,
   updateAddress,
   updateBasicInfo,
@@ -166,6 +168,18 @@ router.put(
   authenticateUser,
   authenticateClient,
   updateReviews
+);
+router.delete(
+  "/profile/reviews/:id",
+  authenticateUser,
+  authenticateClient,
+  deleteReview
+);
+router.post(
+  "/profile/reviews/report/:id",
+  authenticateUser,
+  authenticateClient,
+  reportReview
 );
 
 // slot area
