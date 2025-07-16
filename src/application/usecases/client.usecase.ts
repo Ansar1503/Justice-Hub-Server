@@ -1099,4 +1099,16 @@ export class ClientUseCase implements I_clientUsecase {
     );
     return reviews;
   }
+
+  async updateReviews(payload: {
+    review_id: string;
+    updates: Partial<Review>;
+  }): Promise<Review | null> {
+    const review = await this.reviewRepository.findByReview_id(
+      payload.review_id
+    );
+    if (!review) throw new ValidationError("review not found");
+    const updated = await this.reviewRepository.update(payload);
+    return updated;
+  }
 }

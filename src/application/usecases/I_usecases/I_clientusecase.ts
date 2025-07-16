@@ -120,4 +120,8 @@ export interface I_clientUsecase {
   }): Promise<
     (Review & { reviewedBy: { name: string; profile_image: string } })[] | []
   >;
+  updateReviews(payload: {
+    review_id: string;
+    updates: Partial<Review>;
+  }): Promise<Review | null>;
 }

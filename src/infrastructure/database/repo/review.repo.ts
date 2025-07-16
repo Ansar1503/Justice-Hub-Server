@@ -7,8 +7,18 @@ export class ReviewRepo implements IreviewRepo {
     const review = await reviewModel.create(payload);
     return review;
   }
-  async update(payload: Partial<Review>): Promise<Review> {
-    return {} as any;
+  async update(payload: {
+    review_id: string;
+    updates: Partial<Review>;
+  }): Promise<Review | null> {
+    const { heading, rating, review } = payload.updates;
+    const updatedData = reviewModel.findOneAndUpdate(
+      { _id: payload.review_id },
+      { $set: { heading, rating, review } },
+      { new: true }
+    );
+    if (!updatedData) return null;
+    return updatedData;
   }
   async findBySession_id(
     session_id: string
@@ -79,5 +89,8 @@ export class ReviewRepo implements IreviewRepo {
   }
   async delete(id: string): Promise<Review> {
     return {} as any;
+  }
+  async findByReview_id(id: string): Promise<Review | null> {
+    return await reviewModel.findOne({ _id: id });
   }
 }

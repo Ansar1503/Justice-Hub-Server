@@ -469,7 +469,30 @@ export const fetchReviewsBySession = async (
     const result = await clientusecase.fetchReviewsBySession({
       session_id: sessionId,
     });
-    console.log("result ;", result);
+    // console.log("result ;", result);
+    res.status(STATUS_CODES.OK).json(result);
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateReviews = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const reviewId = req.params.id;
+  const updates  = req.body;
+
+  try {
+    if (!reviewId) throw new ValidationError("review id not found");
+    if (!updates) throw new ValidationError("Invalid credentials");
+    const result = await clientusecase.updateReviews({
+      review_id: reviewId,
+      updates: updates,
+    });
+    console.log("updated result", result);
     res.status(STATUS_CODES.OK).json(result);
     return;
   } catch (error) {

@@ -23,6 +23,7 @@ import {
   updateBasicInfo,
   updateEmail,
   updatePassword,
+  updateReviews,
   uploadDocuments,
 } from "../controller/client.controller";
 import multer from "multer";
@@ -159,6 +160,12 @@ router.get(
   authenticateUser,
   authenticateClient,
   fetchReviewsBySession
+);
+router.put(
+  "/profile/reviews/:id",
+  authenticateUser,
+  authenticateClient,
+  updateReviews
 );
 
 // slot area

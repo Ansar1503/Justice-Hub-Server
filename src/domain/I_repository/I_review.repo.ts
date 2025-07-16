@@ -1,7 +1,10 @@
 import { Review } from "../entities/Review.entity";
 export interface IreviewRepo {
   create(payload: Review): Promise<Review>;
-  update(payload: Partial<Review>): Promise<Review>;
+  update(payload: {
+    review_id: string;
+    updates: Partial<Review>;
+  }): Promise<Review | null>;
   findByLawyer_id(payload: {
     lawyer_id: string;
     page: number;
@@ -12,4 +15,5 @@ export interface IreviewRepo {
     (Review & { reviewedBy: { name: string; profile_image: string } })[] | []
   >;
   delete(id: string): Promise<Review>;
+  findByReview_id(id: string): Promise<Review | null>;
 }
