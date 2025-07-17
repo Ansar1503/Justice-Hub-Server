@@ -1,6 +1,8 @@
 import { Appointment } from "../../../domain/entities/Appointment.entity";
 import { Client } from "../../../domain/entities/Client.entity";
+import { Disputes } from "../../../domain/entities/Disputes";
 import { lawyer } from "../../../domain/entities/Lawyer.entity";
+import { Review } from "../../../domain/entities/Review.entity";
 import { Session } from "../../../domain/entities/Session.entity";
 import { User } from "../../../domain/entities/User.entity";
 
@@ -77,4 +79,26 @@ export interface IAdminUseCase {
     currentPage: number;
     totalPage: number;
   }>;
+  fetchReviewDisputes(payload: {
+    limit: number;
+    page: number;
+    search: string;
+    sortBy: "review_date" | "reported_date" | "All";
+    sortOrder: "asc" | "desc";
+  }): Promise<{
+    data:
+      | ({
+          contentData: Review;
+          reportedByuserData: Client;
+          reportedUserData: Client;
+        } & Disputes)[]
+      | [];
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }>;
+  deleteDisputeReview(payload: {
+    reviewId: string;
+    disputeId: string;
+  }): Promise<Disputes | null>;
 }

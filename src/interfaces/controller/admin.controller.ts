@@ -8,6 +8,7 @@ import { LawyerRepository } from "../../infrastructure/database/repo/lawyer.repo
 import {
   zodAppointmentQuerySchema,
   zodChatDisputesQuerySchema,
+  zodReviewDisputesQuerySchema,
   zodSessionQuerySchema,
 } from "../middelwares/validator/zod/zod.validate";
 import { ValidationError } from "../middelwares/Error/CustomError";
@@ -15,6 +16,8 @@ import { AppointmentsRepository } from "../../infrastructure/database/repo/appoi
 import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
 import { ChatUseCase } from "../../application/usecases/chat.usecase";
 import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
+import { DisputesRepo } from "../../infrastructure/database/repo/Disputes";
+import { ReviewRepo } from "../../infrastructure/database/repo/review.repo";
 
 const adminUsecase = new AdminUseCase(
   new ClientRepository(),
@@ -22,7 +25,9 @@ const adminUsecase = new AdminUseCase(
   new AddressRepository(),
   new LawyerRepository(),
   new AppointmentsRepository(),
-  new SessionsRepository()
+  new SessionsRepository(),
+  new DisputesRepo(),
+  new ReviewRepo()
 );
 
 const chatUseCase = new ChatUseCase(new ChatRepo(), new SessionsRepository());
@@ -292,3 +297,42 @@ export const fetchChatDisputes = async (
     next(error);
   }
 };
+
+export const fetchReviewDisputes = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const parsedData = zodReviewDisputesQuerySchema.safeParse(req.query);
+    if (!parsedData.success) {
+      console.log("parsed Error :", parsedData.error);
+      throw new ValidationError("Invalid Credentials");
+    }
+    const result = await adminUsecase.fetchReviewDisputes(parsedData.data);
+    res.status(STATUS_CODES.OK).json(result);
+    return;
+  } catch (error) {
+    next(error);
+  }
+};
+
+export function deleteDisputeReviews(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { reviewId, disputeId } = req.params;
+  try {
+    if (!reviewId || !disputeId)
+      throw new ValidationError("Invalid Credentials");
+    const result = adminUsecase.deleteDisputeReview({
+      disputeId: disputeId,
+      reviewId: reviewId,
+    });
+    res.status(STATUS_CODES.OK).json(result);
+    return;
+  } catch (error) {
+    next(error);
+  }
+}

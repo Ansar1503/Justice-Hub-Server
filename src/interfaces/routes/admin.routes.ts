@@ -3,13 +3,14 @@ import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 import {
   BlockUser,
   changeLawyerVerificationStatus,
+  deleteDisputeReviews,
   fetchAllLawyers,
   fetchAllUsers,
   fetchAppointmentDetails,
   fetchChatDisputes,
+  fetchReviewDisputes,
   fetchSessionDetails,
 } from "../controller/admin.controller";
-
 
 const router = express.Router();
 
@@ -23,4 +24,10 @@ router.get("/sessions", authenticateUser, fetchSessionDetails);
 
 // disputes
 router.get("/disputes/chat", authenticateUser, fetchChatDisputes);
+router.get("/disputes/reviews", authenticateUser, fetchReviewDisputes);
+router.delete(
+  "/disputes/reviews/:reviewId/:disputeId",
+  authenticateUser,
+  deleteDisputeReviews
+);
 export default router;

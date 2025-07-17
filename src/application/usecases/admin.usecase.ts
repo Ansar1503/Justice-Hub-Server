@@ -11,6 +11,11 @@ import { IAppointmentsRepository } from "../../domain/I_repository/I_Appointment
 import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
 import { Appointment } from "../../domain/entities/Appointment.entity";
 import { Session } from "../../domain/entities/Session.entity";
+import { Disputes } from "../../domain/entities/Disputes";
+import { Review } from "../../domain/entities/Review.entity";
+import { IDisputes } from "../../domain/I_repository/IDisputes";
+import { IreviewRepo } from "../../domain/I_repository/I_review.repo";
+import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
 
 export class AdminUseCase implements IAdminUseCase {
   constructor(
@@ -19,7 +24,9 @@ export class AdminUseCase implements IAdminUseCase {
     private addressRepo: IAddressRepository,
     private LawyerRepo: ILawyerRepository,
     private AppointmentRepo: IAppointmentsRepository,
-    private SessionRepo: ISessionsRepo
+    private SessionRepo: ISessionsRepo,
+    private DisputesRepo: IDisputes,
+    private reviewRepo: IreviewRepo
   ) {}
   async fetchUsers(query: {
     role: "lawyer" | "client";
@@ -161,5 +168,47 @@ export class AdminUseCase implements IAdminUseCase {
     totalPage: number;
   }> {
     return await this.SessionRepo.findSessionsAggregate(payload);
+  }
+  async fetchReviewDisputes(payload: {
+    limit: number;
+    page: number;
+    search: string;
+    sortBy: "review_date" | "reported_date" | "All";
+    sortOrder: "asc" | "desc";
+  }): Promise<{
+    data:
+      | ({
+          contentData: Review;
+          reportedByuserData: Client;
+          reportedUserData: Client;
+        } & Disputes)[]
+      | [];
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }> {
+    return await this.DisputesRepo.findReviewDisputes(payload);
+  }
+  async deleteDisputeReview(payload: {
+    reviewId: string;
+    disputeId: string;
+  }): Promise<Disputes | null> {
+    const exists = await this.reviewRepo.findByReview_id(payload.reviewId);
+    if (!exists) throw new ValidationError("Review not found");
+    const existsDisputes = await this.DisputesRepo.findByContentId({
+      contentId: payload.reviewId,
+    });
+    if (!existsDisputes) throw new ValidationError("Dispute not found");
+    switch (existsDisputes.status) {
+      case "rejected":
+        throw new ValidationError("disputes already rejected");
+      case "resolved":
+        throw new ValidationError("disputes already resolved");
+    }
+    await this.reviewRepo.delete(payload.reviewId);
+    return await this.DisputesRepo.updateReviewDispute({
+      disputeId: payload.disputeId,
+      status: "resolved",
+    });
   }
 }

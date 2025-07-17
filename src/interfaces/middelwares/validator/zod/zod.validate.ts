@@ -80,3 +80,19 @@ export const zodChatDisputesQuerySchema = z.object({
     .enum(["All", "session_date", "reported_date"])
     .default("reported_date"),
 });
+
+export const zodReviewDisputesQuerySchema = z.object({
+  search: z.string().default(""),
+  page: z
+    .string()
+    .transform((val) => parseInt(val))
+    .default("1"),
+  limit: z
+    .string()
+    .transform((val) => parseInt(val))
+    .default("10"),
+  sortOrder: z.enum(["asc", "desc"]).default("asc"),
+  sortBy: z
+    .enum(["All", "review_date", "reported_date"])
+    .default("review_date"),
+});
