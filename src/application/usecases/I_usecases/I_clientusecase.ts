@@ -131,4 +131,5 @@ export interface I_clientUsecase {
     reportedBy: string;
     reportedUser: string;
   }): Promise<void>;
+  endSession(payload: { sessionId: string }): Promise<Session | null>;
 }

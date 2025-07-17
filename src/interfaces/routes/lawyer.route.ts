@@ -6,6 +6,7 @@ import {
   addOverrideSlots,
   cancelSession,
   confirmClientAppointment,
+  endSession,
   fetchAppointmentDetails,
   fetchAvailableSlots,
   fetchLawyer,
@@ -120,6 +121,12 @@ router.patch(
   authenticateUser,
   authenticateLawyer,
   startSessionWithRoomID
+);
+router.patch(
+  "/profile/sessions/endSession",
+  authenticateUser,
+  authenticateLawyer,
+  endSession
 );
 router.patch(
   `/profile/sessions/cancel`,

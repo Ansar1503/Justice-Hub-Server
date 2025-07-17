@@ -643,6 +643,22 @@ export async function startSessionWithRoomID(
   }
 }
 
+export async function endSession(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { sessionId } = req.body;
+  try {
+    if (!sessionId) throw new ValidationError("session id is required");
+    const result = await lawyerUseCase.endSession({ sessionId });
+    res.status(200).json(result);
+    return;
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function fetchSessionDocuments(
   req: Request,
   res: Response,

@@ -5,6 +5,7 @@ import {
   cancelSession,
   createCheckoutSession,
   deleteReview,
+  endSession,
   fetchAppointmentDetails,
   fetchClientData,
   fetchReviews,
@@ -129,6 +130,7 @@ router.patch(
   authenticateClient,
   cancelSession
 );
+router.patch("/profile/sessions/endSession",authenticateUser,authenticateClient,endSession)
 
 // chats
 router.get(

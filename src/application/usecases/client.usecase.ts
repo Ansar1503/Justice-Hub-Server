@@ -999,6 +999,34 @@ export class ClientUseCase implements I_clientUsecase {
     return session;
   }
 
+  async endSession(payload: { sessionId: string }): Promise<Session | null> {
+    const session = await this.sessionRepo.findById({
+      session_id: payload.sessionId,
+    });
+    if (!session) throw new ValidationError("Session not found");
+    switch (session.status) {
+      case "cancelled":
+        throw new ValidationError("Session has been cancelled");
+      case "completed":
+        throw new ValidationError("Session has been completed");
+      case "missed":
+        throw new ValidationError("Session has been missed");
+      case "upcoming":
+        throw new ValidationError("session has not started yet");
+    }
+    const sessionStartAt = this.timeStringToDate(session.scheduled_date,session.scheduled_time)
+    const currentDate = new Date()
+    if(currentDate <sessionStartAt){throw new ValidationError("Session has not started yet")}
+    
+    const updatedSession = await this.sessionRepo.update({
+      session_id: payload.sessionId,
+      status: "completed",
+      roomId: "",
+      end_time: new Date(),
+    });
+    return updatedSession;
+  }
+
   async uploadNewDocument(payload: {
     sessionId: string;
     document: { name: string; type: string; url: string }[];

@@ -1064,6 +1064,22 @@ export async function cancelSession(
   }
 }
 
+export async function endSession(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { sessionId } = req.body;
+  try {
+    if (!sessionId) throw new ValidationError("session id is required");
+    const result = await clientusecase.endSession({ sessionId });
+    res.status(STATUS_CODES.OK).json(result);
+    return;
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function uploadDocuments(
   req: Request & { user?: any },
   res: Response,

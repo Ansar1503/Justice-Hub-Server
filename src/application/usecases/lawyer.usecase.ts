@@ -532,9 +532,9 @@ export class LawyerUsecase implements Ilawyerusecase {
       existingSession.scheduled_date,
       existingSession.scheduled_time
     );
-    if (slotDateTime <= new Date()) {
-      throw new ValidationError("Session is already begun");
-    }
+    // if (slotDateTime <= new Date()) {
+    //   throw new ValidationError("Session is already Over or session started");
+    // }
     const newDate = new Date();
     const roomId = `Room_${randomUUID()}`;
     const updated = await this.sessionsRepo.update({
@@ -553,5 +553,38 @@ export class LawyerUsecase implements Ilawyerusecase {
     return await this.sessionsRepo.findDocumentBySessionId({
       session_id: sessionId,
     });
+  }
+
+  async endSession(payload: { sessionId: string }): Promise<Session | null> {
+    const session = await this.sessionsRepo.findById({
+      session_id: payload.sessionId,
+    });
+    if (!session) throw new ValidationError("Session not found");
+    switch (session.status) {
+      case "cancelled":
+        throw new ValidationError("Session has been cancelled");
+      case "completed":
+        throw new ValidationError("Session has been completed");
+      case "missed":
+        throw new ValidationError("Session has been missed");
+      case "upcoming":
+        throw new ValidationError("session has not started yet");
+    }
+    const sessionStartAt = this.timeStringToDate(
+      session.scheduled_date,
+      session.scheduled_time
+    );
+    const currentDate = new Date();
+    if (currentDate < sessionStartAt) {
+      throw new ValidationError("Session has not started yet");
+    }
+
+    const updatedSession = await this.sessionsRepo.update({
+      session_id: payload.sessionId,
+      status: "completed",
+      roomId: "",
+      end_time: new Date(),
+    });
+    return updatedSession;
   }
 }

@@ -69,4 +69,5 @@ export interface Ilawyerusecase {
   findExistingSessionDocument(
     sessionId: string
   ): Promise<SessionDocument | null>;
+  endSession(payload: { sessionId: string }): Promise<Session | null>;
 }
