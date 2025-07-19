@@ -53,6 +53,7 @@ export async function setUpChatSocket(io: SocketIOServer) {
     socket.on(
       SocketEventEnum.SEND_MESSAGE_EVENT,
       async (data: ChatMessage, cb: any) => {
+        // console.log("message send listening");
         socketHandler.handleSendMessage(data, cb);
       }
     );

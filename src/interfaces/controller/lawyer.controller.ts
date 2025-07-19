@@ -630,32 +630,25 @@ export async function sendFileMessage(
   next: NextFunction
 ) {
   const { sessionId } = req.body;
-  console.log("body:", req.body);
+  // console.log("body:", req.body);
   const file = req.file;
-  console.log("file", file);
+  // console.log("file", file);
   try {
     if (!sessionId) throw new ValidationError("sessionId is required");
     if (!file) throw new ValidationError("file is required! send a file");
-    const [type, subtype] = file.mimetype.split("/");
-    let fileType = "";
+    const patharr = file.path?.split(".");
+    const fileType = patharr[patharr.length - 1];
+    const document = {
+      name: file.originalname,
+      url: file.path,
+      type: fileType,
+    };
+    // const result = await lawyerUseCase.sendMessageFile({
+    //   sessionId,
+    //   file: document,
+    // });
 
-    if (type === "image") {
-      fileType = "image";
-    } else if (subtype === "pdf") {
-      fileType = "pdf";
-    } else if (
-      subtype === "vnd.openxmlformats-officedocument.wordprocessingml.document"
-    ) {
-      fileType = "docx";
-    } else {
-      fileType = "unknown";
-    }
-    const document = { name: file.filename, url: file.path, type: fileType };
-    const result = await lawyerUseCase.sendMessageFile({
-      sessionId,
-      file: document,
-    });
-    res.status(STATUS_CODES.OK).json(result);
+    res.status(STATUS_CODES.OK).json(document);
     return;
   } catch (error) {
     next(error);

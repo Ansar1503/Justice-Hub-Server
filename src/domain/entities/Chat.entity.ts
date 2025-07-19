@@ -13,7 +13,7 @@ export interface ChatMessage {
   session_id: string;
   senderId: string;
   receiverId: string;
-  content: string;
+  content?: string;
   read: boolean;
   attachments?: {
     name:string;

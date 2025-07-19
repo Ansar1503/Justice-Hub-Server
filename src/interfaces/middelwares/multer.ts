@@ -49,7 +49,7 @@ export const chatDocumentstorage = new CloudinaryStorage({
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
     return {
-      folder: "Justice_Hub/documents",
+      folder: "Justice_Hub/chat_documents",
       public_id: `${filename}-${Date.now()}${ext}`,
       resource_type: isRaw ? "raw" : "auto",
     };

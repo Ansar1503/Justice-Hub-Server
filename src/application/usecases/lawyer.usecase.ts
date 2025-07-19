@@ -589,32 +589,32 @@ export class LawyerUsecase implements Ilawyerusecase {
     return updatedSession;
   }
 
-  async sendMessageFile(payload: {
-    sessionId: string;
-    file: { name: string; url: string; type: string };
-  }): Promise<ChatMessage | null> {
-    const ChatSession = await this.chatRepo.findById(payload.sessionId);
-    if (!ChatSession) throw new ValidationError("chat session not found");
-    const session = await this.sessionsRepo.findById({
-      session_id: ChatSession.session_id,
-    });
-    if (!session) throw new ValidationError("session not found");
-    const scheduled = this.timeStringToDate(
-      session.scheduled_date,
-      session.scheduled_time
-    );
-    const scheduledEnd = new Date(scheduled.getTime() + session.duration + 10);
-    const currentDate = new Date();
-    if (currentDate > scheduledEnd)
-      throw new ValidationError("Scheduled time has passed");
-    const updateMessage = await this.chatRepo.createMessage({
-      content: "",
-      read: false,
-      attachments: [payload.file],
-      session_id: payload.sessionId,
-      senderId: session.client_id,
-      receiverId: session.lawyer_id,
-    });
-    return updateMessage;
-  }
+  // async sendMessageFile(payload: {
+  //   sessionId: string;
+  //   file: { name: string; url: string; type: string };
+  // }): Promise<ChatMessage | null> {
+  //   const ChatSession = await this.chatRepo.findById(payload.sessionId);
+  //   if (!ChatSession) throw new ValidationError("chat session not found");
+  //   const session = await this.sessionsRepo.findById({
+  //     session_id: ChatSession.session_id,
+  //   });
+  //   if (!session) throw new ValidationError("session not found");
+  //   const scheduled = this.timeStringToDate(
+  //     session.scheduled_date,
+  //     session.scheduled_time
+  //   );
+  //   const scheduledEnd = new Date(scheduled.getTime() + session.duration + 10);
+  //   const currentDate = new Date();
+  //   if (currentDate > scheduledEnd)
+  //     throw new ValidationError("Scheduled time has passed");
+  //   const updateMessage = await this.chatRepo.createMessage({
+  //     content: "",
+  //     read: false,
+  //     attachments: [payload.file],
+  //     session_id: payload.sessionId,
+  //     senderId: session.lawyer_id,
+  //     receiverId: session.client_id,
+  //   });
+  //   return updateMessage;
+  // }
 }

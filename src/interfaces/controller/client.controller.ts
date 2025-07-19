@@ -1189,9 +1189,9 @@ export async function sendMessageFile(
   next: NextFunction
 ) {
   const { sessionId } = req.body;
-  console.log("body:", req.body);
+  // console.log("body:", req.body);
   const file = req.file;
-  console.log("file", file);
+  // console.log("file", file);
   try {
     if (!sessionId) throw new ValidationError("sessionId is required");
     if (!file) throw new ValidationError("file is required! send a file");
@@ -1209,12 +1209,12 @@ export async function sendMessageFile(
     } else {
       fileType = "unknown";
     }
-    const document = { name: file.filename, url: file.path, type: fileType };
-    const result = await clientusecase.sendMessageFile({
-      file: document,
-      sessionId: sessionId,
-    });
-    res.status(STATUS_CODES.ACCEPTED).json(result);
+    const document = { name: file.originalname, url: file.path, type: fileType };
+    // const result = await clientusecase.sendMessageFile({
+    //   file: document,
+    //   sessionId: sessionId,
+    // });
+    res.status(STATUS_CODES.ACCEPTED).json(document);
     return;
   } catch (error) {
     next(error);

@@ -44,10 +44,11 @@ const messageSchema = new Schema<IMessageModel>(
     },
     senderId: { type: String, required: true },
     receiverId: { type: String, required: true },
-    content: { type: String, required: true },
+    content: { type: String, required: false },
     read: { type: Boolean, required: true, default: false },
     attachments: [
       {
+        name: { type: String, required: false },
         url: { type: String, required: false },
         type: { type: String, required: false },
       },

@@ -71,8 +71,8 @@ export interface Ilawyerusecase {
     sessionId: string
   ): Promise<SessionDocument | null>;
   endSession(payload: { sessionId: string }): Promise<Session | null>;
-  sendMessageFile(payload: {
-    sessionId: string;
-    file: { name: string; url: string; type: string };
-  }): Promise<ChatMessage | null>;
+  // sendMessageFile(payload: {
+  //   sessionId: string;
+  //   file: { name: string; url: string; type: string };
+  // }): Promise<ChatMessage | null>;
 }
