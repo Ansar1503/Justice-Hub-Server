@@ -1,4 +1,5 @@
 import { Appointment } from "../../../domain/entities/Appointment.entity";
+import { ChatMessage } from "../../../domain/entities/Chat.entity";
 import { lawyer } from "../../../domain/entities/Lawyer.entity";
 import {
   Availability,
@@ -70,4 +71,8 @@ export interface Ilawyerusecase {
     sessionId: string
   ): Promise<SessionDocument | null>;
   endSession(payload: { sessionId: string }): Promise<Session | null>;
+  sendMessageFile(payload: {
+    sessionId: string;
+    file: { name: string; url: string; type: string };
+  }): Promise<ChatMessage | null>;
 }

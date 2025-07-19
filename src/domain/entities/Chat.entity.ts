@@ -16,6 +16,7 @@ export interface ChatMessage {
   content: string;
   read: boolean;
   attachments?: {
+    name:string;
     url: string;
     type: string;
   }[];

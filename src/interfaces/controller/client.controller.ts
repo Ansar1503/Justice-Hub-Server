@@ -15,6 +15,7 @@ import { ValidationError } from "../middelwares/Error/CustomError";
 import { SessionDocument } from "../../domain/entities/Session.entity";
 import { CloudinaryService } from "../../application/services/cloudinary.service";
 import { DisputesRepo } from "../../infrastructure/database/repo/Disputes";
+import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
 
 const clientusecase = new ClientUseCase(
   new UserRepository(),
@@ -26,7 +27,8 @@ const clientusecase = new ClientUseCase(
   new AppointmentsRepository(),
   new SessionsRepository(),
   new CloudinaryService(),
-  new DisputesRepo()
+  new DisputesRepo(),
+  new ChatRepo()
 );
 
 export const fetchClientData = async (
@@ -1175,6 +1177,44 @@ export async function removeSessionDocument(
       message: "document removed successfully",
       data: result,
     });
+    return;
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function sendMessageFile(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { sessionId } = req.body;
+  console.log("body:", req.body);
+  const file = req.file;
+  console.log("file", file);
+  try {
+    if (!sessionId) throw new ValidationError("sessionId is required");
+    if (!file) throw new ValidationError("file is required! send a file");
+    const [type, subtype] = file.mimetype.split("/");
+    let fileType = "";
+
+    if (type === "image") {
+      fileType = "image";
+    } else if (subtype === "pdf") {
+      fileType = "pdf";
+    } else if (
+      subtype === "vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      fileType = "docx";
+    } else {
+      fileType = "unknown";
+    }
+    const document = { name: file.filename, url: file.path, type: fileType };
+    const result = await clientusecase.sendMessageFile({
+      file: document,
+      sessionId: sessionId,
+    });
+    res.status(STATUS_CODES.ACCEPTED).json(result);
     return;
   } catch (error) {
     next(error);

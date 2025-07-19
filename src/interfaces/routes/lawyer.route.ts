@@ -1,5 +1,9 @@
 import express from "express";
-import { documentstorage } from "../middelwares/multer";
+import {
+  chatDocumentstorage,
+  documentstorage,
+  handleMulterErrors,
+} from "../middelwares/multer";
 import multer from "multer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 import {
@@ -16,6 +20,7 @@ import {
   fetchSlotSettings,
   rejectClientAppointment,
   removeOverrideSlot,
+  sendFileMessage,
   startSessionWithRoomID,
   updateAvailableSlot,
   updateSlotSettings,
@@ -25,7 +30,10 @@ import { authenticateLawyer } from "../middelwares/Auth/authenticateLawyer";
 import { authenticateClient } from "../middelwares/Auth/authenticateClient";
 
 const upload = multer({ storage: documentstorage });
-
+const chatFile = multer({
+  storage: chatDocumentstorage,
+  limits: { fileSize: 10 * 1024 * 1024, files: 3 },
+});
 const router = express.Router();
 
 router.post(
@@ -133,6 +141,14 @@ router.patch(
   authenticateUser,
   authenticateLawyer,
   cancelSession
+);
+// chats
+router.post(
+  "/chat/sendFile",
+  authenticateUser,
+  authenticateLawyer,
+  handleMulterErrors(chatFile.single("file")),
+  sendFileMessage
 );
 
 export default router;

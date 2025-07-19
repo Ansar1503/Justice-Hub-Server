@@ -21,6 +21,7 @@ import {
   removeFailedSession,
   removeSessionDocument,
   reportReview,
+  sendMessageFile,
   sendVerifyMail,
   updateAddress,
   updateBasicInfo,
@@ -31,6 +32,7 @@ import {
 } from "../controller/client.controller";
 import multer from "multer";
 import {
+  chatDocumentstorage,
   documentstorage,
   handleMulterErrors,
   profilestorage,
@@ -68,6 +70,10 @@ const documentUpload = multer({
       );
     }
   },
+});
+const chatFile = multer({
+  storage: chatDocumentstorage,
+  limits: { fileSize: 10 * 1024 * 1024, files: 3 },
 });
 
 const router = express.Router();
@@ -130,7 +136,12 @@ router.patch(
   authenticateClient,
   cancelSession
 );
-router.patch("/profile/sessions/endSession",authenticateUser,authenticateClient,endSession)
+router.patch(
+  "/profile/sessions/endSession",
+  authenticateUser,
+  authenticateClient,
+  endSession
+);
 
 // chats
 router.get(
@@ -209,7 +220,13 @@ router.delete(
   authenticateClient,
   removeFailedSession
 );
-// router.get("/stripe/success/:id", authenticateUser,fetchStripeSessionDetails);
+router.post(
+  "/chat/sendFile",
+  authenticateUser,
+  authenticateClient,
+  handleMulterErrors(chatFile.single("file")),
+  sendMessageFile
+);
 
 // stripe  webjook
 router.post(

@@ -15,6 +15,7 @@ import {
   ValidationError,
 } from "../middelwares/Error/CustomError";
 import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
+import { ChatMessage } from "../../domain/entities/Chat.entity";
 
 const lawyerUseCase = new LawyerUsecase(
   new UserRepository(),
@@ -618,6 +619,44 @@ export async function cancelSession(
       message: "success",
       data: result,
     });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function sendFileMessage(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { sessionId } = req.body;
+  console.log("body:", req.body);
+  const file = req.file;
+  console.log("file", file);
+  try {
+    if (!sessionId) throw new ValidationError("sessionId is required");
+    if (!file) throw new ValidationError("file is required! send a file");
+    const [type, subtype] = file.mimetype.split("/");
+    let fileType = "";
+
+    if (type === "image") {
+      fileType = "image";
+    } else if (subtype === "pdf") {
+      fileType = "pdf";
+    } else if (
+      subtype === "vnd.openxmlformats-officedocument.wordprocessingml.document"
+    ) {
+      fileType = "docx";
+    } else {
+      fileType = "unknown";
+    }
+    const document = { name: file.filename, url: file.path, type: fileType };
+    const result = await lawyerUseCase.sendMessageFile({
+      sessionId,
+      file: document,
+    });
+    res.status(STATUS_CODES.OK).json(result);
+    return;
   } catch (error) {
     next(error);
   }

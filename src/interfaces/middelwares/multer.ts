@@ -38,6 +38,24 @@ export const documentstorage = new CloudinaryStorage({
   },
 });
 
+export const chatDocumentstorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    const ext = path.extname(file.originalname);
+    const filename = path.basename(file.originalname, ext);
+    const isRaw =
+      file.mimetype === "application/pdf" ||
+      file.mimetype ===
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+    return {
+      folder: "Justice_Hub/documents",
+      public_id: `${filename}-${Date.now()}${ext}`,
+      resource_type: isRaw ? "raw" : "auto",
+    };
+  },
+});
+
 export { cloudinary };
 
 import multer from "multer";
