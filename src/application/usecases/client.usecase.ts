@@ -14,7 +14,6 @@ import { Review } from "../../domain/entities/Review.entity";
 import { IreviewRepo } from "../../domain/I_repository/I_review.repo";
 import {
   TimeSlot,
-  BlockedSchedule,
   Daytype,
   ScheduleSettings,
 } from "../../domain/entities/Schedule.entity";
@@ -34,8 +33,9 @@ import { Session, SessionDocument } from "../../domain/entities/Session.entity";
 import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
 import { ICloudinaryService } from "../services/cloudinary.service";
 import { IDisputes } from "../../domain/I_repository/IDisputes";
-import { ChatMessage } from "../../domain/entities/Chat.entity";
 import { IChatRepo } from "../../domain/I_repository/IChatRepo";
+import { CallLogs } from "../../domain/entities/CallLogs";
+import { ICallLogs } from "../../domain/I_repository/ICallLogs";
 
 export class ClientUseCase implements I_clientUsecase {
   constructor(
@@ -49,7 +49,8 @@ export class ClientUseCase implements I_clientUsecase {
     private sessionRepo: ISessionsRepo,
     private cloudinaryService: ICloudinaryService,
     private disputesRepo: IDisputes,
-    private chatRepo: IChatRepo
+    private chatRepo: IChatRepo,
+    private callLogsRepo: ICallLogs
   ) {}
   timeStringToDate(baseDate: Date, hhmm: string): Date {
     const [h, m] = hhmm.split(":").map(Number);
@@ -1184,32 +1185,16 @@ export class ClientUseCase implements I_clientUsecase {
       reportedUser: payload.reportedUser,
     });
   }
-  // async sendMessageFile(payload: {
-  //   sessionId: string;
-  //   file: { name: string; url: string; type: string };
-  // }): Promise<ChatMessage | null> {
-  //   const ChatSession = await this.chatRepo.findById(payload.sessionId);
-  //   if (!ChatSession) throw new ValidationError("chat session not found");
-  //   const session = await this.sessionRepo.findById({
-  //     session_id: ChatSession.session_id,
-  //   });
-  //   if (!session) throw new ValidationError("session not found");
-  //   const scheduled = this.timeStringToDate(
-  //     session.scheduled_date,
-  //     session.scheduled_time
-  //   );
-  //   const scheduledEnd = new Date(scheduled.getTime() + session.duration + 10);
-  //   const currentDate = new Date();
-  //   if (currentDate > scheduledEnd)
-  //     throw new ValidationError("Scheduled time has passed");
-  //   const updateMessage = await this.chatRepo.createMessage({
-  //     content: "",
-  //     read: false,
-  //     attachments: [payload.file],
-  //     session_id: payload.sessionId,
-  //     senderId: session.client_id,
-  //     receiverId: session.lawyer_id,
-  //   });
-  //   return updateMessage;
-  // }
+  async fetchCallLogs(payload: {
+    sessionId: string;
+    page: number;
+    limit: number;
+  }): Promise<{
+    data: CallLogs[];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  }> {
+    return await this.callLogsRepo.findBySessionId(payload);
+  }
 }

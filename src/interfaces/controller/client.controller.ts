@@ -16,6 +16,7 @@ import { SessionDocument } from "../../domain/entities/Session.entity";
 import { CloudinaryService } from "../../application/services/cloudinary.service";
 import { DisputesRepo } from "../../infrastructure/database/repo/Disputes";
 import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
+import { CallLogsRepository } from "../../infrastructure/database/repo/callLogs";
 
 const clientusecase = new ClientUseCase(
   new UserRepository(),
@@ -28,7 +29,8 @@ const clientusecase = new ClientUseCase(
   new SessionsRepository(),
   new CloudinaryService(),
   new DisputesRepo(),
-  new ChatRepo()
+  new ChatRepo(),
+  new CallLogsRepository()
 );
 
 export const fetchClientData = async (
@@ -1209,12 +1211,32 @@ export async function sendMessageFile(
     } else {
       fileType = "unknown";
     }
-    const document = { name: file.originalname, url: file.path, type: fileType };
-    // const result = await clientusecase.sendMessageFile({
-    //   file: document,
-    //   sessionId: sessionId,
-    // });
+    const document = {
+      name: file.originalname,
+      url: file.path,
+      type: fileType,
+    };
     res.status(STATUS_CODES.ACCEPTED).json(document);
+    return;
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function fetchCallLogs(
+  req: Request & { user?: any },
+  res: Response,
+  next: NextFunction
+) {
+  const { sessionId, limit, page } = req.query;
+  try {
+    if (!sessionId) throw new ValidationError("sessionId is required");
+    const result = await clientusecase.fetchCallLogs({
+      sessionId: String(sessionId),
+      limit: Number(limit),
+      page: Number(page),
+    });
+    res.status(STATUS_CODES.OK).json(result);
     return;
   } catch (error) {
     next(error);

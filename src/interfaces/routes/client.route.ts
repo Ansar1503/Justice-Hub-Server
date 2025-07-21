@@ -7,6 +7,7 @@ import {
   deleteReview,
   endSession,
   fetchAppointmentDetails,
+  fetchCallLogs,
   fetchClientData,
   fetchReviews,
   fetchReviewsBySession,
@@ -227,6 +228,11 @@ router.post(
   handleMulterErrors(chatFile.single("file")),
   sendMessageFile
 );
+
+// callLogs
+
+router.get("/call-logs", authenticateUser, authenticateClient, fetchCallLogs);
+
 
 // stripe  webjook
 router.post(
