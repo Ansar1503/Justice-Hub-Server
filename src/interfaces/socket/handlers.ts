@@ -5,8 +5,15 @@ import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
 import { SocketEventEnum } from "../../infrastructure/constant/SocketEventEnum";
 import { ChatMessage } from "../../domain/entities/Chat.entity";
 import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
+import { NotificationRepo } from "../../infrastructure/database/repo/Notification";
+import { NotificationUsecase } from "../../application/usecases/Notification";
+import { Notification } from "../../domain/entities/Notification.entity";
 
 const chatUsecase = new ChatUseCase(new ChatRepo(), new SessionsRepository());
+const notificationUsecase = new NotificationUsecase(
+  new NotificationRepo(),
+  new SessionsRepository()
+);
 
 export class SocketHandlers {
   private eventEnum = SocketEventEnum;
@@ -15,13 +22,6 @@ export class SocketHandlers {
     this.socket.to(id).emit(event, payload);
     console.log(`Emitting ${event} to user ${id}`, payload);
   }
-  // handleCheckOnline(targetId: string) {
-  //   const isOnline = socketStore.onlineStatus.has(targetId);
-  //   this.socket.emit(this.eventEnum.CHECKONLINE_STATUS, {
-  //     userId: targetId,
-  //     isOnline,
-  //   });
-  // }
   getChatSessionDetails(sessionId: string) {
     return chatUsecase.getChatSessionById(sessionId);
   }
@@ -208,6 +208,21 @@ export class SocketHandlers {
     } catch (error: any) {
       console.log("error :", error);
       cb({ success: false, error: error?.message });
+    }
+  }
+
+  async handleSendNotification(payload: Notification) {
+    try {
+      const newNotification =
+        await notificationUsecase.createSessionNotification(payload);
+      // console.log("new notification created: ", newNotification);
+
+      this.io
+        .to(newNotification.recipientId)
+        .emit("NOTIFICATION_RECEIVE", newNotification);
+    } catch (error: any) {
+      console.log("error :", error);
+      this.io.to(payload.senderId).emit(this.eventEnum.ERROR, error.message);
     }
   }
 }

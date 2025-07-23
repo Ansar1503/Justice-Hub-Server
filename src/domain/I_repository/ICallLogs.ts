@@ -11,4 +11,5 @@ export interface ICallLogs {
     currentPage: number;
     totalPages: number;
   }>;
+  create(payload: CallLogs): Promise<CallLogs>;
 }

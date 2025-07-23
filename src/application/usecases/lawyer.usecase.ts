@@ -22,7 +22,9 @@ import {
   ValidationError,
 } from "../../interfaces/middelwares/Error/CustomError";
 import { Ilawyerusecase } from "./I_usecases/I_lawyer.usecase";
-import { ChatMessage } from "../../domain/entities/Chat.entity";
+import { ICallLogs } from "../../domain/I_repository/ICallLogs";
+import { createToken } from "../services/ZegoCloud.service";
+import "dotenv/config";
 
 export class LawyerUsecase implements Ilawyerusecase {
   constructor(
@@ -33,7 +35,8 @@ export class LawyerUsecase implements Ilawyerusecase {
     private documentsRepo: IDocumentsRepository,
     private appointRepo: IAppointmentsRepository,
     private sessionsRepo: ISessionsRepo,
-    private chatRepo: IChatRepo
+    private chatRepo: IChatRepo,
+    private callLogs: ICallLogs
   ) {}
   timeStringToDate(baseDate: Date, hhmm: string): Date {
     const [h, m] = hhmm.split(":").map(Number);
@@ -513,7 +516,9 @@ export class LawyerUsecase implements Ilawyerusecase {
     });
     return updated;
   }
-  async startSession(payload: { sessionId: string }): Promise<Session | null> {
+  async startSession(payload: {
+    sessionId: string;
+  }): Promise<(Session & { zc: { appId: number; token: string } }) | null> {
     const existingSession = await this.sessionsRepo.findById({
       session_id: payload.sessionId,
     });
@@ -533,19 +538,38 @@ export class LawyerUsecase implements Ilawyerusecase {
       existingSession.scheduled_date,
       existingSession.scheduled_time
     );
-    // if (slotDateTime <= new Date()) {
-    //   throw new ValidationError("Session is already Over or session started");
-    // }
     const newDate = new Date();
+    if (newDate < slotDateTime) {
+      throw new ValidationError("Scheduled time is not reached");
+    }
+    slotDateTime.setMinutes(
+      slotDateTime.getMinutes() + existingSession.duration + 5
+    );
+    // if (newDate > slotDateTime)
+    //   throw new ValidationError("session time is over");
     const roomId = `Room_${randomUUID()}`;
-    const updated = await this.sessionsRepo.update({
-      session_id: existingSession._id || "",
-      status: "ongoing",
-      start_time: newDate,
-      lawyer_joined_at: newDate,
-      roomId,
+
+    // await this.callLogs.create({
+    //   status: "ongoing",
+    //   start_time: newDate,
+    //   lawyer_joined_at: newDate,
+    // });
+    const { appId, token } = await createToken({
+      userId: existingSession.lawyer_id,
+      roomId: roomId,
+      expiry: existingSession?.duration,
     });
-    return updated;
+    const session = await this.sessionsRepo.update({
+      start_time: newDate,
+      room_id: roomId,
+      lawyer_joined_at: newDate,
+      session_id: payload.sessionId,
+      status: "ongoing",
+    });
+    return {
+      ...(session as Session),
+      zc: { appId, token },
+    };
   }
 
   async findExistingSessionDocument(
@@ -579,13 +603,54 @@ export class LawyerUsecase implements Ilawyerusecase {
     if (currentDate < sessionStartAt) {
       throw new ValidationError("Session has not started yet");
     }
-
     const updatedSession = await this.sessionsRepo.update({
       session_id: payload.sessionId,
+      lawyer_left_at: currentDate,
+      room_id: "",
       status: "completed",
-      roomId: "",
-      end_time: new Date(),
     });
+
     return updatedSession;
+  }
+  async joinSession(payload: {
+    sessionId: string;
+  }): Promise<Session & { zc: { appId: number; token: string } }> {
+    const existingSession = await this.sessionsRepo.findById({
+      session_id: payload.sessionId,
+    });
+    if (!existingSession) throw new ValidationError("session not found");
+    switch (existingSession.status) {
+      case "cancelled":
+        throw new ValidationError("Session is cancelled");
+      case "completed":
+        throw new ValidationError("Session is completed");
+      case "missed":
+        throw new ValidationError("Session is missed");
+      default:
+        break;
+    }
+    const slotDateTime = this.timeStringToDate(
+      existingSession.scheduled_date,
+      existingSession.scheduled_time
+    );
+    const newDate = new Date();
+    if (newDate < slotDateTime) {
+      throw new ValidationError("Scheduled time is not reached");
+    }
+    slotDateTime.setMinutes(
+      slotDateTime.getMinutes() + existingSession.duration + 5
+    );
+    // if (newDate > slotDateTime)
+    //   throw new ValidationError("session time is over");
+    const { appId, token } = await createToken({
+      userId: existingSession.lawyer_id,
+      roomId: existingSession.room_id,
+      expiry: existingSession?.duration,
+    });
+
+    return {
+      ...existingSession,
+      zc: { appId, token },
+    };
   }
 }

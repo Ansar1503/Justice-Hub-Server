@@ -1,5 +1,4 @@
 import { Appointment } from "../../../domain/entities/Appointment.entity";
-import { ChatMessage } from "../../../domain/entities/Chat.entity";
 import { lawyer } from "../../../domain/entities/Lawyer.entity";
 import {
   Availability,
@@ -66,13 +65,14 @@ export interface Ilawyerusecase {
     status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
   }): Promise<Appointment | null>;
   cancelSession(payload: { session_id: string }): Promise<Session | null>;
-  startSession(payload: { sessionId: string }): Promise<Session | null>;
+  startSession(payload: {
+    sessionId: string;
+  }): Promise<(Session & { zc: { appId: number; token: string } }) | null>;
   findExistingSessionDocument(
     sessionId: string
   ): Promise<SessionDocument | null>;
   endSession(payload: { sessionId: string }): Promise<Session | null>;
-  // sendMessageFile(payload: {
-  //   sessionId: string;
-  //   file: { name: string; url: string; type: string };
-  // }): Promise<ChatMessage | null>;
+  joinSession(payload: {
+    sessionId: string;
+  }): Promise<Session & { zc: { appId: number; token: string } }>;
 }

@@ -58,26 +58,6 @@ const sessionSchema = new Schema(
       enum: ["upcoming", "ongoing", "completed", "cancelled", "missed"],
       default: "upcoming",
     },
-    room_id: {
-      type: String,
-      required: false,
-    },
-    start_time: {
-      type: Date,
-      required: false,
-    },
-    end_time: {
-      type: Date,
-      required: false,
-    },
-    client_joined_at: {
-      type: Date,
-      required: false,
-    },
-    lawyer_joined_at: {
-      type: Date,
-      required: false,
-    },
     notes: {
       type: String,
       required: false,
@@ -94,6 +74,9 @@ const sessionSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "sessions",
       required: false,
+    },
+    room_id: {
+      type: String,
     },
   },
   {

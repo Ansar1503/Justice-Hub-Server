@@ -3,14 +3,16 @@ import { SocketEventEnum } from "../../infrastructure/constant/SocketEventEnum";
 import { SocketHandlers } from "./handlers";
 import { ChatMessage, ChatSession } from "../../domain/entities/Chat.entity";
 import { socketStore } from "./SocketStore";
+import { Notification } from "../../domain/entities/Notification.entity";
 
 export async function setUpChatSocket(io: SocketIOServer) {
   io.on("connection", (socket: Socket) => {
     const socketHandler = new SocketHandlers(socket, io);
     const user = socket.data?.user;
     const userId = user?.id;
-    // console.log(`user : ${user}`);
+
     socket.join(userId);
+    console.log("user joined", userId);
     socketStore.onlineUsers.add(userId);
     io.emit(SocketEventEnum.ONLINE_USERS, {
       users: Array.from(socketStore.onlineUsers),
@@ -90,5 +92,9 @@ export async function setUpChatSocket(io: SocketIOServer) {
         socketHandler.handleReportMessage(data, cb);
       }
     );
+
+    socket.on("NOTIFICATION_SEND", (data: Notification) => {
+      socketHandler.handleSendNotification(data);
+    });
   });
 }

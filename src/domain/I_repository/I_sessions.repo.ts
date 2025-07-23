@@ -20,13 +20,17 @@ export interface ISessionsRepo {
     totalPage: number;
   }>;
   update(payload: {
-    session_id: string;
-    status?: Session["status"];
-    roomId?: string;
-    start_time?: Date;
     end_time?: Date;
     client_joined_at?: Date;
+    client_left_at?: Date;
+    lawyer_left_at?: Date;
+    end_reason?: string;
+    callDuration?: number;
     lawyer_joined_at?: Date;
+    start_time?: Date;
+    room_id?: string;
+    session_id: string;
+    status?: Session["status"];
     notes?: string;
     summary?: string;
     follow_up_suggested?: boolean;

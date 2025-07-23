@@ -34,8 +34,7 @@ import { ValidationError } from "../../interfaces/middelwares/Error/CustomError"
 import { ICloudinaryService } from "../services/cloudinary.service";
 import { IDisputes } from "../../domain/I_repository/IDisputes";
 import { IChatRepo } from "../../domain/I_repository/IChatRepo";
-import { CallLogs } from "../../domain/entities/CallLogs";
-import { ICallLogs } from "../../domain/I_repository/ICallLogs";
+import { createToken } from "../services/ZegoCloud.service";
 
 export class ClientUseCase implements I_clientUsecase {
   constructor(
@@ -49,8 +48,7 @@ export class ClientUseCase implements I_clientUsecase {
     private sessionRepo: ISessionsRepo,
     private cloudinaryService: ICloudinaryService,
     private disputesRepo: IDisputes,
-    private chatRepo: IChatRepo,
-    private callLogsRepo: ICallLogs
+    private chatRepo: IChatRepo
   ) {}
   timeStringToDate(baseDate: Date, hhmm: string): Date {
     const [h, m] = hhmm.split(":").map(Number);
@@ -996,6 +994,26 @@ export class ClientUseCase implements I_clientUsecase {
   async cancelSession(payload: {
     session_id: string;
   }): Promise<Session | null> {
+    const Existingsession = await this.sessionRepo.findById({
+      session_id: payload.session_id,
+    });
+    if (!Existingsession) throw new ValidationError("Session not found");
+    switch (Existingsession.status) {
+      case "cancelled":
+        throw new ValidationError("Session has already been cancelled");
+      case "completed":
+        throw new ValidationError("Session has already been completed");
+      case "missed":
+        throw new ValidationError("Session has been missed");
+    }
+    const sessionStartAt = this.timeStringToDate(
+      Existingsession.scheduled_date,
+      Existingsession.scheduled_time
+    );
+    const currentDate = new Date();
+    if (sessionStartAt > currentDate) {
+      throw new ValidationError("Session has already started!");
+    }
     const session = await this.sessionRepo.update({
       session_id: payload.session_id,
       status: "cancelled",
@@ -1030,8 +1048,6 @@ export class ClientUseCase implements I_clientUsecase {
     const updatedSession = await this.sessionRepo.update({
       session_id: payload.sessionId,
       status: "completed",
-      roomId: "",
-      end_time: new Date(),
     });
     return updatedSession;
   }
@@ -1185,16 +1201,49 @@ export class ClientUseCase implements I_clientUsecase {
       reportedUser: payload.reportedUser,
     });
   }
-  async fetchCallLogs(payload: {
+  async joinSession(payload: {
     sessionId: string;
-    page: number;
-    limit: number;
-  }): Promise<{
-    data: CallLogs[];
-    totalCount: number;
-    currentPage: number;
-    totalPages: number;
-  }> {
-    return await this.callLogsRepo.findBySessionId(payload);
+  }): Promise<Session & { zc: { appId: number; token: string } }> {
+    const existingSession = await this.sessionRepo.findById({
+      session_id: payload.sessionId,
+    });
+    if (!existingSession) throw new ValidationError("session not found");
+    switch (existingSession.status) {
+      case "cancelled":
+        throw new ValidationError("Session is cancelled");
+      case "completed":
+        throw new ValidationError("Session is completed");
+      case "missed":
+        throw new ValidationError("Session is missed");
+      default:
+        break;
+    }
+    const slotDateTime = this.timeStringToDate(
+      existingSession.scheduled_date,
+      existingSession.scheduled_time
+    );
+    const newDate = new Date();
+    if (newDate < slotDateTime) {
+      throw new ValidationError("Scheduled time is not reached");
+    }
+    slotDateTime.setMinutes(
+      slotDateTime.getMinutes() + existingSession.duration + 5
+    );
+    // if (newDate > slotDateTime)
+    //   throw new ValidationError("session time is over");
+    const { appId, token } = await createToken({
+      userId: existingSession.client_id,
+      roomId: existingSession.room_id,
+      expiry: existingSession?.duration,
+    });
+
+    const session = await this.sessionRepo.update({
+      client_joined_at: newDate,
+      session_id: payload.sessionId,
+    });
+    return {
+      ...(session as Session),
+      zc: { appId, token },
+    };
   }
 }

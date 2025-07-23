@@ -7,7 +7,6 @@ import {
   deleteReview,
   endSession,
   fetchAppointmentDetails,
-  fetchCallLogs,
   fetchClientData,
   fetchReviews,
   fetchReviewsBySession,
@@ -19,6 +18,7 @@ import {
   getLawyerSlotDetais,
   getLawyerslotSettings,
   handleWebhooks,
+  JoinVideoSession,
   removeFailedSession,
   removeSessionDocument,
   reportReview,
@@ -229,16 +229,16 @@ router.post(
   sendMessageFile
 );
 
-// callLogs
-
-router.get("/call-logs", authenticateUser, authenticateClient, fetchCallLogs);
-
-
 // stripe  webjook
 router.post(
   "/stripe/webhooks",
   express.raw({ type: "application/json" }),
   handleWebhooks
 );
-
+router.patch(
+  "/profile/sessions/join",
+  authenticateUser,
+  authenticateClient,
+  JoinVideoSession
+);
 export default router;

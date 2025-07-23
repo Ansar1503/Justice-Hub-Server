@@ -15,13 +15,29 @@ import {
 } from "../../interfaces/middelwares/Error/ErrorHandler";
 import { InitialiseSocketServer } from "../socket/config";
 import { setUpChatSocket } from "../../interfaces/socket/chatSocket";
+import rateLimit from "express-rate-limit";
 
 const PORT = process.env.PORT || 4000;
 const app: Application = express();
 const server = createServer(app);
 const io = InitialiseSocketServer(server);
+const rateLimiter = rateLimit({
+  windowMs: 60000,
+  max: 100,
+  message: "Too many requests from this IP, please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
 connectDB();
+app.use(
+  cors({
+    origin: `${process.env.FRONTEND_URL}`,
+    methods: ["PUT", "POST", "GET", "PATCH", "DELETE"],
+    credentials: true,
+  })
+);
+app.use(rateLimiter);
 app.use(
   "/api/client/stripe/webhooks",
   express.raw({ type: "application/json" }),
@@ -30,13 +46,7 @@ app.use(
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-  cors({
-    origin: `${process.env.FRONTEND_URL}`,
-    methods: ["PUT", "POST", "GET", "PATCH", "DELETE"],
-    credentials: true,
-  })
-);
+
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/user/", authRoute);

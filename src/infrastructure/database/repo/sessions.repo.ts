@@ -174,13 +174,17 @@ export class SessionsRepository implements ISessionsRepo {
   }
 
   async update(payload: {
-    session_id: string;
-    status?: Session["status"];
-    roomId?: string;
-    start_time?: Date;
     end_time?: Date;
     client_joined_at?: Date;
+    client_left_at?: Date;
+    lawyer_left_at?: Date;
+    end_reason?: string;
+    callDuration?: number;
     lawyer_joined_at?: Date;
+    start_time?: Date;
+    room_id?: string;
+    session_id: string;
+    status?: Session["status"];
     notes?: string;
     summary?: string;
     follow_up_suggested?: boolean;
@@ -202,6 +206,18 @@ export class SessionsRepository implements ISessionsRepo {
     if (payload.lawyer_joined_at) {
       update.lawyer_joined_at = payload.lawyer_joined_at;
     }
+    if (payload.client_left_at) {
+      update.client_left_at = payload.client_left_at;
+    }
+    if (payload.lawyer_left_at) {
+      update.lawyer_left_at = payload.lawyer_left_at;
+    }
+    if (payload.end_reason) {
+      update.end_reason = payload.end_reason;
+    }
+    if (payload.callDuration) {
+      update.callDuration = payload.callDuration;
+    }
     if (payload.notes) {
       update.notes = payload.notes;
     }
@@ -214,9 +230,7 @@ export class SessionsRepository implements ISessionsRepo {
     if (payload.follow_up_session_id) {
       update.follow_up_session_id = payload.follow_up_session_id;
     }
-    if (payload.roomId) {
-      update.room_id = payload.roomId;
-    }
+    update.room_id = payload.room_id;
 
     if (Object.keys(update).length === 0) {
       return null;

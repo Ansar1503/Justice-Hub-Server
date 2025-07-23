@@ -15,7 +15,7 @@ import {
   ValidationError,
 } from "../middelwares/Error/CustomError";
 import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
-import { ChatMessage } from "../../domain/entities/Chat.entity";
+import { CallLogsRepo } from "../../infrastructure/database/repo/callLogs";
 
 const lawyerUseCase = new LawyerUsecase(
   new UserRepository(),
@@ -25,7 +25,8 @@ const lawyerUseCase = new LawyerUsecase(
   new DocumentsRepo(),
   new AppointmentsRepository(),
   new SessionsRepository(),
-  new ChatRepo()
+  new ChatRepo(),
+  new CallLogsRepo()
 );
 
 export const verifyLawyer = async (
@@ -656,7 +657,7 @@ export async function sendFileMessage(
 }
 
 export async function startSessionWithRoomID(
-  req: Request,
+  req: Request & { user?: any },
   res: Response,
   next: NextFunction
 ) {
@@ -664,11 +665,7 @@ export async function startSessionWithRoomID(
   try {
     if (!sessionId) throw new ValidationError("Session id is required");
     const result = await lawyerUseCase.startSession({ sessionId });
-    res.status(STATUS_CODES.OK).json({
-      success: true,
-      message: "session initiated",
-      data: result,
-    });
+    res.status(STATUS_CODES.OK).json(result);
     return;
   } catch (error) {
     next(error);
@@ -706,6 +703,22 @@ export async function fetchSessionDocuments(
       message: "document fetched successfully",
       data: result,
     });
+    return;
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function JoinVideoSession(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { sessionId } = req.body;
+  try {
+    if (!sessionId) throw new ValidationError("sessionId is required");
+    const result = await lawyerUseCase.joinSession({ sessionId });
+    res.status(STATUS_CODES.OK).json(result);
     return;
   } catch (error) {
     next(error);

@@ -18,6 +18,7 @@ import {
   fetchSessionDocuments,
   fetchSessions,
   fetchSlotSettings,
+  JoinVideoSession,
   rejectClientAppointment,
   removeOverrideSlot,
   sendFileMessage,
@@ -151,4 +152,10 @@ router.post(
   sendFileMessage
 );
 
+router.patch(
+  "/profile/sessions/join",
+  authenticateUser,
+  authenticateLawyer,
+  JoinVideoSession
+);
 export default router;

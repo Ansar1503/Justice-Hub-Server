@@ -14,14 +14,14 @@ const callLogsSchema = new Schema<IcallLogModel>(
     lawyer_left_at: { type: Date },
     start_time: { type: Date },
     end_time: { type: Date },
-    duration: { type: Number },
+    callDuration: { type: Number },
+    end_reason: { type: String },
     status: {
       type: String,
       enum: ["ongoing", "completed", "cancelled", "missed", "dropped"],
       required: true,
       default: "ongoing",
     },
-    room_id: { type: String, required: true },
   },
   { timestamps: true }
 );

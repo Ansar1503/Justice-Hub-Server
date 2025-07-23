@@ -16,7 +16,6 @@ import { SessionDocument } from "../../domain/entities/Session.entity";
 import { CloudinaryService } from "../../application/services/cloudinary.service";
 import { DisputesRepo } from "../../infrastructure/database/repo/Disputes";
 import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
-import { CallLogsRepository } from "../../infrastructure/database/repo/callLogs";
 
 const clientusecase = new ClientUseCase(
   new UserRepository(),
@@ -29,8 +28,7 @@ const clientusecase = new ClientUseCase(
   new SessionsRepository(),
   new CloudinaryService(),
   new DisputesRepo(),
-  new ChatRepo(),
-  new CallLogsRepository()
+  new ChatRepo()
 );
 
 export const fetchClientData = async (
@@ -1223,19 +1221,15 @@ export async function sendMessageFile(
   }
 }
 
-export async function fetchCallLogs(
-  req: Request & { user?: any },
+export async function JoinVideoSession(
+  req: Request,
   res: Response,
   next: NextFunction
 ) {
-  const { sessionId, limit, page } = req.query;
+  const { sessionId } = req.body;
   try {
     if (!sessionId) throw new ValidationError("sessionId is required");
-    const result = await clientusecase.fetchCallLogs({
-      sessionId: String(sessionId),
-      limit: Number(limit),
-      page: Number(page),
-    });
+    const result = await clientusecase.joinSession({ sessionId });
     res.status(STATUS_CODES.OK).json(result);
     return;
   } catch (error) {
