@@ -1,4 +1,5 @@
 import { Appointment } from "../../../domain/entities/Appointment.entity";
+import { CallLogs } from "../../../domain/entities/CallLogs";
 import { lawyer } from "../../../domain/entities/Lawyer.entity";
 import {
   Availability,
@@ -75,4 +76,14 @@ export interface Ilawyerusecase {
   joinSession(payload: {
     sessionId: string;
   }): Promise<Session & { zc: { appId: number; token: string } }>;
+  fetchCallLogs(payload: {
+    sessionId: string;
+    limit: number;
+    page: number;
+  }): Promise<{
+    data: CallLogs[] | [];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  }>;
 }

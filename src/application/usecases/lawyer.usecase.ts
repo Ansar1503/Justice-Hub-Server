@@ -25,6 +25,7 @@ import { Ilawyerusecase } from "./I_usecases/I_lawyer.usecase";
 import { ICallLogs } from "../../domain/I_repository/ICallLogs";
 import { createToken } from "../services/ZegoCloud.service";
 import "dotenv/config";
+import { CallLogs } from "../../domain/entities/CallLogs";
 
 export class LawyerUsecase implements Ilawyerusecase {
   constructor(
@@ -549,15 +550,17 @@ export class LawyerUsecase implements Ilawyerusecase {
     //   throw new ValidationError("session time is over");
     const roomId = `Room_${randomUUID()}`;
 
-    // await this.callLogs.create({
-    //   status: "ongoing",
-    //   start_time: newDate,
-    //   lawyer_joined_at: newDate,
-    // });
     const { appId, token } = await createToken({
       userId: existingSession.lawyer_id,
       roomId: roomId,
       expiry: existingSession?.duration,
+    });
+    await this.callLogs.create({
+      status: "ongoing",
+      start_time: newDate,
+      lawyer_joined_at: newDate,
+      session_id: payload.sessionId,
+      roomId: roomId,
     });
     const session = await this.sessionsRepo.update({
       start_time: newDate,
@@ -603,13 +606,27 @@ export class LawyerUsecase implements Ilawyerusecase {
     if (currentDate < sessionStartAt) {
       throw new ValidationError("Session has not started yet");
     }
+    const duration = session.start_time
+      ? session.start_time.getTime() - currentDate.getTime()
+      : 0;
+
     const updatedSession = await this.sessionsRepo.update({
       session_id: payload.sessionId,
       lawyer_left_at: currentDate,
       room_id: "",
+      end_time: currentDate,
+      callDuration: duration,
       status: "completed",
+      end_reason: "session completed",
     });
-
+    await this.callLogs.updateByRoomId({
+      roomId: session?.room_id,
+      lawyer_left_at: currentDate,
+      end_time: currentDate,
+      status: "completed",
+      callDuration: duration,
+      end_reason: "session completed",
+    });
     return updatedSession;
   }
   async joinSession(payload: {
@@ -652,5 +669,17 @@ export class LawyerUsecase implements Ilawyerusecase {
       ...existingSession,
       zc: { appId, token },
     };
+  }
+  async fetchCallLogs(payload: {
+    sessionId: string;
+    limit: number;
+    page: number;
+  }): Promise<{
+    data: CallLogs[] | [];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  }> {
+    return await this.callLogs.findBySessionId(payload);
   }
 }

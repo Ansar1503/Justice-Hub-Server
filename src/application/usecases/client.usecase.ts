@@ -35,6 +35,8 @@ import { ICloudinaryService } from "../services/cloudinary.service";
 import { IDisputes } from "../../domain/I_repository/IDisputes";
 import { IChatRepo } from "../../domain/I_repository/IChatRepo";
 import { createToken } from "../services/ZegoCloud.service";
+import { ICallLogs } from "../../domain/I_repository/ICallLogs";
+import { CallLogs } from "../../domain/entities/CallLogs";
 
 export class ClientUseCase implements I_clientUsecase {
   constructor(
@@ -48,7 +50,8 @@ export class ClientUseCase implements I_clientUsecase {
     private sessionRepo: ISessionsRepo,
     private cloudinaryService: ICloudinaryService,
     private disputesRepo: IDisputes,
-    private chatRepo: IChatRepo
+    private chatRepo: IChatRepo,
+    private callRepo: ICallLogs
   ) {}
   timeStringToDate(baseDate: Date, hhmm: string): Date {
     const [h, m] = hhmm.split(":").map(Number);
@@ -1044,10 +1047,26 @@ export class ClientUseCase implements I_clientUsecase {
     if (currentDate < sessionStartAt) {
       throw new ValidationError("Session has not started yet");
     }
-
+    const duration = session.start_time
+      ? session.start_time.getTime() - currentDate.getTime()
+      : 0;
     const updatedSession = await this.sessionRepo.update({
       session_id: payload.sessionId,
+      room_id: "",
+      client_left_at: currentDate,
       status: "completed",
+      callDuration: duration,
+      end_time: currentDate,
+      end_reason: "session completed",
+    });
+    await this.callRepo.updateByRoomId({
+      roomId: session.room_id,
+      session_id: payload.sessionId,
+      client_left_at: currentDate,
+      status: "completed",
+      callDuration: duration,
+      end_time: currentDate,
+      end_reason: "session completed",
     });
     return updatedSession;
   }
@@ -1245,5 +1264,17 @@ export class ClientUseCase implements I_clientUsecase {
       ...(session as Session),
       zc: { appId, token },
     };
+  }
+  async fetchCallLogs(payload: {
+    sessionId: string;
+    limit: number;
+    page: number;
+  }): Promise<{
+    data: CallLogs[] | [];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  }> {
+    return await this.callRepo.findBySessionId(payload);
   }
 }

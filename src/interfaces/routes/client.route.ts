@@ -7,6 +7,7 @@ import {
   deleteReview,
   endSession,
   fetchAppointmentDetails,
+  fetchCallLogs,
   fetchClientData,
   fetchReviews,
   fetchReviewsBySession,
@@ -240,5 +241,11 @@ router.patch(
   authenticateUser,
   authenticateClient,
   JoinVideoSession
+);
+router.get(
+  "/profile/sessions/callLogs/:id",
+  authenticateUser,
+  authenticateClient,
+  fetchCallLogs
 );
 export default router;

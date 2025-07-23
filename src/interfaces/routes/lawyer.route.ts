@@ -13,6 +13,7 @@ import {
   endSession,
   fetchAppointmentDetails,
   fetchAvailableSlots,
+  fetchCallLogs,
   fetchLawyer,
   fetchOverrideSlots,
   fetchSessionDocuments,
@@ -132,6 +133,12 @@ router.patch(
   startSessionWithRoomID
 );
 router.patch(
+  "/profile/sessions/join",
+  authenticateUser,
+  authenticateLawyer,
+  JoinVideoSession
+);
+router.patch(
   "/profile/sessions/endSession",
   authenticateUser,
   authenticateLawyer,
@@ -152,10 +159,10 @@ router.post(
   sendFileMessage
 );
 
-router.patch(
-  "/profile/sessions/join",
+router.get(
+  "/profile/sessions/callLogs/:id",
   authenticateUser,
   authenticateLawyer,
-  JoinVideoSession
+  fetchCallLogs
 );
 export default router;

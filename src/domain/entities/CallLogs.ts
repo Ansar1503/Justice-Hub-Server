@@ -1,4 +1,6 @@
 export interface CallLogs {
+  roomId: string;
+  session_id: string;
   start_time?: Date;
   end_time?: Date;
   client_joined_at?: Date;

@@ -724,3 +724,25 @@ export async function JoinVideoSession(
     next(error);
   }
 }
+
+export async function fetchCallLogs(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { id } = req.params;
+  const sessionId = id;
+  const { page, limit } = req.query;
+  try {
+    if (!sessionId) throw new ValidationError("sessionId is required");
+    const result = await lawyerUseCase.fetchCallLogs({
+      limit: !isNaN(Number(limit)) ? Number(limit) : 10,
+      page: !isNaN(Number(page)) ? Number(page) : 1,
+      sessionId,
+    });
+    res.status(STATUS_CODES.OK).json(result);
+    return;
+  } catch (error) {
+    next(error);
+  }
+}

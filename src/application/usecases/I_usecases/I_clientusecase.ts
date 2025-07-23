@@ -15,6 +15,7 @@ import {
   Session,
   SessionDocument,
 } from "../../../domain/entities/Session.entity";
+import { CallLogs } from "../../../domain/entities/CallLogs";
 
 export interface I_clientUsecase {
   timeStringToMinutes(time: string): number;
@@ -135,4 +136,14 @@ export interface I_clientUsecase {
   joinSession(payload: {
     sessionId: string;
   }): Promise<Session & { zc: { appId: number; token: string } }>;
+  fetchCallLogs(payload: {
+    sessionId: string;
+    limit: number;
+    page: number;
+  }): Promise<{
+    data: CallLogs[] | [];
+    totalCount: number;
+    currentPage: number;
+    totalPages: number;
+  }>;
 }

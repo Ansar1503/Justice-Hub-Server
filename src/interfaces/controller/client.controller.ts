@@ -16,6 +16,7 @@ import { SessionDocument } from "../../domain/entities/Session.entity";
 import { CloudinaryService } from "../../application/services/cloudinary.service";
 import { DisputesRepo } from "../../infrastructure/database/repo/Disputes";
 import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
+import { CallLogsRepo } from "../../infrastructure/database/repo/callLogs";
 
 const clientusecase = new ClientUseCase(
   new UserRepository(),
@@ -28,7 +29,8 @@ const clientusecase = new ClientUseCase(
   new SessionsRepository(),
   new CloudinaryService(),
   new DisputesRepo(),
-  new ChatRepo()
+  new ChatRepo(),
+  new CallLogsRepo()
 );
 
 export const fetchClientData = async (
@@ -1230,6 +1232,28 @@ export async function JoinVideoSession(
   try {
     if (!sessionId) throw new ValidationError("sessionId is required");
     const result = await clientusecase.joinSession({ sessionId });
+    res.status(STATUS_CODES.OK).json(result);
+    return;
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function fetchCallLogs(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { id } = req.params;
+  const sessionId = id;
+  const { limit, page } = req.query;
+  try {
+    if (!sessionId) throw new ValidationError("sessionId is required");
+    const result = await clientusecase.fetchCallLogs({
+      limit: !isNaN(Number(limit)) ? Number(limit) : 10,
+      page: !isNaN(Number(page)) ? Number(page) : 1,
+      sessionId,
+    });
     res.status(STATUS_CODES.OK).json(result);
     return;
   } catch (error) {

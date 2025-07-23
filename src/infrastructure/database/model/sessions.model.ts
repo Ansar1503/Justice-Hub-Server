@@ -60,11 +60,9 @@ const sessionSchema = new Schema(
     },
     notes: {
       type: String,
-      required: false,
     },
     summary: {
       type: String,
-      required: false,
     },
     follow_up_suggested: {
       type: Boolean,
@@ -73,11 +71,22 @@ const sessionSchema = new Schema(
     follow_up_session_id: {
       type: Schema.Types.ObjectId,
       ref: "sessions",
-      required: false,
     },
     room_id: {
       type: String,
     },
+    start_time: {
+      type: Date,
+    },
+    end_time: {
+      type: Date,
+    },
+    client_joined_at: { type: Date },
+    client_left_at: { type: Date },
+    lawyer_joined_at: { type: Date },
+    lawyer_left_at: { type: Date },
+    end_reason: { type: String },
+    callDuration: { type: Number },
   },
   {
     timestamps: true,

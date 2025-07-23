@@ -7,6 +7,7 @@ export interface IcallLogModel extends Omit<CallLogs, "session_id">, Document {
 
 const callLogsSchema = new Schema<IcallLogModel>(
   {
+    roomId: { type: String, required: true },
     session_id: { type: Schema.Types.ObjectId, required: true, ref: "Session" },
     client_joined_at: { type: Date },
     client_left_at: { type: Date },
