@@ -506,4 +506,7 @@ export class AppointmentsRepository implements IAppointmentsRepository {
       totalPage,
     };
   }
+  async findByClientID(client: string): Promise<Appointment[] | []> {
+    return AppointmentModel.find({ client_id: client });
+  }
 }

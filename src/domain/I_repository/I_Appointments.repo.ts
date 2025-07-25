@@ -80,5 +80,5 @@ export interface IAppointmentsRepository {
     currentPage: number;
     totalPage: number;
   }>;
+  findByClientID(client: string): Promise<Appointment[] | []>;
 }
- 

@@ -540,9 +540,9 @@ export class LawyerUsecase implements Ilawyerusecase {
       existingSession.scheduled_time
     );
     const newDate = new Date();
-    if (newDate < slotDateTime) {
-      throw new ValidationError("Scheduled time is not reached");
-    }
+    // if (newDate < slotDateTime) {
+    //   throw new ValidationError("Scheduled time is not reached");
+    // }
     slotDateTime.setMinutes(
       slotDateTime.getMinutes() + existingSession.duration + 5
     );
@@ -553,7 +553,7 @@ export class LawyerUsecase implements Ilawyerusecase {
     const { appId, token } = await createToken({
       userId: existingSession.lawyer_id,
       roomId: roomId,
-      expiry: existingSession?.duration,
+      expiry: existingSession?.duration * 60,
     });
     await this.callLogs.create({
       status: "ongoing",
@@ -603,11 +603,13 @@ export class LawyerUsecase implements Ilawyerusecase {
       session.scheduled_time
     );
     const currentDate = new Date();
-    if (currentDate < sessionStartAt) {
-      throw new ValidationError("Session has not started yet");
-    }
-    const duration = session.start_time
-      ? session.start_time.getTime() - currentDate.getTime()
+    // if (currentDate < sessionStartAt) {
+    //   throw new ValidationError("Session has not started yet");
+    // }
+    const durationInMinutes = session.start_time
+      ? Math.floor(
+          (currentDate.getTime() - session.start_time.getTime()) / (1000 * 60)
+        )
       : 0;
 
     const updatedSession = await this.sessionsRepo.update({
@@ -615,7 +617,7 @@ export class LawyerUsecase implements Ilawyerusecase {
       lawyer_left_at: currentDate,
       room_id: "",
       end_time: currentDate,
-      callDuration: duration,
+      callDuration: durationInMinutes,
       status: "completed",
       end_reason: "session completed",
     });
@@ -624,7 +626,7 @@ export class LawyerUsecase implements Ilawyerusecase {
       lawyer_left_at: currentDate,
       end_time: currentDate,
       status: "completed",
-      callDuration: duration,
+      callDuration: durationInMinutes,
       end_reason: "session completed",
     });
     return updatedSession;
@@ -651,9 +653,9 @@ export class LawyerUsecase implements Ilawyerusecase {
       existingSession.scheduled_time
     );
     const newDate = new Date();
-    if (newDate < slotDateTime) {
-      throw new ValidationError("Scheduled time is not reached");
-    }
+    // if (newDate < slotDateTime) {
+    //   throw new ValidationError("Scheduled time is not reached");
+    // }
     slotDateTime.setMinutes(
       slotDateTime.getMinutes() + existingSession.duration + 5
     );
@@ -662,7 +664,7 @@ export class LawyerUsecase implements Ilawyerusecase {
     const { appId, token } = await createToken({
       userId: existingSession.lawyer_id,
       roomId: existingSession.room_id,
-      expiry: existingSession?.duration,
+      expiry: existingSession?.duration * 60,
     });
 
     return {

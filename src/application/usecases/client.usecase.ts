@@ -660,6 +660,12 @@ export class ClientUseCase implements I_clientUsecase {
       err.code = STATUS_CODES.BAD_REQUEST;
       throw err;
     }
+    const existingAppointment = await this.appointmentRepo.findByClientID(
+      client_id
+    );
+    if(existingAppointment){
+      const filtered = existingAppointment.filter((app)=>app.date)
+    }
     const slotSettings = await this.scheduleRepo.fetchScheduleSettings(
       lawyer_id
     );
@@ -1044,18 +1050,21 @@ export class ClientUseCase implements I_clientUsecase {
       session.scheduled_time
     );
     const currentDate = new Date();
-    if (currentDate < sessionStartAt) {
-      throw new ValidationError("Session has not started yet");
-    }
-    const duration = session.start_time
-      ? session.start_time.getTime() - currentDate.getTime()
+    // if (currentDate < sessionStartAt) {
+    //   throw new ValidationError("Session has not started yet");
+    // }
+    const durationInMinutes = session.start_time
+      ? Math.floor(
+          (currentDate.getTime() - session.start_time.getTime()) / (1000 * 60)
+        )
       : 0;
+
     const updatedSession = await this.sessionRepo.update({
       session_id: payload.sessionId,
       room_id: "",
       client_left_at: currentDate,
       status: "completed",
-      callDuration: duration,
+      callDuration: durationInMinutes,
       end_time: currentDate,
       end_reason: "session completed",
     });
@@ -1064,7 +1073,7 @@ export class ClientUseCase implements I_clientUsecase {
       session_id: payload.sessionId,
       client_left_at: currentDate,
       status: "completed",
-      callDuration: duration,
+      callDuration: durationInMinutes,
       end_time: currentDate,
       end_reason: "session completed",
     });
@@ -1242,9 +1251,9 @@ export class ClientUseCase implements I_clientUsecase {
       existingSession.scheduled_time
     );
     const newDate = new Date();
-    if (newDate < slotDateTime) {
-      throw new ValidationError("Scheduled time is not reached");
-    }
+    // if (newDate < slotDateTime) {
+    //   throw new ValidationError("Scheduled time is not reached");
+    // }
     slotDateTime.setMinutes(
       slotDateTime.getMinutes() + existingSession.duration + 5
     );
@@ -1253,7 +1262,7 @@ export class ClientUseCase implements I_clientUsecase {
     const { appId, token } = await createToken({
       userId: existingSession.client_id,
       roomId: existingSession.room_id,
-      expiry: existingSession?.duration,
+      expiry: existingSession?.duration * 60,
     });
 
     const session = await this.sessionRepo.update({

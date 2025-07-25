@@ -30,7 +30,7 @@ export class CallLogsRepo implements ICallLogs {
       .lean();
 
     const totalCount = await CallLogsModel.countDocuments({
-      session_id: sessionId,
+      session_id: sessionId, 
     });
     const totalPages = Math.ceil(totalCount / limit);
     const currentPage = page;
@@ -64,7 +64,7 @@ export class CallLogsRepo implements ICallLogs {
     if (!roomId) return null;
     const update: any = {};
     if (callDuration) {
-      update.call_duration = callDuration;
+      update.callDuration = callDuration;
     }
     if (client_joined_at) {
       update.client_joined_at = client_joined_at;
@@ -87,6 +87,9 @@ export class CallLogsRepo implements ICallLogs {
     if (start_time) {
       update.start_time = start_time;
     }
+    if (end_time) {
+      update.end_time = end_time;
+    }
     if (session_id) {
       update.session_id = session_id;
     }
@@ -94,7 +97,7 @@ export class CallLogsRepo implements ICallLogs {
       update.status = status;
     }
     const updatedLog = await CallLogsModel.findOneAndUpdate(
-      { room_id: roomId },
+      { roomId: roomId },
       { $set: update },
       { new: true }
     );
