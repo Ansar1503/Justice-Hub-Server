@@ -1,5 +1,5 @@
 import { Review } from "../../../domain/entities/Review.entity";
-import { IreviewRepo } from "../../../domain/I_repository/I_review.repo";
+import { IreviewRepo } from "../../../domain/IRepository/I_review.repo";
 import reviewModel from "../model/review.model";
 
 export class ReviewRepo implements IreviewRepo {

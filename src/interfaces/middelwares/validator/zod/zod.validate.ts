@@ -37,7 +37,7 @@ export const zodAppointmentQuerySchema = z.object({
     "rejected",
     "all",
   ]),
-  type: z.enum(["consultation", "follow-up", "all"]),
+  consultation_type: z.enum(["consultation", "follow-up", "all"]),
 });
 
 export const zodSessionQuerySchema = z.object({
@@ -62,7 +62,7 @@ export const zodSessionQuerySchema = z.object({
     "missed",
     "all",
   ]),
-  type: z.enum(["consultation", "follow-up", "all"]),
+  consultation_type: z.enum(["consultation", "follow-up", "all"]),
 });
 
 export const zodChatDisputesQuerySchema = z.object({

@@ -1,8 +1,8 @@
 import { Types } from "mongoose";
 import { ChatMessage, ChatSession } from "../../../domain/entities/Chat.entity";
-import { IChatRepo } from "../../../domain/I_repository/IChatRepo";
+import { IChatRepo } from "../../../domain/IRepository/IChatRepo";
 import { ChatModel, MessageModel } from "../model/chat.model";
-import { Client } from "../../../domain/entities/Client.entity";
+import { Client } from "../../../domain/entities/Client";
 
 export class ChatRepo implements IChatRepo {
   async create(payload: ChatSession): Promise<ChatSession> {

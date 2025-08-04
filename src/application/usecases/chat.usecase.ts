@@ -1,8 +1,8 @@
 import { ChatMessage, ChatSession } from "../../domain/entities/Chat.entity";
-import { Client } from "../../domain/entities/Client.entity";
+import { Client } from "../../domain/entities/Client";
 import { Session } from "../../domain/entities/Session.entity";
-import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
-import { IChatRepo } from "../../domain/I_repository/IChatRepo";
+import { ISessionsRepo } from "../../domain/IRepository/I_sessions.repo";
+import { IChatRepo } from "../../domain/IRepository/IChatRepo";
 import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
 import { IChatusecase } from "./I_usecases/IChatusecase";
 

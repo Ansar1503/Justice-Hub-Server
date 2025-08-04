@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { Client } from "../../../domain/entities/Client.entity";
+import { Client } from "../../../domain/entities/Client";
 
 interface IClientModel extends Document, Client {}
 

@@ -1,33 +1,75 @@
-import express from "express";
+import { Request, Response, Router } from "express";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
-import {
-  BlockUser,
-  changeLawyerVerificationStatus,
-  deleteDisputeReviews,
-  fetchAllLawyers,
-  fetchAllUsers,
-  fetchAppointmentDetails,
-  fetchChatDisputes,
-  fetchReviewDisputes,
-  fetchSessionDetails,
-} from "../controller/admin.controller";
+import { expressAdapter } from "@interfaces/adapters/express";
+import { FetchAllUserComposer } from "@infrastructure/services/composers/Admin/FetchAllUsers";
+import { FetchAllLawyersComposer } from "@infrastructure/services/composers/Admin/FetchAllLawyers";
+import { BlockUserComposer } from "@infrastructure/services/composers/Admin/BlockUser";
+import { ChangeLawyerVerificationComposer } from "@infrastructure/services/composers/Admin/ChangeLawyerVerificationStatus";
+import { FetchAppointmentsComposer } from "@infrastructure/services/composers/Admin/FetchAppointment";
+import { fetchSessionsComposer } from "@infrastructure/services/composers/Admin/FetchSessions";
+import { FetchReviewDipsutesComposer } from "@infrastructure/services/composers/Admin/FetchReviewDisputes";
 
-const router = express.Router();
+const router = Router();
 
-router.get("/users", authenticateUser, fetchAllUsers);
-router.get("/lawyers", fetchAllLawyers);
-router.patch("/user", authenticateUser, BlockUser);
-router.patch("/lawyer", authenticateUser, changeLawyerVerificationStatus);
-
-router.get("/appointments", authenticateUser, fetchAppointmentDetails);
-router.get("/sessions", authenticateUser, fetchSessionDetails);
-
-// disputes
-router.get("/disputes/chat", authenticateUser, fetchChatDisputes);
-router.get("/disputes/reviews", authenticateUser, fetchReviewDisputes);
-router.delete(
-  "/disputes/reviews/:reviewId/:disputeId",
+router.get("/users", async (req: Request, res: Response) => {
+  const adapter = await expressAdapter(req, FetchAllUserComposer());
+  res.status(adapter.statusCode).json(adapter.body);
+  return;
+});
+router.get(
+  "/lawyers",
   authenticateUser,
-  deleteDisputeReviews
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchAllLawyersComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
 );
+router.patch("/user", authenticateUser, async (req: Request, res: Response) => {
+  const adapter = await expressAdapter(req, BlockUserComposer());
+  res.status(adapter.statusCode).json(adapter.body);
+  return;
+});
+router.patch(
+  "/lawyer",
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      ChangeLawyerVerificationComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  "/appointments",
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchAppointmentsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+router.get(
+  "/sessions",
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adaper = await expressAdapter(req, fetchSessionsComposer());
+    res.status(adaper.statusCode).json(adaper.body);
+    return;
+  }
+);
+
+router.get(
+  "/disputes/reviews",
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adaper = await expressAdapter(req, FetchReviewDipsutesComposer());
+    res.status(adaper.statusCode).json(adaper.body);
+    return;
+  }
+);
+
 export default router;

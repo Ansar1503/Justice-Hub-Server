@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
 import { UserRepository } from "../../../infrastructure/database/repo/user.repo";
-import { IUserRepository } from "../../../domain/I_repository/I_user.repo";
+import { IUserRepository } from "../../../domain/IRepository/IUserRepo";
+import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
 
-const userRepo: IUserRepository = new UserRepository();
+const userRepo: IUserRepository = new UserRepository(new UserMapper());
 
 export async function authenticateClient(
   req: Request & { user?: any },

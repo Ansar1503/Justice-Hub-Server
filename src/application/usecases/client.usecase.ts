@@ -1,41 +1,41 @@
 import { ClientDto, ClientUpdateDto } from "../dtos/client.dto";
-import { IUserRepository } from "../../domain/I_repository/I_user.repo";
-import { IClientRepository } from "../../domain/I_repository/I_client.repo";
+import { IUserRepository } from "../../domain/IRepository/IUserRepo";
+import { IClientRepository } from "../../domain/IRepository/I_client.repo";
 import { ResposeUserDto } from "../dtos/user.dto";
 import { sendVerificationEmail } from "../services/email.service";
 import bcrypt from "bcrypt";
 import { Address } from "../../domain/entities/Address.entity";
-import { IAddressRepository } from "../../domain/I_repository/I_address.repo";
-import { ILawyerRepository } from "../../domain/I_repository/I_lawyer.repo";
+import { IAddressRepository } from "../../domain/IRepository/I_address.repo";
+import { ILawyerRepository } from "../../domain/IRepository/ILawyer.repo";
 import { I_clientUsecase } from "./I_usecases/I_clientusecase";
-import { LawyerFilterParams } from "../../domain/entities/Lawyer.entity";
+// import { LawyerFilterParams } from "../../domain/entities/Lawyer";
 import { LawyerResponseDto } from "../dtos/lawyer.dto";
 import { Review } from "../../domain/entities/Review.entity";
-import { IreviewRepo } from "../../domain/I_repository/I_review.repo";
+import { IreviewRepo } from "../../domain/IRepository/I_review.repo";
 import {
   TimeSlot,
   Daytype,
   ScheduleSettings,
 } from "../../domain/entities/Schedule.entity";
 import { ERRORS } from "../../infrastructure/constant/errors";
-import { IScheduleRepo } from "../../domain/I_repository/I_schedule.repo";
+import { IScheduleRepo } from "../../domain/IRepository/I_schedule.repo";
 import {
   getSessionDetails,
   getSessionMetaData,
   getStripeSession,
   handleStripeWebHook,
 } from "../services/stripe.service";
-import { IAppointmentsRepository } from "../../domain/I_repository/I_Appointments.repo";
+import { IAppointmentsRepository } from "../../domain/IRepository/I_Appointments.repo";
 import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
 import { Appointment } from "../../domain/entities/Appointment.entity";
-import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
+import { ISessionsRepo } from "../../domain/IRepository/I_sessions.repo";
 import { Session, SessionDocument } from "../../domain/entities/Session.entity";
 import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
 import { ICloudinaryService } from "../services/cloudinary.service";
-import { IDisputes } from "../../domain/I_repository/IDisputes";
-import { IChatRepo } from "../../domain/I_repository/IChatRepo";
+import { IDisputes } from "../../domain/IRepository/IDisputes";
+import { IChatRepo } from "../../domain/IRepository/IChatRepo";
 import { createToken } from "../services/ZegoCloud.service";
-import { ICallLogs } from "../../domain/I_repository/ICallLogs";
+import { ICallLogs } from "../../domain/IRepository/ICallLogs";
 import { CallLogs } from "../../domain/entities/CallLogs";
 
 export class ClientUseCase implements I_clientUsecase {
@@ -187,20 +187,16 @@ export class ClientUseCase implements I_clientUsecase {
         throw new Error("NO_USER_FOUND");
       }
       const userExist = await this.userRepository.findByEmail(email);
-      if (userDetails?.email) {
+      if (userExist?.email) {
         throw new Error("EMAIL_ALREADY_EXIST");
       }
-
+      // console.log("email", email);
       await this.userRepository.update({
-        email: email || userDetails.email,
+        email: email,
         user_id,
-        is_blocked: userDetails.is_blocked,
-        is_verified: false,
-        mobile: userDetails.mobile,
-        password: userDetails.password,
-        role: userDetails.role,
-        name: userDetails.name,
+        is_verified:false
       });
+      // console.log("email updated");
       try {
         await sendVerificationEmail(email, user_id, "");
       } catch (error) {
@@ -313,7 +309,7 @@ export class ClientUseCase implements I_clientUsecase {
     await this.clientRepository.update(updateData);
   }
 
-  async getLawyers(filter: LawyerFilterParams): Promise<{
+  async getLawyers(filter: any): Promise<{
     data: any[];
     totalCount: number;
     currentPage: number;
@@ -663,8 +659,8 @@ export class ClientUseCase implements I_clientUsecase {
     const existingAppointment = await this.appointmentRepo.findByClientID(
       client_id
     );
-    if(existingAppointment){
-      const filtered = existingAppointment.filter((app)=>app.date)
+    if (existingAppointment) {
+      const filtered = existingAppointment.filter((app) => app.date);
     }
     const slotSettings = await this.scheduleRepo.fetchScheduleSettings(
       lawyer_id
@@ -1120,10 +1116,9 @@ export class ClientUseCase implements I_clientUsecase {
     if (slotDateTime <= new Date()) {
       throw new ValidationError("Session is already begun");
     }
-
     const newDocument = await this.sessionRepo.createDocument({
       client_id: session.client_id,
-      session_id: session._id as string,
+      session_id: session.id as string,
       document: payload.document,
     });
     return newDocument;
@@ -1157,7 +1152,7 @@ export class ClientUseCase implements I_clientUsecase {
     // console.log("deleted", deleted);
     if (!deleted?.document?.length) {
       // console.log("working....");
-      await this.sessionRepo.removeAllDocuments(deleted?._id || "");
+      await this.sessionRepo.removeAllDocuments(deleted?.id || "");
       return null;
     }
     return deleted;

@@ -1,14 +1,29 @@
-import mongoose, { Schema, Document } from "mongoose";
-import { lawyer } from "../../../domain/entities/Lawyer.entity";
+import mongoose, { Schema, Document, Types } from "mongoose";
 
-export interface ILawyerModel extends Document, lawyer {
+type VerificationStatus = "verified" | "rejected" | "pending" | "requested";
+export interface ILawyerModel extends Document {
+  _id: string;
   user_id: string;
+  description: string;
+  barcouncil_number: string;
+  enrollment_certificate_number: string;
+  certificate_of_practice_number: string;
+  verification_status: VerificationStatus;
+  practice_areas: string[];
+  experience: number;
+  specialisation: string[];
+  consultation_fee: number;
+  documents: Types.ObjectId;
+  rejectReason: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-const LawyerSchema = new Schema(
+const LawyerSchema = new Schema<ILawyerModel>(
   {
+    _id: { type: String },
     user_id: { type: String, required: true, unique: true },
-    description: { type: String, required: false },
+    description: { type: String, required: false, default: "" },
     documents: {
       ref: "LawyerDocuments",
       type: mongoose.Schema.Types.ObjectId,

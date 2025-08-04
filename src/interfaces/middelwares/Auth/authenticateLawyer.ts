@@ -1,18 +1,21 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
-import { ILawyerRepository } from "../../../domain/I_repository/I_lawyer.repo";
+import { ILawyerRepository } from "../../../domain/IRepository/ILawyer.repo";
 import { LawyerRepository } from "../../../infrastructure/database/repo/lawyer.repo";
 import { UserRepository } from "../../../infrastructure/database/repo/user.repo";
-import { IUserRepository } from "../../../domain/I_repository/I_user.repo";
+import { IUserRepository } from "../../../domain/IRepository/IUserRepo";
+import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
+import { LawyerMapper } from "@infrastructure/Mapper/Implementations/LawyerMapper";
 
-const userRepo: IUserRepository = new UserRepository();
-const LawyerRepo: ILawyerRepository = new LawyerRepository();
+const userRepo: IUserRepository = new UserRepository(new UserMapper());
+const LawyerRepo: ILawyerRepository = new LawyerRepository(new LawyerMapper());
 
 export async function authenticateLawyer(
   req: Request & { user?: any },
   res: Response,
   next: NextFunction
 ) {
+  // console.log("lawyer getting authenticated")
   const lawyer_id = req.user.id;
   if (!lawyer_id) {
     res.status(STATUS_CODES.FORBIDDEN).json({

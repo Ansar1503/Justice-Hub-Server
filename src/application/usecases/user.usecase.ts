@@ -1,26 +1,24 @@
 import { JwtPayload } from "jsonwebtoken";
-import { UserRepository } from "../../infrastructure/database/repo/user.repo";
 import {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
 } from "../services/jwt.service";
 import { ResposeUserDto } from "../dtos/user.dto";
-import { User } from "../../domain/entities/User.entity";
+import { User } from "../../domain/entities/User";
 import bcrypt from "bcryptjs";
 import {
   emailVerification,
   sendVerificationEmail,
 } from "../services/email.service";
-import { generateOtp } from "../services/otp.service";
-import { ClientRepository } from "../../infrastructure/database/repo/client.repo";
-import { Client } from "../../domain/entities/Client.entity";
-import { OtpRepository } from "../../infrastructure/database/repo/otp.repo";
-import { IUserRepository } from "../../domain/I_repository/I_user.repo";
-import { IClientRepository } from "../../domain/I_repository/I_client.repo";
-import { IotpRepository } from "../../domain/I_repository/I_otp.repo";
-import { ILawyerRepository } from "../../domain/I_repository/I_lawyer.repo";
+import { Client } from "../../domain/entities/Client";
+import { IUserRepository } from "../../domain/IRepository/IUserRepo";
+import { IClientRepository } from "../../domain/IRepository/I_client.repo";
+import { IotpRepository } from "../../domain/IRepository/I_otp.repo";
+import { ILawyerRepository } from "../../domain/IRepository/ILawyer.repo";
 import { verifyAuthCode } from "../services/google.service";
+import { Lawyer } from "@domain/entities/Lawyer";
+import { generateOtp } from "../services/otp.service";
 
 export class UserUseCase {
   constructor(
@@ -39,12 +37,34 @@ export class UserUseCase {
     if (existingUser) {
       throw new Error("USER_EXISTS");
     }
-    userData.password = await bcrypt.hash(userData.password, 10);
+
+    const hashedPassword = await bcrypt.hash(userData.password, 10);
+    const newUser = User.create(userData);
+    newUser.changePassword(hashedPassword);
     try {
-      const user = await this.userRepository.create(userData);
-      await this.createClient({ user_id: user.user_id });
+      const user = await this.userRepository.create(newUser);
+      const client = Client.create({
+        user_id: user.user_id,
+        profile_image: "",
+        address: "",
+        dob: "",
+        gender: "",
+      });
+      await this.createClient(client);
       if (userData.role === "lawyer") {
-        await this.lawyerRepo.create({ user_id: userData.user_id });
+        const lawyerData = Lawyer.create({
+          barcouncil_number: "",
+          certificate_of_practice_number: "",
+          consultation_fee: 0,
+          description: "",
+          documents: "",
+          enrollment_certificate_number: "",
+          experience: 0,
+          practice_areas: [],
+          rejectReason: "",
+          specialisation: [],
+        });
+        await this.lawyerRepo.create(lawyerData);
       }
 
       const otp = await generateOtp();
@@ -62,10 +82,10 @@ export class UserUseCase {
       });
       return new ResposeUserDto(user);
     } catch (error: any) {
+      console.log("error creating user0", error);
       if (error.message === "MAIL_SEND_ERROR") {
         throw new Error(error.message);
       }
-      console.log(error);
       throw new Error("DB_ERROR");
     }
   }
@@ -220,7 +240,7 @@ export class UserUseCase {
     //   role:payload.role,
     //   is_verified:true,
     //   password:"",
-      
+
     // });
   }
 }

@@ -1,5 +1,5 @@
 export interface Session {
-  _id?: string;
+  id: string;
   appointment_id: string;
   lawyer_id: string;
   client_id: string;
@@ -24,12 +24,12 @@ export interface Session {
   lawyer_left_at?: Date;
   end_reason?: string;
   callDuration?: number;
-  createdAt?: Date;
-  updatedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface SessionDocument {
-  _id?: string;
+  id?: string;
   session_id: string;
   client_id: string;
   document: { name: string; type: string; url: string; _id?: string }[];

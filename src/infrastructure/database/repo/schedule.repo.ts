@@ -5,7 +5,7 @@ import {
   OverrideSlots,
   ScheduleSettings,
 } from "../../../domain/entities/Schedule.entity";
-import { IScheduleRepo } from "../../../domain/I_repository/I_schedule.repo";
+import { IScheduleRepo } from "../../../domain/IRepository/I_schedule.repo";
 import {
   availableSlotsModel,
   overrideSlotsModel,

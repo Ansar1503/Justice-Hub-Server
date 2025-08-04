@@ -1,5 +1,5 @@
 import { Address } from "../../../domain/entities/Address.entity";
-import { IAddressRepository } from "../../../domain/I_repository/I_address.repo";
+import { IAddressRepository } from "../../../domain/IRepository/I_address.repo";
 import AddressModel from "../model/address.model";
 
 export class AddressRepository implements IAddressRepository {

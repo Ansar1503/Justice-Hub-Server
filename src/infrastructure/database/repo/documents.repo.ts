@@ -1,6 +1,6 @@
 import { timeStamp } from "console";
-import { LawyerDocuments } from "../../../domain/entities/Lawyer.entity";
-import { IDocumentsRepository } from "../../../domain/I_repository/I_documents.repo";
+import { LawyerDocuments } from "../../../domain/entities/Lawyer";
+import { IDocumentsRepository } from "../../../domain/IRepository/I_documents.repo";
 import LawyerDocumentsModel from "../model/lawyerdocuments.model";
 
 export class DocumentsRepo implements IDocumentsRepository {

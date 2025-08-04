@@ -1,9 +1,13 @@
 import path from "path";
-import { Client } from "../../../domain/entities/Client.entity";
+import { Client } from "../../../domain/entities/Client";
 import { Disputes } from "../../../domain/entities/Disputes";
 import { Review } from "../../../domain/entities/Review.entity";
-import { IDisputes } from "../../../domain/I_repository/IDisputes";
+import { IDisputes } from "../../../domain/IRepository/IDisputes";
 import { DisputesModel } from "../model/Disputes";
+import {
+  FetchReviewDisputesInputDto,
+  FetchReviewDisputesOutputDto,
+} from "@src/application/dtos/Admin/FetchReviewDisputesDto";
 
 export class DisputesRepo implements IDisputes {
   async create(payload: Disputes): Promise<Disputes> {
@@ -20,24 +24,9 @@ export class DisputesRepo implements IDisputes {
       ? { ...disputes, contentId: disputes.contentId.toString() }
       : null;
   }
-  async findReviewDisputes(payload: {
-    limit: number;
-    page: number;
-    search: string;
-    sortBy: "review_date" | "reported_date" | "All";
-    sortOrder: "asc" | "desc";
-  }): Promise<{
-    data:
-      | ({
-          contentData: Review;
-          reportedByuserData: Client;
-          reportedUserData: Client;
-        } & Disputes)[]
-      | [];
-    totalCount: number;
-    currentPage: number;
-    totalPage: number;
-  }> {
+  async findReviewDisputes(
+    payload: FetchReviewDisputesInputDto
+  ): Promise<FetchReviewDisputesOutputDto> {
     const { limit, page, search, sortBy, sortOrder } = payload;
     const skip = (page - 1) * limit;
     const order = sortOrder === "asc" ? 1 : -1;

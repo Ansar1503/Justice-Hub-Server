@@ -1,41 +1,75 @@
-import { User } from "../../../domain/entities/User.entity";
-import { IUserRepository } from "../../../domain/I_repository/I_user.repo";
-import UserModel from "../model/user.model";
+import { IMapper } from "@infrastructure/Mapper/IMapper";
+import { User } from "../../../domain/entities/User";
+import { IUserRepository } from "../../../domain/IRepository/IUserRepo";
+import UserModel, { IUserModel } from "../model/user.model";
 
 export class UserRepository implements IUserRepository {
+  constructor(private readonly Mapper: IMapper<User, IUserModel>) {
+    // super(UserModel, Mapper);
+  }
   async create(user: User): Promise<User> {
-    return await new UserModel(user).save();
+    const mapped = this.Mapper.toPersistence(user);
+    console.log("mapped:", mapped);
+    const savedUser = await new UserModel(mapped).save();
+    return this.Mapper.toDomain(savedUser);
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return await UserModel.findOne({ email });
+    const userDoc = await UserModel.findOne({ email });
+    return userDoc ? this.Mapper.toDomain(userDoc) : null;
   }
 
   async findByuser_id(user_id: string): Promise<User | null> {
-    return await UserModel.findOne({ user_id });
+    const userDoc = await UserModel.findOne({ user_id });
+    return userDoc ? this.Mapper?.toDomain(userDoc) : null;
   }
+
   async update(user: Partial<User>): Promise<User | null> {
+    const {
+      user_id,
+      email,
+      is_blocked,
+      is_verified,
+      mobile,
+      name,
+      password,
+      role,
+    } = user;
     let query: { user_id?: string; email?: string } = {};
-    if (user.user_id) {
-      query.user_id = user.user_id;
-    } else if (user.email) {
-      query.email = user.email;
+    const update: Record<string, any> = {};
+    if (user_id) {
+      query.user_id = user_id;
+    } else if (email) {
+      query.email = email;
     }
-    return await UserModel.findOneAndUpdate(
-      query,
-      {
-        $set: {
-          is_verified: user.is_verified,
-          name: user.name,
-          mobile: user.mobile,
-          email: user.email,
-          is_blocked: user.is_blocked,
-          password: user.password,
-          role: user.role,
-        },
-      },
-      { new: true }
-    );
+
+    if (email) {
+      update.email = email;
+    }
+    if (is_blocked !== undefined || is_blocked != null) {
+      update.is_blocked = is_blocked;
+    }
+    if (is_verified !== undefined || is_verified != null) {
+      update.is_verified = is_verified;
+    }
+    if (mobile?.trim()) {
+      update.mobile = mobile;
+    }
+    if (name?.trim()) {
+      update.name = name;
+    }
+    if (password?.trim()) {
+      update.password = password;
+    }
+    if (role && ["lawyer", "admin", "client"].includes(role)) {
+      update.role = role;
+    }
+    console.log("updated", update);
+    console.log("query", query);
+    const updated = await UserModel.findOneAndUpdate(query, update, {
+      new: true,
+    });
+    return updated ? this.Mapper.toDomain(updated) : null;
   }
   async findAll(query: {
     role: "lawyer" | "client";

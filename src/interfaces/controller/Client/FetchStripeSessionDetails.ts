@@ -1,0 +1,40 @@
+import { I_clientUsecase } from "@src/application/usecases/I_usecases/I_clientusecase";
+import { IController } from "../Interface/IController";
+import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
+import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
+import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
+
+export class FetchStripeSessionDetailsController implements IController {
+  constructor(private clientUseCase: I_clientUsecase) {}
+
+  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+    const session_id = (httpRequest.params as { id?: string })?.id;
+
+    if (!session_id) {
+      return new HttpResponse(400, {
+        success: false,
+        message: "Please provide session id",
+      });
+    }
+
+    try {
+      const response = await this.clientUseCase.fetchStripeSessionDetails(
+        session_id
+      );
+      return new HttpResponse(200, response);
+    } catch (error: any) {
+      switch (error.message) {
+        case "SECRETKEYNOTFOUND":
+          return new HttpResponse(400, {
+            success: false,
+            message: "SecretKey Not Found",
+          });
+        default:
+          return new HttpResponse(500, {
+            success: false,
+            message: "Internal Server Error",
+          });
+      }
+    }
+  }
+}

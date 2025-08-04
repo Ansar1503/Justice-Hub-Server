@@ -1,45 +1,36 @@
-import {
-  lawyer,
-  LawyerFilterParams,
-} from "../../../domain/entities/Lawyer.entity";
-import { ILawyerRepository } from "../../../domain/I_repository/I_lawyer.repo";
-import lawyerModel from "../model/lawyer.model";
+import { IMapper } from "@infrastructure/Mapper/IMapper";
+import { Lawyer } from "../../../domain/entities/Lawyer";
+import { ILawyerRepository } from "../../../domain/IRepository/ILawyer.repo";
+import lawyerModel, { ILawyerModel } from "../model/lawyer.model";
 
 export class LawyerRepository implements ILawyerRepository {
-  async create(lawyer: lawyer): Promise<lawyer> {
-    return await lawyerModel.create(lawyer);
+  constructor(private mapper: IMapper<Lawyer, ILawyerModel>) {}
+
+  async create(lawyer: Lawyer): Promise<Lawyer> {
+    const mapped = this.mapper.toPersistence(lawyer);
+    const lawyerData = await lawyerModel.create(mapped);
+    return this.mapper.toDomain(lawyerData);
   }
-  async findUserId(user_id: string): Promise<lawyer | null> {
-    return await lawyerModel.findOne({ user_id }).populate("documents");
+  async findUserId(user_id: string): Promise<Lawyer | null> {
+    const lawyerData = await lawyerModel
+      .findOne({ user_id })
+      .populate("documents");
+    return lawyerData ? this.mapper.toDomain(lawyerData) : null;
   }
-  async update(
-    user_id: string,
-    lawyer: Partial<lawyer>
-  ): Promise<lawyer | null> {
-    return await lawyerModel.findOneAndUpdate(
-      { user_id },
+  async update(update: Partial<Lawyer>): Promise<Lawyer | null> {
+    const updatedData = await lawyerModel.findOneAndUpdate(
+      { user_id: update.user_id },
+      update,
       {
-        $set: {
-          description: lawyer.description || "",
-          documents: lawyer.documents || "",
-          barcouncil_number: lawyer.barcouncil_number || "",
-          enrollment_certificate_number:
-            lawyer.enrollment_certificate_number || "",
-          certificate_of_practice_number:
-            lawyer.certificate_of_practice_number || "",
-          practice_areas: lawyer.practice_areas || "",
-          verification_status: lawyer.verification_status || "",
-          rejectReason: lawyer.rejectReason || "",
-          experience: lawyer.experience || "",
-          specialisation: lawyer.specialisation || "",
-          consultation_fee: lawyer.consultation_fee || "",
-        },
-      },
-      { upsert: true, new: true }
+        upsert: true,
+        new: true,
+      }
     );
+    return updatedData ? this.mapper.toDomain(updatedData) : null;
   }
-  async findAll(): Promise<lawyer[]> {
-    return await lawyerModel.find({}).populate("documents");
+  async findAll(): Promise<Lawyer[] | []> {
+    const lawyerData = await lawyerModel.find({}).populate("documents");
+    return lawyerData ? this.mapper?.toDomainArray?.(lawyerData) ?? [] : [];
   }
   async findAllLawyersWithQuery(query: {
     matchStage: any;

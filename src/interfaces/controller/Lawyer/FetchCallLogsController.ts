@@ -1,0 +1,59 @@
+import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
+import { IController } from "../Interface/IController";
+import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
+import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
+import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
+import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
+import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
+import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
+import { AppError } from "@interfaces/middelwares/Error/CustomError";
+import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
+
+export class FetchCallLogsController implements IController {
+  constructor(
+    private lawyerUseCase: Ilawyerusecase,
+    private httpSuccess: IHttpSuccess = new HttpSuccess(),
+    private httpErrors: IHttpErrors = new HttpErrors()
+  ) {}
+  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+    let id: string = "";
+    let page: number = 1;
+    let limit: number = 10;
+    if (
+      httpRequest.params &&
+      typeof httpRequest.params === "object" &&
+      "id" in httpRequest.params
+    ) {
+      id = String(httpRequest.params.id);
+    }
+    if (httpRequest.query && typeof httpRequest.query === "object") {
+      if ("page" in httpRequest.query) {
+        page = !isNaN(Number(httpRequest.query.page))
+          ? Number(httpRequest.query.page)
+          : 1;
+      }
+      if ("limit" in httpRequest.query) {
+        limit = !isNaN(Number(httpRequest.query.limit))
+          ? Number(httpRequest.query.limit)
+          : 10;
+      }
+    }
+    if (!id) {
+      return this.httpErrors.error_400("session id is required");
+    }
+    try {
+      const result = await this.lawyerUseCase.fetchCallLogs({
+        limit,
+        page,
+        sessionId: id,
+      });
+      console.log("result : ", result);
+      return this.httpSuccess.success_200(result);
+    } catch (error) {
+      if (error instanceof AppError) {
+        return new HttpResponse(error.statusCode, error.message);
+      }
+      return this.httpErrors.error_500();
+    }
+  }
+}

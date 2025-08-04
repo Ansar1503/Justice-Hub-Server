@@ -1,0 +1,60 @@
+import { IController } from "@interfaces/controller/Interface/IController";
+import { IHttpRequest } from "@interfaces/helpers/IHttpRequest";
+import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
+import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
+import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
+import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
+import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
+import { I_clientUsecase } from "@src/application/usecases/I_usecases/I_clientusecase";
+import { ERRORS } from "@infrastructure/constant/errors";
+
+export class GetLawyerSlotDetailsController implements IController {
+  constructor(
+    private readonly clientUsecase: I_clientUsecase,
+    private readonly httpErrors: IHttpErrors = new HttpErrors(),
+    private readonly httpSuccess: IHttpSuccess = new HttpSuccess()
+  ) {}
+
+  async handle(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    try {
+      const lawyer_id = (httpRequest.params as { id: string })?.id || "";
+      const date = (httpRequest.query as { date: string })?.date;
+      const client_id = (
+        httpRequest as IHttpRequest & { user?: { id?: string } }
+      ).user?.id;
+
+      if (!lawyer_id.trim() || !date || !client_id) {
+        return this.httpErrors.error_400("Invalid Credentials");
+      }
+
+      const dateObj = new Date(
+        new Date(date).getTime() - new Date(date).getTimezoneOffset() * 60000
+      );
+
+      const result = await this.clientUsecase.fetchLawyerSlots({
+        lawyer_id,
+        date: dateObj,
+        client_id,
+      });
+
+      return this.httpSuccess.success_200({
+        success: true,
+        message: "Lawyer slots fetched successfully",
+        data: result,
+      });
+    } catch (error: any) {
+      switch (error.message) {
+        case ERRORS.USER_NOT_FOUND:
+          return this.httpErrors.error_404("User not found");
+        case ERRORS.USER_BLOCKED:
+          return this.httpErrors.error_403("User is blocked");
+        case ERRORS.LAWYER_NOT_VERIFIED:
+          return this.httpErrors.error_400("Lawyer is not verified");
+        default:
+          return this.httpErrors.error_500(
+            error.message || "Internal Server Error"
+          );
+      }
+    }
+  }
+}

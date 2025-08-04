@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import "dotenv/config";
-let retry = 0;
-const connectDB = async (): Promise<void> => {
+
+const connectDB = async (retry = 0): Promise<void> => {
   try {
     await mongoose.connect(
       process.env.MONGO_URI || "mongodb://localhost:27017/justicehub"
@@ -9,12 +9,13 @@ const connectDB = async (): Promise<void> => {
     console.log("MongoDB Connected");
   } catch (error) {
     console.error("MongoDB Connection Error:", error);
-    setTimeout(connectDB, 5000);
     retry++;
-    if (retry >= 5) {
-      retry = 0;
-      console.log("maximum tries reached, process exitting...");
+    if (retry > 3) {
+      console.log("Maximum retries reached. Exiting...");
       process.exit(1);
+    } else {
+      console.log(`Retrying to connect... Attempt ${retry}`);
+      setTimeout(() => connectDB(retry), 5000);
     }
   }
 };

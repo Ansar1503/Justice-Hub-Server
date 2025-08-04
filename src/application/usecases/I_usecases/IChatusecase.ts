@@ -1,5 +1,5 @@
 import { ChatSession, ChatMessage } from "../../../domain/entities/Chat.entity";
-import { Client } from "../../../domain/entities/Client.entity";
+import { Client } from "../../../domain/entities/Client";
 import { Session } from "../../../domain/entities/Session.entity";
 
 export interface IChatusecase {

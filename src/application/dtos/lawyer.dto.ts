@@ -1,6 +1,6 @@
 import { Address } from "../../domain/entities/Address.entity";
-import { Client } from "../../domain/entities/Client.entity";
-import { User } from "../../domain/entities/User.entity";
+import { Client } from "../../domain/entities/Client";
+import { User } from "../../domain/entities/User";
 
 export class LawyerResponseDto implements Partial<Client>, Partial<User> {
   constructor(

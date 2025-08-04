@@ -1,5 +1,5 @@
 import { CallLogs as CallLogsEntity } from "../../../domain/entities/CallLogs";
-import { ICallLogs } from "../../../domain/I_repository/ICallLogs";
+import { ICallLogs } from "../../../domain/IRepository/ICallLogs";
 import { CallLogsModel } from "../model/callLogs";
 
 export class CallLogsRepo implements ICallLogs {

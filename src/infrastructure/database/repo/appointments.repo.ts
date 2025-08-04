@@ -1,9 +1,13 @@
 import mongoose from "mongoose";
 import { Appointment } from "../../../domain/entities/Appointment.entity";
-import { IAppointmentsRepository } from "../../../domain/I_repository/I_Appointments.repo";
+import { IAppointmentsRepository } from "../../../domain/IRepository/I_Appointments.repo";
 import { AppointmentModel } from "../model/appointments.model";
-import { User } from "../../../domain/entities/User.entity";
-import { Client } from "../../../domain/entities/Client.entity";
+// import { User } from "../../../domain/entities/User";
+// import { Client } from "../../../domain/entities/Client";
+import {
+  FetchAppointmentsInputDto,
+  FetchAppointmentsOutputDto,
+} from "@src/application/dtos/Admin/FetchAppointmentsDto";
 
 export class AppointmentsRepository implements IAppointmentsRepository {
   async createWithTransaction(payload: Appointment): Promise<Appointment> {
@@ -345,35 +349,26 @@ export class AppointmentsRepository implements IAppointmentsRepository {
   async findById(id: string): Promise<Appointment | null> {
     return await AppointmentModel.findOne({ _id: id });
   }
-  async findAllAggregate(payload: {
-    search: string;
-    limit: number;
-    page: number;
-    sortBy: "date" | "amount" | "lawyer_name" | "client_name";
-    sortOrder: "asc" | "desc";
-    status:
-      | "pending"
-      | "confirmed"
-      | "completed"
-      | "cancelled"
-      | "rejected"
-      | "all";
-    type: "consultation" | "follow-up" | "all";
-  }): Promise<{
-    data: (Appointment & { clientData: Client; lawyerData: Client }[]) | [];
-    totalCount: number;
-    currentPage: number;
-    totalPage: number;
-  }> {
-    const { search, limit, page, sortBy, sortOrder, status, type } = payload;
+  async findAllAggregate(
+    payload: FetchAppointmentsInputDto
+  ): Promise<FetchAppointmentsOutputDto> {
+    const {
+      search,
+      limit,
+      page,
+      sortBy,
+      sortOrder,
+      status,
+      consultation_type,
+    } = payload;
     const skip = (page - 1) * limit;
     const order = sortOrder === "asc" ? 1 : -1;
     const matchStage: Record<string, any> = {};
     if (status && status !== "all") {
       matchStage["status"] = status;
     }
-    if (type && type !== "all") {
-      matchStage["type"] = type;
+    if (consultation_type && consultation_type !== "all") {
+      matchStage["type"] = consultation_type;
     }
 
     const matchStage2: Record<string, any> = {
@@ -470,12 +465,53 @@ export class AppointmentsRepository implements IAppointmentsRepository {
       },
       {
         $project: {
-          clientsUserData: 0,
-          clientsClientData: 0,
-          lawyersUserData: 0,
-          lawyersClientData: 0,
-          "clientData.password": 0,
-          "lawyerData.password": 0,
+          // clientsUserData: 0,
+          // clientsClientData: 0,
+          // lawyersUserData: 0,
+          // lawyersClientData: 0,
+          "clientData.name": 1,
+          "clientData.email": 1,
+          "clientData.mobile": 1,
+          "clientData.user_id": 1,
+          "clientData.profile_image": 1,
+          "clientData.dob": 1,
+          "clientData.gender": 1,
+
+          "lawyerData.name": 1,
+          "lawyerData.email": 1,
+          "lawyerData.mobile": 1,
+          "lawyerData.user_id": 1,
+          "lawyerData.profile_image": 1,
+          "lawyerData.dob": 1,
+          "lawyerData.gender": 1,
+
+          appointment_id: 1,
+          lawyer_id: 1,
+          client_id: 1,
+          scheduled_date: 1,
+          scheduled_time: 1,
+          duration: 1,
+          date: 1,
+          time: 1,
+          payment_status: 1,
+          reason: 1,
+          amount: 1,
+          type: 1,
+          status: 1,
+          notes: 1,
+          summary: 1,
+          follow_up_suggested: 1,
+          follow_up_session_id: 1,
+          start_time: 1,
+          end_time: 1,
+          client_joined_at: 1,
+          client_left_at: 1,
+          lawyer_joined_at: 1,
+          lawyer_left_at: 1,
+          end_reason: 1,
+          callDuration: 1,
+          createdAt: 1,
+          updatedAt: 1,
         },
       },
     ];
@@ -498,9 +534,7 @@ export class AppointmentsRepository implements IAppointmentsRepository {
     const totalCount = countResult[0]?.total || 0;
     const totalPage = Math.ceil(totalCount / limit);
     return {
-      data: dataResult as
-        | (Appointment & { clientData: Client; lawyerData: Client }[])
-        | [],
+      data: dataResult,
       totalCount,
       currentPage: page,
       totalPage,

@@ -1,9 +1,13 @@
-import { Client } from "../../../domain/entities/Client.entity";
+import {
+  FetchSessionsInputDto,
+  FetchSessionsOutputtDto,
+} from "@src/application/dtos/Admin/FetchSessionsDto";
+import { Client } from "../../../domain/entities/Client";
 import {
   Session,
   SessionDocument,
 } from "../../../domain/entities/Session.entity";
-import { ISessionsRepo } from "../../../domain/I_repository/I_sessions.repo";
+import { ISessionsRepo } from "../../../domain/IRepository/I_sessions.repo";
 import { SessionDocumentModel, SessionModel } from "../model/sessions.model";
 export class SessionsRepository implements ISessionsRepo {
   async aggregate(payload: {
@@ -245,14 +249,14 @@ export class SessionsRepository implements ISessionsRepo {
     );
 
     return sessions
-      ? { ...sessions.toObject(), _id: sessions._id?.toString() }
+      ? { ...sessions.toObject(), id: sessions.id.toString() }
       : null;
   }
 
   async findById(payload: { session_id: string }): Promise<Session | null> {
     const sessions = await SessionModel.findById(payload.session_id);
     return sessions
-      ? { ...sessions.toObject(), _id: sessions._id?.toString() }
+      ? { ...sessions.toObject(), id: sessions.id.toString() }
       : null;
   }
 
@@ -265,7 +269,7 @@ export class SessionsRepository implements ISessionsRepo {
     if (!newSession) return null;
     return {
       ...newSession.toObject(),
-      _id: (newSession._id as any).toString(),
+      id: newSession.id.toString(),
       session_id: newSession.session_id?.toString(),
     };
   }
@@ -279,7 +283,7 @@ export class SessionsRepository implements ISessionsRepo {
     if (!document) return null;
     return {
       ...document.toObject(),
-      _id: document._id?.toString(),
+      id: document.id.toString(),
       session_id: document.session_id?.toString(),
     };
   }
@@ -304,37 +308,18 @@ export class SessionsRepository implements ISessionsRepo {
     await SessionDocumentModel.findOneAndDelete({ _id: id });
   }
 
-  async findSessionsAggregate(payload: {
-    search?: string;
-    limit: number;
-    page: number;
-    sortBy?: "date" | "amount" | "lawyer_name" | "client_name";
-    sortOrder?: "asc" | "desc";
-    status?:
-      | "upcoming"
-      | "ongoing"
-      | "completed"
-      | "cancelled"
-      | "missed"
-      | "all";
-    type?: "consultation" | "follow-up" | "all";
-  }): Promise<{
-    data: (Session & { clientData: Client; lawyerData: Client }[]) | [];
-    totalCount: number;
-    currentPage: number;
-    totalPage: number;
-  }> {
+  async findSessionsAggregate(
+    payload: FetchSessionsInputDto
+  ): Promise<FetchSessionsOutputtDto> {
     const { search, limit, page, sortBy, sortOrder, status, type } = payload;
     const skip = (page - 1) * limit;
     const order = sortOrder === "asc" ? 1 : -1;
+
     const matchStage: Record<string, any> = {};
-    if (status && status !== "all") {
-      matchStage["status"] = status;
-    }
-    if (type && type !== "all") {
-      matchStage["type"] = type;
-    }
-    const matchStage2: Record<string, any> = {
+    if (status && status !== "all") matchStage.status = status;
+    if (type && type !== "all") matchStage.type = type;
+
+    const matchStage2 = {
       $or: [
         { "clientData.name": { $regex: search, $options: "i" } },
         { "clientData.email": { $regex: search, $options: "i" } },
@@ -342,17 +327,32 @@ export class SessionsRepository implements ISessionsRepo {
         { "lawyerData.email": { $regex: search, $options: "i" } },
       ],
     };
-    const sortStage: Record<string, any> = {};
-    switch (sortBy) {
-      case "amount":
-        sortStage[sortBy] = order;
-      case "date":
-        sortStage[sortBy] = order;
-      case "client_name":
-        sortStage["clientData.name"] = order;
-      case "lawyer_name":
-        sortStage["lawyerData.name"] = order;
-    }
+
+    const sortStage: Record<string, any> = (() => {
+      switch (sortBy) {
+        case "amount":
+        case "date":
+          return { [sortBy]: order };
+        case "client_name":
+          return { "clientData.name": order };
+        case "lawyer_name":
+          return { "lawyerData.name": order };
+        default:
+          return { createdAt: -1 };
+      }
+    })();
+
+    const projectStage = {
+      $project: {
+        clientsUserData: 0,
+        clientsClientData: 0,
+        lawyersUserData: 0,
+        lawyersClientData: 0,
+        "clientData.password": 0,
+        "lawyerData.password": 0,
+      },
+    };
+
     const pipeline: any[] = [
       { $match: matchStage },
       {
@@ -364,10 +364,7 @@ export class SessionsRepository implements ISessionsRepo {
         },
       },
       {
-        $unwind: {
-          path: "$clientsUserData",
-          preserveNullAndEmptyArrays: true,
-        },
+        $unwind: { path: "$clientsUserData", preserveNullAndEmptyArrays: true },
       },
       {
         $lookup: {
@@ -377,7 +374,6 @@ export class SessionsRepository implements ISessionsRepo {
           as: "clientsClientData",
         },
       },
-
       {
         $unwind: {
           path: "$clientsClientData",
@@ -400,10 +396,7 @@ export class SessionsRepository implements ISessionsRepo {
         },
       },
       {
-        $unwind: {
-          path: "$lawyersUserData",
-          preserveNullAndEmptyArrays: true,
-        },
+        $unwind: { path: "$lawyersUserData", preserveNullAndEmptyArrays: true },
       },
       {
         $lookup: {
@@ -426,17 +419,9 @@ export class SessionsRepository implements ISessionsRepo {
           },
         },
       },
-      {
-        $project: {
-          clientsUserData: 0,
-          clientsClientData: 0,
-          lawyersUserData: 0,
-          lawyersClientData: 0,
-          "clientData.password": 0,
-          "lawyerData.password": 0,
-        },
-      },
+      projectStage,
     ];
+
     const [dataResult, countResult] = await Promise.all([
       SessionModel.aggregate([
         ...pipeline,
@@ -448,16 +433,15 @@ export class SessionsRepository implements ISessionsRepo {
       SessionModel.aggregate([
         ...pipeline,
         { $match: matchStage2 },
-        { $sort: sortStage },
         { $count: "total" },
       ]),
     ]);
+    
     const totalCount = countResult[0]?.total || 0;
     const totalPage = Math.ceil(totalCount / limit);
+
     return {
-      data: dataResult as
-        | (Session & { clientData: Client; lawyerData: Client }[])
-        | [],
+      data: dataResult,
       totalCount,
       currentPage: page,
       totalPage,

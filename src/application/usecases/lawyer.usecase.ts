@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { Appointment } from "../../domain/entities/Appointment.entity";
-import { lawyer } from "../../domain/entities/Lawyer.entity";
+import { Lawyer } from "../../domain/entities/Lawyer";
 import {
   Availability,
   OverrideDate,
@@ -8,21 +8,21 @@ import {
   ScheduleSettings,
 } from "../../domain/entities/Schedule.entity";
 import { Session, SessionDocument } from "../../domain/entities/Session.entity";
-import { IAppointmentsRepository } from "../../domain/I_repository/I_Appointments.repo";
-import { IClientRepository } from "../../domain/I_repository/I_client.repo";
-import { IDocumentsRepository } from "../../domain/I_repository/I_documents.repo";
-import { ILawyerRepository } from "../../domain/I_repository/I_lawyer.repo";
-import { IScheduleRepo } from "../../domain/I_repository/I_schedule.repo";
-import { ISessionsRepo } from "../../domain/I_repository/I_sessions.repo";
-import { IUserRepository } from "../../domain/I_repository/I_user.repo";
-import { IChatRepo } from "../../domain/I_repository/IChatRepo";
+import { IAppointmentsRepository } from "../../domain/IRepository/I_Appointments.repo";
+import { IClientRepository } from "../../domain/IRepository/I_client.repo";
+import { IDocumentsRepository } from "../../domain/IRepository/I_documents.repo";
+import { ILawyerRepository } from "../../domain/IRepository/ILawyer.repo";
+import { IScheduleRepo } from "../../domain/IRepository/I_schedule.repo";
+import { ISessionsRepo } from "../../domain/IRepository/I_sessions.repo";
+import { IUserRepository } from "../../domain/IRepository/IUserRepo";
+import { IChatRepo } from "../../domain/IRepository/IChatRepo";
 import { STATUS_CODES } from "../../infrastructure/constant/status.codes";
 import {
   NotFoundError,
   ValidationError,
 } from "../../interfaces/middelwares/Error/CustomError";
 import { Ilawyerusecase } from "./I_usecases/I_lawyer.usecase";
-import { ICallLogs } from "../../domain/I_repository/ICallLogs";
+import { ICallLogs } from "../../domain/IRepository/ICallLogs";
 import { createToken } from "../services/ZegoCloud.service";
 import "dotenv/config";
 import { CallLogs } from "../../domain/entities/CallLogs";
@@ -59,7 +59,7 @@ export class LawyerUsecase implements Ilawyerusecase {
     return `${hoursStr}:${minsStr}`;
   }
 
-  async verifyLawyer(payload: lawyer): Promise<lawyer> {
+  async verifyLawyer(payload: Lawyer): Promise<Lawyer> {
     const userDetails = await this.userRepo.findByuser_id(payload.user_id);
     if (!userDetails) {
       throw new Error("USER_NOT_FOUND");
@@ -86,7 +86,7 @@ export class LawyerUsecase implements Ilawyerusecase {
     }
     // console.log("document created", documents);
 
-    const lawyerData = await this.lawyerRepo.update(userDetails.user_id, {
+    const lawyerData = await this.lawyerRepo.update({
       user_id: userDetails.user_id,
       description: payload.description || "",
       barcouncil_number: payload.barcouncil_number,
@@ -98,11 +98,11 @@ export class LawyerUsecase implements Ilawyerusecase {
       experience: payload.experience,
       consultation_fee: payload.consultation_fee,
       documents: documents._id as any,
-    } as lawyer);
-    return lawyerData as lawyer;
+    });
+    return lawyerData as Lawyer;
   }
 
-  async fetchLawyerData(user_id: string): Promise<lawyer | null> {
+  async fetchLawyerData(user_id: string): Promise<Lawyer | null> {
     const userDetails = await this.userRepo.findByuser_id(user_id);
 
     if (!userDetails) {
@@ -119,10 +119,7 @@ export class LawyerUsecase implements Ilawyerusecase {
       throw new Error("USER_NOT_FOUND");
     }
 
-    return {
-      ...userDetails,
-      ...lawyerDetails,
-    };
+    return lawyerDetails as Lawyer;
   }
 
   async updateSlotSettings(
@@ -437,7 +434,7 @@ export class LawyerUsecase implements Ilawyerusecase {
       error.code = STATUS_CODES.BAD_REQUEST;
       throw error;
     }
-
+    const now = new Date();
     const newsession = await this.sessionsRepo.create({
       amount: appointment.amount,
       appointment_id: payload.id,
@@ -449,9 +446,12 @@ export class LawyerUsecase implements Ilawyerusecase {
       scheduled_time: appointment.time,
       status: "upcoming",
       type: appointment.type,
+      createdAt: now,
+      updatedAt: now,
+      id: "",
     });
 
-    if (!newsession || !newsession._id) {
+    if (!newsession || !newsession.id) {
       const error: any = new Error("failed to create session");
       error.code = STATUS_CODES.BAD_REQUEST;
       throw error;
@@ -466,7 +466,7 @@ export class LawyerUsecase implements Ilawyerusecase {
         client_id: newsession.client_id,
         lawyer_id: newsession.lawyer_id,
       },
-      session_id: newsession?._id,
+      session_id: newsession?.id,
     });
     return response;
   }

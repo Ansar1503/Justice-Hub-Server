@@ -10,10 +10,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.SMTP_PASS,
   },
 });
-console.log({
-  user: process.env.SMTP_USER,
-  pass: process.env.SMTP_PASS,
-});
+
 export const sendVerificationEmail = async (
   email: string,
   user_id: string,
@@ -38,10 +35,10 @@ export const sendVerificationEmail = async (
             }`,
   };
   try {
-  await transporter.sendMail(mailoptions);
+    await transporter.sendMail(mailoptions);
   } catch (error) {
-    console.log('mail send error',error)
-    throw new Error("MAIL_SEND_ERROR")
+    console.log("mail send error", error);
+    throw new Error("MAIL_SEND_ERROR");
   }
 };
 

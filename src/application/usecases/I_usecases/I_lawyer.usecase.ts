@@ -1,6 +1,7 @@
+import { Lawyer } from "@domain/entities/Lawyer";
 import { Appointment } from "../../../domain/entities/Appointment.entity";
 import { CallLogs } from "../../../domain/entities/CallLogs";
-import { lawyer } from "../../../domain/entities/Lawyer.entity";
+// import { lawyer } from "../../../domain/entities/Lawyer";
 import {
   Availability,
   OverrideDate,
@@ -13,8 +14,8 @@ import {
 } from "../../../domain/entities/Session.entity";
 
 export interface Ilawyerusecase {
-  verifyLawyer(payload: lawyer): Promise<lawyer>;
-  fetchLawyerData(user_id: string): Promise<lawyer | null>;
+  verifyLawyer(payload: Lawyer): Promise<Lawyer>;
+  fetchLawyerData(user_id: string): Promise<Lawyer | null>;
   timeStringToDate(baseDate: Date, hhmm: string): Date;
   timeStringToMinutes(time: string): number;
   timeStringToMinutes(time: string): number;
@@ -65,6 +66,22 @@ export interface Ilawyerusecase {
     id: string;
     status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
   }): Promise<Appointment | null>;
+
+  fetchSessions(payload: {
+    user_id: string;
+    search: string;
+    sort: "name" | "date" | "amount" | "created_at";
+    order: "asc" | "desc";
+    status?: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
+    consultation_type?: "consultation" | "follow-up";
+    page: number;
+    limit: number;
+  }): Promise<{
+    data: any;
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }>;
   cancelSession(payload: { session_id: string }): Promise<Session | null>;
   startSession(payload: {
     sessionId: string;
