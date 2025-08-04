@@ -1,10 +1,24 @@
 import { Appointment } from "../../../domain/entities/Appointment.entity";
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface IAppointmentModel extends Document, Appointment {}
+export interface IAppointmentModel extends Document {
+  lawyer_id: string;
+  client_id: string;
+  date: Date;
+  time: string;
+  duration: number;
+  reason: string;
+  amount: number;
+  type: "consultation" | "follow-up";
+  payment_status: "pending" | "success" | "failed";
+  status: "pending" | "confirmed" | "completed" | "cancelled" | "rejected";
+  createdAt: Date;
+  updatedAt: Date;
+}
 
-const appointmentSchema = new Schema(
+const appointmentSchema = new Schema<IAppointmentModel>(
   {
+    id: { type: String },
     lawyer_id: { type: String, required: true },
     client_id: { type: String, required: true },
     date: { type: Date, required: true },
