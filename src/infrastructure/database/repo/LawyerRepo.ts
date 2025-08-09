@@ -18,13 +18,15 @@ export class LawyerRepository implements ILawyerRepository {
     const lawyerData = await lawyerModel
       .findOne({ user_id })
       .populate("documents");
-    
+
     return lawyerData ? this.mapper.toDomain(lawyerData) : null;
   }
   async update(update: Partial<Lawyer>): Promise<Lawyer | null> {
+    const mapped = this.mapper.toPersistence(update as Lawyer);
+    console.log("mapped:", mapped);
     const updatedData = await lawyerModel.findOneAndUpdate(
       { user_id: update.user_id },
-      update,
+      mapped,
       {
         upsert: true,
         new: true,

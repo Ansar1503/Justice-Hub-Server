@@ -15,7 +15,7 @@ export class LawyerDocumentsRepository implements ILawyerDocumentsRepository {
   ) {}
   async create(documents: LawyerDocuments): Promise<LawyerDocuments> {
     const createdDocument = await LawyerDocumentsModel.findOneAndUpdate(
-      { user_id: documents.user_id },
+      { _id: documents.id, user_id: documents.user_id },
       {
         bar_council_certificate: documents.bar_council_certificate,
         enrollment_certificate: documents.enrollment_certificate,

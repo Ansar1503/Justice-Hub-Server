@@ -76,4 +76,24 @@ export class LawyerDocuments {
   get updatedAt(): Date {
     return this._updatedAt;
   }
+  update(props: Partial<LawyerDocumentsProps>) {
+    let change = false;
+    if (props.bar_council_certificate) {
+      this._bar_council_certificate = props.bar_council_certificate;
+      change = true;
+    }
+    if (props.certificate_of_practice) {
+      this._certificate_of_practice = props.certificate_of_practice;
+      change = true;
+    }
+    if (props.enrollment_certificate) {
+      this._enrollment_certificate = props.enrollment_certificate;
+      change = true;
+    }
+    if (change) {
+      const now = new Date();
+      this._updatedAt = now;
+      this._createdAt = now;
+    }
+  }
 }

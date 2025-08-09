@@ -211,4 +211,49 @@ export class Lawyer {
     this._consultation_fee = newFee;
     this.touch();
   }
+
+  update(payload: Partial<LawyerProps>): void {
+    let change = false;
+    if (payload.barcouncil_number) {
+      this._barcouncil_number = payload.barcouncil_number;
+      change = true;
+    }
+    if (payload.certificate_of_practice_number) {
+      this._certificate_of_practice_number =
+        payload.certificate_of_practice_number;
+      change = true;
+    }
+    if (payload.consultation_fee) {
+      this._consultation_fee = payload.consultation_fee;
+      change = true;
+    }
+    if (payload.description) {
+      this._description = payload.description;
+      change = true;
+    }
+    if (payload.documents) {
+      this._documents = payload.documents;
+      change = true;
+    }
+    if (payload.enrollment_certificate_number) {
+      this._enrollment_certificate_number =
+        payload.enrollment_certificate_number;
+      change = true;
+    }
+    if (payload.experience) {
+      this._experience = payload.experience;
+      change = true;
+    }
+    if (payload.practice_areas) {
+      this._practice_areas = payload.practice_areas;
+      change = true;
+    }
+    if (payload.specialisation) {
+      this._specialisation = payload.specialisation;
+      change = true;
+    }
+    if (change) {
+      this.touch();
+    }
+  }
 }

@@ -49,7 +49,7 @@ export class VerifyLawyerController implements IController {
       specialisation: [],
       consultation_fee: "",
     };
-
+    // console.log("req.files.", httpRequest.files);
     if (
       httpRequest.user &&
       typeof httpRequest.user === "object" &&
@@ -76,19 +76,19 @@ export class VerifyLawyerController implements IController {
       typeof httpRequest.files.certificate_of_practice === "object" &&
       "path" in httpRequest.files.certificate_of_practice[0]
     ) {
-      LawyersPayload.certificate_of_practice =
+      DocumentsPayload.certificate_of_practice =
         httpRequest.files.certificate_of_practice[0]?.path;
     }
     if (
       httpRequest.files &&
       typeof httpRequest.files === "object" &&
-      "bar_council_certificate" in httpRequest.files &&
-      Array.isArray(httpRequest.files.bar_council_certificate) &&
-      typeof httpRequest.files.bar_council_certificate[0] === "object" &&
-      "path" in httpRequest.files.bar_council_certificate[0]
+      "barcouncilid" in httpRequest.files &&
+      Array.isArray(httpRequest.files.barcouncilid) &&
+      typeof httpRequest.files.barcouncilid[0] === "object" &&
+      "path" in httpRequest.files.barcouncilid[0]
     ) {
-      LawyersPayload.bar_council_certificate =
-        httpRequest.files.bar_council_certificate[0].path;
+      DocumentsPayload.bar_council_certificate =
+        httpRequest.files.barcouncilid[0].path;
     }
     if (httpRequest.body && typeof httpRequest.body === "object") {
       if ("description" in httpRequest.body) {
@@ -137,7 +137,13 @@ export class VerifyLawyerController implements IController {
       certificate_of_practice: DocumentsPayload.certificate_of_practice,
       bar_council_certificate: DocumentsPayload.bar_council_certificate,
     };
-
+    if (
+      !documents.bar_council_certificate ||
+      !documents.certificate_of_practice ||
+      !documents.enrollment_certificate
+    ) {
+      return this.httpErrors.error_400("documents not found");
+    }
     const payload = {
       user_id: DocumentsPayload.user_id,
       description: LawyersPayload.description,
@@ -166,6 +172,7 @@ export class VerifyLawyerController implements IController {
       return this.httpSuccess.success_200(result);
     } catch (error) {
       if (error instanceof Error) {
+        console.log("error ", error);
         switch (error.message) {
           case "USER_NOT_FOUND":
             return this.httpErrors.error_404("user not found, try again later");

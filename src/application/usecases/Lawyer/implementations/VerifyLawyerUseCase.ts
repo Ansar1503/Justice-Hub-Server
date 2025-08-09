@@ -17,6 +17,7 @@ export class VerifyLawyerUseCase implements IVerifyLawyerUseCase {
     private lawyerDocumentRepo: ILawyerDocumentsRepository
   ) {}
   async execute(input: LawyerVerificationInputDto): Promise<LawyerOutputDto> {
+    // console.log("lawyer verification input :: ", input);
     const userDetails = await this.userRepo.findByuser_id(input.user_id);
     if (!userDetails) {
       throw new Error("USER_NOT_FOUND");
@@ -31,8 +32,14 @@ export class VerifyLawyerUseCase implements IVerifyLawyerUseCase {
     const lawyerVerficationData = await this.lawyerRepo.findUserId(
       userDetails.user_id
     );
-    if (lawyerVerficationData || document) {
-      throw new Error("VERIFICATION_EXISTS");
+    if (!lawyerVerficationData) throw new Error("lawyer not found");
+    if (lawyerVerficationData?.verification_status === "verified") {
+      throw new Error("lawyer already verified");
+    }
+    if (lawyerVerficationData.verification_status === "requested") {
+      throw new Error(
+        "lawyer verification is requested please wait till admin appromve"
+      );
     }
     const DocumentsPayload = LawyerDocuments.create({
       user_id: input.user_id,
@@ -40,10 +47,18 @@ export class VerifyLawyerUseCase implements IVerifyLawyerUseCase {
       certificate_of_practice: input.documents.certificate_of_practice,
       enrollment_certificate: input.documents.enrollment_certificate,
     });
-    const newDocument = await this.lawyerDocumentRepo.create(DocumentsPayload);
+    if (document) {
+      document.update({
+        bar_council_certificate: input.documents.bar_council_certificate,
+        certificate_of_practice: input.documents.certificate_of_practice,
+        enrollment_certificate: input.documents.enrollment_certificate,
+      });
+    }
+    const newDocument = await this.lawyerDocumentRepo.create(
+      document || DocumentsPayload
+    );
 
-    const LawyersPayload = Lawyer.create({
-      user_id: input.user_id,
+    lawyerVerficationData?.update({
       barcouncil_number: input.barcouncil_number,
       certificate_of_practice_number: input.certificate_of_practice_number,
       consultation_fee: input.consultation_fee,
@@ -52,10 +67,11 @@ export class VerifyLawyerUseCase implements IVerifyLawyerUseCase {
       enrollment_certificate_number: input.enrollment_certificate_number,
       experience: input.experience,
       practice_areas: input.practice_areas,
-      rejectReason: "",
       specialisation: input.specialisation,
     });
-    const lawyerData = await this.lawyerRepo.update(LawyersPayload);
+    lawyerVerficationData?.requestVerification();
+
+    const lawyerData = await this.lawyerRepo.update(lawyerVerficationData);
     if (!lawyerData) {
       throw new Error("lawyer Data not found");
     }

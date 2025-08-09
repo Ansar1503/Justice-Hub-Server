@@ -16,7 +16,10 @@ export class ChangeLawyerVerificationStatusController implements IController {
     private httpSuccess: IHttpSuccess = new HttpSuccess()
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    const { user_id, status } = httpRequest.body as Record<string, any>;
+    const { user_id, status, rejectReason } = httpRequest.body as Record<
+      string,
+      any
+    >;
     if (!user_id) {
       const error = this.httpError.error_400();
       return new HttpResponse(error.statusCode, "UserId not found");
@@ -34,6 +37,7 @@ export class ChangeLawyerVerificationStatusController implements IController {
     const result = await this.ChangeLawyerVerificationUseCase.execute({
       user_id,
       status,
+      rejectReason,
     });
     if (!result) {
       const error = this.httpError.error_400();

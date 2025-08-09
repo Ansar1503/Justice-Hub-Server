@@ -18,6 +18,7 @@ export class ChangeLawyerVerificationStatus
   async execute(
     input: ChangeLawyerVerificationInnOutDto
   ): Promise<ChangeLawyerVerificationInnOutDto> {
+    console.log("input for changeing", input);
     const userDetails = await this.UserRepo.findByuser_id(input.user_id);
     if (!userDetails) {
       throw new ValidationError("USER_NOT_FOUND");
@@ -38,8 +39,17 @@ export class ChangeLawyerVerificationStatus
     if (lawyerDetails?.verification_status === "verified") {
       throw new ValidationError("LAWYER_ALREADY_VERIFIED");
     }
-    lawyerDetails.verify();
-    const updatedData = await this.LawyerRepo.update(lawyerDetails);
+    if (input.status === "verified") {
+      lawyerDetails.verify();
+    } else if (input.status === "rejected") {
+      lawyerDetails.reject(input.rejectReason || "");
+    }
+
+    const updatedData = await this.LawyerRepo.update({
+      verification_status: input.status,
+      rejectReason: input.rejectReason,
+      user_id: input.user_id,
+    });
     if (!updatedData) throw new InternalError("Update Failed");
     return {
       status: updatedData.verification_status,
