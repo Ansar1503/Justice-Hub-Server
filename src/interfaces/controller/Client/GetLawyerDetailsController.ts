@@ -7,10 +7,11 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { I_clientUsecase } from "@src/application/usecases/I_usecases/I_clientusecase";
+import { IGetLawyerDetailUseCase } from "@src/application/usecases/Client/IGetLawyerDetailUseCase";
 
 export class GetLawyerDetailController implements IController {
   constructor(
-    private clientUseCase: I_clientUsecase,
+    private getLawyerDetails: IGetLawyerDetailUseCase,
     private httpErrors: IHttpErrors = new HttpErrors(),
     private httpSuccess: IHttpSuccess = new HttpSuccess()
   ) {}
@@ -24,7 +25,7 @@ export class GetLawyerDetailController implements IController {
       const { id } = httpRequest.params as { id: string };
 
       try {
-        const response = await this.clientUseCase.getLawyer(id);
+        const response = await this.getLawyerDetails.execute(id);
 
         return new HttpResponse(200, {
           success: true,

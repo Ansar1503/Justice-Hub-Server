@@ -6,11 +6,11 @@ import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
+import { IConfirmAppointmentUseCase } from "@src/application/usecases/Lawyer/IConfirmAppointmentUseCase";
 
 export class ConfirmClientAppointment implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private confirmAppointment: IConfirmAppointmentUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
@@ -44,7 +44,7 @@ export class ConfirmClientAppointment implements IController {
       return this.httpErrors.error_400("Invalid Credentials");
     }
     try {
-      const result = await this.lawyerUseCase.confirmClientAppointment({
+      const result = await this.confirmAppointment.execute({
         id,
         status,
       });

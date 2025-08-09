@@ -1,5 +1,5 @@
-import { LawyerRepository } from "@infrastructure/database/repo/lawyer.repo";
-import { UserRepository } from "@infrastructure/database/repo/user.repo";
+import { LawyerRepository } from "@infrastructure/database/repo/LawyerRepo";
+import { UserRepository } from "@infrastructure/database/repo/UserRepo";
 import { LawyerMapper } from "@infrastructure/Mapper/Implementations/LawyerMapper";
 import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
 import { ChangeLawyerVerificationStatusController } from "@interfaces/controller/Admin/ChangeLawyerVerification";

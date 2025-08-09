@@ -1,4 +1,4 @@
-import { IDisputes } from "@domain/IRepository/IDisputes";
+import { IDisputes } from "@domain/IRepository/IDisputesRepo";
 import { IFetchReviewDisputesUseCase } from "../IFetchReviewDisputesUseCase";
 import {
   FetchReviewDisputesInputDto,

@@ -6,11 +6,11 @@ import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
+import { IFetchSessionUseCase } from "@src/application/usecases/Lawyer/IFetchSessionsUseCase";
 
 export class FetchSessionsController implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private fetchSession: IFetchSessionUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
@@ -83,7 +83,7 @@ export class FetchSessionsController implements IController {
       }
     }
     try {
-      const result = await this.lawyerUseCase.fetchSessions({
+      const result = await this.fetchSession.execute({
         limit,
         order,
         page,

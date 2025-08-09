@@ -1,12 +1,15 @@
-import { ChatRepo } from "@infrastructure/database/repo/chat.repo";
-import { SessionsRepository } from "@infrastructure/database/repo/sessions.repo";
+import { ChatMessageRepository } from "@infrastructure/database/repo/ChatMessageRepo";
+import { ChatSessionRepository } from "@infrastructure/database/repo/ChatSessionRepo";
+import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
 import { GetChatsController } from "@interfaces/controller/Chats/GetChatscontroller";
 import { IController } from "@interfaces/controller/Interface/IController";
 import { ChatUseCase } from "@src/application/usecases/chat.usecase";
 
 export function GetChatsComposer(): IController {
-  const chatRepo = new ChatRepo();
-  const sessionRepo = new SessionsRepository();
-  const usecase = new ChatUseCase(chatRepo, sessionRepo);
+  const usecase = new ChatUseCase(
+    new ChatSessionRepository(),
+    new ChatMessageRepository(),
+    new SessionsRepository()
+  );
   return new GetChatsController(usecase);
 }

@@ -7,11 +7,11 @@ import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { AppError } from "@interfaces/middelwares/Error/CustomError";
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
+import { ICancelSessionUseCase } from "@src/application/usecases/Lawyer/ICancellSessionUseCase";
 
 export class CancelSessionController implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private cancelSession: ICancelSessionUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
@@ -25,7 +25,7 @@ export class CancelSessionController implements IController {
       id = String(httpRequest.body.id);
     }
     try {
-      const result = await this.lawyerUseCase.cancelSession({ session_id: id });
+      const result = await this.cancelSession.execute({ session_id: id });
       return this.httpSuccess.success_200(result);
     } catch (error) {
       if (error instanceof AppError) {

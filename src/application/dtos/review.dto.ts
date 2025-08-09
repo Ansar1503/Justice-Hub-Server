@@ -1,4 +1,4 @@
-import { Review } from "../../domain/entities/Review.entity";
+import { Review } from "../../domain/entities/Review";
 
 // export class ReviewResponseDto implements Review {
 //   client_id: string;

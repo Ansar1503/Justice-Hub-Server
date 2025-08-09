@@ -25,19 +25,20 @@ interface UserProfile {
 }
 
 export interface FetchAppointmentsInputDto {
+  client_id: string;
   search: string;
-  limit: number;
-  page: number;
-  sortBy: "date" | "amount" | "lawyer_name" | "client_name";
-  sortOrder: "asc" | "desc";
-  status:
-    | "pending"
+  appointmentStatus:
+    | "all"
     | "confirmed"
+    | "pending"
     | "completed"
     | "cancelled"
-    | "rejected"
-    | "all";
-  consultation_type: "consultation" | "follow-up" | "all";
+    | "rejected";
+  appointmentType: "all" | "consultation" | "follow-up";
+  sortField: "name" | "date" | "consultation_fee" | "created_at";
+  sortOrder: "asc" | "desc";
+  page: number;
+  limit: number;
 }
 
 export interface FetchAppointmentsOutputDto {

@@ -1,8 +1,13 @@
 import { IController } from "@interfaces/controller/Interface/IController";
-import { lawyerUseCaseComposer } from "../LawyerUseCaseComposer";
 import { AddOverrideSlotsController } from "@interfaces/controller/Lawyer/Slots/AddOverrideSlotsController";
+import { AddOverrideSlotsUseCase } from "@src/application/usecases/Lawyer/implementations/AddOverrideSlotsUseCase";
+import { ScheduleSettingsRepository } from "@infrastructure/database/repo/ScheduleSettingsRepo";
+import { OverrideSlotsRepository } from "@infrastructure/database/repo/OverrideSlotsRepo";
 
 export function AddOverrideSlotsComposer(): IController {
-  const usecase = lawyerUseCaseComposer();
+  const usecase = new AddOverrideSlotsUseCase(
+    new ScheduleSettingsRepository(),
+    new OverrideSlotsRepository()
+  );
   return new AddOverrideSlotsController(usecase);
 }

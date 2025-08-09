@@ -6,10 +6,11 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
+import { IVerifyEmailByOtp } from "@src/application/usecases/Auth/IVerifyEmailByOtp";
 
 export class VerifyEmailOtpController implements IController {
   constructor(
-    private userUseCase: any,
+    private verifyEmailByOtpUseCase: IVerifyEmailByOtp,
     private httpErrors: IHttpErrors = new HttpErrors(),
     private httpSuccess: IHttpSuccess = new HttpSuccess()
   ) {}
@@ -20,15 +21,15 @@ export class VerifyEmailOtpController implements IController {
       return new HttpResponse(err.statusCode, err.body);
     }
     try {
-      await this.userUseCase.verifyEmailByOtp(
-        String(email).toLowerCase(),
-        String(otp)
-      );
+      await this.verifyEmailByOtpUseCase.execute({ email, otp });
       const success = this.httpSuccess.success_200();
       return new HttpResponse(success.statusCode, success.body);
     } catch (error) {
-      const err = this.httpErrors.error_500();
-      return new HttpResponse(err.statusCode, err.body);
+      console.log("verify email otp controller", error);
+      if (error instanceof Error) {
+        return this.httpErrors.error_400(error.message);
+      }
+      return this.httpErrors.error_500();
     }
   }
 }

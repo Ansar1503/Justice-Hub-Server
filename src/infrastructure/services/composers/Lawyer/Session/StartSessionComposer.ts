@@ -1,8 +1,13 @@
 import { IController } from "@interfaces/controller/Interface/IController";
-import { lawyerUseCaseComposer } from "../LawyerUseCaseComposer";
 import { StartSessionController } from "@interfaces/controller/Lawyer/Sessions/StartSessionController";
+import { StartSessionUseCase } from "@src/application/usecases/Lawyer/implementations/StartSessionUseCase";
+import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
+import { CallLogsRepository } from "@infrastructure/database/repo/CallLogsRepo";
 
 export function StartSessionComposer(): IController {
-  const usecase = lawyerUseCaseComposer();
+  const usecase = new StartSessionUseCase(
+    new SessionsRepository(),
+    new CallLogsRepository()
+  );
   return new StartSessionController(usecase);
 }

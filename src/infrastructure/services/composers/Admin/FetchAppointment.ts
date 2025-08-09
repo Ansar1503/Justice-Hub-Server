@@ -1,4 +1,4 @@
-import { AppointmentsRepository } from "@infrastructure/database/repo/appointments.repo";
+import { AppointmentsRepository } from "@infrastructure/database/repo/AppointmentsRepo";
 import { FetchAppointments } from "@interfaces/controller/Admin/FetchAppointments";
 import { IController } from "@interfaces/controller/Interface/IController";
 import { FetchAppointmentsUseCase } from "@src/application/usecases/Admin/Implementations/FetchAppointmentsUseCase";

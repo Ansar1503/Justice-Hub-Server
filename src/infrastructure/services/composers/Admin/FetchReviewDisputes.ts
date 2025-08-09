@@ -1,4 +1,4 @@
-import { DisputesRepo } from "@infrastructure/database/repo/Disputes";
+import { DisputesRepo } from "@infrastructure/database/repo/DisputesRepo";
 import { FetchReviewDisputes } from "@interfaces/controller/Admin/FetchReviewDisputes";
 import { IController } from "@interfaces/controller/Interface/IController";
 import { FetchReviewDisputesUseCase } from "@src/application/usecases/Admin/Implementations/FetchReviewDisputesUseCase";

@@ -1,4 +1,4 @@
-import { Address } from "../../domain/entities/Address.entity";
+import { Address } from "../../domain/entities/Address";
 import { UserDto } from "./user.dto";
 
 export class ClientDto {
@@ -22,10 +22,10 @@ export class ClientUpdateDto extends UserDto {
   dob?: string;
   gender?: string;
   address?: string;
-  is_verified?: boolean;
-  is_blocked?: boolean;
+  is_verified: boolean;
+  is_blocked: boolean;
   password?: string;
-  
+
   constructor({
     name,
     email,

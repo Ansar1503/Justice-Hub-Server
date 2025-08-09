@@ -1,6 +1,6 @@
 import { BaseRepository } from "@infrastructure/database/repo/base/BaseRepo";
 import { User } from "../entities/User";
-import { IUserModel } from "@infrastructure/database/model/user.model";
+import { IUserModel } from "@infrastructure/database/model/UserModel";
 
 export interface IUserRepository {
   create(user: User): Promise<User>;

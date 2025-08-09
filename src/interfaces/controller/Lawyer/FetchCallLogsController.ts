@@ -1,4 +1,3 @@
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
 import { IController } from "../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
@@ -8,10 +7,11 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { AppError } from "@interfaces/middelwares/Error/CustomError";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
+import { IFetchCallLogsUseCase } from "@src/application/usecases/Lawyer/IFetchCallLogsUseCase";
 
 export class FetchCallLogsController implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private FetchCallLogs: IFetchCallLogsUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
@@ -42,7 +42,7 @@ export class FetchCallLogsController implements IController {
       return this.httpErrors.error_400("session id is required");
     }
     try {
-      const result = await this.lawyerUseCase.fetchCallLogs({
+      const result = await this.FetchCallLogs.execute({
         limit,
         page,
         sessionId: id,

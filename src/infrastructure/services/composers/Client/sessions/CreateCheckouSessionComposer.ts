@@ -1,0 +1,20 @@
+import { CreateCheckoutSessionController } from "@interfaces/controller/Client/Sessions/CreateCheckoutSessionController";
+import { CreateCheckoutSessionUseCase } from "@src/application/usecases/Client/implementations/CreateChekoutSessionUseCase";
+import { UserRepository } from "@infrastructure/database/repo/UserRepo";
+import { LawyerRepository } from "@infrastructure/database/repo/LawyerRepo";
+import { AppointmentsRepository } from "@infrastructure/database/repo/AppointmentsRepo";
+import { ScheduleSettingsRepository } from "@infrastructure/database/repo/ScheduleSettingsRepo";
+import { AvailableSlotRepository } from "@infrastructure/database/repo/AvailableSlotsRepo";
+import { OverrideSlotsRepository } from "@infrastructure/database/repo/OverrideSlotsRepo";
+
+export const CreateCheckoutSessionComposer = () => {
+  const useCase = new CreateCheckoutSessionUseCase(
+    new UserRepository(),
+    new LawyerRepository(),
+    new AppointmentsRepository(),
+    new ScheduleSettingsRepository(),
+    new AvailableSlotRepository(),
+    new OverrideSlotsRepository()
+  );
+  return new CreateCheckoutSessionController(useCase);
+};

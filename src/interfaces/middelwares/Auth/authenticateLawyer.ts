@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
-import { ILawyerRepository } from "../../../domain/IRepository/ILawyer.repo";
-import { LawyerRepository } from "../../../infrastructure/database/repo/lawyer.repo";
-import { UserRepository } from "../../../infrastructure/database/repo/user.repo";
+import { ILawyerRepository } from "../../../domain/IRepository/ILawyerRepo";
+import { LawyerRepository } from "../../../infrastructure/database/repo/LawyerRepo";
+import { UserRepository } from "../../../infrastructure/database/repo/UserRepo";
 import { IUserRepository } from "../../../domain/IRepository/IUserRepo";
 import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
 import { LawyerMapper } from "@infrastructure/Mapper/Implementations/LawyerMapper";

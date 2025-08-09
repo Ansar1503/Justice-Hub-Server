@@ -1,14 +1,24 @@
-import { ChatMessage, ChatSession } from "../../domain/entities/Chat.entity";
+import { IChatSessionRepo } from "@domain/IRepository/IChatSessionRepo";
+// import { ChatMessage, ChatSession } from "../../domain/entities/Chat.entity";
 import { Client } from "../../domain/entities/Client";
-import { Session } from "../../domain/entities/Session.entity";
-import { ISessionsRepo } from "../../domain/IRepository/I_sessions.repo";
-import { IChatRepo } from "../../domain/IRepository/IChatRepo";
+import { Session } from "../../domain/entities/Session";
+import { ISessionsRepo } from "../../domain/IRepository/ISessionsRepo";
+// import { IChatRepo } from "../../domain/IRepository/IChatRepo";
 import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
 import { IChatusecase } from "./I_usecases/IChatusecase";
+import { IChatMessagesRepo } from "@domain/IRepository/IChatMessagesRepo";
+import { ChatSession } from "@domain/entities/ChatSession";
+import { FetchChatSessionOutPutDto } from "../dtos/chats/fetchChatsDto";
+import { ChatMessage } from "@domain/entities/ChatMessage";
+import {
+  ChatMessageInputDto,
+  ChatMessageOutputDto,
+} from "../dtos/chats/ChatMessageDto";
 
 export class ChatUseCase implements IChatusecase {
   constructor(
-    private chatRepo: IChatRepo,
+    private chatSessionRepo: IChatSessionRepo,
+    private chatMessageRepo: IChatMessagesRepo,
     private sessionRepo: ISessionsRepo
   ) {}
   async fetchChats(payload: {
@@ -16,30 +26,62 @@ export class ChatUseCase implements IChatusecase {
     search: string;
     page: number;
     role: "lawyer" | "client";
-  }): Promise<any> {
-    const aggregateresult = await this.chatRepo.aggregate(payload);
+  }): Promise<{ data: any[]; nextCursor?: number }> {
+    const aggregateresult = await this.chatSessionRepo.aggregate(payload);
     // console.log("aggregation resltu;", aggregateresult);
     return aggregateresult;
   }
 
-  async getChatSessionById(sessionId: string): Promise<ChatSession | null> {
-    return await this.chatRepo.findById(sessionId);
+  async getChatSessionById(
+    sessionId: string
+  ): Promise<FetchChatSessionOutPutDto | null> {
+    const chatSession = await this.chatSessionRepo.findById(sessionId);
+    if (!chatSession) return null;
+    return {
+      createdAt: chatSession.createdAt,
+      id: chatSession.id,
+      last_message: chatSession.lastMessage,
+      name: chatSession.name,
+      participants: chatSession.participants,
+      session_id: chatSession.sessionId,
+      updatedAt: chatSession.updatedAt,
+    };
   }
-  async createChatMessage(message: ChatMessage): Promise<ChatMessage | null> {
+  async createChatMessage(
+    message: ChatMessageInputDto
+  ): Promise<ChatMessageOutputDto | null> {
     // console.log("newmessage", message);
-    const newChatMessage = await this.chatRepo.createMessage(message);
-    if (!newChatMessage) return null;
-    await this.chatRepo.update({
-      id: newChatMessage?.session_id || "",
-      last_message: newChatMessage?._id || "",
+    const messagepayload = ChatMessage.create({
+      receiverId: message.receiverId,
+      senderId: message.receiverId,
+      session_id: message.session_id,
+      attachments: message.attachments,
+      content: message.content,
     });
-    return newChatMessage;
+    const newChatMessage = await this.chatMessageRepo.create(messagepayload);
+    if (!newChatMessage) return null;
+
+    await this.chatSessionRepo.update({
+      id: newChatMessage?.sessionId || "",
+      last_message: newChatMessage?.id || "",
+    });
+    return {
+      createdAt: newChatMessage.createdAt,
+      id: newChatMessage.id,
+      read: newChatMessage.read,
+      receiverId: newChatMessage.receiverId,
+      senderId: newChatMessage.senderId,
+      session_id: newChatMessage.sessionId,
+      updatedAt: newChatMessage.updatedAt,
+      attachments: newChatMessage.attachments,
+      content: newChatMessage.content,
+    };
   }
   async fetchChatMessages(payload: {
     session_id: string;
     page: number;
   }): Promise<{ data: ChatMessage[]; nextCursor?: number }> {
-    return await this.chatRepo.findMessagesBySessionId(
+    return await this.chatMessageRepo.findMessagesBySessionId(
       payload.session_id,
       payload.page
     );
@@ -50,7 +92,7 @@ export class ChatUseCase implements IChatusecase {
     chatName: string;
   }): Promise<ChatSession | null> {
     const { chatId, chatName } = payload;
-    const updatedChat = await this.chatRepo.update({
+    const updatedChat = await this.chatSessionRepo.update({
       name: chatName,
       id: chatId,
     });
@@ -63,8 +105,8 @@ export class ChatUseCase implements IChatusecase {
   }): Promise<ChatMessage | null> {
     if (!payload.messageId) throw new ValidationError("MessageId not found");
     // console.log("payload:pa", payload);
-    await this.chatRepo.deleteMessage({ messageId: payload.messageId });
-    const messages = await this.chatRepo.findMessagesBySessionId(
+    await this.chatMessageRepo.delete({ messageId: payload.messageId });
+    const messages = await this.chatMessageRepo.findMessagesBySessionId(
       payload.sessionId,
       1
     );
@@ -72,9 +114,9 @@ export class ChatUseCase implements IChatusecase {
       messages.data.length > 0
         ? messages?.data[messages?.data?.length - 1]
         : null;
-    await this.chatRepo.update({
+    await this.chatSessionRepo.update({
       id: payload.sessionId,
-      last_message: lastMessage?._id || "",
+      last_message: lastMessage?.id || "",
     });
     return lastMessage;
   }
@@ -84,9 +126,9 @@ export class ChatUseCase implements IChatusecase {
     reason: string;
     reportedAt: Date;
   }): Promise<ChatMessage | null> {
-    const chatExists = await this.chatRepo.findMessageById(payload.messageId);
+    const chatExists = await this.chatMessageRepo.findById(payload.messageId);
     if (!chatExists) throw new Error("message doesnt exist");
-    return await this.chatRepo.updateMessage(payload);
+    return await this.chatMessageRepo.update(payload);
   }
   async getSessionDetails(sessionId: string): Promise<Session | null> {
     return await this.sessionRepo.findById({ session_id: sessionId });
@@ -111,6 +153,6 @@ export class ChatUseCase implements IChatusecase {
     currentPage: number;
     totalPage: number;
   }> {
-    return await this.chatRepo.fetchDisputesAggregation(payload);
+    return await this.chatMessageRepo.fetchDisputesAggregation(payload);
   }
 }

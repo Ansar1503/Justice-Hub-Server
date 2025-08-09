@@ -1,6 +1,6 @@
 import { User } from "@domain/entities/User";
 import { IMapper } from "../IMapper";
-import { IUserModel } from "@infrastructure/database/model/user.model";
+import { IUserModel } from "@infrastructure/database/model/UserModel";
 
 export class UserMapper implements IMapper<User, IUserModel> {
   toDomain(raw: IUserModel): User {
@@ -32,7 +32,7 @@ export class UserMapper implements IMapper<User, IUserModel> {
     };
   }
 
-  //   toDomainArray(raw: IUserModel[]): User[] {
-  //     return raw.map((r) => this.toDomain(r));
-  //   }
+    toDomainArray(raw: IUserModel[]): User[] {
+      return raw.map((r) => this.toDomain(r));
+    }
 }

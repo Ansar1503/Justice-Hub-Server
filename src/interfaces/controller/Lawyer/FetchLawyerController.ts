@@ -1,15 +1,15 @@
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IController } from "../Interface/IController";
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
+import { IFetchLawyerDataUseCase } from "@src/application/usecases/Lawyer/IFetchLawyerDataUseCase";
 
 export class FetchLawyerController implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private FetchLawyer: IFetchLawyerDataUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
@@ -26,7 +26,7 @@ export class FetchLawyerController implements IController {
       return this.httpErrors.error_400("User_id Not found");
     }
     try {
-      const lawyers = await this.lawyerUseCase.fetchLawyerData(user_id);
+      const lawyers = await this.FetchLawyer.execute(user_id);
       return this.httpSuccess.success_200(lawyers);
     } catch (error) {
       return this.httpErrors.error_500("lawyer fetch failed");

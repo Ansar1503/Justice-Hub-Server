@@ -5,11 +5,11 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
+import { IFetchSessionDocumentsUseCase } from "@src/application/usecases/Lawyer/IFetchSessionDocumentsUseCase";
 
 export class FetchSessionsDocumentsController implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private fetchSessionDocuments: IFetchSessionDocumentsUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
@@ -26,9 +26,7 @@ export class FetchSessionsDocumentsController implements IController {
       return this.httpErrors.error_400("session id is required");
     }
     try {
-      const result = await this.lawyerUseCase.findExistingSessionDocument(
-        session_id
-      );
+      const result = await this.fetchSessionDocuments.execute(session_id);
       return this.httpSuccess.success_200({
         success: true,
         message: "document fetched successfully",

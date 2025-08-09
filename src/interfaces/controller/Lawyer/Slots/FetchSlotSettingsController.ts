@@ -1,4 +1,3 @@
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
 import { IController } from "../../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
@@ -6,10 +5,11 @@ import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
+import { IFetchSlotSettingsUseCase } from "@src/application/usecases/Lawyer/IFetchSlotSettingsUseCase";
 
 export class FetchSlotSettingsController implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private slotSettings: IFetchSlotSettingsUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
@@ -26,7 +26,7 @@ export class FetchSlotSettingsController implements IController {
       return this.httpErrors.error_400("User_id Not found");
     }
     try {
-      const response = await this.lawyerUseCase.fetchSlotSettings(user_id);
+      const response = await this.slotSettings.execute(user_id);
       return this.httpSuccess.success_200({
         success: true,
         message: "data fetched",

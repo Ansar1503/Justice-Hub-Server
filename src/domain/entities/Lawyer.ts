@@ -60,14 +60,17 @@ export class Lawyer {
   }
 
   static create(
-    props: Omit<LawyerProps, "id" | "verification_status" | "user_id" | "createdAt" | "updatedAt">
+    props: Omit<
+      LawyerProps,
+      "id" | "verification_status" | "createdAt" | "updatedAt"
+    >
   ): Lawyer {
     const now = new Date();
     return new Lawyer({
       ...props,
-      verification_status:"pending",
+      verification_status: "pending",
       id: uuidv4(),
-      user_id: `user-${uuidv4()}`,
+      user_id: props.user_id,
       createdAt: now,
       updatedAt: now,
     });

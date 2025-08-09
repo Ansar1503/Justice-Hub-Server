@@ -1,4 +1,4 @@
-import { UserRepository } from "@infrastructure/database/repo/user.repo";
+import { UserRepository } from "@infrastructure/database/repo/UserRepo";
 import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
 import { FetchALLUsers } from "@interfaces/controller/Admin/FetchUsers";
 import { IController } from "@interfaces/controller/Interface/IController";

@@ -5,17 +5,17 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
+import { IRemoveOverrideSlotUseCase } from "@src/application/usecases/Lawyer/IRemoveOverrideSlotsUseCase";
 
 export class RemoveOverrideSlotsController implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private removeOverrideSlots: IRemoveOverrideSlotUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
     let user_id: string = "";
-    let id: string = "";
+    let date: string = "";
     if (
       httpRequest.user &&
       typeof httpRequest.user === "object" &&
@@ -29,17 +29,20 @@ export class RemoveOverrideSlotsController implements IController {
     if (!httpRequest.params) {
       return this.httpErrors.error_400("Invalid Params");
     }
-    if (typeof httpRequest.params === "object" && "id" in httpRequest.params) {
-      id = String(httpRequest.params.id);
+    if (typeof httpRequest.query === "object" && httpRequest.query !== null) {
+      if ("date" in httpRequest.query) {
+        date =
+          typeof httpRequest.query.date === "string"
+            ? httpRequest.query.date
+            : String(httpRequest.query.date);
+      }
     }
-    if (!id) {
-      return this.httpErrors.error_400("Invalid Credentials");
-    }
+
     try {
-      const response = await this.lawyerUseCase.removeOverrideSlots(
-        user_id,
-        id
-      );
+      const response = await this.removeOverrideSlots.execute({
+        lawyer_id: user_id,
+        date: date,
+      });
       return this.httpSuccess.success_200({
         success: true,
         message: "override slots removed",

@@ -11,7 +11,7 @@ export const zodOverrideSlotsSchema = z.array(
           end: z.string().regex(/^\d{2}:\d{2}$/),
         })
       )
-      .optional(),
+      .default([{ start: "9:00", end: "17:00" }]),
   })
 );
 

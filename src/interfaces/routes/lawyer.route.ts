@@ -17,12 +17,11 @@ import { RemoveOverriedSlotsComposer } from "@infrastructure/services/composers/
 import { FetchAppointmentsComposer } from "@infrastructure/services/composers/Admin/FetchAppointment";
 import { RejectClientAppointmentComposer } from "@infrastructure/services/composers/Lawyer/Appointment/RejectClientAppointmentComposer";
 import { ConfirmClientAppointmentComposer } from "@infrastructure/services/composers/Lawyer/Appointment/ConfirmClientAppointment";
-import { FetchSessionDocumentsComposer } from "@infrastructure/services/composers/Lawyer/Slots/FetchSessionDocumentsComposer";
+import { FetchSessionDocumentsComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchSessionDocumentsComposer";
 import { StartSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/StartSessionComposer";
 import { JoinVideoSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/JoinVideoSessionComposer";
 import { EndSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/EndSessionComposer";
 import { CancelSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/CancelSessionComposer";
-// import { FetchClientDataComposer } from "@infrastructure/services/composers/Client/FetchClientDataComposer";
 import { fetchSessionsComposer } from "@infrastructure/services/composers/Admin/FetchSessions";
 import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
 
@@ -117,7 +116,7 @@ router.post(
   }
 );
 router.delete(
-  "/schedule/override/:id",
+  "/schedule/override",
   authenticateUser,
   authenticateLawyer,
   async (req: Request, res: Response) => {

@@ -1,17 +1,23 @@
 import { Socket, Server as SocketIOServer } from "socket.io";
 import { socketStore } from "./SocketStore";
 import { ChatUseCase } from "../../application/usecases/chat.usecase";
-import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
 import { SocketEventEnum } from "../../infrastructure/constant/SocketEventEnum";
-import { ChatMessage } from "../../domain/entities/Chat.entity";
-import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
-import { NotificationRepo } from "../../infrastructure/database/repo/Notification";
 import { NotificationUsecase } from "../../application/usecases/Notification";
-import { Notification } from "../../domain/entities/Notification.entity";
+import { Notification } from "../../domain/entities/Notification";
+import { ChatMessageRepository } from "@infrastructure/database/repo/ChatMessageRepo";
+import { ChatSessionRepository } from "@infrastructure/database/repo/ChatSessionRepo";
+import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
+import { NotificationRepository } from "@infrastructure/database/repo/NotificationRepo";
+import { ChatMessage } from "@domain/entities/ChatMessage";
+import { ChatMessageOutputDto } from "@src/application/dtos/chats/ChatMessageDto";
 
-const chatUsecase = new ChatUseCase(new ChatRepo(), new SessionsRepository());
+const chatUsecase = new ChatUseCase(
+  new ChatSessionRepository(),
+  new ChatMessageRepository(),
+  new SessionsRepository()
+);
 const notificationUsecase = new NotificationUsecase(
-  new NotificationRepo(),
+  new NotificationRepository(),
   new SessionsRepository()
 );
 
@@ -33,12 +39,18 @@ export class SocketHandlers {
     newMessage: ChatMessage,
     cb: (payload: {
       success: boolean;
-      savedMessage?: ChatMessage;
+      savedMessage?: ChatMessageOutputDto;
       error?: string;
     }) => {}
   ) {
     try {
-      const chatSend = await chatUsecase.createChatMessage(newMessage);
+      const chatSend = await chatUsecase.createChatMessage({
+        receiverId: newMessage.receiverId,
+        senderId: newMessage.senderId,
+        session_id: newMessage.sessionId,
+        attachments: newMessage.attachments,
+        content: newMessage.content,
+      });
       cb({ success: true, savedMessage: chatSend || undefined });
       this.handleEmiter(
         chatSend?.receiverId || "",

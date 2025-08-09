@@ -6,10 +6,11 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
+import { IResendOtpUseCase } from "@src/application/usecases/Auth/IResendOtpUseCase";
 
 export class ResendOtpController implements IController {
   constructor(
-    private userUseCase: any,
+    private resendOtpUseCase: IResendOtpUseCase,
     private httpErrors: IHttpErrors = new HttpErrors(),
     private httpSuccess: IHttpSuccess = new HttpSuccess()
   ) {}
@@ -20,7 +21,7 @@ export class ResendOtpController implements IController {
       return new HttpResponse(err.statusCode, err.body);
     }
     try {
-      await this.userUseCase.ResendOtp(String(email).toLowerCase());
+      await this.resendOtpUseCase.execute(email?.toLowerCase());
       const success = this.httpSuccess.success_200();
       return new HttpResponse(success.statusCode, success.body);
     } catch (error) {

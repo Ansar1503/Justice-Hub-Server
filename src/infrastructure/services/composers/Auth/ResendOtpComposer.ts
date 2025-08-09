@@ -1,21 +1,22 @@
-import { ClientRepository } from "@infrastructure/database/repo/client.repo";
-import { LawyerRepository } from "@infrastructure/database/repo/lawyer.repo";
-import { OtpRepository } from "@infrastructure/database/repo/otp.repo";
-import { UserRepository } from "@infrastructure/database/repo/user.repo";
-import { LawyerMapper } from "@infrastructure/Mapper/Implementations/LawyerMapper";
-import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
+import { OtpRepository } from "@infrastructure/database/repo/OtpRepo";
+import { UserRepository } from "@infrastructure/database/repo/UserRepo";
+import { JwtProvider } from "@infrastructure/Providers/JwtProvider";
+import { NodeMailerProvider } from "@infrastructure/Providers/NodeMailerProvider";
 import { ResendOtpController } from "@interfaces/controller/Auth/ResendOtp";
 import { IController } from "@interfaces/controller/Interface/IController";
-import { UserUseCase } from "@src/application/usecases/user.usecase";
+import { ResendOtpUseCase } from "@src/application/usecases/Auth/implementation/ResendOtpUseCase";
 
 export function ResendOtpComposer(): IController {
-  const usermapper = new UserMapper();
-  const lawyermapper = new LawyerMapper();
-  const userrepo = new UserRepository(usermapper);
+  const userrepo = new UserRepository();
   const otprepo = new OtpRepository();
-  const clientrepo = new ClientRepository();
-  const lawyerRepo = new LawyerRepository(lawyermapper);
-  const usecase = new UserUseCase(userrepo, otprepo, clientrepo, lawyerRepo);
+  const emailProvider = new NodeMailerProvider();
+  const tokentProvider = new JwtProvider();
+  const usecase = new ResendOtpUseCase(
+    userrepo,
+    otprepo,
+    emailProvider,
+    tokentProvider
+  );
   const controller = new ResendOtpController(usecase);
   return controller;
 }

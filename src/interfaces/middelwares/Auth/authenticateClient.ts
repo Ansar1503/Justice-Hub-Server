@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
-import { UserRepository } from "../../../infrastructure/database/repo/user.repo";
+import { UserRepository } from "../../../infrastructure/database/repo/UserRepo";
 import { IUserRepository } from "../../../domain/IRepository/IUserRepo";
 import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
 

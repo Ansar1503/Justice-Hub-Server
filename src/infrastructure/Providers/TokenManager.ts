@@ -1,5 +1,4 @@
 import { AuthenticatedUser } from "@shared/types/authenticatedUser";
-import { ITokenManagerProvider } from "@src/application/providers/TokenManager";
 import jwt, { Secret } from "jsonwebtoken";
 import "dotenv/config";
 import {
@@ -7,6 +6,7 @@ import {
   InternalError,
   UnauthorizedError,
 } from "@interfaces/middelwares/Error/CustomError";
+import { ITokenManagerProvider } from "@src/application/providers/ITokenManagerProvider";
 
 export class TokenManagerProvider implements ITokenManagerProvider {
   private ACCESS_SECRET_KEY: Secret =

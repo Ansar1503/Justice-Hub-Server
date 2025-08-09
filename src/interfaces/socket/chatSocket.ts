@@ -3,7 +3,7 @@ import { SocketEventEnum } from "../../infrastructure/constant/SocketEventEnum";
 import { SocketHandlers } from "./handlers";
 import { ChatMessage, ChatSession } from "../../domain/entities/Chat.entity";
 import { socketStore } from "./SocketStore";
-import { Notification } from "../../domain/entities/Notification.entity";
+import { Notification } from "../../domain/entities/Notification";
 
 export async function setUpChatSocket(io: SocketIOServer) {
   io.on("connection", (socket: Socket) => {

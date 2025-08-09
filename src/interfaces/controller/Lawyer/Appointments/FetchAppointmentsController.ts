@@ -5,11 +5,11 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
+import { IFetchAppointmentDetailsLawyerUseCase } from "@src/application/usecases/Lawyer/IFetchAppointmentDetailsLawyerUseCase";
 
 export class FetchAppointmentsController implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private FetchAppointmentsLawyer: IFetchAppointmentDetailsLawyerUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
@@ -85,18 +85,16 @@ export class FetchAppointmentsController implements IController {
       }
     }
     try {
-      const result = await this.lawyerUseCase.fetchAppointmentDetailsforLawyers(
-        {
-          appointmentStatus,
-          appointmentType,
-          lawyer_id: user_id,
-          limit,
-          page,
-          search,
-          sortField,
-          sortOrder,
-        }
-      );
+      const result = await this.FetchAppointmentsLawyer.execute({
+        appointmentStatus,
+        appointmentType,
+        lawyer_id: user_id,
+        limit,
+        page,
+        search,
+        sortField,
+        sortOrder,
+      });
       return this.httpSuccess.success_200({
         success: true,
         message: "success",

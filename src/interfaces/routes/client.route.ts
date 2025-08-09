@@ -13,39 +13,39 @@ import { authenticateClient } from "../middelwares/Auth/authenticateClient";
 // import { ChatRepo } from "../../infrastructure/database/repo/chat.repo";
 // import { SessionsRepository } from "../../infrastructure/database/repo/sessions.repo";
 import { expressAdapter } from "@interfaces/adapters/express";
-import { FetchClientDataComposer } from "@infrastructure/services/composers/Client/FetchClientDataComposer";
-import { updateClientDataComposer } from "@infrastructure/services/composers/Client/UpdateBasicInfo";
-import { UpdateEmailComposer } from "@infrastructure/services/composers/Client/UpdateEmailComposer";
-import { SendVerificationMailComposer } from "@infrastructure/services/composers/Client/SendVerificationMailComposer";
-import { UpdatePasswordComposer } from "@infrastructure/services/composers/Client/UpdatePasswordComposer";
-import { UpdateAddressComposer } from "@infrastructure/services/composers/Client/UpdateAddressComposer";
-import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/FetchAppointmentsComposer";
-import { CancelAppointmentComposer } from "@infrastructure/services/composers/Auth/CancelAppointmentComposer";
+import { FetchClientDataComposer } from "@infrastructure/services/composers/Client/Profile/FetchClientDataComposer";
+import { updateClientDataComposer } from "@infrastructure/services/composers/Client/Profile/UpdateBasicInfo";
+import { UpdateEmailComposer } from "@infrastructure/services/composers/Client/Profile/UpdateEmailComposer";
+import { SendVerificationMailComposer } from "@infrastructure/services/composers/Client/Profile/SendVerificationMailComposer";
+import { UpdatePasswordComposer } from "@infrastructure/services/composers/Client/Profile/UpdatePasswordComposer";
+import { UpdateAddressComposer } from "@infrastructure/services/composers/Client/Profile/UpdateAddressComposer";
+import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 import { fetchSessionsComposer } from "@infrastructure/services/composers/Admin/FetchSessions";
-import { FetchSessionDocumentsComposer } from "@infrastructure/services/composers/Client/FetchSessionDocumentsComposer";
-import { UploadSessionDocumentsComposer } from "@infrastructure/services/composers/Client/UploadSessionDocumentsComposer";
-import { RemoveSessionDocumentComposer } from "@infrastructure/services/composers/Client/RemoveSessionDocumentComposer";
-import { GetLawyersComposer } from "@infrastructure/services/composers/Client/GetLawyerComposer";
-import { GetLawyerDetailComposer } from "@infrastructure/services/composers/Client/GetLawyerDetailsComposer";
-import { FetchReviewsComposer } from "@infrastructure/services/composers/Client/FetchReviewsComposers";
-import { FetchReviewsBySessionComposer } from "@infrastructure/services/composers/Client/FetchReviewBySessionComposer";
-import { UpdateReviewsComposer } from "@infrastructure/services/composers/Client/UpdateReviewComposer";
-import { DeleteReviewComposer } from "@infrastructure/services/composers/Client/DeleteReviewComposer";
-import { AddReviewComposer } from "@infrastructure/services/composers/Client/AddReviewComposer";
-import { ReportReviewComposer } from "@infrastructure/services/composers/Client/Report ReviewComposer";
-import { GetLawyerSlotSettingsComposer } from "@infrastructure/services/composers/Client/GetLawyerSlotSettingsComposer";
-import { GetLawyerSlotDetailsComposer } from "@infrastructure/services/composers/Client/GetLawyerSlotDetails";
-import { CreateCheckoutSessionComposer } from "@infrastructure/services/composers/Client/CreateCheckouSessionComposer";
+import { FetchSessionDocumentsComposer } from "@infrastructure/services/composers/Client/sessions/FetchSessionDocumentsComposer";
+import { UploadSessionDocumentsComposer } from "@infrastructure/services/composers/Client/sessions/UploadSessionDocumentsComposer";
+import { RemoveSessionDocumentComposer } from "@infrastructure/services/composers/Client/sessions/RemoveSessionDocumentComposer";
+import { GetLawyersComposer } from "@infrastructure/services/composers/Client/LawyerProfile/GetLawyerComposer";
+import { GetLawyerDetailComposer } from "@infrastructure/services/composers/Client/LawyerProfile/GetLawyerDetailsComposer";
+import { FetchReviewsComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsComposers";
+import { FetchReviewsBySessionComposer } from "@infrastructure/services/composers/Client/review/FetchReviewBySessionComposer";
+import { UpdateReviewsComposer } from "@infrastructure/services/composers/Client/review/UpdateReviewComposer";
+import { DeleteReviewComposer } from "@infrastructure/services/composers/Client/review/DeleteReviewComposer";
+import { AddReviewComposer } from "@infrastructure/services/composers/Client/review/AddReviewComposer";
+import { ReportReviewComposer } from "@infrastructure/services/composers/Client/review/Report ReviewComposer";
+import { GetLawyerSlotDetailsComposer } from "@infrastructure/services/composers/Client/LawyerProfile/GetLawyerSlotDetails";
+import { CreateCheckoutSessionComposer } from "@infrastructure/services/composers/Client/sessions/CreateCheckouSessionComposer";
 import { HandleWebhookComposer } from "@infrastructure/services/composers/Client/StripeWebHookComposer";
 import { FetchStripeSessionDetailsComposer } from "@infrastructure/services/composers/Client/FetchStripeSessionDetailsComposer";
-import { RemoveFailedSessionComposer } from "@infrastructure/services/composers/Client/RemoveFailedSessionComposer";
-import { CancelSessionComposer } from "@infrastructure/services/composers/Client/CancelSessionComposer";
-import { EndSessionComposer } from "@infrastructure/services/composers/Client/EndSessionComposer";
+import { RemoveFailedSessionComposer } from "@infrastructure/services/composers/Client/sessions/RemoveFailedSessionComposer";
 import { SendMessageFileComposer } from "@infrastructure/services/composers/Client/SendMessageFileComposer";
-import { JoinVideoSessionComposer } from "@infrastructure/services/composers/Client/JoinVideoSessionComposer";
-import { FetchCallLogsComposer } from "@infrastructure/services/composers/Client/FetchCallLogsComposer";
 import { GetChatsComposer } from "@infrastructure/services/composers/Chats/GetChatsComposer";
 import { GetMessagesComposer } from "@infrastructure/services/composers/Chats/GetMessagesComposer";
+import { FetchSlotSettingsComposer } from "@infrastructure/services/composers/Lawyer/Slots/FetchSlotSettingsComposer";
+import { CancelAppointmentComposer } from "@infrastructure/services/composers/Client/Appointment/CancelAppointmentsComposer";
+import { CancelSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/CancelSessionComposer";
+import { EndSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/EndSessionComposer";
+import { JoinVideoSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/JoinVideoSessionComposer";
+import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -338,7 +338,7 @@ router.get(
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, GetLawyerSlotSettingsComposer());
+    const adapter = await expressAdapter(req, FetchSlotSettingsComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }
@@ -424,7 +424,7 @@ router.get(
   authenticateUser,
   authenticateClient,
   async (req, res) => {
-    const controller = FetchCallLogsComposer();
+    const controller = FetchCallLogsSessionComposer();
     const response = await expressAdapter(req, controller);
     res.status(response.statusCode).json(response.body);
   }

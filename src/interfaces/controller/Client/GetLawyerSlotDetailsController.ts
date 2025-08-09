@@ -5,12 +5,12 @@ import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { I_clientUsecase } from "@src/application/usecases/I_usecases/I_clientusecase";
 import { ERRORS } from "@infrastructure/constant/errors";
+import { IFetchLawyerSlotsUseCase } from "@src/application/usecases/Client/IFetchLawyerSlotsUseCase";
 
 export class GetLawyerSlotDetailsController implements IController {
   constructor(
-    private readonly clientUsecase: I_clientUsecase,
+    private readonly fetchLawyerSlots: IFetchLawyerSlotsUseCase,
     private readonly httpErrors: IHttpErrors = new HttpErrors(),
     private readonly httpSuccess: IHttpSuccess = new HttpSuccess()
   ) {}
@@ -31,7 +31,7 @@ export class GetLawyerSlotDetailsController implements IController {
         new Date(date).getTime() - new Date(date).getTimezoneOffset() * 60000
       );
 
-      const result = await this.clientUsecase.fetchLawyerSlots({
+      const result = await this.fetchLawyerSlots.execute({
         lawyer_id,
         date: dateObj,
         client_id,

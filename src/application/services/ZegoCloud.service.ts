@@ -1,12 +1,12 @@
-import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
 import {
+  ZEGO_SERVER_SECRET,
   GenerateToken,
   generateToken04,
   KPrivilegeKey,
   KPrivilegeVal,
   ZEGO_APP_ID,
-  ZEGO_SERVER_SECRET,
-} from "../../ZegoCloud/config";
+} from "@shared/utils/ZegoCloud/config";
+import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
 
 export async function createToken({
   userId,

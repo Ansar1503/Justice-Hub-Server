@@ -7,11 +7,11 @@ import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { AppError } from "@interfaces/middelwares/Error/CustomError";
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
+import { IEndSessionUseCase } from "@src/application/usecases/Lawyer/IEndSessionUseCase";
 
 export class EndSessionController implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private endSession: IEndSessionUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
@@ -28,13 +28,13 @@ export class EndSessionController implements IController {
       return this.httpErrors.error_400("session id is required");
     }
     try {
-      const result = await this.lawyerUseCase.endSession({ sessionId });
+      const result = await this.endSession.execute({ sessionId });
       return this.httpSuccess.success_200(result);
     } catch (error) {
       if (error instanceof AppError) {
         return new HttpResponse(error.statusCode, error.message);
       }
-      return this.httpErrors.error_500()
+      return this.httpErrors.error_500();
     }
   }
 }

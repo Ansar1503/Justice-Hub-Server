@@ -13,19 +13,10 @@ export class UserDto {
 }
 
 export class RegisterUserDto extends UserDto {
-  user_id: string;
   password: string;
-  constructor({
-    name,
-    email,
-    mobile,
-    role,
-    password,
-    user_id
-  }: RegisterUserDto) {
+  constructor({ name, email, mobile, role, password }: RegisterUserDto) {
     super({ name, email, mobile, role });
     this.password = password;
-    this.user_id = user_id
   }
 }
 

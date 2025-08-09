@@ -3,8 +3,8 @@ import { Model } from "mongoose";
 
 export abstract class BaseRepository<TDomain, TPersistence> {
   constructor(
-    private readonly model: Model<TPersistence>,
-    private readonly mapper: IMapper<TDomain, TPersistence>
+    protected readonly model: Model<TPersistence>,
+    protected readonly mapper: IMapper<TDomain, TPersistence>
   ) {}
 
   async create(entity: TDomain): Promise<TDomain> {
@@ -20,10 +20,5 @@ export abstract class BaseRepository<TDomain, TPersistence> {
     });
     return result ? this.mapper.toDomain(result) : null;
   }
-  // abstract findAll(): Promise<TPersistence[]>;
-  abstract delete(id: string): Promise<void>;
-  // async update(id: string, data: Partial<TDomain>): Promise<TDomain | null> {
-  //   const persited = this.mapper.toPersistence(data as TDomain);
-  //   const updated = await this.model.findOneAndUpdate({ _id: id });
-  // }
+  abstract delete(payload: Partial<TDomain>): Promise<TDomain | null>;
 }

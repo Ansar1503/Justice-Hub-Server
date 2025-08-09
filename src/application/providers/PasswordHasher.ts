@@ -1,4 +1,4 @@
-export interface IPasswordHasher {
+export interface IPasswordManager {
   hashPassword(password: string): Promise<string>;
   comparePasswords(password: string, hashedPassword: string): Promise<boolean>;
 }

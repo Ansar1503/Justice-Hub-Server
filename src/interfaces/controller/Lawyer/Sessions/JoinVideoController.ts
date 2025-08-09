@@ -7,11 +7,11 @@ import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { AppError } from "@interfaces/middelwares/Error/CustomError";
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
+import { IJoinSessionUseCase } from "@src/application/usecases/Lawyer/IJoinSessionUseCase";
 
 export class JoinVideoSessionController implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private JoinSession: IJoinSessionUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
@@ -25,7 +25,7 @@ export class JoinVideoSessionController implements IController {
       sessionId = String(httpRequest.body.sessionId);
     }
     try {
-      const result = await this.lawyerUseCase.joinSession({ sessionId });
+      const result = await this.JoinSession.execute({ sessionId });
       return this.httpSuccess.success_200(result);
     } catch (error) {
       if (error instanceof AppError) {

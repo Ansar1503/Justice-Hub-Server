@@ -3,9 +3,12 @@ import { IController } from "../Interface/IController";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
+import { IFetchStripeSessionDetailsUseCase } from "@src/application/usecases/Client/IFetchStripeSessionDetailsUseCase";
 
 export class FetchStripeSessionDetailsController implements IController {
-  constructor(private clientUseCase: I_clientUsecase) {}
+  constructor(
+    private FetchStripeSessionDetails: IFetchStripeSessionDetailsUseCase
+  ) {}
 
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
     const session_id = (httpRequest.params as { id?: string })?.id;
@@ -18,9 +21,7 @@ export class FetchStripeSessionDetailsController implements IController {
     }
 
     try {
-      const response = await this.clientUseCase.fetchStripeSessionDetails(
-        session_id
-      );
+      const response = await this.FetchStripeSessionDetails.execute(session_id);
       return new HttpResponse(200, response);
     } catch (error: any) {
       switch (error.message) {

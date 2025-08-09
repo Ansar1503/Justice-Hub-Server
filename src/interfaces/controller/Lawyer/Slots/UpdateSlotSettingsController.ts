@@ -1,4 +1,3 @@
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
 import { IController } from "../../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
@@ -6,10 +5,11 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
+import { IUpdateSlotSettingsUseCase } from "@src/application/usecases/Lawyer/IUpdateSlotSettingsUseCase";
 
 export class UpdateLawyerSlotSettingsController implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private updateSlotSettings: IUpdateSlotSettingsUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
@@ -65,11 +65,11 @@ export class UpdateLawyerSlotSettingsController implements IController {
       return this.httpErrors.error_400("Provide required fields");
     }
     try {
-      const slotSettings = await this.lawyerUseCase.updateSlotSettings({
+      const slotSettings = await this.updateSlotSettings.execute({
+        autoConfirm: autoConfirm,
         lawyer_id: user_id,
-        autoConfirm,
-        maxDaysInAdvance,
-        slotDuration,
+        maxDaysInAdvance: maxDaysInAdvance,
+        slotDuration: slotDuration,
       });
       return this.httpSuccess.success_200(slotSettings);
     } catch (error) {

@@ -6,10 +6,11 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
+import { IUserReAuth } from "@src/application/usecases/Auth/IUserReAuthUseCase";
 
 export class RefreshToken implements IController {
   constructor(
-    private userUseCase: any,
+    private userReAuth: IUserReAuth,
     private httpErrors: IHttpErrors = new HttpErrors(),
     private httpSuccess: IHttpSuccess = new HttpSuccess()
   ) {}
@@ -20,7 +21,7 @@ export class RefreshToken implements IController {
       return new HttpResponse(err.statusCode, err.body);
     }
     try {
-      const accesstoken = this.userUseCase.userReAuth(token);
+      const accesstoken = await this.userReAuth.execute(token);
       if (!accesstoken) {
         const err = this.httpErrors.error_400();
         return new HttpResponse(err.statusCode, err.body);
@@ -28,6 +29,7 @@ export class RefreshToken implements IController {
       const success = this.httpSuccess.success_200(accesstoken);
       return new HttpResponse(success.statusCode, success.body);
     } catch (error) {
+      console.log("error in refresh", error);
       const err = this.httpErrors.error_500();
       return new HttpResponse(err.statusCode, err.body);
     }

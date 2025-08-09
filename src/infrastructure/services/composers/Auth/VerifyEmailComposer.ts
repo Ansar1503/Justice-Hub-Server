@@ -1,21 +1,15 @@
 import { VerifyEmailController } from "@interfaces/controller/Auth/VerifyEmailController";
-import { ClientRepository } from "@infrastructure/database/repo/client.repo";
-import { LawyerRepository } from "@infrastructure/database/repo/lawyer.repo";
-import { OtpRepository } from "@infrastructure/database/repo/otp.repo";
-import { UserRepository } from "@infrastructure/database/repo/user.repo";
-import { LawyerMapper } from "@infrastructure/Mapper/Implementations/LawyerMapper";
-import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
+import { OtpRepository } from "@infrastructure/database/repo/OtpRepo";
+import { UserRepository } from "@infrastructure/database/repo/UserRepo";
 import { IController } from "@interfaces/controller/Interface/IController";
-import { UserUseCase } from "@src/application/usecases/user.usecase";
+import { VerifyEmailUseCase } from "@src/application/usecases/Auth/implementation/VerifyEmailUseCase";
+import { JwtProvider } from "@infrastructure/Providers/JwtProvider";
 
 export function VerifyEmailComposer(): IController {
-  const usermapper = new UserMapper();
-  const lawyermapper = new LawyerMapper();
-  const userrepo = new UserRepository(usermapper);
+  const userrepo = new UserRepository();
   const otprepo = new OtpRepository();
-  const clientrepo = new ClientRepository();
-  const lawyerRepo = new LawyerRepository(lawyermapper);
-  const usecase = new UserUseCase(userrepo, otprepo, clientrepo, lawyerRepo);
+  const jwtManager = new JwtProvider();
+  const usecase = new VerifyEmailUseCase(userrepo, otprepo, jwtManager);
   const controller = new VerifyEmailController(usecase);
-  return controller
+  return controller;
 }

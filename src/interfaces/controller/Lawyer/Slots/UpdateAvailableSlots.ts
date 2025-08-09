@@ -1,4 +1,3 @@
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
 import { IController } from "../../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
@@ -7,15 +6,18 @@ import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { Availability } from "@src/application/dtos/AvailableSlotsDto";
+import { IUpdateAvailableSlotsUseCase } from "@src/application/usecases/Lawyer/IUpdateAvailableSlotsUseCase";
+import { UpdateAvailableSlotsBodyValidateSchema } from "@interfaces/middelwares/validator/zod/lawyer/UpdateAvailableSlotSchema";
 
 export class UpdateAvailableSlotsController implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private updateAvailableSlots: IUpdateAvailableSlotsUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
     let user_id: string = "";
+
     if (
       httpRequest.user &&
       typeof httpRequest.user === "object" &&
@@ -23,22 +25,21 @@ export class UpdateAvailableSlotsController implements IController {
     ) {
       user_id = String(httpRequest.user.id);
     }
+
     if (!user_id) {
       return this.httpErrors.error_400("User_id Not found");
     }
-    if (
-      typeof httpRequest.body === "object" &&
-      httpRequest.body !== null &&
-      Object.keys(httpRequest.body).length === 0
-    ) {
-      return this.httpErrors.error_400("Invalid Credentials");
-    }
 
     try {
-      const result = await this.lawyerUseCase.updateAvailableSlot(
-        httpRequest.body as Availability,
-        user_id
+      const parsed = UpdateAvailableSlotsBodyValidateSchema.safeParse(
+        httpRequest.body
       );
+      if (!parsed.success) {
+        const err = parsed.error.errors[0];
+        return this.httpErrors.error_400(err.message);
+      }
+      const payload = { ...parsed.data, lawyer_id: user_id };
+      const result = await this.updateAvailableSlots.execute(payload);
       return this.httpSuccess.success_200(result);
     } catch (error) {
       if (error instanceof Error) {

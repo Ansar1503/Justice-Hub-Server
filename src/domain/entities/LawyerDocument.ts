@@ -20,13 +20,13 @@ export class LawyerDocuments {
   private _updatedAt: Date;
 
   private constructor(private props: LawyerDocumentsProps) {
-    this._id = props.id
-    this._user_id =props.user_id
-    this._enrollment_certificate = props.enrollment_certificate
-    this._certificate_of_practice = props.certificate_of_practice
-    this._bar_council_certificate = props.bar_council_certificate
-    this._createdAt = props.createdAt
-    this._updatedAt = props.updatedAt
+    this._id = props.id;
+    this._user_id = props.user_id;
+    this._enrollment_certificate = props.enrollment_certificate;
+    this._certificate_of_practice = props.certificate_of_practice;
+    this._bar_council_certificate = props.bar_council_certificate;
+    this._createdAt = props.createdAt;
+    this._updatedAt = props.updatedAt;
   }
 
   static create(
@@ -49,35 +49,31 @@ export class LawyerDocuments {
     return { ...this.props };
   }
 
-  private touch(): void {
-    this.props.updatedAt = new Date();
-  }
-
   get id(): string {
-    return this.props.id;
+    return this._id;
   }
 
   get user_id(): string {
-    return this.props.user_id;
+    return this._user_id;
   }
 
   get enrollment_certificate(): string {
-    return this.props.enrollment_certificate;
+    return this._enrollment_certificate;
   }
 
   get certificate_of_practice(): string {
-    return this.props.certificate_of_practice;
+    return this._certificate_of_practice;
   }
 
   get bar_council_certificate(): string {
-    return this.props.bar_council_certificate;
+    return this._bar_council_certificate;
   }
 
   get createdAt(): Date {
-    return this.props.createdAt;
+    return this._createdAt;
   }
 
   get updatedAt(): Date {
-    return this.props.updatedAt;
+    return this._updatedAt;
   }
 }

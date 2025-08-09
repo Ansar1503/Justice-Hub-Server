@@ -1,4 +1,3 @@
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
 import { IController } from "../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
@@ -6,10 +5,11 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
+import { IVerifyLawyerUseCase } from "@src/application/usecases/Lawyer/IVerifyLawyerUseCase";
 
 export class VerifyLawyerController implements IController {
   constructor(
-    private lawyerUsecase: Ilawyerusecase,
+    private verifyLawyer: IVerifyLawyerUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
@@ -146,15 +146,23 @@ export class VerifyLawyerController implements IController {
         LawyersPayload.enrollment_certificate_number,
       certificate_of_practice_number:
         LawyersPayload.certificate_of_practice_number,
-      verification_status: "requested",
+      verification_status: "requested" as
+        | "verified"
+        | "rejected"
+        | "pending"
+        | "requested",
       practice_areas: LawyersPayload.practice_areas,
-      experience: LawyersPayload.experience,
+      experience: isNaN(Number(LawyersPayload.experience))
+        ? 0
+        : Number(LawyersPayload.experience),
       specialisation: LawyersPayload.specialisation,
-      consultation_fee: LawyersPayload.consultation_fee,
+      consultation_fee: isNaN(Number(LawyersPayload.consultation_fee))
+        ? 0
+        : Number(LawyersPayload.consultation_fee),
       documents,
     };
     try {
-      const result = await this.lawyerUsecase.verifyLawyer(payload);
+      const result = await this.verifyLawyer.execute(payload);
       return this.httpSuccess.success_200(result);
     } catch (error) {
       if (error instanceof Error) {

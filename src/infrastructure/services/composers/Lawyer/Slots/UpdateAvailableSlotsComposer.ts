@@ -1,8 +1,13 @@
 import { IController } from "@interfaces/controller/Interface/IController";
-import { lawyerUseCaseComposer } from "../LawyerUseCaseComposer";
 import { UpdateAvailableSlotsController } from "@interfaces/controller/Lawyer/Slots/UpdateAvailableSlots";
+import { UpdateAvailableSlotUseCase } from "@src/application/usecases/Lawyer/implementations/UpdateAvailableSlotUseCase";
+import { ScheduleSettingsRepository } from "@infrastructure/database/repo/ScheduleSettingsRepo";
+import { AvailableSlotRepository } from "@infrastructure/database/repo/AvailableSlotsRepo";
 
-export function UpdateAvailableSlotsComposer():IController{
-    const usecase = lawyerUseCaseComposer()
-    return new UpdateAvailableSlotsController(usecase)
+export function UpdateAvailableSlotsComposer(): IController {
+  const usecase = new UpdateAvailableSlotUseCase(
+    new ScheduleSettingsRepository(),
+    new AvailableSlotRepository()
+  );
+  return new UpdateAvailableSlotsController(usecase);
 }

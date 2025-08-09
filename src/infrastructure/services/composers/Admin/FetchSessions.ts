@@ -1,4 +1,4 @@
-import { SessionsRepository } from "@infrastructure/database/repo/sessions.repo";
+import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
 import { FetchSessions } from "@interfaces/controller/Admin/FetchSessions";
 import { IController } from "@interfaces/controller/Interface/IController";
 import { FetchSessionUseCase } from "@src/application/usecases/Admin/Implementations/FetchSessionUseCase";

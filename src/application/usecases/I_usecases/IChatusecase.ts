@@ -1,6 +1,6 @@
 import { ChatSession, ChatMessage } from "../../../domain/entities/Chat.entity";
 import { Client } from "../../../domain/entities/Client";
-import { Session } from "../../../domain/entities/Session.entity";
+import { Session } from "../../../domain/entities/Session";
 
 export interface IChatusecase {
   fetchChats(payload: {

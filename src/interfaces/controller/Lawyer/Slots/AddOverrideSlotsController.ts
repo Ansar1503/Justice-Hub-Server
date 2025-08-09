@@ -6,11 +6,11 @@ import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { zodOverrideSlotsSchema } from "@interfaces/middelwares/validator/zod/zod.validate";
-import { Ilawyerusecase } from "@src/application/usecases/I_usecases/I_lawyer.usecase";
+import { IAddOverrideSlotsUseCase } from "@src/application/usecases/Lawyer/IAddOverrideSlotsUseCase";
 
 export class AddOverrideSlotsController implements IController {
   constructor(
-    private lawyerUseCase: Ilawyerusecase,
+    private addOverrideUsecase: IAddOverrideSlotsUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
   ) {}
@@ -37,10 +37,10 @@ export class AddOverrideSlotsController implements IController {
       return this.httpErrors.error_400("invalid Credentials");
     }
     try {
-      const response = await this.lawyerUseCase.addOverrideSlots(
-        payload.data,
-        user_id
-      );
+      const response = await this.addOverrideUsecase.execute({
+        overrideDates: payload.data,
+        lawyer_id: user_id,
+      });
       const body = {
         success: true,
         message: "override slot added",

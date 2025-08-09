@@ -36,6 +36,7 @@ export class Client {
     return new Client({
       ...props,
       id: uuidv4(),
+      user_id: props.user_id,
       createdAt: now,
       updatedAt: now,
     });

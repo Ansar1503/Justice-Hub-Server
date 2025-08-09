@@ -7,10 +7,11 @@ import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
+import { IGetLawyersUseCase } from "@src/application/usecases/Client/IGetLawyerUseCase";
 
 export class GetLawyersController implements IController {
   constructor(
-    private clientUseCase: I_clientUsecase,
+    private getLawyerUsecase: IGetLawyersUseCase,
     private httpErrors: IHttpErrors = new HttpErrors(),
     private httpSuccess: IHttpSuccess = new HttpSuccess()
   ) {}
@@ -50,7 +51,7 @@ export class GetLawyersController implements IController {
       limit: Number(limit),
     };
     try {
-      const lawyers = await this.clientUseCase.getLawyers(filters);
+      const lawyers = await this.getLawyerUsecase.execute(filters);
       const success = this.httpSuccess.success_200({
         success: true,
         message: "lawyers fetch success",

@@ -1,7 +1,7 @@
-import { IPasswordHasher } from "@src/application/providers/PasswordHasher";
+import { IPasswordManager } from "@src/application/providers/PasswordHasher";
 import * as bcrypt from "bcryptjs";
 
-export class PasswordHasher implements IPasswordHasher {
+export class PasswordManager implements IPasswordManager {
   private readonly saltRounds: number;
 
   constructor(saltRounds: number = 10) {

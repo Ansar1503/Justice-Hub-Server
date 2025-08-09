@@ -3,7 +3,7 @@ import {
   FetchSessionsOutputtDto,
 } from "@src/application/dtos/Admin/FetchSessionsDto";
 import { IFetchSessionUseCase } from "../IFetchSessionUseCase";
-import { ISessionsRepo } from "@domain/IRepository/I_sessions.repo";
+import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 
 export class FetchSessionUseCase implements IFetchSessionUseCase {
   constructor(private sessionRepo: ISessionsRepo) {}
