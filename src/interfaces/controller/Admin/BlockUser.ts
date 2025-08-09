@@ -15,13 +15,19 @@ export class BlockUser implements IController {
     private httpSuccess: IHttpSuccess = new HttpSuccess()
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    const { user_id } = httpRequest.body as Record<string, string>;
+    const { user_id, status } = httpRequest.body as Record<string, string>;
     if (!user_id) {
       const error = this.httpErrors.error_400();
       return new HttpResponse(error.statusCode, "user Id not found");
     }
+    if (status === undefined || status === null || status === "") {
+      return this.httpErrors.error_400("status not found");
+    }
     try {
-      const result = await this.BlockUserUseCase.execute(user_id);
+      const result = await this.BlockUserUseCase.execute({
+        status: typeof status === "boolean" ? status : Boolean(status),
+        user_id,
+      });
       const body = {
         success: true,
         message: `user ${result?.status ? "blocked" : "unblocked"}`,
