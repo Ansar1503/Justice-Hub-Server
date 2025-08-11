@@ -49,6 +49,7 @@ export class RemoveOverrideSlotsController implements IController {
         data: response,
       });
     } catch (error) {
+      console.log("error while deleting override data", error);
       if (error instanceof Error) {
         return this.httpErrors.error_400(error.message);
       }

@@ -5,7 +5,7 @@ interface ChatParticipants {
   client_id: string;
 }
 
-export interface IChatSessionModel extends Document {
+export interface  IChatSessionModel extends Document {
   _id: string;
   name: string;
   participants: ChatParticipants;
@@ -14,7 +14,7 @@ export interface IChatSessionModel extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
-
+ 
 const chatSessionSchema = new Schema<IChatSessionModel>(
   {
     _id: { type: String },

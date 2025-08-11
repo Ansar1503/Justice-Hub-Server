@@ -6,7 +6,6 @@ import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
-import { I_clientUsecase } from "@src/application/usecases/I_usecases/I_clientusecase";
 import { IAddReviewUseCase } from "@src/application/usecases/Client/IAddReviewUseCase";
 
 export class AddReviewController implements IController {
@@ -57,6 +56,7 @@ export class AddReviewController implements IController {
       const success = this.httpSuccess.success_200({ message: "review added" });
       return new HttpResponse(success.statusCode, success.body);
     } catch (error: any) {
+      console.log("error in adding review", error);
       switch (error.message) {
         case "USER_EMPTY":
           return new HttpResponse(404, {

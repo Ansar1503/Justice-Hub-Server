@@ -41,6 +41,16 @@ export interface FetchAppointmentsInputDto {
   limit: number;
 }
 
+export interface FindAppointmentRepoInputDto {
+  search: string;
+  limit: number;
+  page: number;
+  sortBy: "amount" | "date" | "client_name" | "lawyer_name";
+  sortOrder: "asc" | "desc";
+  status: "all" | "pending" | "confirmed" | "cancelled";
+  consultation_type: "all" | "in_person" | "online";
+}
+
 export interface FetchAppointmentsOutputDto {
   data:
     | (Appointment & {

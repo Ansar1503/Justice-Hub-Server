@@ -13,20 +13,7 @@ export class ChatSessionRepository implements IChatSessionRepo {
     > = new ChatSessionMapper()
   ) {}
   async create(payload: ChatSession): Promise<ChatSession> {
-    const createPayload = {
-      participants: payload.participants,
-      name: payload.name,
-      session_id:
-        payload.sessionId && Types.ObjectId.isValid(payload.sessionId)
-          ? new Types.ObjectId(payload.sessionId)
-          : undefined,
-      last_message:
-        payload.lastMessage && Types.ObjectId.isValid(payload.lastMessage)
-          ? new Types.ObjectId(payload.lastMessage)
-          : undefined,
-    };
-
-    const chat = new ChatModel(createPayload);
+    const chat = new ChatModel(this.mapper.toPersistence(payload));
     await chat.save();
     return this.mapper.toDomain(chat);
   }

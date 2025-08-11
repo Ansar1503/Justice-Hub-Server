@@ -31,6 +31,7 @@ export interface ISessionModel extends Document {
 
 const sessionSchema = new Schema<ISessionModel>(
   {
+    _id: { type: String },
     appointment_id: {
       type: String,
       required: true,

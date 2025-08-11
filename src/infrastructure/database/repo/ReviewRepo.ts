@@ -11,7 +11,9 @@ export class ReviewRepo implements IReviewRepo {
   ) {}
 
   async create(payload: Review): Promise<Review> {
-    const review = await new ReviewModel(payload).save();
+    const review = await new ReviewModel(
+      this.mappper.toPersistence(payload)
+    ).save();
     return this.mappper.toDomain(review);
   }
   async update(payload: {

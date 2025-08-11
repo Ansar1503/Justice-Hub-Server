@@ -43,6 +43,7 @@ const dayScheduleSchema = new Schema<DayAvailability>(
 
 const AvailabilitySchema = new Schema<IAvailabilityModel>(
   {
+    _id: { type: String },
     lawyer_id: { type: String, required: true, unique: true },
     monday: { type: dayScheduleSchema, required: true },
     tuesday: { type: dayScheduleSchema, required: true },

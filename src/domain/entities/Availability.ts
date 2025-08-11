@@ -69,7 +69,7 @@ export class Availability {
     const now = new Date();
 
     const defaultAvailability: AvailabilityProps = {
-      id: `ovd-${uuid()}`,
+      id: `avb-${uuid()}`,
       lawyer_id: defaultSlots?.lawyer_id || "",
       monday: defaultSlots?.monday || setDefaultDay("monday"),
       tuesday: defaultSlots?.tuesday || setDefaultDay("tuesday"),

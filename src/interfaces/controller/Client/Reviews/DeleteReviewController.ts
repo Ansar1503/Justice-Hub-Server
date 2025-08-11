@@ -6,7 +6,6 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
-import { I_clientUsecase } from "@src/application/usecases/I_usecases/I_clientusecase";
 import { IDeleteReviewUseCase } from "@src/application/usecases/Client/IDeleteReviewUseCase";
 
 export class DeleteReviewController implements IController {

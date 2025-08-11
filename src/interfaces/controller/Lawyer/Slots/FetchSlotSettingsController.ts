@@ -16,11 +16,11 @@ export class FetchSlotSettingsController implements IController {
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
     let user_id: string = "";
     if (
-      httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user
+      httpRequest.params &&
+      typeof httpRequest.params === "object" &&
+      "id" in httpRequest.params
     ) {
-      user_id = String(httpRequest.user.id);
+      user_id = String(httpRequest.params.id);
     }
     if (!user_id) {
       return this.httpErrors.error_400("User_id Not found");

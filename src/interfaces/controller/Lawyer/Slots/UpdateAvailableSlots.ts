@@ -5,7 +5,6 @@ import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
-import { Availability } from "@src/application/dtos/AvailableSlotsDto";
 import { IUpdateAvailableSlotsUseCase } from "@src/application/usecases/Lawyer/IUpdateAvailableSlotsUseCase";
 import { UpdateAvailableSlotsBodyValidateSchema } from "@interfaces/middelwares/validator/zod/lawyer/UpdateAvailableSlotSchema";
 
@@ -43,6 +42,7 @@ export class UpdateAvailableSlotsController implements IController {
       return this.httpSuccess.success_200(result);
     } catch (error) {
       if (error instanceof Error) {
+        console.log("error in updating avaliable slots:", error);
         return this.httpErrors.error_500(error.message);
       }
       return this.httpErrors.error_500();

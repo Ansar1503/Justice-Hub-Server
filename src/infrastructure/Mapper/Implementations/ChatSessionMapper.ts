@@ -1,7 +1,6 @@
 import { ChatSession } from "@domain/entities/ChatSession";
 import { IMapper } from "../IMapper";
 import { IChatSessionModel } from "@infrastructure/database/model/ChatSessionModel";
-import { Types } from "mongoose";
 
 export class ChatSessionMapper
   implements IMapper<ChatSession, IChatSessionModel>
@@ -23,8 +22,8 @@ export class ChatSessionMapper
   toPersistence(entity: ChatSession): Partial<IChatSessionModel> {
     return {
       _id: entity.id,
-      session_id: new Types.ObjectId(entity.sessionId),
-      last_message: new Types.ObjectId(entity.lastMessage),
+      session_id: entity.sessionId,
+      last_message: entity.lastMessage,
       name: entity.name,
       participants: entity.participants,
       createdAt: entity.createdAt,

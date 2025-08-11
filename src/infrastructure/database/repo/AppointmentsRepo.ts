@@ -6,8 +6,8 @@ import {
   IAppointmentModel,
 } from "../model/AppointmentsModel";
 import {
-  FetchAppointmentsInputDto,
   FetchAppointmentsOutputDto,
+  FindAppointmentRepoInputDto,
 } from "@src/application/dtos/Admin/FetchAppointmentsDto";
 import { BaseRepository } from "./base/BaseRepo";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
@@ -45,12 +45,15 @@ export class AppointmentsRepository
         throw error;
       }
 
-      const newAppointment = new AppointmentModel(payload);
+      const newAppointment = new AppointmentModel(
+        this.mapper.toPersistence(payload)
+      );
       await newAppointment.save({ session });
 
       await session.commitTransaction();
       return this.mapper.toDomain(newAppointment);
     } catch (error) {
+      console.log("error in transaction ", error);
       await session.abortTransaction();
     } finally {
       session.endSession();
@@ -365,7 +368,7 @@ export class AppointmentsRepository
     return await AppointmentModel.findOne({ _id: id });
   }
   async findAllAggregate(
-    payload: FetchAppointmentsInputDto
+    payload: FindAppointmentRepoInputDto
   ): Promise<FetchAppointmentsOutputDto> {
     const {
       search,

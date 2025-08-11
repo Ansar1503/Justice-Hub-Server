@@ -14,15 +14,19 @@ export class OverrideSlotsRepository implements IOverrideRepo {
     > = new OverrideSlotsMapper()
   ) {}
   async addOverrideSlots(payload: Override): Promise<Override | null> {
+    const mapped = this.mapper.toPersistence(payload);
+    // console.log("mapped", mapped);
     const data = await OverrideSlotModel.findOneAndUpdate(
       { lawyer_id: payload.lawyerId },
-      { $push: { overrideDates: payload } },
+      { $push: { overrideDates: { $each: mapped.overrideDates } } },
       { upsert: true, new: true }
     );
     return this.mapper.toDomain(data);
   }
   async fetchOverrideSlots(lawyer_id: string): Promise<Override | null> {
+    // console.log("lalywer", lawyer_id);
     const data = await OverrideSlotModel.findOne({ lawyer_id });
+    // console.log("data", data);
     return data ? this.mapper.toDomain(data) : null;
   }
   async removeOverrideSlots(

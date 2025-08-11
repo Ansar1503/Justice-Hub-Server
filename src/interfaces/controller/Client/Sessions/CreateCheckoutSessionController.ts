@@ -12,7 +12,6 @@ import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { I_clientUsecase } from "@src/application/usecases/I_usecases/I_clientusecase";
 import { ERRORS } from "@infrastructure/constant/errors";
 import { ICreateCheckoutSessionUseCase } from "@src/application/usecases/Client/ICreateCheckoutSessionUseCase";
 
@@ -43,6 +42,14 @@ export class CreateCheckoutSessionController implements IController {
         !duration ||
         !reason
       ) {
+        console.log("invalid creds", {
+          lawyer_id,
+          date,
+          timeSlot,
+          user_id,
+          duration,
+          reason,
+        });
         return this.httpErrors.error_400("Invalid Credentials");
       }
 
@@ -60,7 +67,7 @@ export class CreateCheckoutSessionController implements IController {
       });
 
       return this.httpSuccess.success_200(response);
-    } catch (error: any) {
+    } catch (error: any) {  
       switch (error.message) {
         case ERRORS.USER_NOT_FOUND:
           return this.httpErrors.error_404("User not found");

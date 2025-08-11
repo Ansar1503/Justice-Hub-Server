@@ -49,7 +49,7 @@ export class AddOverrideSlotsController implements IController {
       return this.httpSuccess.success_200(body);
     } catch (error) {
       if (error instanceof Error) {
-        return this.httpErrors.error_500(error.message);
+        return this.httpErrors.error_400(error.message);
       }
       return this.httpErrors.error_500();
     }

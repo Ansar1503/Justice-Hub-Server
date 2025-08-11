@@ -1,6 +1,6 @@
 import {
-  FetchAppointmentsInputDto,
   FetchAppointmentsOutputDto,
+  FindAppointmentRepoInputDto,
 } from "@src/application/dtos/Admin/FetchAppointmentsDto";
 import { Appointment } from "../entities/Appointment";
 import { Client } from "../entities/Client";
@@ -65,7 +65,7 @@ export interface IAppointmentsRepository {
   }): Promise<Appointment | null>;
   findById(id: string): Promise<Appointment | null>;
   findAllAggregate(
-    payload: FetchAppointmentsInputDto
+    payload: FindAppointmentRepoInputDto
   ): Promise<FetchAppointmentsOutputDto>;
   findByClientID(client: string): Promise<Appointment[] | []>;
 }

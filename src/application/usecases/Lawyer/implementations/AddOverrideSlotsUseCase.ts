@@ -86,7 +86,7 @@ export class AddOverrideSlotsUseCase implements IAddOverrideSlotsUseCase {
         }
       }
     }
-    
+
     const overridePayload = Override.create(input);
     const updatedOverrideSlots = await this.overrideSlotRepo.addOverrideSlots(
       overridePayload

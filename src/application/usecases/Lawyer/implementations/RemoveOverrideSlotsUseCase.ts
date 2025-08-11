@@ -16,6 +16,7 @@ export class RemoveOverrideSlots implements IRemoveOverrideSlotUseCase {
     const existingOverrideSlots = await this.overrideRepo.fetchOverrideSlots(
       input.lawyer_id
     );
+    // console.log("override slots", existingOverrideSlots);
     if (!existingOverrideSlots) {
       const error: any = new Error("Override slots not found");
       error.code = STATUS_CODES.NOT_FOUND;
@@ -27,15 +28,15 @@ export class RemoveOverrideSlots implements IRemoveOverrideSlotUseCase {
       throw error;
     }
 
-    if (
-      existingOverrideSlots.overrideDates.find(
-        (override) => override.date === overrideDate
-      ) === undefined
-    ) {
-      const error: any = new Error("Override slot not found");
-      error.code = STATUS_CODES.NOT_FOUND;
-      throw error;
-    }
+    // if (
+    //   existingOverrideSlots.overrideDates.find(
+    //     (override) => override.date === overrideDate
+    //   ) === undefined
+    // ) {
+    //   const error: any = new Error("Override slot not found");
+    //   error.code = STATUS_CODES.NOT_FOUND;
+    //   throw error;
+    // }
 
     const updatedOverrideSlots = await this.overrideRepo.removeOverrideSlots(
       input.lawyer_id,

@@ -50,7 +50,6 @@ export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
       error.code = STATUS_CODES.BAD_REQUEST;
       throw error;
     }
-    const now = new Date();
     const sessionPayload = Session.create({
       amount: appointment.amount,
       appointment_id: input.id,
@@ -70,7 +69,6 @@ export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
       error.code = STATUS_CODES.BAD_REQUEST;
       throw error;
     }
-    const client = await this.userRepo.findByuser_id(newsession.client_id);
     const lawyer = await this.userRepo.findByuser_id(newsession.lawyer_id);
     const response = await this.appointmentRepo.updateWithId(input);
     if (!response) throw new Error("session creation failed");

@@ -54,6 +54,7 @@ export class ConfirmClientAppointment implements IController {
         data: result,
       });
     } catch (error) {
+      console.log("error:", error);
       if (
         error &&
         typeof error === "object" &&

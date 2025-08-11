@@ -113,7 +113,7 @@ export class Session {
     return new Session({
       id: uuidv4(),
       ...props,
-      createdAt: now,
+      createdAt: now, 
       updatedAt: now,
     });
   }

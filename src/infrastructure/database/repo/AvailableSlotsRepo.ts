@@ -21,11 +21,12 @@ export class AvailableSlotRepository implements IAvailableSlots {
     payload: Availability
   ): Promise<Availability | null> {
     const newpayload = this.mapper.toPersistence(payload);
+    const { _id, ...updateData } = newpayload;
     const data = await AvailabilityModel.findOneAndUpdate(
       {
         lawyer_id: payload.lawyer_id,
       },
-      { $set: newpayload },
+      { $set: updateData },
       { upsert: true, new: true }
     );
     return data ? this.mapper.toDomain(data) : null;
