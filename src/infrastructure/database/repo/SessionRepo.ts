@@ -171,7 +171,9 @@ export class SessionsRepository implements ISessionsRepo {
   }
 
   async create(payload: Session): Promise<Session> {
-    const newSessions = new SessionModel(this.mapper.toPersistence(payload));
+    const newpayload = this.mapper.toPersistence(payload);
+    console.log("newpayload :", newpayload);
+    const newSessions = new SessionModel(newpayload);
     const savedSession = await newSessions.save();
     return this.mapper.toDomain(savedSession);
   }

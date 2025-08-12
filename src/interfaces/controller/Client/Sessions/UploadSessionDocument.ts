@@ -1,4 +1,3 @@
-import { I_clientUsecase } from "@src/application/usecases/I_usecases/I_clientusecase";
 import { IController } from "../../Interface/IController";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
@@ -52,13 +51,15 @@ export class UploadSessionDocumentsController implements IController {
       });
     });
     try {
+      console.log({ sessionId, documents });
       const result = await this.uploadSessionDocument.execute({
         sessionId,
         document: documents,
       });
-      const success = this.httpSuccess.success_200();
+      const success = this.httpSuccess.success_200(result);
       return new HttpResponse(success.statusCode, success.body);
     } catch (error) {
+      console.log("error in upload session documents : ", error);
       const err = this.httpErrors.error_500();
       return new HttpResponse(err.statusCode, err.body);
     }
