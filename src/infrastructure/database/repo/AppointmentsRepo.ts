@@ -6,8 +6,8 @@ import {
   IAppointmentModel,
 } from "../model/AppointmentsModel";
 import {
+  FetchAppointmentsInputDto,
   FetchAppointmentsOutputDto,
-  FindAppointmentRepoInputDto,
 } from "@src/application/dtos/Admin/FetchAppointmentsDto";
 import { BaseRepository } from "./base/BaseRepo";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
@@ -368,7 +368,7 @@ export class AppointmentsRepository
     return await AppointmentModel.findOne({ _id: id });
   }
   async findAllAggregate(
-    payload: FindAppointmentRepoInputDto
+    payload: FetchAppointmentsInputDto
   ): Promise<FetchAppointmentsOutputDto> {
     const {
       search,

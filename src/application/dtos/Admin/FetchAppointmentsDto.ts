@@ -25,30 +25,19 @@ interface UserProfile {
 }
 
 export interface FetchAppointmentsInputDto {
-  client_id: string;
   search: string;
-  appointmentStatus:
+  status:
     | "all"
-    | "confirmed"
     | "pending"
-    | "completed"
+    | "confirmed"
     | "cancelled"
+    | "completed"
     | "rejected";
-  appointmentType: "all" | "consultation" | "follow-up";
-  sortField: "name" | "date" | "consultation_fee" | "created_at";
-  sortOrder: "asc" | "desc";
-  page: number;
-  limit: number;
-}
-
-export interface FindAppointmentRepoInputDto {
-  search: string;
-  limit: number;
-  page: number;
+  consultation_type: "all" | "consultation" | "follow-up";
   sortBy: "amount" | "date" | "client_name" | "lawyer_name";
   sortOrder: "asc" | "desc";
-  status: "all" | "pending" | "confirmed" | "cancelled";
-  consultation_type: "all" | "in_person" | "online";
+  page: number;
+  limit: number;
 }
 
 export interface FetchAppointmentsOutputDto {
