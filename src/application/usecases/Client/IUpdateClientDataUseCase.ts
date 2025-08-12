@@ -1,5 +1,5 @@
 import { UpdateBasicInfoInputDto } from "@src/application/dtos/client/UpdateBasicInfoDto";
-import { IUseCase } from "../I_usecases/IUseCase";
+import { IUseCase } from "../IUseCases/IUseCase";
 import { ClientUpdateDto } from "@src/application/dtos/client.dto";
 
 export interface IUpdateClientDataUseCase

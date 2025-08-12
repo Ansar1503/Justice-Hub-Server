@@ -2,7 +2,7 @@ import { Notification } from "../../domain/entities/Notification";
 import { ISessionsRepo } from "../../domain/IRepository/ISessionsRepo";
 import { INotificationRepo } from "../../domain/IRepository/INotificationRepo";
 import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
-import { INotificationUsecase } from "./I_usecases/INotificationUsecase";
+import { INotificationUsecase } from "./IUseCases/INotificationUsecase";
 
 export class NotificationUsecase implements INotificationUsecase {
   constructor(

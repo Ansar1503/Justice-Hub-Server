@@ -1,7 +1,7 @@
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IController } from "../Interface/IController";
-import { IChatusecase } from "@src/application/usecases/I_usecases/IChatusecase";
+import { IChatusecase } from "@src/application/usecases/IUseCases/IChatusecase";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";

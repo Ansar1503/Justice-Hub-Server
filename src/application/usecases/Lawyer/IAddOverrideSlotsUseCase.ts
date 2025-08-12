@@ -1,5 +1,5 @@
 import { OverrideSlotsDto } from "@src/application/dtos/Lawyer/OverrideSlotsDto";
-import { IUseCase } from "../I_usecases/IUseCase";
+import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IAddOverrideSlotsUseCase
   extends IUseCase<OverrideSlotsDto, OverrideSlotsDto> {}

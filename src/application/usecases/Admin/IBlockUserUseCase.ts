@@ -1,4 +1,4 @@
-import { IUseCase } from "../I_usecases/IUseCase";
+import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IBlockUserUseCase
   extends IUseCase<

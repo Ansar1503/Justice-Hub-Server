@@ -1,4 +1,4 @@
-import { IChatusecase } from "@src/application/usecases/I_usecases/IChatusecase";
+import { IChatusecase } from "@src/application/usecases/IUseCases/IChatusecase";
 import { IController } from "../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";

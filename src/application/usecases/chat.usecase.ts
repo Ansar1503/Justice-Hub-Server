@@ -5,7 +5,7 @@ import { Session } from "../../domain/entities/Session";
 import { ISessionsRepo } from "../../domain/IRepository/ISessionsRepo";
 // import { IChatRepo } from "../../domain/IRepository/IChatRepo";
 import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
-import { IChatusecase } from "./I_usecases/IChatusecase";
+import { IChatusecase } from "./IUseCases/IChatusecase";
 import { IChatMessagesRepo } from "@domain/IRepository/IChatMessagesRepo";
 import { ChatSession } from "@domain/entities/ChatSession";
 import { FetchChatSessionOutPutDto } from "../dtos/chats/fetchChatsDto";
@@ -50,7 +50,7 @@ export class ChatUseCase implements IChatusecase {
   async createChatMessage(
     message: ChatMessageInputDto
   ): Promise<ChatMessageOutputDto | null> {
-    console.log("newmessage", message);
+    // console.log("newmessage", message);
     const messagepayload = ChatMessage.create({
       receiverId: message.receiverId,
       senderId: message.senderId,
@@ -80,11 +80,25 @@ export class ChatUseCase implements IChatusecase {
   async fetchChatMessages(payload: {
     session_id: string;
     page: number;
-  }): Promise<{ data: ChatMessage[]; nextCursor?: number }> {
-    return await this.chatMessageRepo.findMessagesBySessionId(
+  }): Promise<{ data: ChatMessageOutputDto[]; nextCursor?: number }> {
+    const messages = await this.chatMessageRepo.findMessagesBySessionId(
       payload.session_id,
       payload.page
     );
+    return {
+      data: messages.data.map((m) => ({
+        id: m.id,
+        createdAt: m.createdAt,
+        read: m.read,
+        receiverId: m.receiverId,
+        senderId: m.senderId,
+        session_id: m.sessionId,
+        updatedAt: m.updatedAt,
+        attachments: m.attachments,
+        content: m.content,
+      })),
+      nextCursor: messages.nextCursor,
+    };
   }
 
   async updateChatName(payload: {
@@ -104,7 +118,7 @@ export class ChatUseCase implements IChatusecase {
     sessionId: string;
   }): Promise<ChatMessage | null> {
     if (!payload.messageId) throw new ValidationError("MessageId not found");
-    // console.log("payload:pa", payload);
+    console.log("delete paylaod :: ", payload);
     await this.chatMessageRepo.delete({ messageId: payload.messageId });
     const messages = await this.chatMessageRepo.findMessagesBySessionId(
       payload.sessionId,

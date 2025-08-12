@@ -20,7 +20,7 @@ export interface IChatusecase {
   fetchChatMessages(payload: {
     session_id: string;
     page: number;
-  }): Promise<{ data: ChatMessage[]; nextCursor?: number }>;
+  }): Promise<{ data: ChatMessageOutputDto[]; nextCursor?: number }>;
   updateChatName(payload: {
     chatId: string;
     chatName: string;
