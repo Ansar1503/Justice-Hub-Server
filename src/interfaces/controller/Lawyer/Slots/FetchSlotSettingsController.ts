@@ -21,6 +21,12 @@ export class FetchSlotSettingsController implements IController {
       "id" in httpRequest.params
     ) {
       user_id = String(httpRequest.params.id);
+    } else if (
+      httpRequest.user &&
+      typeof httpRequest.user === "object" &&
+      "id" in httpRequest.user
+    ) {
+      user_id = String(httpRequest.user.id);
     }
     if (!user_id) {
       return this.httpErrors.error_400("User_id Not found");
@@ -33,6 +39,7 @@ export class FetchSlotSettingsController implements IController {
         data: response || {},
       });
     } catch (error) {
+      console.log("error in fetching slot Settings: ", error);
       if (error instanceof Error) {
         return this.httpErrors.error_500(error.message);
       }
