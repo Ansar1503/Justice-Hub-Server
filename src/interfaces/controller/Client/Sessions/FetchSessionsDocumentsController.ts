@@ -1,4 +1,3 @@
-import { I_clientUsecase } from "@src/application/usecases/I_usecases/I_clientusecase";
 import { IController } from "../../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
@@ -28,8 +27,11 @@ export class FetchSessionsDocumentsController implements IController {
       const success = this.httpSuccess.success_200(result);
       return new HttpResponse(success.statusCode, success.body);
     } catch (error) {
-      const err = this.httpErrors.error_500();
-      return new HttpResponse(err.statusCode, err.body);
+      console.log("error in Fetching session Documents :: ", error);
+      if (error instanceof Error) {
+        return this.httpErrors.error_400(error.message);
+      }
+      return this.httpErrors.error_500();
     }
   }
 }
