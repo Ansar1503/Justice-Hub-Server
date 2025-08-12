@@ -1,6 +1,9 @@
-import { ChatSession, ChatMessage } from "../../../domain/entities/Chat.entity";
+import { ChatSession } from "@domain/entities/ChatSession";
 import { Client } from "../../../domain/entities/Client";
 import { Session } from "../../../domain/entities/Session";
+import { ChatMessage } from "@domain/entities/ChatMessage";
+import { FetchChatSessionOutPutDto } from "@src/application/dtos/chats/fetchChatsDto";
+import { ChatMessageInputDto, ChatMessageOutputDto } from "@src/application/dtos/chats/ChatMessageDto";
 
 export interface IChatusecase {
   fetchChats(payload: {
@@ -9,9 +12,11 @@ export interface IChatusecase {
     page: number;
     role: "lawyer" | "client";
   }): Promise<any>;
-  getChatSessionById(sessionId: string): Promise<ChatSession | null>;
+  getChatSessionById(
+    sessionId: string
+  ): Promise<FetchChatSessionOutPutDto | null>;
   getSessionDetails(sessionId: string): Promise<Session | null>;
-  createChatMessage(message: ChatMessage): Promise<ChatMessage | null>;
+  createChatMessage(message: ChatMessageInputDto): Promise<ChatMessageOutputDto | null>;
   fetchChatMessages(payload: {
     session_id: string;
     page: number;

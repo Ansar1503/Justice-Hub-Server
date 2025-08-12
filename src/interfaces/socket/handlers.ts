@@ -8,8 +8,10 @@ import { ChatMessageRepository } from "@infrastructure/database/repo/ChatMessage
 import { ChatSessionRepository } from "@infrastructure/database/repo/ChatSessionRepo";
 import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
 import { NotificationRepository } from "@infrastructure/database/repo/NotificationRepo";
-import { ChatMessage } from "@domain/entities/ChatMessage";
-import { ChatMessageOutputDto } from "@src/application/dtos/chats/ChatMessageDto";
+import {
+  ChatMessageInputDto,
+  ChatMessageOutputDto,
+} from "@src/application/dtos/chats/ChatMessageDto";
 
 const chatUsecase = new ChatUseCase(
   new ChatSessionRepository(),
@@ -36,7 +38,7 @@ export class SocketHandlers {
   }
 
   async handleSendMessage(
-    newMessage: ChatMessage,
+    newMessage: ChatMessageInputDto,
     cb: (payload: {
       success: boolean;
       savedMessage?: ChatMessageOutputDto;
@@ -44,10 +46,11 @@ export class SocketHandlers {
     }) => {}
   ) {
     try {
+      // console.log("newmessage:", newMcessage);
       const chatSend = await chatUsecase.createChatMessage({
         receiverId: newMessage.receiverId,
         senderId: newMessage.senderId,
-        session_id: newMessage.sessionId,
+        session_id: newMessage.session_id,
         attachments: newMessage.attachments,
         content: newMessage.content,
       });
@@ -58,6 +61,7 @@ export class SocketHandlers {
         chatSend
       );
     } catch (error: any) {
+      console.log("error sending message", error);
       cb({ success: false, error: error.message });
     }
   }
@@ -193,7 +197,7 @@ export class SocketHandlers {
     },
     cb: (response: {
       success: boolean;
-      reportedMessage?: ChatMessage | null;
+      reportedMessage?: any | null;
       error?: string;
     }) => void
   ) {

@@ -8,8 +8,8 @@ export class ChatSessionMapper
   toDomain(persistence: IChatSessionModel): ChatSession {
     return ChatSession.fromPersistence({
       id: persistence._id,
-      session_id: persistence.session_id.toString(),
-      last_message: persistence.last_message.toString(),
+      session_id: persistence.session_id,
+      last_message: persistence.last_message,
       name: persistence.name,
       participants: persistence.participants,
       createdAt: persistence.createdAt,

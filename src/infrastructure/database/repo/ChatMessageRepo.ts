@@ -11,8 +11,8 @@ export class ChatMessageRepository implements IChatMessagesRepo {
       IChatMessageModel
     > = new ChatMessageMapper()
   ) {}
-  async create(payload: ChatMessage): Promise<ChatMessage | null> {
-    const newmessage = new MessageModel(payload);
+  async create(payload: ChatMessage): Promise<ChatMessage> {
+    const newmessage = new MessageModel(this.mapper.toPersistence(payload));
     await newmessage.save();
     return this.mapper.toDomain(newmessage);
   }

@@ -1,9 +1,10 @@
 import { Socket, Server as SocketIOServer } from "socket.io";
 import { SocketEventEnum } from "../../infrastructure/constant/SocketEventEnum";
 import { SocketHandlers } from "./handlers";
-import { ChatMessage, ChatSession } from "../../domain/entities/Chat.entity";
+
 import { socketStore } from "./SocketStore";
 import { Notification } from "../../domain/entities/Notification";
+import { ChatMessageInputDto } from "@src/application/dtos/chats/ChatMessageDto";
 
 export async function setUpChatSocket(io: SocketIOServer) {
   io.on("connection", (socket: Socket) => {
@@ -54,7 +55,7 @@ export async function setUpChatSocket(io: SocketIOServer) {
     // sendmessage listender
     socket.on(
       SocketEventEnum.SEND_MESSAGE_EVENT,
-      async (data: ChatMessage, cb: any) => {
+      async (data: ChatMessageInputDto, cb: any) => {
         // console.log("message send listening");
         socketHandler.handleSendMessage(data, cb);
       }
@@ -85,7 +86,7 @@ export async function setUpChatSocket(io: SocketIOServer) {
         },
         cb: (response: {
           success: boolean;
-          reportedMessage?: ChatMessage | null;
+          reportedMessage?: any | null;
           error?: string;
         }) => void
       ) => {

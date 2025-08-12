@@ -50,10 +50,10 @@ export class ChatUseCase implements IChatusecase {
   async createChatMessage(
     message: ChatMessageInputDto
   ): Promise<ChatMessageOutputDto | null> {
-    // console.log("newmessage", message);
+    console.log("newmessage", message);
     const messagepayload = ChatMessage.create({
       receiverId: message.receiverId,
-      senderId: message.receiverId,
+      senderId: message.senderId,
       session_id: message.session_id,
       attachments: message.attachments,
       content: message.content,

@@ -1,7 +1,7 @@
 import { ChatMessage } from "@domain/entities/ChatMessage";
 
 export interface IChatMessagesRepo {
-  create(payload: ChatMessage): Promise<ChatMessage | null>;
+  create(payload: ChatMessage): Promise<ChatMessage >;
   findMessagesBySessionId(
     id: string,
     page: number

@@ -2,7 +2,6 @@ import { ChatSession } from "@domain/entities/ChatSession";
 import { IChatSessionRepo } from "@domain/IRepository/IChatSessionRepo";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
 import { ChatModel, IChatSessionModel } from "../model/ChatSessionModel";
-import { Types } from "mongoose";
 import { ChatSessionMapper } from "@infrastructure/Mapper/Implementations/ChatSessionMapper";
 
 export class ChatSessionRepository implements IChatSessionRepo {
@@ -184,7 +183,7 @@ export class ChatSessionRepository implements IChatSessionRepo {
       update.name = payload.name;
     }
     if (payload.last_message) {
-      update.last_message = new Types.ObjectId(payload.last_message);
+      update.last_message = payload.last_message;
     }
 
     const updatedChatSession = await ChatModel.findOneAndUpdate(
