@@ -299,16 +299,16 @@ router.get(
     return;
   }
 );
-// router.get(
-//   "/profile/sessions/reviews/:id",
-//   authenticateUser,
-//   authenticateClient,
-//   async (req: Request, res: Response) => {
-//     const adapter = await expressAdapter(req, FetchReviewsBySessionComposer());
-//     res.status(adapter.statusCode).json(adapter.body);
-//     return;
-//   }
-// );
+router.get(
+  "/profile/sessions/reviews/:id",
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchReviewsBySessionComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
 
 router.put(
   "/profile/reviews/:id",

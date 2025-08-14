@@ -25,6 +25,7 @@ import { CancelSessionComposer } from "@infrastructure/services/composers/Lawyer
 import { fetchSessionsComposer } from "@infrastructure/services/composers/Admin/FetchSessions";
 import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
 import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsByUserIdComposer";
+import { FetchReviewsBySessionComposer } from "@infrastructure/services/composers/Client/review/FetchReviewBySessionComposer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -255,5 +256,14 @@ router.get(
     return;
   }
 );
-
+router.get(
+  "/profile/sessions/reviews/:id",
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchReviewsBySessionComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
 export default router;
