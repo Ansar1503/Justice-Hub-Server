@@ -31,21 +31,17 @@ export class UpdateReviewsController implements IController {
           : undefined;
 
       if (!reviewId) {
-        const error = this.httpErrors.error_400();
-        return new HttpResponse(error.statusCode, error.body);
+        const error = this.httpErrors.error_400("review id not found");
+        return error;
       }
-
       if (
         !body ||
-        !body.session_id ||
         !body.heading ||
         !body.review ||
-        typeof body.rating !== "number" ||
-        !body.client_id ||
-        !body.lawyer_id
+        typeof body.rating !== "number"
       ) {
-        const error = this.httpErrors.error_400();
-        return new HttpResponse(error.statusCode, error.body);
+        const error = this.httpErrors.error_400("invalid payload");
+        return error;
       }
 
       const updates: UpdateReviewInputDto["updates"] = {
@@ -63,10 +59,12 @@ export class UpdateReviewsController implements IController {
       });
 
       const success = this.httpSuccess.success_200(result);
-      return new HttpResponse(success.statusCode, success.body);
+      return success;
     } catch (error) {
-      const err = this.httpErrors.error_500();
-      return new HttpResponse(err.statusCode, err.body);
+      if (error instanceof Error) {
+        return this.httpErrors.error_400(error.message);
+      }
+      return this.httpErrors.error_500();
     }
   }
 }
