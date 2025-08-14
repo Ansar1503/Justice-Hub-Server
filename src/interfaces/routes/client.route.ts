@@ -46,6 +46,7 @@ import { CancelSessionComposer } from "@infrastructure/services/composers/Lawyer
 import { EndSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/EndSessionComposer";
 import { JoinVideoSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/JoinVideoSessionComposer";
 import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
+import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsByUserIdComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -274,7 +275,6 @@ router.post(
   authenticateUser,
   async (req: Request, res: Response) => {
     req.body.user = req.user;
-
     const adapter = await expressAdapter(req, AddReviewComposer());
     res.status(adapter.statusCode).json(adapter.body);
   }
@@ -289,17 +289,26 @@ router.get(
     return;
   }
 );
-
 router.get(
-  "/profile/sessions/reviews/:id",
+  "/profile/reviews/",
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FetchReviewsBySessionComposer());
+    const adapter = await expressAdapter(req, FetchReviewsByUserIdComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }
 );
+// router.get(
+//   "/profile/sessions/reviews/:id",
+//   authenticateUser,
+//   authenticateClient,
+//   async (req: Request, res: Response) => {
+//     const adapter = await expressAdapter(req, FetchReviewsBySessionComposer());
+//     res.status(adapter.statusCode).json(adapter.body);
+//     return;
+//   }
+// );
 
 router.put(
   "/profile/reviews/:id",

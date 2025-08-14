@@ -64,7 +64,7 @@ export class RegisterUserUseCase implements IRegiserUserUseCase {
       await this.lawyerRepo.create(lawyerData);
     }
     const otp = await generateOtp();
-    const token = await this.jwtprovider.GenerateAccessToken({
+    const token = await this.jwtprovider.GenerateEmailToken({
       user_id: user.user_id,
     });
     try {

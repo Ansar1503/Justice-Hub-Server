@@ -1,4 +1,9 @@
+import {
+  FetchReviewInputDto,
+  FetchReviewOutputDto,
+} from "@src/application/dtos/Reviews/review.dto";
 import { Review } from "../entities/Review";
+import { FetchReviewsOutputDto } from "@src/application/dtos/client/FetchReviewDto";
 export interface IReviewRepo {
   create(payload: Review): Promise<Review>;
   update(payload: {
@@ -8,7 +13,7 @@ export interface IReviewRepo {
   findByLawyer_id(payload: {
     lawyer_id: string;
     page: number;
-  }): Promise<{ data: Review[]; nextCursor?: number }>;
+  }): Promise<FetchReviewsOutputDto>;
   findBySession_id(
     session_id: string
   ): Promise<
@@ -16,4 +21,7 @@ export interface IReviewRepo {
   >;
   delete(id: string): Promise<void>;
   findByReview_id(id: string): Promise<Review | null>;
+  findReviewsByUser_id(
+    payload: FetchReviewInputDto
+  ): Promise<FetchReviewOutputDto>;
 }

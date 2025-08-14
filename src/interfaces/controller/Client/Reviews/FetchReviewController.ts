@@ -6,7 +6,6 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
-import { I_clientUsecase } from "@src/application/usecases/I_usecases/I_clientusecase";
 import { IFetchReviewsUseCase } from "@src/application/usecases/Client/IFetchReviewsUseCase";
 
 export class FetchReviewsController implements IController {
@@ -33,8 +32,10 @@ export class FetchReviewsController implements IController {
           : undefined;
 
       if (!lawyer_id || !cursor) {
-        const err = this.httpErrors.error_400();
-        return new HttpResponse(err.statusCode, err.body);
+        const err = this.httpErrors.error_400(
+          "Please provide lawyer_id and cursor."
+        );
+        return err;
       }
 
       const result = await this.fetchReviews.execute({
@@ -43,10 +44,13 @@ export class FetchReviewsController implements IController {
       });
 
       const success = this.httpSuccess.success_200(result);
-      return new HttpResponse(success.statusCode, success.body);
+      return success;
     } catch (error) {
-      const err = this.httpErrors.error_500();
-      return new HttpResponse(err.statusCode, err.body);
+      // console.log("error in fetch reviews controller",error);
+      if (error instanceof Error) {
+        return this.httpErrors.error_400(error.message);
+      }
+      return this.httpErrors.error_500();
     }
   }
 }

@@ -6,6 +6,12 @@ export interface FetchReviewInputDto {
 export interface FetchReviewsOutputDto {
   data: {
     id: string;
+    reviewedBy: {
+      name: string;
+      email: string;
+      phone: string;
+      profile_image: string;
+    };
     session_id: string;
     heading: string;
     review: string;

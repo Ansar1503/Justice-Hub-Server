@@ -24,6 +24,7 @@ import { EndSessionComposer } from "@infrastructure/services/composers/Lawyer/Se
 import { CancelSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/CancelSessionComposer";
 import { fetchSessionsComposer } from "@infrastructure/services/composers/Admin/FetchSessions";
 import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
+import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsByUserIdComposer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -229,7 +230,7 @@ router.patch(
 //   authenticateLawyer,
 //   handleMulterErrors(chatFile.single("file")),
 //   sendFileMessage
-// );
+// )
 
 router.get(
   "/profile/sessions/callLogs/:id",
@@ -241,4 +242,18 @@ router.get(
     return;
   }
 );
+
+//reviews
+
+router.get(
+  "/profile/reviews/",
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchReviewsByUserIdComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
 export default router;

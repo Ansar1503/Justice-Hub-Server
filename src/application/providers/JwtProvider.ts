@@ -1,8 +1,10 @@
+import { JwtPayloadDto } from "../dtos/JwtPayloadDto";
+
 export interface IJwtProvider {
-  GenerateAccessToken(payload: Record<string, unknown>): string;
-  GenerateRefreshToken(payload: Record<string, unknown>): string;
+  GenerateAccessToken(payload: JwtPayloadDto): string;
+  GenerateRefreshToken(payload: JwtPayloadDto): string;
   GenerateEmailToken(payload: { user_id: string }): string;
-  VerifyAccessToken(token: string): unknown;
-  VerifyRefreshToken(token: string): unknown;
-  VerifyEmailToken(token: string): unknown;
+  VerifyAccessToken(token: string): JwtPayloadDto
+  VerifyRefreshToken(token: string): JwtPayloadDto;
+  VerifyEmailToken(token: string): { user_id: string };
 }
