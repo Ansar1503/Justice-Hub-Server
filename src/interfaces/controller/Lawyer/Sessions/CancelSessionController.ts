@@ -28,6 +28,7 @@ export class CancelSessionController implements IController {
       const result = await this.cancelSession.execute({ session_id: id });
       return this.httpSuccess.success_200(result);
     } catch (error) {
+      console.log("error:", error);
       if (error instanceof AppError) {
         return new HttpResponse(error.statusCode, error.message);
       }

@@ -24,7 +24,7 @@ export class CancelSessionUseCase implements ICancelSessionUseCase {
       sessionExist.scheduled_time
     );
     const currentDate = new Date();
-    if (sessionStartAt > currentDate) {
+    if (currentDate >= sessionStartAt) {
       throw new ValidationError("Session has already started!");
     }
     // console.log("sessionExist", sessionExist);
