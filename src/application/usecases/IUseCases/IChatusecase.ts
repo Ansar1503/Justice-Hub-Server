@@ -3,7 +3,10 @@ import { Client } from "../../../domain/entities/Client";
 import { Session } from "../../../domain/entities/Session";
 import { ChatMessage } from "@domain/entities/ChatMessage";
 import { FetchChatSessionOutPutDto } from "@src/application/dtos/chats/fetchChatsDto";
-import { ChatMessageInputDto, ChatMessageOutputDto } from "@src/application/dtos/chats/ChatMessageDto";
+import {
+  ChatMessageInputDto,
+  ChatMessageOutputDto,
+} from "@src/application/dtos/chats/ChatMessageDto";
 
 export interface IChatusecase {
   fetchChats(payload: {
@@ -16,7 +19,9 @@ export interface IChatusecase {
     sessionId: string
   ): Promise<FetchChatSessionOutPutDto | null>;
   getSessionDetails(sessionId: string): Promise<Session | null>;
-  createChatMessage(message: ChatMessageInputDto): Promise<ChatMessageOutputDto | null>;
+  createChatMessage(
+    message: ChatMessageInputDto
+  ): Promise<ChatMessageOutputDto | null>;
   fetchChatMessages(payload: {
     session_id: string;
     page: number;
@@ -33,7 +38,7 @@ export interface IChatusecase {
     messageId: string;
     reason: string;
     reportedAt: Date;
-  }): Promise<ChatMessage | null>;
+  }): Promise<void>;
   fetchDisputes(payload: {
     search: string;
     sortBy: "All" | "session_date" | "reported_date";

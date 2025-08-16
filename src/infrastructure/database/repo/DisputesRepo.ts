@@ -7,14 +7,16 @@ import {
   FetchReviewDisputesOutputDto,
 } from "@src/application/dtos/Admin/FetchReviewDisputesDto";
 import { DisputesMapper } from "@infrastructure/Mapper/Implementations/DisputesMapper";
+import { BaseRepository } from "./base/BaseRepo";
 
-export class DisputesRepo implements IDisputes {
+export class DisputesRepo
+  extends BaseRepository<Disputes, IDisputesModel>
+  implements IDisputes
+{
   constructor(
-    private mapper: IMapper<Disputes, IDisputesModel> = new DisputesMapper()
-  ) {}
-  async create(payload: Disputes): Promise<Disputes> {
-    const disputes = (await DisputesModel.create(payload)).toObject();
-    return this.mapper.toDomain(disputes);
+    mapper: IMapper<Disputes, IDisputesModel> = new DisputesMapper()
+  ) {
+    super(DisputesModel, mapper);
   }
   async findByContentId(payload: {
     contentId: string;

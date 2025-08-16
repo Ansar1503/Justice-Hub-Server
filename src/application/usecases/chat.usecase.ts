@@ -14,12 +14,15 @@ import {
   ChatMessageInputDto,
   ChatMessageOutputDto,
 } from "../dtos/chats/ChatMessageDto";
+import { IDisputes } from "@domain/IRepository/IDisputesRepo";
+import { Disputes } from "@domain/entities/Disputes";
 
 export class ChatUseCase implements IChatusecase {
   constructor(
     private chatSessionRepo: IChatSessionRepo,
     private chatMessageRepo: IChatMessagesRepo,
-    private sessionRepo: ISessionsRepo
+    private sessionRepo: ISessionsRepo,
+    private _disputesRepo: IDisputes
   ) {}
   async fetchChats(payload: {
     user_id: string;
@@ -139,10 +142,18 @@ export class ChatUseCase implements IChatusecase {
     messageId: string;
     reason: string;
     reportedAt: Date;
-  }): Promise<ChatMessage | null> {
+  }): Promise<void> {
     const chatExists = await this.chatMessageRepo.findById(payload.messageId);
     if (!chatExists) throw new Error("message doesnt exist");
-    return await this.chatMessageRepo.update(payload);
+    const disputePayload = Disputes.create({
+      contentId: payload.messageId,
+      reason: payload.reason,
+      disputeType: "messages",
+      reportedBy: chatExists.senderId,
+      reportedUser: chatExists.receiverId,
+      status: "pending",
+    });
+    await this._disputesRepo.create(disputePayload);
   }
   async getSessionDetails(sessionId: string): Promise<Session | null> {
     return await this.sessionRepo.findById({ session_id: sessionId });

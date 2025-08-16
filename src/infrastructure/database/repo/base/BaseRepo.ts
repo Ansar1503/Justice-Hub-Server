@@ -14,11 +14,4 @@ export abstract class BaseRepository<TDomain, TPersistence> {
     });
     return this.mapper.toDomain(saved);
   }
-  async findById(id: string): Promise<TDomain | null> {
-    const result = await this.model.findOne({ _id: id }).catch((err) => {
-      throw new Error(err.message);
-    });
-    return result ? this.mapper.toDomain(result) : null;
-  }
-  abstract delete(payload: Partial<TDomain>): Promise<TDomain | null>;
 }

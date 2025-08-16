@@ -12,11 +12,13 @@ import {
   ChatMessageInputDto,
   ChatMessageOutputDto,
 } from "@src/application/dtos/chats/ChatMessageDto";
+import { DisputesRepo } from "@infrastructure/database/repo/DisputesRepo";
 
 const chatUsecase = new ChatUseCase(
   new ChatSessionRepository(),
   new ChatMessageRepository(),
-  new SessionsRepository()
+  new SessionsRepository(),
+  new DisputesRepo()
 );
 const notificationUsecase = new NotificationUsecase(
   new NotificationRepository(),
@@ -203,7 +205,7 @@ export class SocketHandlers {
     }) => void
   ) {
     try {
-      const { messageId, reason, reportedBy, sessionId } = payload;
+      const { messageId, reason, reportedBy } = payload;
       if (!messageId) {
         cb({ success: false, error: "messageId Not found" });
         return;
@@ -221,9 +223,9 @@ export class SocketHandlers {
         reportedAt: new Date(),
       });
 
-      cb({ success: true, reportedMessage });
+      cb({ success: true });
     } catch (error: any) {
-      console.log("error :", error);
+      console.log("error reporting message :", error);
       cb({ success: false, error: error?.message });
     }
   }
