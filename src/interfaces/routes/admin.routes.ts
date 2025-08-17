@@ -8,6 +8,7 @@ import { ChangeLawyerVerificationComposer } from "@infrastructure/services/compo
 import { FetchAppointmentsComposer } from "@infrastructure/services/composers/Admin/FetchAppointment";
 import { fetchSessionsComposer } from "@infrastructure/services/composers/Admin/FetchSessions";
 import { FetchReviewDipsutesComposer } from "@infrastructure/services/composers/Admin/FetchReviewDisputes";
+import { FetchChatDisputesComposer } from "@infrastructure/services/composers/Admin/FetchChatDisputesComposer";
 
 const router = Router();
 
@@ -62,12 +63,23 @@ router.get(
   }
 );
 
+// disputes
 router.get(
   "/disputes/reviews",
   authenticateUser,
   async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, FetchReviewDipsutesComposer());
     res.status(adaper.statusCode).json(adaper.body);
+    return;
+  }
+);
+
+router.get(
+  "/disputes/chat",
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchChatDisputesComposer());
+    res.status(adapter.statusCode).json(adapter.body);
     return;
   }
 );

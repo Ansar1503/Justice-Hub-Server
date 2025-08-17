@@ -3,6 +3,10 @@ import {
   FetchReviewDisputesOutputDto,
 } from "@src/application/dtos/Admin/FetchReviewDisputesDto";
 import { Disputes } from "../entities/Disputes";
+import {
+  FetchChatDisputesInputDto,
+  FetchChatDisputesOutputDto,
+} from "@src/application/dtos/Admin/FetchChatDisputesDto";
 
 export interface IDisputes {
   create(payload: Disputes): Promise<Disputes>;
@@ -14,4 +18,7 @@ export interface IDisputes {
     disputeId: string;
     status: Disputes["status"];
   }): Promise<Disputes | null>;
+  findAllChatDisputes(
+    payload: FetchChatDisputesInputDto
+  ): Promise<FetchChatDisputesOutputDto>;
 }
