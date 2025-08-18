@@ -9,6 +9,7 @@ import { FetchAppointmentsComposer } from "@infrastructure/services/composers/Ad
 import { fetchSessionsComposer } from "@infrastructure/services/composers/Admin/FetchSessions";
 import { FetchReviewDipsutesComposer } from "@infrastructure/services/composers/Admin/FetchReviewDisputes";
 import { FetchChatDisputesComposer } from "@infrastructure/services/composers/Admin/FetchChatDisputesComposer";
+import { UpdateDisputesStatusComposer } from "@infrastructure/services/composers/Admin/UpdateDisputesStatusComposer";
 
 const router = Router();
 
@@ -79,6 +80,16 @@ router.get(
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchChatDisputesComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.put(
+  "/disputes/status/:id",
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, UpdateDisputesStatusComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }

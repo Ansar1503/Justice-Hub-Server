@@ -14,4 +14,5 @@ export abstract class BaseRepository<TDomain, TPersistence> {
     });
     return this.mapper.toDomain(saved);
   }
+  
 }

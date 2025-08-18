@@ -6,6 +6,7 @@ export interface DisputesDto {
   reportedUser: string;
   reason: string;
   status: "pending" | "resolved" | "rejected";
+  resolveAction?: "deleted" | "blocked";
   createdAt: Date;
   updatedAt: Date;
 }

@@ -10,15 +10,17 @@ import {
 
 export interface IDisputes {
   create(payload: Disputes): Promise<Disputes>;
+  findById(id: string): Promise<Disputes | null>;
   findByContentId(payload: { contentId: string }): Promise<Disputes | null>;
   findReviewDisputes(
     payload: FetchReviewDisputesInputDto
   ): Promise<FetchReviewDisputesOutputDto>;
-  updateReviewDispute(payload: {
-    disputeId: string;
-    status: Disputes["status"];
-  }): Promise<Disputes | null>;
   findAllChatDisputes(
     payload: FetchChatDisputesInputDto
   ): Promise<FetchChatDisputesOutputDto>;
+  update(payload: {
+    disputesId: string;
+    action: "blocked" | "deleted";
+    status: "pending" | "resolved" | "rejected";
+  }): Promise<Disputes | null>;
 }

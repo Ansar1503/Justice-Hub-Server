@@ -30,6 +30,27 @@ export class DisputesRepo
     });
     return disputes ? this.mapper.toDomain(disputes) : null;
   }
+  async findById(id: string): Promise<Disputes | null> {
+    const disputes = await DisputesModel.findOne({ _id: id });
+    if (!disputes) return null;
+    return this.mapper.toDomain(disputes);
+  }
+  async update(payload: {
+    disputesId: string;
+    action: "blocked" | "deleted";
+    status: "pending" | "resolved" | "rejected";
+  }): Promise<Disputes | null> {
+    const update = { status: payload.status, resolveAction: payload.action };
+    const updated = await DisputesModel.findOneAndUpdate(
+      {
+        _id: payload.disputesId,
+      },
+      update,
+      { new: true }
+    );
+    if (!updated) return null;
+    return this.mapper.toDomain(updated);
+  }
   async findReviewDisputes(
     payload: FetchReviewDisputesInputDto
   ): Promise<FetchReviewDisputesOutputDto> {
@@ -283,6 +304,7 @@ export class DisputesRepo
         $project: {
           _id: 1,
           disputeType: 1,
+          resolveAction: 1,
           "chatMessage._id": 1,
           "chatMessage.session_id": 1,
           "chatMessage.content": 1,
@@ -333,6 +355,7 @@ export class DisputesRepo
             disputeType: d.disputeType,
             reason: d.reason,
             status: d.status,
+            resolveAction: d.resolveAction,
             createdAt: d.createdAt,
             updatedAt: d.updatedAt,
             reportedBy: {
@@ -364,21 +387,5 @@ export class DisputesRepo
       totalCount,
       currentPage: page,
     };
-  }
-
-  async updateReviewDispute(payload: {
-    disputeId: string;
-    status: Disputes["status"];
-  }): Promise<Disputes | null> {
-    const update: any = {};
-
-    const updated = await DisputesModel.findOneAndUpdate(
-      {
-        _id: payload?.disputeId,
-      },
-      { $set: { status: payload.status } },
-      { new: true }
-    );
-    return updated ? this.mapper.toDomain(updated) : null;
   }
 }

@@ -11,7 +11,7 @@ export interface PersistedDisputesProps {
   updatedAt: Date;
 }
 
-export interface CreateDisputesProps {  
+export interface CreateDisputesProps {
   disputeType: "reviews" | "messages";
   contentId: string;
   reportedBy: string;
@@ -28,6 +28,7 @@ export class Disputes {
   private _reportedUser: string;
   private _reason: string;
   private _status: "pending" | "resolved" | "rejected";
+  private _resolveAction?: "deleted" | "blocked";
   private _createdAt: Date;
   private _updatedAt: Date;
 
@@ -41,6 +42,7 @@ export class Disputes {
     this._status = props.status;
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
+    this._resolveAction = props.resolveAction;
   }
 
   static create(props: CreateDisputesProps): Disputes {
@@ -74,7 +76,9 @@ export class Disputes {
   get reportedBy(): string {
     return this._reportedBy;
   }
-
+  get resolveAction() {
+    return this._resolveAction;
+  }
   get reportedUser(): string {
     return this._reportedUser;
   }
@@ -99,7 +103,10 @@ export class Disputes {
     this._status = status;
     this.touch();
   }
-
+  updateAction(action: "deleted" | "blocked"): void {
+    this._resolveAction = action;
+    this.touch();
+  }
   updateReason(reason: string): void {
     this._reason = reason;
     this.touch();
