@@ -8,6 +8,7 @@ export interface IDisputesModel extends Document {
   reportedBy: string;
   reportedUser: string;
   status: "pending" | "resolved" | "rejected";
+  resolveAction?: "deleted" | "blocked";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,7 +29,17 @@ const diputesSchema = new Schema<IDisputesModel>(
     reason: { type: String, required: true },
     reportedBy: { type: String, required: true },
     reportedUser: { type: String, required: true },
-    status: { type: String, required: true },
+    status: {
+      type: String,
+      required: true,
+      enum: ["pending", "resolved", "rejected"],
+      default: "pending",
+    },
+    resolveAction: {
+      type: String,
+      required: false,
+      enum: ["deleted", "blocked"],
+    },
   },
   { timestamps: true }
 );

@@ -6,11 +6,12 @@ export interface PersistedDisputesProps {
   reportedUser: string;
   reason: string;
   status: "pending" | "resolved" | "rejected";
+  resolveAction?: "deleted" | "blocked";
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface CreateDisputesProps {
+export interface CreateDisputesProps {  
   disputeType: "reviews" | "messages";
   contentId: string;
   reportedBy: string;
