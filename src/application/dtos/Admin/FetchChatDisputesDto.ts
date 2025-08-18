@@ -10,6 +10,7 @@ export interface FetchChatDisputesInputDto {
 }
 
 interface UserProfile {
+  user_id: string;
   name: string;
   email: string;
   mobile: string;

@@ -290,10 +290,12 @@ export class DisputesRepo
           "chatMessage.attachments": 1,
           "chatMessage.createdAt": 1,
           "chatMessage.updatedAt": 1,
+          "reportedBy.user_id": 1,
           "reportedBy.name": 1,
           "reportedBy.email": 1,
           "reportedBy.mobile": 1,
           "reportedBy.profile_image": 1,
+          "reportedUser.user_id": 1,
           "reportedUser.name": 1,
           "reportedUser.email": 1,
           "reportedUser.mobile": 1,
@@ -323,7 +325,7 @@ export class DisputesRepo
     ]);
     const totalCount = count[0]?.count || 0;
     const totalPage = Math.ceil(totalCount / limit);
-    console.log("data ::", data);
+    // console.log("data ::", data);
     return {
       data: data
         ? data?.map((d: any) => ({
@@ -334,12 +336,14 @@ export class DisputesRepo
             createdAt: d.createdAt,
             updatedAt: d.updatedAt,
             reportedBy: {
+              user_id: d.reportedBy.user_id,
               name: d.reportedBy.name,
               email: d.reportedBy.email,
               mobile: d.reportedBy.mobile,
               profile_image: d.reportedBy.profile_image,
             },
             reportedUser: {
+              user_id: d.reportedUser.user_id,
               name: d.reportedUser.name,
               email: d.reportedUser.email,
               mobile: d.reportedUser.mobile,
