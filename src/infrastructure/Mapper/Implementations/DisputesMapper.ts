@@ -12,6 +12,7 @@ export class DisputesMapper implements IMapper<Disputes, IDisputesModel> {
       reportedBy: persistence.reportedBy,
       reportedUser: persistence.reportedUser,
       status: persistence.status,
+      resolveAction: persistence.resolveAction,
       createdAt: persistence.createdAt,
       updatedAt: persistence.updatedAt,
     });
@@ -27,6 +28,7 @@ export class DisputesMapper implements IMapper<Disputes, IDisputesModel> {
       reason: entity.reason,
       reportedBy: entity.reportedBy,
       reportedUser: entity.reportedUser,
+      resolveAction: entity.resolveAction,
       status: entity.status,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,

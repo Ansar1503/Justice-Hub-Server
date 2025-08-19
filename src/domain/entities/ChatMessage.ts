@@ -13,6 +13,7 @@ export interface PersistedChatMessageProps {
   receiverId: string;
   content?: string;
   read: boolean;
+  active: boolean;
   attachments?: Attachment[];
   createdAt: Date;
   updatedAt: Date;
@@ -33,6 +34,7 @@ export class ChatMessage {
   private _receiverId: string;
   private _content?: string;
   private _read: boolean;
+  private _active: boolean;
   private _attachments?: Attachment[];
   private _createdAt: Date;
   private _updatedAt: Date;
@@ -44,6 +46,7 @@ export class ChatMessage {
     this._receiverId = props.receiverId;
     this._content = props.content;
     this._read = props.read;
+    this._active = props.active;
     this._attachments = props.attachments;
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
@@ -58,6 +61,7 @@ export class ChatMessage {
       receiverId: props.receiverId,
       content: props.content,
       read: false,
+      active: true,
       attachments: props.attachments,
       createdAt: now,
       updatedAt: now,
@@ -93,6 +97,10 @@ export class ChatMessage {
     return this._read;
   }
 
+  get active(): boolean {
+    return this._active;
+  }
+
   get attachments(): Attachment[] | undefined {
     return this._attachments;
   }
@@ -108,6 +116,11 @@ export class ChatMessage {
   //   Methods
   markAsRead(): void {
     this._read = true;
+    this.touch();
+  }
+
+  deleteMessage(): void {
+    this._active = false;
     this.touch();
   }
 

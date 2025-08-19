@@ -72,6 +72,7 @@ export class ChatUseCase implements IChatusecase {
       createdAt: newChatMessage.createdAt,
       id: newChatMessage.id,
       read: newChatMessage.read,
+      active: newChatMessage.active,
       receiverId: newChatMessage.receiverId,
       senderId: newChatMessage.senderId,
       session_id: newChatMessage.sessionId,
@@ -93,6 +94,7 @@ export class ChatUseCase implements IChatusecase {
         id: m.id,
         createdAt: m.createdAt,
         read: m.read,
+        active: m.active,
         receiverId: m.receiverId,
         senderId: m.senderId,
         session_id: m.sessionId,
@@ -121,8 +123,11 @@ export class ChatUseCase implements IChatusecase {
     sessionId: string;
   }): Promise<ChatMessage | null> {
     if (!payload.messageId) throw new ValidationError("MessageId not found");
-    console.log("delete paylaod :: ", payload);
-    await this.chatMessageRepo.delete({ messageId: payload.messageId });
+    // console.log("delete paylaod :: ", payload);
+    await this.chatMessageRepo.update({
+      messageId: payload.messageId,
+      active: false,
+    });
     const messages = await this.chatMessageRepo.findMessagesBySessionId(
       payload.sessionId,
       1

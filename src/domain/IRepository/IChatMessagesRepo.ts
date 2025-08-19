@@ -1,17 +1,17 @@
 import { ChatMessage } from "@domain/entities/ChatMessage";
 
 export interface IChatMessagesRepo {
-  create(payload: ChatMessage): Promise<ChatMessage >;
+  create(payload: ChatMessage): Promise<ChatMessage>;
   findMessagesBySessionId(
     id: string,
     page: number
   ): Promise<{ data: ChatMessage[] | []; nextCursor?: number }>;
-  delete(payload: { messageId: string }): Promise<ChatMessage | null>;
   update(payload: {
     messageId: string;
     reason?: string;
     reportedAt?: Date;
     read?: boolean;
+    active?: boolean;
   }): Promise<ChatMessage | null>;
   findById(messageId: string): Promise<ChatMessage | null>;
   fetchDisputesAggregation(payload: {

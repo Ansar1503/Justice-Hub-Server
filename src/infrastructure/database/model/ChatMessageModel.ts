@@ -13,6 +13,7 @@ export interface IChatMessageModel extends Document {
   receiverId: string;
   content?: string;
   read: boolean;
+  active: boolean;
   attachments?: Attachment[];
   createdAt: Date;
   updatedAt: Date;
@@ -26,6 +27,7 @@ const chatMessageSchema = new Schema<IChatMessageModel>(
     receiverId: { type: String, required: true },
     content: { type: String },
     read: { type: Boolean, default: false },
+    active: { type: Boolean, default: true },
     attachments: [
       {
         name: { type: String },

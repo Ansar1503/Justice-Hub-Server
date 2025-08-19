@@ -16,6 +16,7 @@ export class ChatMessageMapper
       attachments: persistence.attachments,
       createdAt: persistence.createdAt,
       updatedAt: persistence.updatedAt,
+      active: persistence.active,
     });
   }
   toDomainArray(persistence: IChatMessageModel[]): ChatMessage[] {
@@ -28,6 +29,7 @@ export class ChatMessageMapper
       receiverId: entity.receiverId,
       session_id: entity.sessionId,
       read: entity.read,
+      active: entity.active,
       content: entity.content,
       attachments: entity.attachments,
       createdAt: entity.createdAt,

@@ -18,6 +18,7 @@ export interface ChatMessageOutputDto {
   receiverId: string;
   content?: string;
   read: boolean;
+  active: boolean;
   attachments?: Attachment[];
   createdAt: Date;
   updatedAt: Date;

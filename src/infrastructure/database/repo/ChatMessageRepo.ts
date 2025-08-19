@@ -22,7 +22,7 @@ export class ChatMessageRepository implements IChatMessagesRepo {
   ): Promise<{ data: ChatMessage[] | []; nextCursor?: number }> {
     const limit = 10;
     const skip = page > 0 ? (page - 1) * limit : 0;
-    const messages = await MessageModel.find({ session_id: id })
+    const messages = await MessageModel.find({ session_id: id, active: true })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit + 1);
@@ -37,23 +37,19 @@ export class ChatMessageRepository implements IChatMessagesRepo {
       nextCursor: hasNextPage ? page + 1 : undefined,
     };
   }
-  async delete(payload: { messageId: string }): Promise<ChatMessage | null> {
-    const data = await MessageModel.findOneAndDelete({
-      _id: payload.messageId,
-    });
-    return data ? this.mapper.toDomain(data) : null;
-  }
   async update(payload: {
     messageId: string;
     reason?: string;
     reportedAt?: Date;
     read?: boolean;
+    active?: boolean;
   }): Promise<ChatMessage | null> {
-    const { messageId, reason, reportedAt, read } = payload;
+    const { messageId, reason, reportedAt, read, active } = payload;
 
     const update: {
       read?: boolean;
       report?: { reason?: string; reportedAt?: Date };
+      active?: boolean;
     } = {};
 
     if (reason || reportedAt) {
@@ -61,7 +57,11 @@ export class ChatMessageRepository implements IChatMessagesRepo {
       if (reason) update.report.reason = reason;
       if (reportedAt) update.report.reportedAt = reportedAt;
     }
-
+    if (active !== undefined || active !== null) {
+      if (typeof active === "boolean") {
+        update.active = active;
+      }
+    }
     if (typeof read === "boolean") {
       update.read = read;
     }
@@ -99,6 +99,7 @@ export class ChatMessageRepository implements IChatMessagesRepo {
     const matchStageFilter1: Record<string, any> = {
       report: { $exists: true, $ne: null },
       "report.reason": { $exists: true, $ne: "" },
+      active: true,
     };
     const matchStageFilter2: Record<string, any> = {};
     if (search.trim()) {
