@@ -1,5 +1,9 @@
 import express, { Request, Response } from "express";
-import { chatDocumentstorage, documentstorage } from "../middelwares/multer";
+import {
+  chatDocumentstorage,
+  documentstorage,
+  handleMulterErrors,
+} from "../middelwares/multer";
 import multer from "multer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 import { authenticateLawyer } from "../middelwares/Auth/authenticateLawyer";
@@ -26,6 +30,8 @@ import { fetchSessionsComposer } from "@infrastructure/services/composers/Admin/
 import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
 import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsByUserIdComposer";
 import { FetchReviewsBySessionComposer } from "@infrastructure/services/composers/Client/review/FetchReviewBySessionComposer";
+import { NextFunction } from "express-serve-static-core";
+import { SendMessageFileComposer } from "@infrastructure/services/composers/Client/SendMessageFileComposer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -224,14 +230,21 @@ router.patch(
     return;
   }
 );
-// chats
-// router.post(
-//   "/chat/sendFile",
-//   authenticateUser,
-//   authenticateLawyer,
-//   handleMulterErrors(chatFile.single("file")),
-//   sendFileMessage
-// )
+  
+router.post(
+  "/chat/sendFile",
+  authenticateUser,
+  authenticateLawyer,
+  handleMulterErrors(chatFile.single("file")),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const adapter = await expressAdapter(req, SendMessageFileComposer());
+      res.status(adapter.statusCode).json(adapter.body);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 router.get(
   "/profile/sessions/callLogs/:id",
