@@ -6,6 +6,7 @@ export interface IreviewModel extends Document {
   session_id: string;
   heading: string;
   rating: number;
+  active: boolean;
   client_id: string;
   lawyer_id: string;
   createdAt: Date;

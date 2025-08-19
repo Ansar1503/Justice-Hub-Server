@@ -91,7 +91,9 @@ export class Review {
   get clientId(): string {
     return this._client_id;
   }
-
+  get active(): boolean {
+    return this._active;
+  }
   get lawyerId(): string {
     return this._lawyer_id;
   }
