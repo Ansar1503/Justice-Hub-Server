@@ -10,7 +10,11 @@ export class DelereReviewUseCase implements IDeleteReviewUseCase {
       input.review_id
     );
     if (!deletingReview) throw new ValidationError("review not found");
-    await this.reviewRepository.delete(input.review_id);
+    deletingReview.deleteReview();
+    await this.reviewRepository.update({
+      review_id: input.review_id,
+      updates: deletingReview,
+    });
     return {
       client_id: deletingReview.clientId,
       createdAt: deletingReview.createdAt,

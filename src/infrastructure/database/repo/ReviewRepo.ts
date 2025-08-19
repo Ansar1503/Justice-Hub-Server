@@ -25,10 +25,25 @@ export class ReviewRepo implements IReviewRepo {
     review_id: string;
     updates: Partial<Review>;
   }): Promise<Review | null> {
-    const { heading, rating, review } = payload.updates;
+    const { heading, rating, review, active } = payload.updates;
+    const update: any = {};
+    if (heading) {
+      update.heading = heading;
+    }
+    if (rating) {
+      update.rating = rating;
+    }
+    if (review) {
+      update.review = review;
+    }
+    if (active !== undefined && active !== null) {
+      if (typeof active === "boolean") {
+        update.active = active;
+      }
+    }
     const updatedData = await reviewModel.findOneAndUpdate(
       { _id: payload.review_id },
-      { $set: { heading, rating, review } },
+      update,
       { new: true }
     );
     if (!updatedData) return null;
@@ -41,7 +56,7 @@ export class ReviewRepo implements IReviewRepo {
   > {
     // console.log("session(d", session_id);
     const result = await reviewModel.aggregate([
-      { $match: { session_id } },
+      { $match: { active: true, session_id: session_id } },
       {
         $lookup: {
           from: "users",
@@ -82,7 +97,6 @@ export class ReviewRepo implements IReviewRepo {
         },
       },
     ]);
-
     return result;
   }
   async findByLawyer_id(payload: {
@@ -93,7 +107,7 @@ export class ReviewRepo implements IReviewRepo {
     const limit = 10;
     const skip = page > 0 ? Math.abs(page - 1) * limit : 0;
     const result = await reviewModel.aggregate([
-      { $match: { lawyer_id } },
+      { $match: { active: true, lawyer_id: lawyer_id } },
       {
         $lookup: {
           from: "users",
@@ -167,9 +181,6 @@ export class ReviewRepo implements IReviewRepo {
       nextCursor: hasNextPage ? page + 1 : undefined,
     };
   }
-  async delete(id: string): Promise<void> {
-    await reviewModel.deleteOne({ _id: id });
-  }
   async findByReview_id(id: string): Promise<Review | null> {
     const data = await reviewModel.findOne({ _id: id });
     return data ? this.mappper.toDomain(data) : null;
@@ -180,7 +191,7 @@ export class ReviewRepo implements IReviewRepo {
     const { limit, page, role, search, sortBy, sortOrder, user_id } = payload;
     const order = sortOrder === "asc" ? 1 : -1;
     const skip = page > 0 ? Math.abs(page - 1) * limit : 0;
-    const matchQuery: Record<string, any> = {};
+    const matchQuery: Record<string, any> = { active: true };
     const sortQuery: Record<string, any> = {};
     if (role === "client") {
       matchQuery["client_id"] = user_id;

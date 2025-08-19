@@ -19,7 +19,6 @@ export interface IReviewRepo {
   ): Promise<
     (Review & { reviewedBy: { name: string; profile_image: string } })[] | []
   >;
-  delete(id: string): Promise<void>;
   findByReview_id(id: string): Promise<Review | null>;
   findReviewsByUser_id(
     payload: FetchReviewInputDto
