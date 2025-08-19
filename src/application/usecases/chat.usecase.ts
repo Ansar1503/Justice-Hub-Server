@@ -138,7 +138,7 @@ export class ChatUseCase implements IChatusecase {
         : null;
     await this.chatSessionRepo.update({
       id: payload.sessionId,
-      last_message: lastMessage?.id ?? "",
+      last_message: lastMessage?.id || "no message",
     });
     if (!lastMessage) return null;
     return {
