@@ -121,7 +121,7 @@ export class ChatUseCase implements IChatusecase {
   async deleteMessage(payload: {
     messageId: string;
     sessionId: string;
-  }): Promise<ChatMessage | null> {
+  }): Promise<ChatMessageOutputDto | null> {
     if (!payload.messageId) throw new ValidationError("MessageId not found");
     // console.log("delete paylaod :: ", payload);
     await this.chatMessageRepo.update({
@@ -140,7 +140,19 @@ export class ChatUseCase implements IChatusecase {
       id: payload.sessionId,
       last_message: lastMessage?.id || "",
     });
-    return lastMessage;
+    if (!lastMessage) return null;
+    return {
+      active: lastMessage.active,
+      createdAt: lastMessage.createdAt,
+      id: lastMessage.id,
+      read: lastMessage.read,
+      updatedAt: lastMessage.updatedAt,
+      receiverId: lastMessage.receiverId,
+      senderId: lastMessage.senderId,
+      session_id: lastMessage.sessionId,
+      attachments: lastMessage.attachments,
+      content: lastMessage.content,
+    };
   }
 
   async reportMessage(payload: {

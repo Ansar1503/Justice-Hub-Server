@@ -33,7 +33,7 @@ export interface IChatusecase {
   deleteMessage(payload: {
     messageId: string;
     sessionId: string;
-  }): Promise<ChatMessage | null>;
+  }): Promise<ChatMessageOutputDto | null>;
   reportMessage(payload: {
     messageId: string;
     reason: string;

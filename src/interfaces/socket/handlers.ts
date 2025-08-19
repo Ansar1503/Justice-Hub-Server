@@ -180,9 +180,9 @@ export class SocketHandlers {
 
   async handleDeleteMessage(payload: { messageId: string; sessionId: string }) {
     try {
-      console.log("payload", payload);
+      // console.log("payload", payload);
       const lastMessage = await chatUsecase.deleteMessage(payload);
-      console.log("lastmessage", lastMessage);
+      // console.log("lastmessage", lastMessage);
       this.io.in(payload.sessionId).emit(this.eventEnum.MESSAGE_DELETE_EVENT, {
         ...payload,
         lastMessage: lastMessage,
