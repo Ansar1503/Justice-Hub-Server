@@ -16,6 +16,7 @@ export interface UpdateReviewOutputDto {
   heading: string;
   review: string;
   rating: number;
+  active: boolean;
   client_id: string;
   lawyer_id: string;
   createdAt: Date;
