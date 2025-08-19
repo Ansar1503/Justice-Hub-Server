@@ -16,6 +16,7 @@ export interface FetchReviewsOutputDto {
     heading: string;
     review: string;
     rating: number;
+    active: boolean;
     client_id: string;
     lawyer_id: string;
     createdAt: Date;
@@ -35,6 +36,7 @@ export interface FetchReviewsBySessionOutputDto {
   heading: string;
   review: string;
   rating: number;
+  active: boolean;
   client_id: string;
   lawyer_id: string;
   reviewedBy: reviewedBy;

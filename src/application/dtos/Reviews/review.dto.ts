@@ -15,6 +15,7 @@ export interface FetchReviewOutputDto {
     heading: string;
     rating: number;
     review: string;
+    active: boolean;
     client_id: string;
     lawyer_id: string;
     reviewedBy: { name: string; profile_image: string };

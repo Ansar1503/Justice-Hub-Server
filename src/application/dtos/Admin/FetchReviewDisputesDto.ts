@@ -10,6 +10,7 @@ interface Review {
   session_id: string;
   heading: string;
   review: string;
+  active: boolean;
   rating: number;
   client_id: string;
   lawyer_id: string;
