@@ -16,6 +16,7 @@ export class DelereReviewUseCase implements IDeleteReviewUseCase {
       createdAt: deletingReview.createdAt,
       heading: deletingReview.heading,
       id: deletingReview.id,
+      active: deletingReview.active,
       lawyer_id: deletingReview.lawyerId,
       rating: deletingReview.rating,
       review: deletingReview.review,

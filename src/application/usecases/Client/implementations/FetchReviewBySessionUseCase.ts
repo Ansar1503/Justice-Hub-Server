@@ -25,6 +25,7 @@ export class FetchReviewBySessionUseCase
       heading: r.heading,
       id: r.id,
       lawyer_id: r.lawyerId,
+      active: r.active,
       rating: r.rating,
       review: r.review,
       reviewedBy: r.reviewedBy,

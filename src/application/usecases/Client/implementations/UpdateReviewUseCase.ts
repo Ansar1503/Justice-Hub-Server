@@ -20,6 +20,7 @@ export class UpdateReviewUseCase implements IUpdateReviewUseCase {
       createdAt: updated.createdAt,
       heading: updated.heading,
       id: updated.id,
+      active: updated.active,
       lawyer_id: updated.lawyerId,
       rating: updated.rating,
       review: updated.review,
