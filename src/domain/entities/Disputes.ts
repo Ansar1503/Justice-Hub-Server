@@ -103,7 +103,7 @@ export class Disputes {
     this._status = status;
     this.touch();
   }
-  updateAction(action: "deleted" | "blocked"): void {
+  updateAction(action?: "deleted" | "blocked"): void {
     this._resolveAction = action;
     this.touch();
   }

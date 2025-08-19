@@ -37,7 +37,7 @@ export class DisputesRepo
   }
   async update(payload: {
     disputesId: string;
-    action: "blocked" | "deleted";
+    action?: "blocked" | "deleted";
     status: "pending" | "resolved" | "rejected";
   }): Promise<Disputes | null> {
     const update = { status: payload.status, resolveAction: payload.action };
@@ -347,7 +347,7 @@ export class DisputesRepo
     ]);
     const totalCount = count[0]?.count || 0;
     const totalPage = Math.ceil(totalCount / limit);
-    // console.log("data ::", data); 
+    // console.log("data ::", data);
     return {
       data: data
         ? data?.map((d: any) => ({

@@ -20,7 +20,7 @@ export interface IDisputes {
   ): Promise<FetchChatDisputesOutputDto>;
   update(payload: {
     disputesId: string;
-    action: "blocked" | "deleted";
+    action?: "blocked" | "deleted";
     status: "pending" | "resolved" | "rejected";
   }): Promise<Disputes | null>;
 }

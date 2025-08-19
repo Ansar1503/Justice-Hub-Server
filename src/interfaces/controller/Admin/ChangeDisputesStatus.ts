@@ -51,15 +51,13 @@ export class ChangeDisputesStatusController implements IController {
     if (!dispute_id) {
       return this.httpError.error_400("id is required");
     }
-    if (!action) {
-      return this.httpError.error_400("action is required");
-    }
+
     if (!status) {
       return this.httpError.error_400("status is required");
     }
     try {
       const result = await this.changeDisputesStatus.execute({
-        action,
+        action: action ? action : undefined,
         disputesId: dispute_id,
         status,
       });
