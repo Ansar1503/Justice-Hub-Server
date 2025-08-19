@@ -30,7 +30,7 @@ export class SocketHandlers {
   constructor(private socket: Socket, private io: SocketIOServer) {}
   handleEmiter(id: string, event: SocketEventEnum, payload: any) {
     this.socket.to(id).emit(event, payload);
-    console.log(`Emitting ${event} to user ${id}`, payload);
+    // console.log(`Emitting ${event} to user ${id}`, payload);
   }
   getChatSessionDetails(sessionId: string) {
     return chatUsecase.getChatSessionById(sessionId);
