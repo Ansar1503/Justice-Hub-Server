@@ -347,7 +347,7 @@ export class DisputesRepo
     ]);
     const totalCount = count[0]?.count || 0;
     const totalPage = Math.ceil(totalCount / limit);
-    // console.log("data ::", data);
+    console.log("data ::", data); 
     return {
       data: data
         ? data?.map((d: any) => ({
@@ -373,13 +373,13 @@ export class DisputesRepo
               profile_image: d.reportedUser.profile_image,
             },
             chatMessage: {
-              id: d.chatMessage.id,
-              session_id: d.chatMessage.session_id,
-              content: d.chatMessage.content,
-              read: d.chatMessage.read,
-              attachments: d.chatMessage.attachments,
-              createdAt: d.chatMessage.createdAt,
-              updatedAt: d.chatMessage.updatedAt,
+              id: d.chatMessage?._id,
+              session_id: d.chatMessage?.session_id,
+              content: d.chatMessage?.content,
+              read: d.chatMessage?.read,
+              attachments: d.chatMessage?.attachments,
+              createdAt: d.chatMessage?.createdAt,
+              updatedAt: d.chatMessage?.updatedAt,
             },
           }))
         : [],
