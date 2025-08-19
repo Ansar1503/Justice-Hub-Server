@@ -8,6 +8,7 @@ export interface PersistedReviewProps {
   rating: number;
   client_id: string;
   lawyer_id: string;
+  active: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +30,7 @@ export class Review {
   private _rating: number;
   private _client_id: string;
   private _lawyer_id: string;
+  private _active: boolean;
   private _createdAt: Date;
   private _updatedAt: Date;
 
@@ -42,6 +44,7 @@ export class Review {
     this._lawyer_id = props.lawyer_id;
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
+    this._active = props.active;
   }
 
   static create(props: CreateReviewProps): Review {
@@ -52,6 +55,7 @@ export class Review {
       heading: props.heading,
       review: props.review,
       rating: props.rating,
+      active: true,
       client_id: props.client_id,
       lawyer_id: props.lawyer_id,
       createdAt: now,
@@ -100,11 +104,15 @@ export class Review {
     return this._updatedAt;
   }
 
-  
   updateReview(newHeading: string, newReview: string, newRating: number): void {
     this._heading = newHeading;
     this._review = newReview;
     this._rating = newRating;
+    this.touch();
+  }
+
+  deleteReview(): void {
+    this._active = false;
     this.touch();
   }
 
