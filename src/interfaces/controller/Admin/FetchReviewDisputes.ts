@@ -7,7 +7,6 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
-import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 
 export class FetchReviewDisputes implements IController {
   constructor(
@@ -20,21 +19,22 @@ export class FetchReviewDisputes implements IController {
       httpRequest.query
     );
     if (!parsedData.success) {
-      console.log("parsed Error :", parsedData.error);
-      const err = this.httpErrors.error_400();
-      return new HttpResponse(err.statusCode, {
-        message: "Invalid Credentials",
-      });
+      // console.log("parsed Error :", parsedData.error);
+      const err = parsedData.error.errors[0].message;
+      return this.httpErrors.error_400(err);
     }
     try {
       const result = await this.FetchReviewDisputesUseCase.execute(
         parsedData.data
       );
       const success = this.httpSuccess.success_200(result);
-      return new HttpResponse(success.statusCode, success.body);
+      return success;
     } catch (error) {
-      const err = this.httpErrors.error_500();
-      return new HttpResponse(err.statusCode, err.body);
+      console.log("error in fetch review disputes controller : ", error);
+      if (error instanceof Error) {
+        return this.httpErrors.error_400(error.message);
+      }
+      return this.httpErrors.error_500();
     }
   }
 }

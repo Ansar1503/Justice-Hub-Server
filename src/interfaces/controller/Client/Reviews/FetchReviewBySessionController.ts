@@ -26,18 +26,19 @@ export class FetchReviewsBySessionController implements IController {
 
       if (!sessionId) {
         const error = this.httpErrors.error_400();
-        return new HttpResponse(error.statusCode, error.body);
+        return error;
       }
 
       const result = await this.fetchReviewBySessionId.execute({
         session_id: sessionId,
       });
-
       const success = this.httpSuccess.success_200(result);
-      return new HttpResponse(success.statusCode, success.body);
+      return success;
     } catch (error) {
-      const err = this.httpErrors.error_500();
-      return new HttpResponse(err.statusCode, err.body);
+      if (error instanceof Error) {
+        return this.httpErrors.error_400(error.message);
+      }
+      return this.httpErrors.error_500();
     }
   }
 }

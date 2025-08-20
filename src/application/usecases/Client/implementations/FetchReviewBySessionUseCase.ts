@@ -19,18 +19,6 @@ export class FetchReviewBySessionUseCase
     const reviews = await this.reviewRepository.findBySession_id(
       input.session_id
     );
-    return reviews.map((r) => ({
-      client_id: r.clientId,
-      createdAt: r.createdAt,
-      heading: r.heading,
-      id: r.id,
-      lawyer_id: r.lawyerId,
-      active: r.active,
-      rating: r.rating,
-      review: r.review,
-      reviewedBy: r.reviewedBy,
-      session_id: r.sessionId,
-      updatedAt: r.updatedAt,
-    }));
+    return reviews;
   }
 }

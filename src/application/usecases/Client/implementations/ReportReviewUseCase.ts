@@ -17,7 +17,6 @@ export class ReportReviewUseCase implements IReportReviewUseCase {
     const exists = await this.disputesRepo.findByContentId({
       contentId: input.review_id,
     });
-
     if (exists && Object.keys(exists).length > 0)
       throw new ValidationError("content already reported");
 

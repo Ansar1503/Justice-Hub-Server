@@ -10,7 +10,7 @@ export class FetchReviewDisputesUseCase implements IFetchReviewDisputesUseCase {
   async execute(
     input: FetchReviewDisputesInputDto
   ): Promise<FetchReviewDisputesOutputDto> {
-    const disputes = await this.DisputesRepo.findReviewDisputes(input);
+    const disputes = await this.DisputesRepo.findReviewDisputes(input)
     return disputes
   }
 }

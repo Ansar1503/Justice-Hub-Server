@@ -19,6 +19,7 @@ const reviewSchema = new Schema<IreviewModel>(
     review: { type: String, required: true },
     session_id: { type: String, required: true },
     heading: { type: String, required: true },
+    active: { type: Boolean, default: true },
     rating: { type: Number, min: 1, max: 5, required: true },
     client_id: { type: String, required: true },
     lawyer_id: { type: String, required: true },

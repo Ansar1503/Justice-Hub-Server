@@ -8,7 +8,10 @@ import {
   FetchReviewInputDto,
   FetchReviewOutputDto,
 } from "@src/application/dtos/Reviews/review.dto";
-import { FetchReviewsOutputDto } from "@src/application/dtos/client/FetchReviewDto";
+import {
+  FetchReviewsBySessionOutputDto,
+  FetchReviewsOutputDto,
+} from "@src/application/dtos/client/FetchReviewDto";
 
 export class ReviewRepo implements IReviewRepo {
   constructor(
@@ -51,12 +54,10 @@ export class ReviewRepo implements IReviewRepo {
   }
   async findBySession_id(
     session_id: string
-  ): Promise<
-    (Review & { reviewedBy: { name: string; profile_image: string } })[] | []
-  > {
-    // console.log("session(d", session_id);
+  ): Promise<FetchReviewsBySessionOutputDto[] | []> {
     const result = await reviewModel.aggregate([
       { $match: { active: true, session_id: session_id } },
+
       {
         $lookup: {
           from: "users",
@@ -68,6 +69,7 @@ export class ReviewRepo implements IReviewRepo {
       {
         $unwind: { path: "$clientUserData", preserveNullAndEmptyArrays: true },
       },
+
       {
         $lookup: {
           from: "clients",
@@ -91,14 +93,28 @@ export class ReviewRepo implements IReviewRepo {
       },
       {
         $project: {
-          clientUserData: 0,
-          clientClientData: 0,
-          "reviewedBy.password": 0,
+          id: "$_id",
+          session_id: 1,
+          heading: 1,
+          review: 1,
+          rating: 1,
+          active: 1,
+          client_id: 1,
+          lawyer_id: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          reviewedBy: {
+            user_id: "$reviewedBy.user_id",
+            name: "$reviewedBy.name",
+            profile_image: "$reviewedBy.profile_image",
+          },
         },
       },
     ]);
+
     return result;
   }
+
   async findByLawyer_id(payload: {
     lawyer_id: string;
     page: number;

@@ -6,7 +6,6 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IReportReviewUseCase } from "@src/application/usecases/Client/IReportReviewUseCase";
-import { I_clientUsecase } from "@src/application/usecases/I_usecases/I_clientusecase";
 
 export class ReportReviewController implements IController {
   constructor(
@@ -18,12 +17,12 @@ export class ReportReviewController implements IController {
   async handle(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
       const { id: review_id } = httpRequest.params as { id: string };
-
       const { reason, reportedBy, reportedUser } = httpRequest.body as {
         reason: string;
         reportedBy: string;
         reportedUser: string;
       };
+
       if (!review_id || review_id.trim() === "") {
         return this.httpErrors.error_400("reviewId required");
       }
@@ -49,7 +48,9 @@ export class ReportReviewController implements IController {
         message: "Review reported ",
       });
     } catch (error) {
-      console.error("ReportReviewController Error:", error);
+      if (error instanceof Error) {
+        return this.httpErrors.error_400(error.message);
+      }
       return this.httpErrors.error_500("Something went wrong");
     }
   }

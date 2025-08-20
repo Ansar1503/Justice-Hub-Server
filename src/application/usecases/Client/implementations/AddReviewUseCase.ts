@@ -21,13 +21,13 @@ export class AddReviewUseCase implements IAddReviewUseCase {
     if (lawyer.verification_status !== "verified")
       throw new Error("LAWYER_UNVERIFIED");
 
-    // const existingReview = await this.reviewRepository.findBySession_id(
-    //   input.session_id
-    // );
-    // // console.log(existingReview);
-    // if (existingReview && existingReview.length > 5) {
-    //   throw new Error("REVIEW_LIMIT_EXCEEDED");
-    // }
+    const existingReview = await this.reviewRepository.findBySession_id(
+      input.session_id
+    );
+    // console.log(existingReview);
+    if (existingReview && existingReview.length > 5) {
+      throw new Error("REVIEW_LIMIT_EXCEEDED");
+    }
 
     try {
       const reviewpayload = Review.create(input);
