@@ -235,7 +235,6 @@ export class SocketHandlers {
     try {
       const newNotification =
         await notificationUsecase.createSessionNotification(payload);
-      // console.log("new notification created: ", newNotification);
 
       this.io
         .to(newNotification.recipientId)

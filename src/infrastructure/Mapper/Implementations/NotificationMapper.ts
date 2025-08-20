@@ -7,7 +7,7 @@ export class NotificationMapper
 {
   toDomain(persistence: INotificationModel): Notification {
     return Notification.fromPersistence({
-      id: persistence._id,
+      id: persistence._id.toString(),
       sessionId: persistence.sessionId,
       senderId: persistence.senderId,
       recipientId: persistence.recipientId,
@@ -25,7 +25,7 @@ export class NotificationMapper
   }
   toPersistence(entity: Notification): Partial<INotificationModel> {
     return {
-      _id: entity.id,
+      _id: entity.id.toString(),
       sessionId: entity.sessionId,
       senderId: entity.senderId,
       recipientId: entity.recipientId,

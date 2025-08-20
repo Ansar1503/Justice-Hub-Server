@@ -13,7 +13,7 @@ export class CallLogsRepository implements ICallLogs {
   ) {}
 
   async create(payload: CallLogsEntity): Promise<CallLogsEntity> {
-    const newLog = new CallLogsModel(this.mapper.toPersistence(payload));
+    const newLog = new CallLogsModel(payload);
     await newLog.save();
     return this.mapper.toDomain(newLog);
   }

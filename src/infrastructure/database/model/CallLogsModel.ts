@@ -19,6 +19,7 @@ export interface IcallLogModel extends Document {
 
 const callLogsSchema = new Schema<IcallLogModel>(
   {
+    _id: { type: String },
     roomId: { type: String, required: true },
     session_id: { type: String, required: true, ref: "Session" },
     client_joined_at: { type: Date },

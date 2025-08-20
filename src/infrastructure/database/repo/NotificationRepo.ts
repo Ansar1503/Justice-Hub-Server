@@ -15,7 +15,9 @@ export class NotificationRepository implements INotificationRepo {
     > = new NotificationMapper()
   ) {}
   async addNotification(notification: Notification): Promise<Notification> {
-    const newNotification = new NotificationModel(notification);
+    const newNotification = new NotificationModel(
+      this.mapper.toPersistence(notification)
+    );
     newNotification.save();
     return this.mapper.toDomain(newNotification);
   }

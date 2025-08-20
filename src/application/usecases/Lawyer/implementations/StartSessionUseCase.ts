@@ -59,7 +59,11 @@ export class StartSessionUseCase implements IStartSessionUseCase {
       session_id: input.sessionId,
       roomId: roomId,
     });
-    await this.callLogsRepo.create(newcallLog);
+    try {
+      await this.callLogsRepo.create(newcallLog);
+    } catch (error) {
+      console.log("clalllogs erro", error);
+    }
     const session = await this.sessionsRepo.update({
       start_time: newDate,
       room_id: roomId,
