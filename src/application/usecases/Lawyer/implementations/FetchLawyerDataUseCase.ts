@@ -37,7 +37,15 @@ export class FetchLawyerDataUseCase implements IFetchLawyerDataUseCase {
         lawyerDetails.certificate_of_practice_number,
       consultation_fee: lawyerDetails.consultation_fee,
       description: lawyerDetails.description,
-      documents: lawyerDocs,
+      documents: {
+        bar_council_certificate: lawyerDocs.bar_council_certificate,
+        certificate_of_practice: lawyerDocs.certificate_of_practice,
+        enrollment_certificate: lawyerDocs.enrollment_certificate,
+        id: lawyerDocs.id,
+        createdAt: lawyerDocs.createdAt,
+        updatedAt: lawyerDocs.updatedAt,
+        user_id: lawyerDocs.user_id,
+      },
       enrollment_certificate_number:
         lawyerDetails.enrollment_certificate_number,
       experience: lawyerDetails.experience,
