@@ -172,25 +172,8 @@ export class VerifyLawyerController implements IController {
       return this.httpSuccess.success_200(result);
     } catch (error) {
       if (error instanceof Error) {
-        console.log("error ", error);
-        switch (error.message) {
-          case "USER_NOT_FOUND":
-            return this.httpErrors.error_404("user not found, try again later");
-          case "USER_NOT_LAWYER":
-            return this.httpErrors.error_400("unauthorised access");
-          case "USER_BLOCKED":
-            return this.httpErrors.error_403("user is blocked");
-          case "VERIFICATION_EXISTS":
-            return this.httpErrors.error_400(
-              "your request already exists. please wait until admin verifies it."
-            );
-          case "DOCUMENT_NOT_FOUND":
-            return this.httpErrors.error_400("document creation failed");
-          default:
-            return this.httpErrors.error_500("Internal Server Error");
-        }
+        return this.httpErrors.error_400(error.message);
       }
-
       return this.httpErrors.error_500("Something went wrong");
     }
   }
