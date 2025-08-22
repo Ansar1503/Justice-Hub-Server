@@ -18,4 +18,5 @@ export interface FetchClientDto {
     pincode: string;
   };
   lawyerVerfication?: VerificationStatus;
+  rejectReason?: string;
 }

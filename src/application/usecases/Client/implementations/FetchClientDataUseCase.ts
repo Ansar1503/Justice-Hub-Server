@@ -54,6 +54,7 @@ export class FetchClientDataUseCaseDto implements IFetchClientDataUseCase {
         ...responseClientData,
         address,
         lawyerVerfication,
+        rejectReason: lawyerData?.rejectReason,
       };
     } catch (error: any) {
       throw new Error(error.message);
