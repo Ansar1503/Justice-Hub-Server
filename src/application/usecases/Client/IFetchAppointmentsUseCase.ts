@@ -1,7 +1,7 @@
 import {
   FetchAppointmentsInputDto,
   FetchAppointmentsOutputDto,
-} from "@src/application/dtos/Admin/FetchAppointmentsDto";
+} from "@src/application/dtos/Appointments/FetchAppointmentsDto";
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IFetchAppointmentsClientUseCase

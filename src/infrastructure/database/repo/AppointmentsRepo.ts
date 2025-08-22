@@ -5,13 +5,17 @@ import {
   AppointmentModel,
   IAppointmentModel,
 } from "../model/AppointmentsModel";
-import {
-  FetchAppointmentsInputDto,
-  FetchAppointmentsOutputDto,
-} from "@src/application/dtos/Admin/FetchAppointmentsDto";
+// import {
+//   FetchAppointmentsInputDto,
+//   FetchAppointmentsOutputDto,
+// } from "@src/application/dtos/Admin/FetchAppointmentsDto";
 import { BaseRepository } from "./base/BaseRepo";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
 import { AppointmentMapper } from "@infrastructure/Mapper/Implementations/AppointmentMapper";
+import {
+  FetchAppointmentsInputDto,
+  FetchAppointmentsOutputDto,
+} from "@src/application/dtos/Appointments/FetchAppointmentsDto";
 
 export class AppointmentsRepository
   extends BaseRepository<Appointment, IAppointmentModel>
@@ -376,17 +380,21 @@ export class AppointmentsRepository
       page,
       sortBy,
       sortOrder,
-      status,
-      consultation_type,
+      appointmentStatus,
+      consultationType,
+      user_id,
     } = payload;
     const skip = (page - 1) * limit;
     const order = sortOrder === "asc" ? 1 : -1;
     const matchStage: Record<string, any> = {};
-    if (status && status !== "all") {
-      matchStage["status"] = status;
+    if (user_id) {
+      matchStage["$or"] = [{ client_id: user_id }, { lawyer_id: user_id }];
     }
-    if (consultation_type && consultation_type !== "all") {
-      matchStage["type"] = consultation_type;
+    if (consultationType && consultationType !== "all") {
+      matchStage["type"] = consultationType;
+    }
+    if (appointmentStatus && appointmentStatus !== "all") {
+      matchStage["status"] = appointmentStatus;
     }
 
     const matchStage2: Record<string, any> = {
@@ -399,7 +407,7 @@ export class AppointmentsRepository
     };
     const sortStage: Record<string, any> = {};
     switch (sortBy) {
-      case "amount":
+      case "fee":
         sortStage[sortBy] = order;
       case "date":
         sortStage[sortBy] = order;
@@ -483,10 +491,6 @@ export class AppointmentsRepository
       },
       {
         $project: {
-          // clientsUserData: 0,
-          // clientsClientData: 0,
-          // lawyersUserData: 0,
-          // lawyersClientData: 0,
           "clientData.name": 1,
           "clientData.email": 1,
           "clientData.mobile": 1,
@@ -502,32 +506,18 @@ export class AppointmentsRepository
           "lawyerData.profile_image": 1,
           "lawyerData.dob": 1,
           "lawyerData.gender": 1,
-
-          appointment_id: 1,
+          _id: 0,
+          id: "$_id",
           lawyer_id: 1,
           client_id: 1,
-          scheduled_date: 1,
-          scheduled_time: 1,
-          duration: 1,
           date: 1,
           time: 1,
-          payment_status: 1,
           reason: 1,
+          duration: 1,
           amount: 1,
           type: 1,
+          payment_status: 1,
           status: 1,
-          notes: 1,
-          summary: 1,
-          follow_up_suggested: 1,
-          follow_up_session_id: 1,
-          start_time: 1,
-          end_time: 1,
-          client_joined_at: 1,
-          client_left_at: 1,
-          lawyer_joined_at: 1,
-          lawyer_left_at: 1,
-          end_reason: 1,
-          callDuration: 1,
           createdAt: 1,
           updatedAt: 1,
         },

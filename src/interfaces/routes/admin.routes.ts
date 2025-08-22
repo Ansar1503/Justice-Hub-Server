@@ -5,11 +5,11 @@ import { FetchAllUserComposer } from "@infrastructure/services/composers/Admin/F
 import { FetchAllLawyersComposer } from "@infrastructure/services/composers/Admin/FetchAllLawyers";
 import { BlockUserComposer } from "@infrastructure/services/composers/Admin/BlockUser";
 import { ChangeLawyerVerificationComposer } from "@infrastructure/services/composers/Admin/ChangeLawyerVerificationStatus";
-import { FetchAppointmentsComposer } from "@infrastructure/services/composers/Admin/FetchAppointment";
 import { fetchSessionsComposer } from "@infrastructure/services/composers/Admin/FetchSessions";
 import { FetchReviewDipsutesComposer } from "@infrastructure/services/composers/Admin/FetchReviewDisputes";
 import { FetchChatDisputesComposer } from "@infrastructure/services/composers/Admin/FetchChatDisputesComposer";
 import { UpdateDisputesStatusComposer } from "@infrastructure/services/composers/Admin/UpdateDisputesStatusComposer";
+import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 
 const router = Router();
 
@@ -46,10 +46,10 @@ router.patch(
 );
 
 router.get(
-  "/appointments",
+  "/profile/appointments",
   authenticateUser,
   async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FetchAppointmentsComposer());
+    const adapter = await expressAdapter(req, FetchAppointmentDataComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }
@@ -74,7 +74,6 @@ router.get(
     return;
   }
 );
-
 
 router.get(
   "/disputes/chat",

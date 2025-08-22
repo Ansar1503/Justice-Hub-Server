@@ -18,7 +18,6 @@ import { FetchAvailableSlotsComposer } from "@infrastructure/services/composers/
 import { FetchOverrideSlotsComposer } from "@infrastructure/services/composers/Lawyer/Slots/FetchOverrideSlotsComposer";
 import { AddOverrideSlotsComposer } from "@infrastructure/services/composers/Lawyer/Slots/AddOverrideSlotsComposer";
 import { RemoveOverriedSlotsComposer } from "@infrastructure/services/composers/Lawyer/Slots/RemoveOverrideSlotsComposer";
-import { FetchAppointmentsComposer } from "@infrastructure/services/composers/Admin/FetchAppointment";
 import { RejectClientAppointmentComposer } from "@infrastructure/services/composers/Lawyer/Appointment/RejectClientAppointmentComposer";
 import { ConfirmClientAppointmentComposer } from "@infrastructure/services/composers/Lawyer/Appointment/ConfirmClientAppointment";
 import { FetchSessionDocumentsComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchSessionDocumentsComposer";
@@ -32,6 +31,7 @@ import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers
 import { FetchReviewsBySessionComposer } from "@infrastructure/services/composers/Client/review/FetchReviewBySessionComposer";
 import { NextFunction } from "express-serve-static-core";
 import { SendMessageFileComposer } from "@infrastructure/services/composers/Client/SendMessageFileComposer";
+import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -140,7 +140,7 @@ router.get(
   authenticateUser,
   authenticateLawyer,
   async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FetchAppointmentsComposer());
+    const adapter = await expressAdapter(req, FetchAppointmentDataComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }
@@ -230,7 +230,7 @@ router.patch(
     return;
   }
 );
-  
+
 router.post(
   "/chat/sendFile",
   authenticateUser,

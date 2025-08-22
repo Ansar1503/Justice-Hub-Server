@@ -26,10 +26,10 @@ export const zodAppointmentQuerySchema = z.object({
     .transform((val) => parseInt(val))
     .default("10"),
   sortBy: z
-    .enum(["date", "amount", "client_name", "lawyer_name"])
+    .enum(["date", "fee", "client_name", "lawyer_name", "date"])
     .default("date"),
   sortOrder: z.enum(["asc", "desc"]).default("asc"),
-  status: z.enum([
+  appointmentStatus: z.enum([
     "pending",
     "confirmed",
     "completed",
@@ -37,7 +37,7 @@ export const zodAppointmentQuerySchema = z.object({
     "rejected",
     "all",
   ]),
-  consultation_type: z.enum(["consultation", "follow-up", "all"]),
+  consultationType: z.enum(["consultation", "follow-up", "all"]),
 });
 
 export const zodSessionQuerySchema = z.object({

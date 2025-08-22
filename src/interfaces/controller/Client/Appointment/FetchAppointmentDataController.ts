@@ -7,6 +7,7 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IFetchAppointmentsClientUseCase } from "@src/application/usecases/Client/IFetchAppointmentsUseCase";
+import { zodAppointmentQuerySchema } from "@interfaces/middelwares/validator/zod/zod.validate";
 
 export class FetchAppointmentDataController implements IController {
   constructor(
@@ -16,61 +17,35 @@ export class FetchAppointmentDataController implements IController {
   ) {}
 
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    const req = httpRequest as Record<string, any>;
-    const { search, appointmentStatus, sortField, sortOrder, page, limit } =
-      req.query;
-    const appointmentType = req.query.appointmentType;
-    // console.log("req.query", req.query);
-    const normalizedAppointmentType =
-      typeof appointmentType === "string" &&
-      ["all", "consultation", "follow-up"].includes(appointmentType)
-        ? (appointmentType as "all" | "consultation" | "follow-up")
-        : "all";
-    const client_id = req.user.id;
-    type appointmentstatustype =
-      | "all"
-      | "confirmed"
-      | "pending"
-      | "completed"
-      | "cancelled"
-      | "rejected";
-    const allowedStatuses: appointmentstatustype[] = [
-      "all",
-      "confirmed",
-      "pending",
-      "completed",
-      "cancelled",
-      "rejected",
-    ];
+    let user_id = "";
+    if (
+      httpRequest.user &&
+      typeof httpRequest.user == "object" &&
+      "id" in httpRequest.user &&
+      typeof httpRequest.user.id == "string" &&
+      "role" in httpRequest.user &&
+      httpRequest.user.role != "admin"
+    ) {
+      user_id = httpRequest.user.id;
+    }
+    const parsedData = zodAppointmentQuerySchema.safeParse(httpRequest.query);
+    if (!parsedData.success) {
+      const err = parsedData.error.errors[0];
+      console.log("error ", err);
+      return this.httpErrors.error_400(err.message);
+    }
     try {
       const result = await this.fetchAppointments.execute({
-        appointmentStatus:
-          typeof appointmentStatus === "string" &&
-          allowedStatuses.includes(appointmentStatus as appointmentstatustype)
-            ? (appointmentStatus as appointmentstatustype)
-            : "all",
-        appointmentType: normalizedAppointmentType,
-        client_id,
-        limit: Number(limit) || 5,
-        page: Number(page) || 1,
-        sortField:
-          typeof sortField === "string" &&
-          ["name", "consultation_fee", "date", "created_at"].includes(sortField)
-            ? (sortField as "name" | "consultation_fee" | "date" | "created_at")
-            : "date",
-        sortOrder:
-          typeof sortOrder === "string" &&
-          (sortOrder === "asc" || sortOrder === "desc")
-            ? sortOrder
-            : "asc",
-        search: String(search) || "",
+        ...parsedData.data,
+        user_id,
       });
       const success = this.httpSuccess.success_200(result);
-      return new HttpResponse(success.statusCode, success.body);
+      return success;
     } catch (error) {
-      // console.log("error", error);
-      const err = this.httpErrors.error_500();
-      return new HttpResponse(err.statusCode, err.body);
+      if (error instanceof Error) {
+        return this.httpErrors.error_400(error.message);
+      }
+      return this.httpErrors.error_500();
     }
   }
 }
