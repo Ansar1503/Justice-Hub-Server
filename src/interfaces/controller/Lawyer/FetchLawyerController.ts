@@ -29,7 +29,10 @@ export class FetchLawyerController implements IController {
       const lawyers = await this.FetchLawyer.execute(user_id);
       return this.httpSuccess.success_200(lawyers);
     } catch (error) {
-      return this.httpErrors.error_500("lawyer fetch failed");
+      if (error instanceof Error) {
+        return this.httpErrors.error_400(error.message);
+      }
+      return this.httpErrors.error_500("Something went wrong");
     }
   }
 }
