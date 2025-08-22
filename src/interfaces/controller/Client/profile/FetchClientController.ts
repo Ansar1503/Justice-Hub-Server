@@ -26,11 +26,7 @@ export class FetchClientDataController implements IController {
         const err = this.httpErrors.error_400();
         return new HttpResponse(err.statusCode, err.body);
       }
-      const success = this.httpSuccess.success_200({
-        success: true,
-        message: "userdetails fetched",
-        data: clientDetails,
-      });
+      const success = this.httpSuccess.success_200(clientDetails);
       // console.log("success:", success);
       return new HttpResponse(success.statusCode, success.body);
     } catch (error) {
