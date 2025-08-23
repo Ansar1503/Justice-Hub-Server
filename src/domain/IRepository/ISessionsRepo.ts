@@ -1,7 +1,7 @@
 import {
   FetchSessionsInputDto,
   FetchSessionsOutputtDto,
-} from "@src/application/dtos/Admin/FetchSessionsDto";
+} from "@src/application/dtos/sessions/FetchSessionsDto";
 import { Session } from "../entities/Session";
 
 export interface ISessionsRepo {

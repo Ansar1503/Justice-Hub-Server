@@ -5,7 +5,7 @@ import SessionModel, { ISessionModel } from "../model/SessionModel";
 import {
   FetchSessionsInputDto,
   FetchSessionsOutputtDto,
-} from "@src/application/dtos/Admin/FetchSessionsDto";
+} from "@src/application/dtos/sessions/FetchSessionsDto";
 import { SessionMapper } from "@infrastructure/Mapper/Implementations/SessionMapper";
 
 export class SessionsRepository implements ISessionsRepo {
@@ -257,11 +257,15 @@ export class SessionsRepository implements ISessionsRepo {
   async findSessionsAggregate(
     payload: FetchSessionsInputDto
   ): Promise<FetchSessionsOutputtDto> {
-    const { search, limit, page, sortBy, sortOrder, status, type } = payload;
+    const { search, limit, page, sortBy, sortOrder, status, type, user_id } =
+      payload;
     const skip = (page - 1) * limit;
     const order = sortOrder === "asc" ? 1 : -1;
 
     const matchStage: Record<string, any> = {};
+    if (user_id) {
+      matchStage["$or"] = [{ client_id: user_id }, { lawyer_id: user_id }];
+    }
     if (status && status !== "all") matchStage.status = status;
     if (type && type !== "all") matchStage.type = type;
 
@@ -290,12 +294,52 @@ export class SessionsRepository implements ISessionsRepo {
 
     const projectStage = {
       $project: {
-        clientsUserData: 0,
-        clientsClientData: 0,
-        lawyersUserData: 0,
-        lawyersClientData: 0,
-        "clientData.password": 0,
-        "lawyerData.password": 0,
+        id: "$_id",
+        _id: 0,
+        appointment_id: 1,
+        lawyer_id: 1,
+        client_id: 1,
+        scheduled_date: 1,
+        scheduled_time: 1,
+        duration: 1,
+        reason: 1,
+        amount: 1,
+        type: 1,
+        status: 1,
+        notes: 1,
+        summary: 1,
+        follow_up_suggested: 1,
+        follow_up_session_id: 1,
+        start_time: 1,
+        end_time: 1,
+        client_joined_at: 1,
+        client_left_at: 1,
+        lawyer_joined_at: 1,
+        lawyer_left_at: 1,
+        end_reason: 1,
+        callDuration: 1,
+        createdAt: 1,
+        updatedAt: 1,
+
+        clientData: {
+          name: "$clientData.name",
+          email: "$clientData.email",
+          mobile: "$clientData.mobile",
+          user_id: "$clientData.user_id",
+          profile_image: "$clientData.profile_image",
+          dob: "$clientData.dob",
+          gender: "$clientData.gender",
+        },
+
+        lawyerData: {
+          name: "$lawyerData.name",
+          email: "$lawyerData.email",
+          mobile: "$lawyerData.mobile",
+          user_id: "$lawyerData.user_id",
+          profile_image: "$lawyerData.profile_image",
+          dob: "$lawyerData.dob",
+          gender: "$lawyerData.gender",
+        },
       },
     };
 
