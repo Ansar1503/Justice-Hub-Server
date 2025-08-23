@@ -26,5 +26,5 @@ export interface FetchSessionsInputDto {
     | "cancelled"
     | "missed"
     | "all";
-  type?: "consultation" | "follow-up" | "all";
+  consultation_type?: "consultation" | "follow-up" | "all";
 }

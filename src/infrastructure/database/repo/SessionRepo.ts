@@ -257,8 +257,17 @@ export class SessionsRepository implements ISessionsRepo {
   async findSessionsAggregate(
     payload: FetchSessionsInputDto
   ): Promise<FetchSessionsOutputtDto> {
-    const { search, limit, page, sortBy, sortOrder, status, type, user_id } =
-      payload;
+    const {
+      search,
+      limit,
+      page,
+      sortBy,
+      sortOrder,
+      status,
+      consultation_type,
+      user_id,
+    } = payload;
+    console.log("payload", payload);
     const skip = (page - 1) * limit;
     const order = sortOrder === "asc" ? 1 : -1;
 
@@ -267,7 +276,8 @@ export class SessionsRepository implements ISessionsRepo {
       matchStage["$or"] = [{ client_id: user_id }, { lawyer_id: user_id }];
     }
     if (status && status !== "all") matchStage.status = status;
-    if (type && type !== "all") matchStage.type = type;
+    if (consultation_type && consultation_type !== "all")
+      matchStage.type = consultation_type;
 
     const matchStage2 = {
       $or: [
@@ -281,14 +291,15 @@ export class SessionsRepository implements ISessionsRepo {
     const sortStage: Record<string, any> = (() => {
       switch (sortBy) {
         case "amount":
+          return { amount: order };
         case "date":
-          return { [sortBy]: order };
+          return { scheduled_date: order };
         case "client_name":
           return { "clientData.name": order };
         case "lawyer_name":
           return { "lawyerData.name": order };
         default:
-          return { createdAt: -1 };
+          return { scheduled_date: -1 };
       }
     })();
 

@@ -55,7 +55,7 @@ router.get(
   }
 );
 router.get(
-  "/sessions",
+  "/profile/sessions",
   authenticateUser,
   async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, fetchSessionsComposer());

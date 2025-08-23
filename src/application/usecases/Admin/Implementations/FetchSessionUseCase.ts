@@ -11,6 +11,6 @@ export class FetchSessionUseCase implements IFetchSessionUseCase {
     input: FetchSessionsInputDto
   ): Promise<FetchSessionsOutputtDto> {
     const sessions = await this.sessionRepo.findSessionsAggregate(input);
-    return sessions
+    return sessions;
   }
 }
