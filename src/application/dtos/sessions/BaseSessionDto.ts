@@ -14,6 +14,7 @@ export interface BaseSessionDto {
   notes?: string;
   summary?: string;
   follow_up_suggested?: boolean;
+  room_id?: string;
   follow_up_session_id?: string;
   start_time?: Date;
   end_time?: Date;

@@ -311,6 +311,7 @@ export class SessionsRepository implements ISessionsRepo {
         follow_up_suggested: 1,
         follow_up_session_id: 1,
         start_time: 1,
+        room_id: 1,
         end_time: 1,
         client_joined_at: 1,
         client_left_at: 1,
