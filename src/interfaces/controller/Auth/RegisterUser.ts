@@ -85,11 +85,10 @@ export class RegisterUser implements IController {
       const success = this.httpSuccess.success_201(user);
       return new HttpResponse(success.statusCode, success.body);
     } catch (error) {
-      console.log("error in registoring user:", error);
-      const err = this.httpErrors.error_500();
-      return new HttpResponse(err.statusCode, {
-        message: "Error Registering User",
-      });
+      if (error instanceof Error) {
+        return this.httpErrors.error_400(error.message);
+      }
+      return this.httpErrors.error_500("Error Registering User");
     }
   }
 }
