@@ -267,7 +267,6 @@ export class SessionsRepository implements ISessionsRepo {
       consultation_type,
       user_id,
     } = payload;
-    console.log("payload", payload);
     const skip = (page - 1) * limit;
     const order = sortOrder === "asc" ? 1 : -1;
 

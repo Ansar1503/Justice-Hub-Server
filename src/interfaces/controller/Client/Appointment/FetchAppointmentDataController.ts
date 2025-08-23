@@ -31,7 +31,6 @@ export class FetchAppointmentDataController implements IController {
     const parsedData = zodAppointmentQuerySchema.safeParse(httpRequest.query);
     if (!parsedData.success) {
       const err = parsedData.error.errors[0];
-      console.log("error ", err);
       return this.httpErrors.error_400(err.message);
     }
     try {

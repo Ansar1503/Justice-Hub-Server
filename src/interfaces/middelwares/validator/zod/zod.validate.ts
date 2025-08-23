@@ -25,9 +25,7 @@ export const zodAppointmentQuerySchema = z.object({
     .string()
     .transform((val) => parseInt(val))
     .default("10"),
-  sortBy: z
-    .enum(["date", "fee", "client_name", "lawyer_name", "date"])
-    .default("date"),
+  sortBy: z.enum(["fee", "client_name", "lawyer_name", "date"]).default("date"),
   sortOrder: z.enum(["asc", "desc"]).default("asc"),
   appointmentStatus: z.enum([
     "pending",

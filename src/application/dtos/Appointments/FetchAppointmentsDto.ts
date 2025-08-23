@@ -12,7 +12,7 @@ export interface FetchAppointmentsInputDto {
     | "cancelled"
     | "rejected";
   consultationType: "all" | "consultation" | "follow-up";
-  sortBy: "client_name" | "lawyer_name" | "date" | "fee" | "date";
+  sortBy: "client_name" | "lawyer_name" | "fee" | "date";
   sortOrder: "asc" | "desc";
   page: number;
   limit: number;

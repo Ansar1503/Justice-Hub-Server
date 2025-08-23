@@ -408,9 +408,9 @@ export class AppointmentsRepository
     const sortStage: Record<string, any> = {};
     switch (sortBy) {
       case "fee":
-        sortStage[sortBy] = order;
+        sortStage["amount"] = order;
       case "date":
-        sortStage[sortBy] = order;
+        sortStage["createdAt"] = order;
       case "client_name":
         sortStage["clientData.name"] = order;
       case "lawyer_name":
