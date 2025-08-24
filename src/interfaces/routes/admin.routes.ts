@@ -10,16 +10,21 @@ import { FetchReviewDipsutesComposer } from "@infrastructure/services/composers/
 import { FetchChatDisputesComposer } from "@infrastructure/services/composers/Admin/FetchChatDisputesComposer";
 import { UpdateDisputesStatusComposer } from "@infrastructure/services/composers/Admin/UpdateDisputesStatusComposer";
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
+import { AdminRoutes } from "@shared/constant/RouteConstant";
 
 const router = Router();
 
-router.get("/users", authenticateUser, async (req: Request, res: Response) => {
-  const adapter = await expressAdapter(req, FetchAllUserComposer());
-  res.status(adapter.statusCode).json(adapter.body);
-  return;
-});
 router.get(
-  "/lawyers",
+  AdminRoutes.users,
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchAllUserComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+router.get(
+  AdminRoutes.lawyers,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchAllLawyersComposer());
@@ -27,13 +32,17 @@ router.get(
     return;
   }
 );
-router.patch("/user", authenticateUser, async (req: Request, res: Response) => {
-  const adapter = await expressAdapter(req, BlockUserComposer());
-  res.status(adapter.statusCode).json(adapter.body);
-  return;
-});
 router.patch(
-  "/lawyer",
+  AdminRoutes.blockUser,
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, BlockUserComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+router.patch(
+  AdminRoutes.changeLawyerVerification,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
@@ -46,7 +55,7 @@ router.patch(
 );
 
 router.get(
-  "/profile/appointments",
+  AdminRoutes.profileAppointments,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchAppointmentDataComposer());
@@ -55,7 +64,7 @@ router.get(
   }
 );
 router.get(
-  "/profile/sessions",
+  AdminRoutes.profileSessions,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, fetchSessionsComposer());
@@ -66,7 +75,7 @@ router.get(
 
 // disputes
 router.get(
-  "/disputes/reviews",
+  AdminRoutes.reviewDisputes,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, FetchReviewDipsutesComposer());
@@ -76,7 +85,7 @@ router.get(
 );
 
 router.get(
-  "/disputes/chat",
+  AdminRoutes.chatDisputes,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchChatDisputesComposer());
@@ -86,7 +95,7 @@ router.get(
 );
 
 router.put(
-  "/disputes/status/:id",
+  AdminRoutes.updateDisputeStatus,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, UpdateDisputesStatusComposer());
