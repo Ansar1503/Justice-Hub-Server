@@ -74,7 +74,6 @@ export const ClientRoutes = {
   },
 };
 
-// routes/lawyer.routes.ts
 export const LawyerRoutes = {
   base: "/lawyers",
   verification: "/verification",
