@@ -8,11 +8,11 @@ import { RefreshTokenComposer } from "@infrastructure/services/composers/Auth/Re
 import { VerifyEmailComposer } from "@infrastructure/services/composers/Auth/VerifyEmailComposer";
 import { VerifyEmailOtpComposer } from "@infrastructure/services/composers/Auth/VerifyEmailOtpComposer";
 import { ResendOtpComposer } from "@infrastructure/services/composers/Auth/ResendOtpComposer";
+import { AuthRoute } from "@shared/constant/RouteConstant";
 
 const router = express.Router();
-
 router.post(
-  "/signup",
+  AuthRoute.signup,
   validateUser,
   handleValidationErrors,
   async (req: Request, res: Response) => {
@@ -21,7 +21,7 @@ router.post(
     return;
   }
 );
-router.post("/login", async (req: Request, res: Response) => {
+router.post(AuthRoute.login, async (req: Request, res: Response) => {
   const adaper = await expressAdapter(req, LoginUserComposer());
   res.cookie("refresh", adaper.body?.refreshtoken, {
     httpOnly: true,
@@ -32,24 +32,24 @@ router.post("/login", async (req: Request, res: Response) => {
   res.status(adaper.statusCode).json(adaper.body);
   return;
 });
-router.get("/refresh", async (req: Request, res: Response) => {
+router.get(AuthRoute.refresh, async (req: Request, res: Response) => {
   const adaper = await expressAdapter(req, RefreshTokenComposer());
   // console.log("adapter : ", adaper);
   res.status(adaper.statusCode).json(adaper.body);
 });
-router.get("/verify-email", async (req: Request, res: Response) => {
+router.get(AuthRoute.verifyMail, async (req: Request, res: Response) => {
   const adaper = await expressAdapter(req, VerifyEmailComposer());
   if (adaper.body?.redirectUrl) {
     res.redirect(adaper.body?.redirectUrl);
     return;
   }
 });
-router.post("/verify-otp", async (req: Request, res: Response) => {
+router.post(AuthRoute.verifyOtp, async (req: Request, res: Response) => {
   const adaper = await expressAdapter(req, VerifyEmailOtpComposer());
   res.status(adaper.statusCode).json(adaper.body);
   return;
 });
-router.post("/resend-otp", async (req: Request, res: Response) => {
+router.post(AuthRoute.resendOtp, async (req: Request, res: Response) => {
   const adapter = await expressAdapter(req, ResendOtpComposer());
   res.status(adapter.statusCode).json(adapter.body);
   return;
