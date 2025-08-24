@@ -32,6 +32,7 @@ import { FetchReviewsBySessionComposer } from "@infrastructure/services/composer
 import { NextFunction } from "express-serve-static-core";
 import { SendMessageFileComposer } from "@infrastructure/services/composers/Client/SendMessageFileComposer";
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
+import { LawyerRoutes } from "@shared/constant/RouteConstant";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -41,7 +42,7 @@ const chatFile = multer({
 const router = express.Router();
 
 router.post(
-  "/verification",
+  LawyerRoutes.verification,
   authenticateUser,
   upload.fields([
     { name: "enrollment_certificate", maxCount: 1 },
@@ -53,90 +54,69 @@ router.post(
     res.status(adapter.statusCode).json(adapter.body);
   }
 );
-router.get("/", authenticateUser, async (req: Request, res: Response) => {
-  const adapter = await expressAdapter(req, FetchLawyerComposer());
-  res.status(adapter.statusCode).json(adapter.body);
-  return;
-});
-
-router.patch(
-  "/schedule/settings",
+router.get(
+  LawyerRoutes.root,
   authenticateUser,
-  authenticateLawyer,
   async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchLawyerComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router
+  .route(LawyerRoutes.schedule.settings)
+  .all(authenticateUser, authenticateLawyer)
+  .patch(async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
       req,
       UpdateLawyerSlotSettingsComposer()
     );
     res.status(adapter.statusCode).json(adapter.body);
     return;
-  }
-);
-router.get(
-  "/schedule/settings",
-  authenticateUser,
-  authenticateLawyer,
-  async (req: Request, res: Response) => {
+  })
+  .get(async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, FetchSlotSettingsComposer());
     res.status(adaper.statusCode).json(adaper.body);
     return;
-  }
-);
+  });
 
-router.patch(
-  `/schedule/availability`,
-  authenticateUser,
-  authenticateLawyer,
-  async (req: Request, res: Response) => {
+router
+  .route(LawyerRoutes.schedule.availability)
+  .all(authenticateUser, authenticateLawyer)
+  .patch(async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, UpdateAvailableSlotsComposer());
     res.status(adaper.statusCode).json(adaper.body);
     return;
-  }
-);
-router.get(
-  "/schedule/availability",
-  authenticateUser,
-  authenticateLawyer,
-  async (req: Request, res: Response) => {
+  })
+  .get(async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, FetchAvailableSlotsComposer());
     res.status(adaper.statusCode).json(adaper.body);
     return;
-  }
-);
-router.get(
-  "/schedule/override",
-  authenticateUser,
-  authenticateLawyer,
-  async (req: Request, res: Response) => {
+  });
+
+router
+  .route(LawyerRoutes.schedule.override)
+  .all(authenticateUser, authenticateLawyer)
+  .get(async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, FetchOverrideSlotsComposer());
     res.status(adaper.statusCode).json(adaper.body);
     return;
-  }
-);
-router.post(
-  `/schedule/override`,
-  authenticateUser,
-  authenticateLawyer,
-  async (req: Request, res: Response) => {
+  })
+  .post(async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, AddOverrideSlotsComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-  }
-);
-router.delete(
-  "/schedule/override",
-  authenticateUser,
-  authenticateLawyer,
-  async (req: Request, res: Response) => {
+  })
+  .delete(async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, RemoveOverriedSlotsComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-  }
-);
+  });
 
 // profiles
 router.get(
-  "/profile/appointments",
+  LawyerRoutes.profile.appointments.base,
   authenticateUser,
   authenticateLawyer,
   async (req: Request, res: Response) => {
@@ -146,7 +126,7 @@ router.get(
   }
 );
 router.patch(
-  "/profile/appointments/reject",
+  LawyerRoutes.profile.appointments.reject,
   authenticateUser,
   authenticateLawyer,
   async (req: Request, res: Response) => {
@@ -156,7 +136,7 @@ router.patch(
   }
 );
 router.patch(
-  "/profile/appointments/approve",
+  LawyerRoutes.profile.appointments.approve,
   authenticateUser,
   authenticateLawyer,
   async (req: Request, res: Response) => {
@@ -170,7 +150,7 @@ router.patch(
 );
 // profile sesisons
 router.get(
-  "/profile/sessions",
+  LawyerRoutes.profile.sessions.base,
   authenticateUser,
   authenticateLawyer,
   async (req: Request, res: Response) => {
@@ -180,7 +160,7 @@ router.get(
   }
 );
 router.get(
-  "/profile/sessions/document/:id",
+  LawyerRoutes.profile.sessions.document,
   authenticateUser,
   authenticateClient,
   authenticateLawyer,
@@ -191,7 +171,7 @@ router.get(
   }
 );
 router.patch(
-  "/profile/sessions/startSession",
+  LawyerRoutes.profile.sessions.start,
   authenticateUser,
   authenticateLawyer,
   async (req: Request, res: Response) => {
@@ -201,7 +181,7 @@ router.patch(
   }
 );
 router.patch(
-  "/profile/sessions/join",
+  LawyerRoutes.profile.sessions.join,
   authenticateUser,
   authenticateLawyer,
   async (req: Request, res: Response) => {
@@ -211,7 +191,7 @@ router.patch(
   }
 );
 router.patch(
-  "/profile/sessions/endSession",
+  LawyerRoutes.profile.sessions.end,
   authenticateUser,
   authenticateLawyer,
   async (req: Request, res: Response) => {
@@ -221,7 +201,7 @@ router.patch(
   }
 );
 router.patch(
-  `/profile/sessions/cancel`,
+  LawyerRoutes.profile.sessions.cancel,
   authenticateUser,
   authenticateLawyer,
   async (req: Request, res: Response) => {
@@ -232,7 +212,7 @@ router.patch(
 );
 
 router.post(
-  "/chat/sendFile",
+  LawyerRoutes.chat.sendFile,
   authenticateUser,
   authenticateLawyer,
   handleMulterErrors(chatFile.single("file")),
@@ -247,7 +227,7 @@ router.post(
 );
 
 router.get(
-  "/profile/sessions/callLogs/:id",
+  LawyerRoutes.profile.sessions.callLogs,
   authenticateUser,
   authenticateLawyer,
   async (req: Request, res: Response) => {
@@ -260,7 +240,7 @@ router.get(
 //reviews
 
 router.get(
-  "/profile/reviews/",
+  LawyerRoutes.profile.reviews,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -270,7 +250,7 @@ router.get(
   }
 );
 router.get(
-  "/profile/sessions/reviews/:id",
+  LawyerRoutes.profile.sessions.reviewsBySession,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {

@@ -73,3 +73,39 @@ export const ClientRoutes = {
     sendFile: "/chat/sendFile",
   },
 };
+
+// routes/lawyer.routes.ts
+export const LawyerRoutes = {
+  base: "/lawyers",
+  verification: "/verification",
+  root: "/",
+
+  schedule: {
+    settings: "/schedule/settings",
+    availability: "/schedule/availability",
+    override: "/schedule/override",
+  },
+
+  profile: {
+    appointments: {
+      base: "/profile/appointments",
+      reject: "/profile/appointments/reject",
+      approve: "/profile/appointments/approve",
+    },
+    sessions: {
+      base: "/profile/sessions",
+      start: "/profile/sessions/startSession",
+      join: "/profile/sessions/join",
+      end: "/profile/sessions/endSession",
+      cancel: "/profile/sessions/cancel",
+      callLogs: "/profile/sessions/callLogs/:id",
+      document: "/profile/sessions/document/:id",
+      reviewsBySession: "/profile/sessions/reviews/:id",
+    },
+    reviews: "/profile/reviews",
+  },
+
+  chat: {
+    sendFile: "/chat/sendFile",
+  },
+};
