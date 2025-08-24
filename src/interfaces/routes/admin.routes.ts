@@ -13,7 +13,7 @@ import { FetchAppointmentDataComposer } from "@infrastructure/services/composers
 
 const router = Router();
 
-router.get("/users", async (req: Request, res: Response) => {
+router.get("/users", authenticateUser, async (req: Request, res: Response) => {
   const adapter = await expressAdapter(req, FetchAllUserComposer());
   res.status(adapter.statusCode).json(adapter.body);
   return;
