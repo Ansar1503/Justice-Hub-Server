@@ -47,6 +47,7 @@ import { EndSessionComposer } from "@infrastructure/services/composers/Lawyer/Se
 import { JoinVideoSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/JoinVideoSessionComposer";
 import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
 import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsByUserIdComposer";
+import { ClientRoutes } from "@shared/constant/RouteConstant";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -80,7 +81,7 @@ const router = express.Router();
 
 // profile area
 router.get(
-  "/profile",
+  ClientRoutes.profile.base,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, FetchClientDataComposer());
@@ -89,7 +90,7 @@ router.get(
   }
 );
 router.put(
-  "/profile/basic",
+  ClientRoutes.profile.basic,
   authenticateUser,
   upload.single("image"),
   async (req: Request, res: Response) => {
@@ -99,7 +100,7 @@ router.put(
   }
 );
 router.put(
-  "/profile/personal",
+  ClientRoutes.profile.personal,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, UpdateEmailComposer());
@@ -108,7 +109,7 @@ router.put(
   }
 );
 router.post(
-  "/profile/verifyMail",
+  ClientRoutes.profile.verifyMail,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, SendVerificationMailComposer());
@@ -117,7 +118,7 @@ router.post(
   }
 );
 router.put(
-  "/profile/updatePassword",
+  ClientRoutes.profile.updatePassword,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, UpdatePasswordComposer());
@@ -125,8 +126,9 @@ router.put(
     return;
   }
 );
+
 router.post(
-  "/profile/address",
+  ClientRoutes.profile.address,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, UpdateAddressComposer());
@@ -134,30 +136,23 @@ router.post(
     return;
   }
 );
-router.patch(
-  "/profile/appointments",
-  authenticateUser,
-  authenticateClient,
-  async (req: Request, res: Response) => {
+router
+  .route(ClientRoutes.profile.appointments)
+  .all(authenticateUser, authenticateClient)
+  .patch(async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, CancelAppointmentComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-  }
-);
-router.get(
-  "/profile/appointments",
-  authenticateUser,
-  authenticateClient,
-  async (req: Request, res: Response) => {
+  })
+  .get(async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchAppointmentDataComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-  }
-);
+  });
 
 // profile sessions
 router.get(
-  "/profile/sessions",
+  ClientRoutes.profile.sessions,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -166,19 +161,21 @@ router.get(
     return;
   }
 );
-// router.patch("/profile/sessions", authenticateUser, authenticateClient);
-router.get(
-  "/profile/sessions/document/:id",
-  authenticateUser,
-  authenticateClient,
-  async (req: Request, res: Response) => {
+
+router
+  .route(ClientRoutes.profile.sessionDocs.byId)
+  .all(authenticateUser, authenticateClient)
+  .get(async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchSessionDocumentsComposer());
     res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
-);
+  })
+  .delete(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, RemoveSessionDocumentComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+  });
+
 router.post(
-  "/profile/sessions/document",
+  ClientRoutes.profile.sessionDocs.base,
   authenticateUser,
   authenticateClient,
   handleMulterErrors(documentUpload.array("documents", 3)),
@@ -188,19 +185,9 @@ router.post(
     return;
   }
 );
-router.delete(
-  "/profile/sessions/document/:id",
-  authenticateUser,
-  authenticateClient,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, RemoveSessionDocumentComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
-);
 
 router.patch(
-  "/profile/sessions/cancel",
+  ClientRoutes.profile.cancelSession,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response, next: NextFunction) => {
@@ -213,7 +200,7 @@ router.patch(
   }
 );
 router.patch(
-  "/profile/sessions/endSession",
+  ClientRoutes.profile.endSession,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response, next: NextFunction) => {
@@ -228,7 +215,7 @@ router.patch(
 
 // chats
 router.get(
-  "/profile/chats",
+  ClientRoutes.profile.chats,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -239,7 +226,7 @@ router.get(
 );
 
 router.get(
-  "/profile/chats/messages",
+  ClientRoutes.profile.chatMessages,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -251,7 +238,7 @@ router.get(
 
 // lawyers finding and booking areas
 router.get(
-  "/lawyers",
+  ClientRoutes.lawyers.base,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, GetLawyersComposer());
@@ -260,7 +247,7 @@ router.get(
   }
 );
 router.get(
-  "/lawyers/:id",
+  ClientRoutes.lawyers.byId,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, GetLawyerDetailComposer());
@@ -271,7 +258,7 @@ router.get(
 
 // reviews
 router.post(
-  "/lawyers/review",
+  ClientRoutes.lawyers.review,
   authenticateUser,
   async (req: Request, res: Response) => {
     req.body.user = req.user;
@@ -280,7 +267,7 @@ router.post(
   }
 );
 router.get(
-  "/lawyers/reviews/:id",
+  ClientRoutes.lawyers.reviewsByLawyer,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -290,7 +277,7 @@ router.get(
   }
 );
 router.get(
-  "/profile/reviews/",
+  ClientRoutes.profile.reviews,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -300,7 +287,7 @@ router.get(
   }
 );
 router.get(
-  "/profile/sessions/reviews/:id",
+  ClientRoutes.profile.reviewsBySession,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -310,28 +297,22 @@ router.get(
   }
 );
 
-router.put(
-  "/profile/reviews/:id",
-  authenticateUser,
-  authenticateClient,
-  async (req: Request, res: Response) => {
+router
+  .route(ClientRoutes.profile.reviewById)
+  .all(authenticateUser, authenticateClient)
+  .put(async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, UpdateReviewsComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-  }
-);
-router.delete(
-  "/profile/reviews/:id",
-  authenticateUser,
-  authenticateClient,
-  async (req: Request, res: Response) => {
+  })
+  .delete(async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, DeleteReviewComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-  }
-);
+  });
+
 router.post(
-  "/profile/reviews/report/:id",
+  ClientRoutes.profile.reportReview,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -343,7 +324,7 @@ router.post(
 
 // slot area
 router.get(
-  "/lawyers/settings/:id",
+  ClientRoutes.lawyers.settings,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -353,7 +334,7 @@ router.get(
   }
 );
 router.get(
-  "/lawyers/slots/:id",
+  ClientRoutes.lawyers.slots,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, GetLawyerSlotDetailsComposer());
@@ -362,7 +343,7 @@ router.get(
   }
 );
 router.post(
-  "/lawyer/slots/checkout-session/",
+  ClientRoutes.slots.checkout,
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, CreateCheckoutSessionComposer());
@@ -371,7 +352,7 @@ router.post(
   }
 );
 router.get(
-  "/stripe/session/:id",
+  ClientRoutes.stripe.session,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -384,7 +365,7 @@ router.get(
   }
 );
 router.delete(
-  "/lawyer/slots/session/:id",
+  ClientRoutes.slots.removeFailed,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -394,7 +375,7 @@ router.delete(
   }
 );
 router.post(
-  "/chat/sendFile",
+  ClientRoutes.chat.sendFile,
   authenticateUser,
   authenticateClient,
   handleMulterErrors(chatFile.single("file")),
@@ -410,7 +391,7 @@ router.post(
 
 // stripe  webjook
 router.post(
-  "/stripe/webhooks",
+  ClientRoutes.stripe.webhook,
   express.raw({ type: "application/json" }),
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, HandleWebhookComposer());
@@ -419,7 +400,7 @@ router.post(
   }
 );
 router.patch(
-  "/profile/sessions/join",
+  ClientRoutes.profile.join,
   authenticateUser,
   authenticateClient,
   async (req, res) => {
@@ -429,7 +410,7 @@ router.patch(
   }
 );
 router.get(
-  "/profile/sessions/callLogs/:id",
+  ClientRoutes.profile.callLogs,
   authenticateUser,
   authenticateClient,
   async (req, res) => {
