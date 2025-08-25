@@ -1,6 +1,0 @@
-import { NotificationDto } from "@src/application/dtos/Notification";
-import { Notification } from "../../../domain/entities/Notification";
-
-export interface INotificationUsecase {
-  createSessionNotification(payload: Notification): Promise<NotificationDto>;
-}

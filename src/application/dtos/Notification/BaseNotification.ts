@@ -13,3 +13,4 @@ export interface NotificationDto {
   createdAt: Date;
   updatedAt: Date;
 }
+

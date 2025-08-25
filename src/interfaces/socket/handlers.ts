@@ -2,7 +2,7 @@ import { Socket, Server as SocketIOServer } from "socket.io";
 import { socketStore } from "./SocketStore";
 import { ChatUseCase } from "../../application/usecases/chat.usecase";
 import { SocketEventEnum } from "../../infrastructure/constant/SocketEventEnum";
-import { NotificationUsecase } from "../../application/usecases/Notification/CreateNotification";
+import { NotificationUsecase } from "../../application/usecases/Notification/implementation/CreateNotification";
 import { Notification } from "../../domain/entities/Notification";
 import { ChatMessageRepository } from "@infrastructure/database/repo/ChatMessageRepo";
 import { ChatSessionRepository } from "@infrastructure/database/repo/ChatSessionRepo";
@@ -13,6 +13,7 @@ import {
   ChatMessageOutputDto,
 } from "@src/application/dtos/chats/ChatMessageDto";
 import { DisputesRepo } from "@infrastructure/database/repo/DisputesRepo";
+import { NotificationDto } from "@src/application/dtos/Notification/BaseNotification";
 
 const chatUsecase = new ChatUseCase(
   new ChatSessionRepository(),
@@ -20,7 +21,7 @@ const chatUsecase = new ChatUseCase(
   new SessionsRepository(),
   new DisputesRepo()
 );
-const notificationUsecase = new NotificationUsecase(
+const CreateNotification = new NotificationUsecase(
   new NotificationRepository(),
   new SessionsRepository()
 );
@@ -231,10 +232,9 @@ export class SocketHandlers {
     }
   }
 
-  async handleSendNotification(payload: Notification) {
+  async handleSendNotification(payload: NotificationDto) {
     try {
-      const newNotification =
-        await notificationUsecase.createSessionNotification(payload);
+      const newNotification = await CreateNotification.execute(payload);
 
       this.io
         .to(newNotification.recipientId)
