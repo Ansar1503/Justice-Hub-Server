@@ -238,7 +238,7 @@ export class SocketHandlers {
 
       this.io
         .to(newNotification.recipientId)
-        .emit("NOTIFICATION_RECEIVE", newNotification);
+        .emit(this.eventEnum.NOTIFICATION_RECEIVED, newNotification);
     } catch (error: any) {
       console.log("error :", error);
       this.io.to(payload.senderId).emit(this.eventEnum.ERROR, error.message);
