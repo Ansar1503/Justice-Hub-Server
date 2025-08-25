@@ -419,4 +419,13 @@ router.get(
     res.status(response.statusCode).json(response.body);
   }
 );
+
+router.patch(
+  ClientRoutes.notifcation.updateStatus,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    
+  }
+);
 export default router;

@@ -27,4 +27,19 @@ export class NotificationRepository implements INotificationRepo {
     });
     return notification ? this.mapper.toDomain(notification) : null;
   }
+  async findById(id: string): Promise<Notification | null> {
+    const data = await NotificationModel.findOne({ _id: id });
+    return data ? this.mapper.toDomain(data) : null;
+  }
+  async updateStatusById(
+    id: string,
+    status: boolean
+  ): Promise<Notification | null> {
+    const updated = await NotificationModel.findOneAndUpdate(
+      { _id: id },
+      { status: status },
+      { new: true }
+    );
+    return updated ? this.mapper.toDomain(updated) : null;
+  }
 }

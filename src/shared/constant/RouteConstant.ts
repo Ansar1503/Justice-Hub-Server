@@ -63,7 +63,9 @@ export const ClientRoutes = {
     checkout: "/lawyer/slots/checkout-session",
     removeFailed: "/lawyer/slots/session/:id",
   },
-
+  notifcation: {
+    updateStatus: "/lawyer/notification/:id/status",
+  },
   stripe: {
     session: "/stripe/session/:id",
     webhook: "/stripe/webhooks",
