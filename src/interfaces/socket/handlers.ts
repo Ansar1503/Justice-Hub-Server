@@ -2,7 +2,7 @@ import { Socket, Server as SocketIOServer } from "socket.io";
 import { socketStore } from "./SocketStore";
 import { ChatUseCase } from "../../application/usecases/chat.usecase";
 import { SocketEventEnum } from "../../infrastructure/constant/SocketEventEnum";
-import { NotificationUsecase } from "../../application/usecases/Notification";
+import { NotificationUsecase } from "../../application/usecases/Notification/CreateNotification";
 import { Notification } from "../../domain/entities/Notification";
 import { ChatMessageRepository } from "@infrastructure/database/repo/ChatMessageRepo";
 import { ChatSessionRepository } from "@infrastructure/database/repo/ChatSessionRepo";
