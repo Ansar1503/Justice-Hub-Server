@@ -13,10 +13,7 @@ export class UpdateNotificationStatus implements IUpdateNotificationStatus {
     if (!notifcationExist) {
       throw new Error("Notification not found");
     }
-    const notification = await this.notificationRepo.updateStatusById(
-      input.id,
-      input.status
-    );
+    await this.notificationRepo.updateStatusById(input.id, input.status);
     return {
       id: notifcationExist.id,
       createdAt: notifcationExist.createdAt,
