@@ -66,6 +66,7 @@ export const ClientRoutes = {
   notifcation: {
     updateStatus: "/notification/:id/status",
     getAllNotifications: "/notifications",
+    markAllAsRead: "/notification/status",
   },
   stripe: {
     session: "/stripe/session/:id",
@@ -113,5 +114,6 @@ export const LawyerRoutes = {
   nofication: {
     getAllNotifications: "/notifications",
     updateStatus: "/notification/:id/status",
+    markAllAsRead: "/notification/status",
   },
 };

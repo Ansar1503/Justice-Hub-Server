@@ -9,4 +9,5 @@ export interface INotificationRepo {
     userId: string;
     cursor: number;
   }): Promise<{ data: Notification[] | []; nextCursor?: number }>;
+  updateAllByReceiverId(receiverId: string): Promise<void>;
 }

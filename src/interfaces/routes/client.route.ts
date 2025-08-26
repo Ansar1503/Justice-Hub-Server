@@ -50,6 +50,7 @@ import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers
 import { ClientRoutes } from "@shared/constant/RouteConstant";
 import { FetchAllNotificationsComposer } from "@infrastructure/services/composers/Notification/FetchAllNotificationsComposer";
 import { UpdateNotificationStatusComposer } from "@infrastructure/services/composers/Notification/UpdateNotificationStatusComposer";
+import { MarkAllNotificationAsReadComposer } from "@infrastructure/services/composers/Notification/MarkAllNotificationAsRead";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -442,6 +443,20 @@ router.get(
   authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchAllNotificationsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.put(
+  ClientRoutes.notifcation.markAllAsRead,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      MarkAllNotificationAsReadComposer()
+    );
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }

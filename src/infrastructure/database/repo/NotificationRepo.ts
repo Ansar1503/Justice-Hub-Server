@@ -66,4 +66,14 @@ export class NotificationRepository implements INotificationRepo {
       nextCursor: hasNextPage ? cursor + 1 : undefined,
     };
   }
+
+  async updateAllByReceiverId(receiverId: string): Promise<void> {
+    await NotificationModel.updateMany(
+      {
+        recipientId: receiverId,
+      },
+      { isRead: true },
+      { new: true }
+    );
+  }
 }
