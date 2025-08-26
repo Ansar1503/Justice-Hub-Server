@@ -27,11 +27,12 @@ export class FetchAllNotificationsController implements IController {
     if (
       httpRequest.query &&
       typeof httpRequest.query == "object" &&
-      "cursor" in httpRequest.query &&
-      typeof httpRequest.query.cursor == "number"
+      "cursor" in httpRequest.query
     ) {
-      cursor = httpRequest.query.cursor;
-      console.log("cursor is hter", cursor);
+      cursor = Number(httpRequest.query.cursor);
+      if (isNaN(cursor)) {
+        cursor = 1;
+      }
     }
     try {
       const result = await this.fetchAllNotificationsUseCase.execute({
