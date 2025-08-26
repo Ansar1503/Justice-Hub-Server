@@ -48,6 +48,7 @@ import { JoinVideoSessionComposer } from "@infrastructure/services/composers/Law
 import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
 import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsByUserIdComposer";
 import { ClientRoutes } from "@shared/constant/RouteConstant";
+import { FetchAllNotificationsComposer } from "@infrastructure/services/composers/Notification/FetchAllNotificationsComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -424,11 +425,18 @@ router.patch(
   ClientRoutes.notifcation.updateStatus,
   authenticateUser,
   authenticateClient,
-  async (req: Request, res: Response) => {
-    
-  }
+  async (req: Request, res: Response) => {}
 );
 
-
+router.get(
+  ClientRoutes.notifcation.getAllNotifications,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchAllNotificationsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
 
 export default router;
