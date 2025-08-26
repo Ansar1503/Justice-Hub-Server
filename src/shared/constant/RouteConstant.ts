@@ -109,4 +109,7 @@ export const LawyerRoutes = {
   chat: {
     sendFile: "/chat/sendFile",
   },
+  nofication: {
+    getAllNotifications: "/notifications",
+  },
 };
