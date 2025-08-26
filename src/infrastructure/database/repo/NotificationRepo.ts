@@ -42,4 +42,13 @@ export class NotificationRepository implements INotificationRepo {
     );
     return updated ? this.mapper.toDomain(updated) : null;
   }
+
+  async findAllByUserId(userId: string): Promise<Notification[] | []> {
+    const data = await NotificationModel.find({ userId: userId })
+      .limit(10)
+      .sort({ createdAt: -1 });
+    return data && this.mapper.toDomainArray
+      ? this.mapper.toDomainArray(data)
+      : [];
+  }
 }
