@@ -52,7 +52,7 @@ export class NotificationRepository implements INotificationRepo {
   }): Promise<{ data: Notification[] | []; nextCursor?: number }> {
     const limit = 10;
     const skip = cursor > 0 ? (cursor - 1) * limit : 0;
-    const notifications = await NotificationModel.find({ userId: userId })
+    const notifications = await NotificationModel.find({ recipientId: userId })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(10 + 1);
