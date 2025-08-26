@@ -37,7 +37,7 @@ export class NotificationRepository implements INotificationRepo {
   ): Promise<Notification | null> {
     const updated = await NotificationModel.findOneAndUpdate(
       { _id: id },
-      { status: status },
+      { isRead: status },
       { new: true }
     );
     return updated ? this.mapper.toDomain(updated) : null;

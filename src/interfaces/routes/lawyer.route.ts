@@ -34,6 +34,7 @@ import { SendMessageFileComposer } from "@infrastructure/services/composers/Clie
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 import { LawyerRoutes } from "@shared/constant/RouteConstant";
 import { FetchAllNotificationsComposer } from "@infrastructure/services/composers/Notification/FetchAllNotificationsComposer";
+import { UpdateNotificationStatusComposer } from "@infrastructure/services/composers/Notification/UpdateNotificationStatusComposer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -278,6 +279,21 @@ router.get(
   authenticateLawyer,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchAllNotificationsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.patch(
+  LawyerRoutes.nofication.updateStatus,
+  authenticateUser,
+  authenticateClient,
+  authenticateLawyer,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      UpdateNotificationStatusComposer()
+    );
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }
