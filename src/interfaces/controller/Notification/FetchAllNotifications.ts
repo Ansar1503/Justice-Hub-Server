@@ -15,6 +15,7 @@ export class FetchAllNotificationsController implements IController {
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
     let user_id = "";
+    let cursor: number = 0;
     if (
       httpRequest.user &&
       typeof httpRequest.user === "object" &&
@@ -23,9 +24,19 @@ export class FetchAllNotificationsController implements IController {
     ) {
       user_id = httpRequest.user.id;
     }
+    if (
+      httpRequest.query &&
+      typeof httpRequest.query == "object" &&
+      "cursor" in httpRequest.query &&
+      typeof httpRequest.query.cursor == "number"
+    ) {
+      cursor = httpRequest.query.cursor;
+      console.log("cursor is hter", cursor);
+    }
     try {
       const result = await this.fetchAllNotificationsUseCase.execute({
         user_id: user_id,
+        cursor,
       });
       return this.httpSuccess.success_200(result);
     } catch (error) {

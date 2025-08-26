@@ -5,5 +5,8 @@ export interface INotificationRepo {
   getNotification(receipntId: string): Promise<Notification | null>;
   findById(id: string): Promise<Notification | null>;
   updateStatusById(id: string, status: boolean): Promise<Notification | null>;
-  findAllByUserId(userId: string): Promise<Notification[] | []>;
+  findAllByUserId(payload: {
+    userId: string;
+    cursor: number;
+  }): Promise<{ data: Notification[] | []; nextCursor?: number }>;
 }

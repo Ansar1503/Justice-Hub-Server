@@ -33,6 +33,7 @@ import { NextFunction } from "express-serve-static-core";
 import { SendMessageFileComposer } from "@infrastructure/services/composers/Client/SendMessageFileComposer";
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 import { LawyerRoutes } from "@shared/constant/RouteConstant";
+import { FetchAllNotificationsComposer } from "@infrastructure/services/composers/Notification/FetchAllNotificationsComposer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -276,7 +277,9 @@ router.get(
   authenticateClient,
   authenticateLawyer,
   async (req: Request, res: Response) => {
-    
+    const adapter = await expressAdapter(req, FetchAllNotificationsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
   }
 );
 
