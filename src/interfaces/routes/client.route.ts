@@ -47,10 +47,11 @@ import { EndSessionComposer } from "@infrastructure/services/composers/Lawyer/Se
 import { JoinVideoSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/JoinVideoSessionComposer";
 import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
 import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsByUserIdComposer";
-import { ClientRoutes } from "@shared/constant/RouteConstant";
+import { ClientRoutes, WalletRoutes } from "@shared/constant/RouteConstant";
 import { FetchAllNotificationsComposer } from "@infrastructure/services/composers/Notification/FetchAllNotificationsComposer";
 import { UpdateNotificationStatusComposer } from "@infrastructure/services/composers/Notification/UpdateNotificationStatusComposer";
 import { MarkAllNotificationAsReadComposer } from "@infrastructure/services/composers/Notification/MarkAllNotificationAsRead";
+import { FetchWalletByUserComposer } from "@infrastructure/services/composers/Wallet/FetchWalletByUserComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -457,6 +458,17 @@ router.put(
       req,
       MarkAllNotificationAsReadComposer()
     );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  WalletRoutes.base,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchWalletByUserComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }

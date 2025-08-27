@@ -32,10 +32,11 @@ import { FetchReviewsBySessionComposer } from "@infrastructure/services/composer
 import { NextFunction } from "express-serve-static-core";
 import { SendMessageFileComposer } from "@infrastructure/services/composers/Client/SendMessageFileComposer";
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
-import { LawyerRoutes } from "@shared/constant/RouteConstant";
+import { LawyerRoutes, WalletRoutes } from "@shared/constant/RouteConstant";
 import { FetchAllNotificationsComposer } from "@infrastructure/services/composers/Notification/FetchAllNotificationsComposer";
 import { UpdateNotificationStatusComposer } from "@infrastructure/services/composers/Notification/UpdateNotificationStatusComposer";
 import { MarkAllNotificationAsReadComposer } from "@infrastructure/services/composers/Notification/MarkAllNotificationAsRead";
+import { FetchWalletByUserComposer } from "@infrastructure/services/composers/Wallet/FetchWalletByUserComposer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -307,6 +308,18 @@ router.put(
       req,
       MarkAllNotificationAsReadComposer()
     );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  WalletRoutes.base,
+  authenticateUser,
+  authenticateClient,
+  authenticateLawyer,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchWalletByUserComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }
