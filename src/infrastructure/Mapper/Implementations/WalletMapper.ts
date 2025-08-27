@@ -2,7 +2,7 @@ import { Wallet } from "@domain/entities/Wallet";
 import { IMapper } from "../IMapper";
 import { IWalletModel } from "@infrastructure/database/model/WalletModel";
 
-export class WalleMapper implements IMapper<Wallet, IWalletModel> {
+export class WalletMapper implements IMapper<Wallet, IWalletModel> {
   toDomain(persistence: IWalletModel): Wallet {
     return Wallet.fromPersisted({
       balance: persistence.balance,
