@@ -21,14 +21,14 @@ export class Wallet {
   private _balance: number;
   private _status: boolean;
   private _createdAt: Date;
-  private _udpatedAt: Date;
+  private _updatedAt: Date;
   constructor(props: PersistedWalletProps) {
     this._id = props.id;
     this._user_id = props.user_id;
     this._balance = props.balance;
     this._status = props.status;
     this._createdAt = props.createdAt;
-    this._udpatedAt = props.updatedAt;
+    this._updatedAt = props.updatedAt;
   }
   static create(props: CreateWalletProps) {
     const now = new Date();
@@ -41,6 +41,11 @@ export class Wallet {
       id: `w-${uuidv4()}`,
     });
   }
+
+  static fromPersisted(props: PersistedWalletProps) {
+    return new Wallet(props);
+  }
+
   get id() {
     return this._id;
   }
@@ -56,16 +61,16 @@ export class Wallet {
   get createdAt() {
     return this._createdAt;
   }
-  get udpatedAt() {
-    return this._udpatedAt;
+  get updatedAt() {
+    return this._updatedAt;
   }
 
   updateStatus(status: boolean) {
     this._status = status;
-    this._udpatedAt = new Date();
+    this._updatedAt = new Date();
   }
   updateBalance(balance: number) {
     this._balance = balance;
-    this._udpatedAt = new Date();
+    this._updatedAt = new Date();
   }
 }
