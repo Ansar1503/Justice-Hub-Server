@@ -1,7 +1,10 @@
+import { IBaseRepository } from "@domain/IRepository/IBaseRepo";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
 import { Model } from "mongoose";
 
-export abstract class BaseRepository<TDomain, TPersistence> {
+export abstract class BaseRepository<TDomain, TPersistence>
+  implements IBaseRepository<TDomain>
+{
   constructor(
     protected readonly model: Model<TPersistence>,
     protected readonly mapper: IMapper<TDomain, TPersistence>
@@ -14,5 +17,4 @@ export abstract class BaseRepository<TDomain, TPersistence> {
     });
     return this.mapper.toDomain(saved);
   }
-  
 }
