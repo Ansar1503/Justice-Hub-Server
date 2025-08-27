@@ -11,5 +11,8 @@ export class WalletRepo
   constructor() {
     super(WalletModel, new WalletMapper());
   }
-  
+  async getWalletByUserId(userId: string): Promise<Wallet | null> {
+    const wallet = await this.model.findOne({ userId });
+    return wallet ? this.mapper.toDomain(wallet) : null;
+  }
 }
