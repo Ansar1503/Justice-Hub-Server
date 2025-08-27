@@ -117,3 +117,7 @@ export const LawyerRoutes = {
     markAllAsRead: "/notification/status",
   },
 };
+
+export const WalletRoutes = {
+  base: "/wallet",
+};
