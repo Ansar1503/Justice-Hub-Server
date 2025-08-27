@@ -2,6 +2,7 @@ import { ClientRepository } from "@infrastructure/database/repo/ClientRepo";
 import { LawyerRepository } from "@infrastructure/database/repo/LawyerRepo";
 import { OtpRepository } from "@infrastructure/database/repo/OtpRepo";
 import { UserRepository } from "@infrastructure/database/repo/UserRepo";
+import { WalletRepo } from "@infrastructure/database/repo/WalletRepo";
 import { JwtProvider } from "@infrastructure/Providers/JwtProvider";
 import { NodeMailerProvider } from "@infrastructure/Providers/NodeMailerProvider";
 import { PasswordManager } from "@infrastructure/Providers/PasswordHasher";
@@ -24,7 +25,8 @@ export function RegisterUserComponser(): IController {
     otprepo,
     passwordHasher,
     nodeMailerProvider,
-    jwtProvider
+    jwtProvider,
+    new WalletRepo()
   );
   const controller = new RegisterUser(usecase);
   return controller;

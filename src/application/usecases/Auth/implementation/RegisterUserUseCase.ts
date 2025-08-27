@@ -75,7 +75,9 @@ export class RegisterUserUseCase implements IRegiserUserUseCase {
         user_id: user.user_id,
       });
       await this.walletRepo.create(walletPayload);
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
     try {
       await this.nodemailProvider.sendVerificationMail(user.email, token, otp);
       console.log("email send successfully", otp);
