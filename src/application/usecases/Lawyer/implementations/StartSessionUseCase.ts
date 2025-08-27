@@ -37,14 +37,14 @@ export class StartSessionUseCase implements IStartSessionUseCase {
       existingSession.scheduled_time
     );
     const newDate = new Date();
-    // if (newDate < slotDateTime) {
-    //   throw new ValidationError("Scheduled time is not reached");
-    // }
+    if (newDate < slotDateTime) {
+      throw new ValidationError("Scheduled time is not reached");
+    }
     slotDateTime.setMinutes(
       slotDateTime.getMinutes() + existingSession.duration + 5
     );
-    // if (newDate > slotDateTime)
-    //   throw new ValidationError("session time is over");
+    if (newDate > slotDateTime)
+      throw new ValidationError("session time is over");
     const roomId = `Room_${randomUUID()}`;
 
     const { appId, token } = await createToken({
