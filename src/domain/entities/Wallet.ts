@@ -11,8 +11,6 @@ interface PersistedWalletProps {
 
 interface CreateWalletProps {
   user_id: string;
-  balance: number;
-  status: boolean;
 }
 
 export class Wallet {
@@ -33,8 +31,8 @@ export class Wallet {
   static create(props: CreateWalletProps) {
     const now = new Date();
     return new Wallet({
-      balance: props.balance,
-      status: props.status,
+      balance: 0,
+      status: true,
       createdAt: now,
       updatedAt: now,
       user_id: props.user_id,

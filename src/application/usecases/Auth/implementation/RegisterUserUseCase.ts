@@ -16,6 +16,8 @@ import { INodeMailerProvider } from "@src/application/providers/NodeMailerProvid
 import { IJwtProvider } from "@src/application/providers/JwtProvider";
 import { IOtpRepository } from "@domain/IRepository/IOtpRepo";
 import { Otp } from "@domain/entities/Otp";
+import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
+import { Wallet } from "@domain/entities/Wallet";
 
 export class RegisterUserUseCase implements IRegiserUserUseCase {
   constructor(
@@ -25,7 +27,8 @@ export class RegisterUserUseCase implements IRegiserUserUseCase {
     private otpRepo: IOtpRepository,
     private passwordHasher: IPasswordManager,
     private nodemailProvider: INodeMailerProvider,
-    private jwtprovider: IJwtProvider
+    private jwtprovider: IJwtProvider,
+    private walletRepo: IWalletRepo
   ) {}
   async execute(input: RegisterUserDto): Promise<ResposeUserDto> {
     const existingUser = await this.userRepo.findByEmail(input.email);
@@ -67,6 +70,12 @@ export class RegisterUserUseCase implements IRegiserUserUseCase {
     const token = await this.jwtprovider.GenerateEmailToken({
       user_id: user.user_id,
     });
+    try {
+      const walletPayload = Wallet.create({
+        user_id: user.user_id,
+      });
+      await this.walletRepo.create(walletPayload);
+    } catch (error) {}
     try {
       await this.nodemailProvider.sendVerificationMail(user.email, token, otp);
       console.log("email send successfully", otp);
