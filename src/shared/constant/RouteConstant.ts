@@ -64,7 +64,9 @@ export const ClientRoutes = {
     removeFailed: "/lawyer/slots/session/:id",
   },
   notifcation: {
-    updateStatus: "/lawyer/notification/:id/status",
+    updateStatus: "/notification/:id/status",
+    getAllNotifications: "/notifications",
+    markAllAsRead: "/notification/status",
   },
   stripe: {
     session: "/stripe/session/:id",
@@ -108,5 +110,10 @@ export const LawyerRoutes = {
 
   chat: {
     sendFile: "/chat/sendFile",
+  },
+  nofication: {
+    getAllNotifications: "/notifications",
+    updateStatus: "/notification/:id/status",
+    markAllAsRead: "/notification/status",
   },
 };

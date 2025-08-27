@@ -37,9 +37,43 @@ export class NotificationRepository implements INotificationRepo {
   ): Promise<Notification | null> {
     const updated = await NotificationModel.findOneAndUpdate(
       { _id: id },
-      { status: status },
+      { isRead: status },
       { new: true }
     );
     return updated ? this.mapper.toDomain(updated) : null;
+  }
+
+  async findAllByUserId({
+    cursor,
+    userId,
+  }: {
+    userId: string;
+    cursor: number;
+  }): Promise<{ data: Notification[] | []; nextCursor?: number }> {
+    const limit = 10;
+    const skip = cursor > 0 ? (cursor - 1) * limit : 0;
+    const notifications = await NotificationModel.find({ recipientId: userId })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(10 + 1);
+    const hasNextPage = notifications.length > limit;
+    const data = hasNextPage ? notifications.slice(0, limit) : notifications;
+    return {
+      data:
+        this.mapper.toDomainArray && data
+          ? this.mapper.toDomainArray(data)
+          : [],
+      nextCursor: hasNextPage ? cursor + 1 : undefined,
+    };
+  }
+
+  async updateAllByReceiverId(receiverId: string): Promise<void> {
+    await NotificationModel.updateMany(
+      {
+        recipientId: receiverId,
+      },
+      { isRead: true },
+      { new: true }
+    );
   }
 }

@@ -48,6 +48,9 @@ import { JoinVideoSessionComposer } from "@infrastructure/services/composers/Law
 import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
 import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsByUserIdComposer";
 import { ClientRoutes } from "@shared/constant/RouteConstant";
+import { FetchAllNotificationsComposer } from "@infrastructure/services/composers/Notification/FetchAllNotificationsComposer";
+import { UpdateNotificationStatusComposer } from "@infrastructure/services/composers/Notification/UpdateNotificationStatusComposer";
+import { MarkAllNotificationAsReadComposer } from "@infrastructure/services/composers/Notification/MarkAllNotificationAsRead";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -425,7 +428,38 @@ router.patch(
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
-    
+    const adapter = await expressAdapter(
+      req,
+      UpdateNotificationStatusComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
   }
 );
+
+router.get(
+  ClientRoutes.notifcation.getAllNotifications,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchAllNotificationsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.put(
+  ClientRoutes.notifcation.markAllAsRead,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      MarkAllNotificationAsReadComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
 export default router;

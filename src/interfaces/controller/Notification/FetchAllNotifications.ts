@@ -1,45 +1,44 @@
-import { IUpdateNotificationStatus } from "@src/application/usecases/Notification/IUpdateNotificationStatus";
-import { IController } from "../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
+import { IController } from "../Interface/IController";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
+import { IFetchAllNotificationsUseCase } from "@src/application/usecases/Notification/IFetchAllNotificationsUseCase";
 
-export class UpdateNotificationStatusController implements IController {
+export class FetchAllNotificationsController implements IController {
   constructor(
-    private updateNotificationUseCase: IUpdateNotificationStatus,
+    private fetchAllNotificationsUseCase: IFetchAllNotificationsUseCase,
     private httpErrors: IHttpErrors = new HttpErrors(),
     private httpSuccess: IHttpSuccess = new HttpSuccess()
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    let status: boolean = false;
-    let id: string = "";
+    let user_id = "";
+    let cursor: number = 0;
     if (
-      httpRequest &&
-      httpRequest.body &&
-      typeof httpRequest.body === "object" &&
-      "status" in httpRequest.body &&
-      typeof httpRequest.body.status === "boolean"
+      httpRequest.user &&
+      typeof httpRequest.user === "object" &&
+      "id" in httpRequest.user &&
+      typeof httpRequest.user.id === "string"
     ) {
-      status = httpRequest.body.status;
+      user_id = httpRequest.user.id;
     }
     if (
-      httpRequest &&
-      httpRequest.params &&
-      typeof httpRequest.params === "object" &&
-      "id" in httpRequest.params &&
-      typeof httpRequest.params.id === "string"
+      httpRequest.query &&
+      typeof httpRequest.query == "object" &&
+      "cursor" in httpRequest.query
     ) {
-      id = httpRequest.params.id;
+      cursor = Number(httpRequest.query.cursor);
+      if (isNaN(cursor)) {
+        cursor = 1;
+      }
     }
     try {
-      const result = await this.updateNotificationUseCase.execute({
-        id,
-        status,
+      const result = await this.fetchAllNotificationsUseCase.execute({
+        user_id: user_id,
+        cursor,
       });
-      console.log(result);
       return this.httpSuccess.success_200(result);
     } catch (error) {
       if (error instanceof Error) {

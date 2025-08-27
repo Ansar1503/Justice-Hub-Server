@@ -33,6 +33,9 @@ import { NextFunction } from "express-serve-static-core";
 import { SendMessageFileComposer } from "@infrastructure/services/composers/Client/SendMessageFileComposer";
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 import { LawyerRoutes } from "@shared/constant/RouteConstant";
+import { FetchAllNotificationsComposer } from "@infrastructure/services/composers/Notification/FetchAllNotificationsComposer";
+import { UpdateNotificationStatusComposer } from "@infrastructure/services/composers/Notification/UpdateNotificationStatusComposer";
+import { MarkAllNotificationAsReadComposer } from "@infrastructure/services/composers/Notification/MarkAllNotificationAsRead";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -44,6 +47,7 @@ const router = express.Router();
 router.post(
   LawyerRoutes.verification,
   authenticateUser,
+  authenticateClient,
   upload.fields([
     { name: "enrollment_certificate", maxCount: 1 },
     { name: "certificate_of_practice", maxCount: 1 },
@@ -57,6 +61,7 @@ router.post(
 router.get(
   LawyerRoutes.root,
   authenticateUser,
+  authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchLawyerComposer());
     res.status(adapter.statusCode).json(adapter.body);
@@ -66,7 +71,7 @@ router.get(
 
 router
   .route(LawyerRoutes.schedule.settings)
-  .all(authenticateUser, authenticateLawyer)
+  .all(authenticateUser, authenticateClient, authenticateLawyer)
   .patch(async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
       req,
@@ -83,7 +88,7 @@ router
 
 router
   .route(LawyerRoutes.schedule.availability)
-  .all(authenticateUser, authenticateLawyer)
+  .all(authenticateUser, authenticateClient, authenticateLawyer)
   .patch(async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, UpdateAvailableSlotsComposer());
     res.status(adaper.statusCode).json(adaper.body);
@@ -97,7 +102,7 @@ router
 
 router
   .route(LawyerRoutes.schedule.override)
-  .all(authenticateUser, authenticateLawyer)
+  .all(authenticateUser, authenticateClient, authenticateLawyer)
   .get(async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, FetchOverrideSlotsComposer());
     res.status(adaper.statusCode).json(adaper.body);
@@ -118,6 +123,7 @@ router
 router.get(
   LawyerRoutes.profile.appointments.base,
   authenticateUser,
+  authenticateClient,
   authenticateLawyer,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchAppointmentDataComposer());
@@ -128,6 +134,7 @@ router.get(
 router.patch(
   LawyerRoutes.profile.appointments.reject,
   authenticateUser,
+  authenticateClient,
   authenticateLawyer,
   async (req: Request, res: Response) => {
     const adpter = await expressAdapter(req, RejectClientAppointmentComposer());
@@ -138,6 +145,7 @@ router.patch(
 router.patch(
   LawyerRoutes.profile.appointments.approve,
   authenticateUser,
+  authenticateClient,
   authenticateLawyer,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
@@ -152,6 +160,7 @@ router.patch(
 router.get(
   LawyerRoutes.profile.sessions.base,
   authenticateUser,
+  authenticateClient,
   authenticateLawyer,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, fetchSessionsComposer());
@@ -173,6 +182,7 @@ router.get(
 router.patch(
   LawyerRoutes.profile.sessions.start,
   authenticateUser,
+  authenticateClient,
   authenticateLawyer,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, StartSessionComposer());
@@ -183,6 +193,7 @@ router.patch(
 router.patch(
   LawyerRoutes.profile.sessions.join,
   authenticateUser,
+  authenticateClient,
   authenticateLawyer,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, JoinVideoSessionComposer());
@@ -203,6 +214,7 @@ router.patch(
 router.patch(
   LawyerRoutes.profile.sessions.cancel,
   authenticateUser,
+  authenticateClient,
   authenticateLawyer,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, CancelSessionComposer());
@@ -229,6 +241,7 @@ router.post(
 router.get(
   LawyerRoutes.profile.sessions.callLogs,
   authenticateUser,
+  authenticateClient,
   authenticateLawyer,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchCallLogsSessionComposer());
@@ -259,4 +272,44 @@ router.get(
     return;
   }
 );
+
+router.get(
+  LawyerRoutes.nofication.getAllNotifications,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchAllNotificationsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.patch(
+  LawyerRoutes.nofication.updateStatus,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      UpdateNotificationStatusComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.put(
+  LawyerRoutes.nofication.markAllAsRead,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      MarkAllNotificationAsReadComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
 export default router;
