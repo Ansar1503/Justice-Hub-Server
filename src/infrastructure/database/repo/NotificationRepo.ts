@@ -61,7 +61,7 @@ export class NotificationRepository implements INotificationRepo {
     return {
       data:
         this.mapper.toDomainArray && data
-          ? this.mapper.toDomainArray(data).reverse()
+          ? this.mapper.toDomainArray(data)
           : [],
       nextCursor: hasNextPage ? cursor + 1 : undefined,
     };
