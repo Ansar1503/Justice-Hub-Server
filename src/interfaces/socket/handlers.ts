@@ -23,7 +23,8 @@ const chatUsecase = new ChatUseCase(
 );
 const CreateNotification = new NotificationUsecase(
   new NotificationRepository(),
-  new SessionsRepository()
+  new SessionsRepository(),
+  new ChatSessionRepository()
 );
 
 export class SocketHandlers {
@@ -234,11 +235,25 @@ export class SocketHandlers {
 
   async handleSendNotification(payload: NotificationDto) {
     try {
-      const newNotification = await CreateNotification.execute(payload);
-
-      this.io
-        .to(newNotification.recipientId)
-        .emit(this.eventEnum.NOTIFICATION_RECEIVED, newNotification);
+      if (payload.type === "message") {
+        const socketsInRoom = await this.io
+          .in(payload?.sessionId || "")
+          .fetchSockets();
+        const userAlreadyInRoom = socketsInRoom.some(
+          (s) => s.data.userId === payload?.recipientId
+        );
+        if (!userAlreadyInRoom) {
+          const newNotification = await CreateNotification.execute(payload);
+          this.io
+            .to(payload.recipientId)
+            .emit(this.eventEnum.NOTIFICATION_RECEIVED, newNotification);
+        }
+      } else if (payload.type === "session") {
+        const newNotification = await CreateNotification.execute(payload);
+        this.io
+          .to(payload.recipientId)
+          .emit(this.eventEnum.NOTIFICATION_RECEIVED, newNotification);
+      }
     } catch (error: any) {
       console.log("error :", error);
       this.io.to(payload.senderId).emit(this.eventEnum.ERROR, error.message);

@@ -94,7 +94,7 @@ export async function setUpChatSocket(io: SocketIOServer) {
       }
     );
 
-    socket.on("NOTIFICATION_SEND", (data: Notification) => {
+    socket.on(SocketEventEnum.NOTIFICATION_SEND, (data: Notification) => {
       socketHandler.handleSendNotification(data);
     });
   });

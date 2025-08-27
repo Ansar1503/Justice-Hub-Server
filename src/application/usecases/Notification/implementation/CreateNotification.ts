@@ -5,30 +5,41 @@ import { ValidationError } from "../../../../interfaces/middelwares/Error/Custom
 import { NotificationDto } from "../../../dtos/Notification/BaseNotification";
 import { timeStringToDate } from "@shared/utils/helpers/DateAndTimeHelper";
 import { ICreateNotification } from "../ICreateNotification";
+import { IChatSessionRepo } from "@domain/IRepository/IChatSessionRepo";
 
 export class NotificationUsecase implements ICreateNotification {
   constructor(
     private notificationRep: INotificationRepo,
-    private sessionRepo: ISessionsRepo
+    private sessionRepo: ISessionsRepo,
+    private chatSessionRepo: IChatSessionRepo
   ) {}
 
   async execute(input: NotificationDto): Promise<NotificationDto> {
-    const session = await this.sessionRepo.findById({
-      session_id: input.sessionId || "",
-    });
-    if (!session) throw new ValidationError("Session not found");
-    const startTime = timeStringToDate(
-      session.scheduled_date,
-      session.scheduled_time
-    );
-    const newDate = new Date();
-    // if (newDate < startTime) {
-    //   throw new ValidationError("Session has not started yet");
-    // }
-    startTime.setMinutes(startTime.getMinutes() + session.duration + 5);
-    // if (newDate > startTime) {
-    //   throw new ValidationError("Session has ended");
-    // }
+    if (input.type === "session") {
+      const session = await this.sessionRepo.findById({
+        session_id: input.sessionId || "",
+      });
+      if (!session) throw new ValidationError("Session not found");
+
+      const startTime = timeStringToDate(
+        session.scheduled_date,
+        session.scheduled_time
+      );
+      startTime.setMinutes(startTime.getMinutes() + session.duration + 5);
+      // const newDate = new Date();
+      // if (newDate < startTime) {
+      //    throw new ValidationError("Session has not started yet");
+      //    }
+      //  if (newDate > startTime) {
+      // throw new ValidationError("Session has ended");
+      //  }
+    } else {
+      const chatSession = await this.chatSessionRepo.findById(
+        input.sessionId || ""
+      );
+      if (!chatSession) throw new ValidationError("Chat Session not found");
+    }
+
     const newNotificationPayload = Notification.create({
       message: input.message,
       recipientId: input.recipientId,
@@ -38,9 +49,11 @@ export class NotificationUsecase implements ICreateNotification {
       type: input.type,
       roomId: input.roomId,
     });
+
     const newNotification = await this.notificationRep.addNotification(
       newNotificationPayload
     );
+
     return {
       createdAt: newNotification.createdAt,
       id: newNotification.id,
