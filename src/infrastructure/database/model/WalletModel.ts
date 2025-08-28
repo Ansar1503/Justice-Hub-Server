@@ -9,14 +9,15 @@ export interface IWalletModel extends Document {
   updatedAt: Date;
 }
 
-const walletSchema = new Schema<IWalletModel>({
-  _id: { type: String },
-  user_id: { type: String, required: true },
-  balance: { type: Number, required: true, min: 0, max: 100000 },
-  status: { type: Boolean, default: true },
-  createdAt: { type: Date, required: true },
-  updatedAt: { type: Date, required: true },
-});
+const walletSchema = new Schema<IWalletModel>(
+  {
+    _id: { type: String },
+    user_id: { type: String, required: true },
+    balance: { type: Number, required: true, min: 0, max: 100000 },
+    status: { type: Boolean, default: true },
+  },
+  { timestamps: true }
+);
 
 export const WalletModel = mongoose.model<IWalletModel>(
   "wallets",
