@@ -3,13 +3,14 @@ import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
 import { WalletMapper } from "@infrastructure/Mapper/Implementations/WalletMapper";
 import { BaseRepository } from "./base/BaseRepo";
 import { IWalletModel, WalletModel } from "../model/WalletModel";
+import { ClientSession } from "mongoose";
 
 export class WalletRepo
   extends BaseRepository<Wallet, IWalletModel>
   implements IWalletRepo
 {
-  constructor() {
-    super(WalletModel, new WalletMapper());
+  constructor(session?: ClientSession) {
+    super(WalletModel, new WalletMapper(), session);
   }
   async getWalletByUserId(userId: string): Promise<Wallet | null> {
     const wallet = await this.model.findOne({ user_id: userId });
@@ -22,6 +23,6 @@ export class WalletRepo
       { balance: amount },
       { new: true }
     );
-  return updatedWallet ? this.mapper.toDomain(updatedWallet) : null;
+    return updatedWallet ? this.mapper.toDomain(updatedWallet) : null;
   }
 }
