@@ -70,7 +70,7 @@ export const ClientRoutes = {
   },
   stripe: {
     session: "/stripe/session/:id",
-    webhook: "/stripe/webhooks",
+      webhook: "/stripe/webhooks",
   },
 
   chat: {
