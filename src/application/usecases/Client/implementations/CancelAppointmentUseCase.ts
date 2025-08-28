@@ -39,13 +39,6 @@ export class CancelAppointmentUseCase implements ICancelAppointmentUseCase {
       throw error;
     }
 
-    const slotDateTime = timeStringToDate(appointment.date, appointment.time);
-
-    if (slotDateTime <= new Date()) {
-      const error: any = new Error("Date and time has reached or exceeded");
-      error.code = STATUS_CODES.BAD_REQUEST;
-      throw error;
-    }
     const response = await this.appointmentRepo.updateWithId(input);
     if (!response) throw new Error("appointment ccancellation failed");
     return response;
