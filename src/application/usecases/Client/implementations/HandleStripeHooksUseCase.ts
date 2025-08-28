@@ -59,7 +59,6 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
     }
     const wallet = await this.walletRepo.getWalletByUserId(lawyer_id);
     if (!wallet) {
-      console.log(wallet);
       throw new Error("lawyer wallet not found");
     }
     const desc = generateDescription({
