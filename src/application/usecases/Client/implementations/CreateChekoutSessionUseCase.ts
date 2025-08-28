@@ -15,6 +15,7 @@ import { IOverrideRepo } from "@domain/IRepository/IOverrideRepo";
 import { Appointment } from "@domain/entities/Appointment";
 import { getStripeSession } from "@src/application/services/stripe.service";
 import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
+import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
 
 export class CreateCheckoutSessionUseCase
   implements ICreateCheckoutSessionUseCase
@@ -25,7 +26,8 @@ export class CreateCheckoutSessionUseCase
     private appointmentRepo: IAppointmentsRepository,
     private scheduleSettingsRepo: IScheduleSettingsRepo,
     private availableSlotsRepo: IAvailableSlots,
-    private overrideSlotsRepo: IOverrideRepo
+    private overrideSlotsRepo: IOverrideRepo,
+    private walletRepo: IWalletRepo
   ) {}
   async execute(input: CreateCheckoutSessionInputDto): Promise<any> {
     const { client_id, date, duration, lawyer_id, reason, timeSlot } = input;
@@ -49,6 +51,10 @@ export class CreateCheckoutSessionUseCase
       const error: any = new Error("slot settings not found for the lawyer");
       error.code = 404;
       throw error;
+    }
+    const wallet = await this.walletRepo.getWalletByUserId(lawyer_id);
+    if (!wallet) {
+      throw new Error("wallet not found for the lawyer");
     }
     const availableSlots = await this.availableSlotsRepo.findAvailableSlots(
       lawyer_id
