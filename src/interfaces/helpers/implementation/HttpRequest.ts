@@ -9,6 +9,7 @@ export class HttpRequest implements IHttpRequest {
   user?: unknown;
   file?: unknown;
   files?: unknown;
+  headers?: unknown;
   constructor(init?: HttpRequest) {
     Object.assign(this, init);
   }
