@@ -79,7 +79,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
     try {
       await this.transactionRepo.create(transaction);
     } catch (error) {
-      console.log("error creatinmg wallet transaction");
+      console.log("error creatinmg wallet transaction", error);
     }
   }
 }
