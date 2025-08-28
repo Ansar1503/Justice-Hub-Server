@@ -17,6 +17,7 @@ export async function expressAdapter(
     cookies: request.cookies,
     file: request.file,
     files: request.files,
+    headers: request.headers,
   });
   const response: IHttpResponse = await apiRoute.handle(httpRequest);
   return response;
