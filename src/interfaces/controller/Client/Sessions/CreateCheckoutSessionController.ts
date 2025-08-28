@@ -67,19 +67,11 @@ export class CreateCheckoutSessionController implements IController {
       });
 
       return this.httpSuccess.success_200(response);
-    } catch (error: any) {  
-      switch (error.message) {
-        case ERRORS.USER_NOT_FOUND:
-          return this.httpErrors.error_404("User not found");
-        case ERRORS.USER_BLOCKED:
-          return this.httpErrors.error_403("User is blocked");
-        case ERRORS.LAWYER_NOT_VERIFIED:
-          return this.httpErrors.error_400("Lawyer is not verified");
-        default:
-          return this.httpErrors.error_500(
-            error.message || "Internal Server Error"
-          );
+    } catch (error) {
+      if (error instanceof Error) {
+        return this.httpErrors.error_400(error.message);
       }
+      return this.httpErrors.error_500();
     }
   }
 }
