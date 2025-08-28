@@ -68,6 +68,11 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
       type: "credit",
     });
     wallet.updateBalance(wallet.balance + appointment.amount);
+    try {
+      await this.walletRepo.updateBalance(wallet.user_id, wallet.balance);
+    } catch (error) {
+      console.log("wallet update error");
+    }
     const transaction = WalletTransaction.create({
       amount: appointment.amount,
       category: "transfer",
