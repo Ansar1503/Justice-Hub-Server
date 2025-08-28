@@ -19,6 +19,11 @@ export interface WalletTransactionDto {
   updatedAt: Date;
 }
 
+export interface getWalletTransactionsOutputDto {
+  data: WalletTransactionDto[] | [];
+  page: number;
+  totalPages: number;
+}
 // export interface addFundsToWalletInputDto {
 //   userId: string;
 //   amount: number;
