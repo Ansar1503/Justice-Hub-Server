@@ -75,7 +75,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
     const transaction = WalletTransaction.create({
       amount: appointment.amount,
       category: "transfer",
-      description: desc || "",
+      description: desc,
       status: "completed",
       type: "credit",
       walletId: wallet.id,
