@@ -32,9 +32,12 @@ export class CancelAppointmentController implements IController {
       });
       const success = this.httpSuccess.success_200(result);
       return new HttpResponse(success.statusCode, success.body);
-    } catch (error: any) {
-      const err = this.httpErrors.error_500();
-      return new HttpResponse(err.statusCode, err.body);
+    } catch (error) {
+      console.log("error in ", error);
+      if (error instanceof Error) {
+        return this.httpErrors.error_400(error.message);
+      }
+      return this.httpErrors.error_500();
     }
   }
 }
