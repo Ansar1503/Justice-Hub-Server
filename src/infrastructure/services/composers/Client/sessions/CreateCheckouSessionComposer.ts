@@ -6,6 +6,7 @@ import { AppointmentsRepository } from "@infrastructure/database/repo/Appointmen
 import { ScheduleSettingsRepository } from "@infrastructure/database/repo/ScheduleSettingsRepo";
 import { AvailableSlotRepository } from "@infrastructure/database/repo/AvailableSlotsRepo";
 import { OverrideSlotsRepository } from "@infrastructure/database/repo/OverrideSlotsRepo";
+import { WalletRepo } from "@infrastructure/database/repo/WalletRepo";
 
 export const CreateCheckoutSessionComposer = () => {
   const useCase = new CreateCheckoutSessionUseCase(
@@ -14,7 +15,8 @@ export const CreateCheckoutSessionComposer = () => {
     new AppointmentsRepository(),
     new ScheduleSettingsRepository(),
     new AvailableSlotRepository(),
-    new OverrideSlotsRepository()
+    new OverrideSlotsRepository(),
+    new WalletRepo()
   );
   return new CreateCheckoutSessionController(useCase);
 };
