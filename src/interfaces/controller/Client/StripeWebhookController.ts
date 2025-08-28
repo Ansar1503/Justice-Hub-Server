@@ -8,11 +8,12 @@ export class HandleWebhookController implements IController {
   constructor(private handleWebHook: IHandleStripeHookUseCase) {}
 
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    const signature = (
-      httpRequest.header as Record<string, string> | undefined
-    )?.["stripe-signature"];
+    const signature =
+      (httpRequest.headers as any)?.["stripe-signature"] ||
+      (httpRequest.headers as any)?.["Stripe-Signature"];
 
     if (!signature) {
+      console.log("signature msiing");
       return new HttpResponse(400, { message: "Missing Stripe signature" });
     }
 
