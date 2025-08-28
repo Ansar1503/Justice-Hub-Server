@@ -37,6 +37,7 @@ import { FetchAllNotificationsComposer } from "@infrastructure/services/composer
 import { UpdateNotificationStatusComposer } from "@infrastructure/services/composers/Notification/UpdateNotificationStatusComposer";
 import { MarkAllNotificationAsReadComposer } from "@infrastructure/services/composers/Notification/MarkAllNotificationAsRead";
 import { FetchWalletByUserComposer } from "@infrastructure/services/composers/Wallet/FetchWalletByUserComposer";
+import { FetchTransactionsByWalletComposer } from "@infrastructure/services/composers/Wallet/FetchTransactionsByWalletComposer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -320,6 +321,20 @@ router.get(
   authenticateLawyer,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchWalletByUserComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+router.get(
+  WalletRoutes.base + WalletRoutes.transactions,
+  authenticateUser,
+  authenticateClient,
+  authenticateLawyer,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchTransactionsByWalletComposer()
+    );
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }
