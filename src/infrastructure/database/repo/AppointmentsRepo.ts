@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { ClientSession } from "mongoose";
 import { Appointment } from "../../../domain/entities/Appointment";
 import { IAppointmentsRepository } from "../../../domain/IRepository/IAppointmentsRepo";
 import {
@@ -22,9 +22,9 @@ export class AppointmentsRepository
   implements IAppointmentsRepository
 {
   constructor(
-    mapper: IMapper<Appointment, IAppointmentModel> = new AppointmentMapper()
+    session?: ClientSession
   ) {
-    super(AppointmentModel, mapper);
+    super(AppointmentModel, new AppointmentMapper(), session);
   }
   async createWithTransaction(payload: Appointment): Promise<Appointment> {
     const inputDate = payload.date;
