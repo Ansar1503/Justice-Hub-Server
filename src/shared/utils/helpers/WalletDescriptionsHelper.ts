@@ -1,4 +1,4 @@
-function generateDescription(transactionData: {
+export function generateDescription(transactionData: {
   type: "debit" | "credit";
   category: "deposit" | "withdrawal" | "payment" | "refund" | "transfer";
   amount: number;
