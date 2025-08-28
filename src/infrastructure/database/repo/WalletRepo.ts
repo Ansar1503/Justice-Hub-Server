@@ -15,4 +15,13 @@ export class WalletRepo
     const wallet = await this.model.findOne({ user_id: userId });
     return wallet ? this.mapper.toDomain(wallet) : null;
   }
+
+  async updateBalance(userId: string, amount: number): Promise<Wallet | null> {
+    const updatedWallet = await this.model.findOneAndUpdate(
+      { user_id: userId },
+      { balance: amount },
+      { new: true }
+    );
+  return updatedWallet ? this.mapper.toDomain(updatedWallet) : null;
+  }
 }
