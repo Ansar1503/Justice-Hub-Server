@@ -42,12 +42,6 @@ export class CreateCheckoutSessionUseCase
       err.code = STATUS_CODES.BAD_REQUEST;
       throw err;
     }
-    const existingAppointment = await this.appointmentRepo.findByClientID(
-      client_id
-    );
-    if (existingAppointment) {
-      const filtered = existingAppointment.filter((app) => app.date);
-    }
     const slotSettings = await this.scheduleSettingsRepo.fetchScheduleSettings(
       lawyer_id
     );
