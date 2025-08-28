@@ -6,4 +6,5 @@ export interface IHttpRequest {
   cookies?: unknown;
   file?: unknown;
   files?: unknown;
+  headers?: unknown;
 }
