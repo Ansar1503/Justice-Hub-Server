@@ -6,13 +6,14 @@ import {
   walletTransactionModel,
 } from "../model/WalletTransactionModelt";
 import { WalletTransactionMapper } from "@infrastructure/Mapper/Implementations/WalletTransactionMapper";
+import { ClientSession } from "mongoose";
 
 export class WalletTransactionsRepo
   extends BaseRepository<WalletTransaction, IWalletTransactionModel>
   implements IWalletTransactionsRepo
 {
-  constructor() {
-    super(walletTransactionModel, new WalletTransactionMapper());
+  constructor(session?: ClientSession) {
+    super(walletTransactionModel, new WalletTransactionMapper(), session);
   }
   async findTransactionsByWalletId({
     walletId,
