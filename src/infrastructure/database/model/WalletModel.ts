@@ -13,7 +13,7 @@ const walletSchema = new Schema<IWalletModel>(
   {
     _id: { type: String },
     user_id: { type: String, required: true },
-    balance: { type: Number, required: true, min: 0, max: 100000 },
+    balance: { type: Number, required: true, min: 0 },
     status: { type: Boolean, default: true },
   },
   { timestamps: true }
