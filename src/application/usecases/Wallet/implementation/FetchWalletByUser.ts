@@ -13,6 +13,7 @@ export class FetchWalletByUser implements IFetchWalletByUser {
       updatedAt: wallet.updatedAt,
       id: wallet.id,
       status: wallet.status,
+      isAdmin: wallet.isAdmin,
       user_id: wallet.user_id,
     };
   }

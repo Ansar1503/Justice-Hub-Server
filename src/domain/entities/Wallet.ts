@@ -5,6 +5,7 @@ interface PersistedWalletProps {
   user_id: string;
   balance: number;
   status: boolean;
+  isAdmin: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,6 +19,7 @@ export class Wallet {
   private _user_id: string;
   private _balance: number;
   private _status: boolean;
+  private _isAdmin: boolean;
   private _createdAt: Date;
   private _updatedAt: Date;
   constructor(props: PersistedWalletProps) {
@@ -25,6 +27,7 @@ export class Wallet {
     this._user_id = props.user_id;
     this._balance = props.balance;
     this._status = props.status;
+    this._isAdmin = props.isAdmin;
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
   }
@@ -35,6 +38,7 @@ export class Wallet {
       status: true,
       createdAt: now,
       updatedAt: now,
+      isAdmin: false,
       user_id: props.user_id,
       id: `w-${uuidv4()}`,
     });
@@ -55,6 +59,9 @@ export class Wallet {
   }
   get status() {
     return this._status;
+  }
+  get isAdmin() {
+    return this._isAdmin;
   }
   get createdAt() {
     return this._createdAt;

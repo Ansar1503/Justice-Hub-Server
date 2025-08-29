@@ -5,6 +5,7 @@ export interface IWalletModel extends Document {
   user_id: string;
   balance: number;
   status: boolean;
+  isAdmin: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,6 +16,7 @@ const walletSchema = new Schema<IWalletModel>(
     user_id: { type: String, required: true },
     balance: { type: Number, required: true, min: 0 },
     status: { type: Boolean, default: true },
+    isAdmin: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
