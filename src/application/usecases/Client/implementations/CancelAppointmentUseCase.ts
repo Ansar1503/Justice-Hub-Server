@@ -17,36 +17,34 @@ export class CancelAppointmentUseCase implements ICancelAppointmentUseCase {
   async execute(
     input: ChangeAppointmentStatusInputDto
   ): Promise<ChangeAppointmentStatusOutputDto> {
-    const appointment = await this.appointmentRepo.findById(input.id);
-    if (!appointment) {
-      const error: any = new Error("appointment not found");
-      error.code = STATUS_CODES.BAD_REQUEST;
-      throw error;
-    }
-    if (appointment.status === "cancelled") {
-      const error: any = new Error("already cancelled");
-      error.code = STATUS_CODES.BAD_REQUEST;
-      throw error;
-    }
-    if (appointment.status === "completed") {
-      const error: any = new Error("appointment completed");
-      error.code = STATUS_CODES.BAD_REQUEST;
-      throw error;
-    }
-    if (appointment.status === "rejected") {
-      const error: any = new Error("appointment already rejected by lawyer");
-      error.code = STATUS_CODES.BAD_REQUEST;
-      throw error;
-    }
-    if (appointment.status === "confirmed") {
-      const error: any = new Error("appointment already confirmed");
-      error.code = STATUS_CODES.BAD_REQUEST;
-      throw error;
-    }
     return await this.unitofWork.startTransaction(async (uow) => {
-      const appointment = await uow.appointmentRepo.findById(input.id);
-      if (!appointment) throw new Error("appointment not found");
-
+      const appointment = await this.appointmentRepo.findById(input.id);
+      if (!appointment) {
+        const error: any = new Error("appointment not found");
+        error.code = STATUS_CODES.BAD_REQUEST;
+        throw error;
+      }
+      if (appointment.status === "cancelled") {
+        const error: any = new Error("already cancelled");
+        error.code = STATUS_CODES.BAD_REQUEST;
+        throw error;
+      }
+      if (appointment.status === "completed") {
+        const error: any = new Error("appointment completed");
+        error.code = STATUS_CODES.BAD_REQUEST;
+        throw error;
+      }
+      if (appointment.status === "rejected") {
+        const error: any = new Error("appointment already rejected by lawyer");
+        error.code = STATUS_CODES.BAD_REQUEST;
+        throw error;
+      }
+      if (appointment.status === "confirmed") {
+        const error: any = new Error("appointment already confirmed");
+        error.code = STATUS_CODES.BAD_REQUEST;
+        throw error;
+      }
+      
       const clientWallet = await uow.walletRepo.getWalletByUserId(
         appointment.client_id
       );
