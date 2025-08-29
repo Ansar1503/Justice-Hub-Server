@@ -21,9 +21,7 @@ export class AppointmentsRepository
   extends BaseRepository<Appointment, IAppointmentModel>
   implements IAppointmentsRepository
 {
-  constructor(
-    session?: ClientSession
-  ) {
+  constructor(session?: ClientSession) {
     super(AppointmentModel, new AppointmentMapper(), session);
   }
   async createWithTransaction(payload: Appointment): Promise<Appointment> {
@@ -111,6 +109,9 @@ export class AppointmentsRepository
           payment_status: payload.payment_status,
           status: payload.status,
         },
+      },
+      {
+        new: true,
       }
     );
     return updated ? this.mapper.toDomain(updated) : null;
@@ -365,7 +366,7 @@ export class AppointmentsRepository
     return await AppointmentModel.findOneAndUpdate(
       { _id: payload.id },
       { $set: { status: payload.status } },
-      { new: true }
+      { new: true, session: this.session }
     );
   }
   async findById(id: string): Promise<Appointment | null> {

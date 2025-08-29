@@ -13,7 +13,11 @@ export class WalletRepo
     super(WalletModel, new WalletMapper(), session);
   }
   async getWalletByUserId(userId: string): Promise<Wallet | null> {
-    const wallet = await this.model.findOne({ user_id: userId });
+    const wallet = await this.model.findOne(
+      { user_id: userId },
+      {},
+      { session: this.session }
+    );
     return wallet ? this.mapper.toDomain(wallet) : null;
   }
 
@@ -21,7 +25,7 @@ export class WalletRepo
     const updatedWallet = await this.model.findOneAndUpdate(
       { user_id: userId },
       { balance: amount },
-      { new: true }
+      { new: true, session: this.session }
     );
     return updatedWallet ? this.mapper.toDomain(updatedWallet) : null;
   }
