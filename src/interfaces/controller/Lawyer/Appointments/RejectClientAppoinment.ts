@@ -54,19 +54,8 @@ export class RejectClientAppointmentController implements IController {
         data: result,
       });
     } catch (error) {
-      if (
-        error &&
-        typeof error === "object" &&
-        "code" in error &&
-        "message" in error
-      ) {
-        const statusCode =
-          typeof error?.code === "number" &&
-          error.code >= 100 &&
-          error.code < 600
-            ? error.code
-            : 500;
-        return new HttpResponse(statusCode, { message: error.message });
+      if (error instanceof Error) {
+        return this.httpErrors.error_400(error.message);
       }
       return this.httpErrors.error_500();
     }
