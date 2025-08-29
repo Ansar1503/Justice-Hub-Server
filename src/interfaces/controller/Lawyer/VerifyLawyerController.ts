@@ -171,6 +171,7 @@ export class VerifyLawyerController implements IController {
       const result = await this.verifyLawyer.execute(payload);
       return this.httpSuccess.success_200(result);
     } catch (error) {
+      console.log("error ", error);
       if (error instanceof Error) {
         return this.httpErrors.error_400(error.message);
       }
