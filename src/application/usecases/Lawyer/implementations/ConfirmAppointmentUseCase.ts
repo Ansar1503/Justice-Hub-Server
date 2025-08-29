@@ -43,6 +43,11 @@ export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
       error.code = STATUS_CODES.BAD_REQUEST;
       throw error;
     }
+    if (appointment.payment_status !== "success") {
+      const error: any = new Error("payment not completed");
+      error.code = STATUS_CODES.BAD_REQUEST;
+      throw error;
+    }
     const slotDateTime = timeStringToDate(appointment.date, appointment.time);
 
     if (slotDateTime <= new Date()) {

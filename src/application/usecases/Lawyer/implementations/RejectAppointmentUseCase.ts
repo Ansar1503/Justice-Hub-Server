@@ -42,30 +42,28 @@ export class RejectAppointmentUseCase implements IRejectAppointmentUseCase {
       const clientWallet = await uow.walletRepo.getWalletByUserId(
         appointment.client_id
       );
-      const lawyerWallet = await uow.walletRepo.getWalletByUserId(
-        appointment.lawyer_id
-      );
+      const adminWallet = await uow.walletRepo.getAdminWallet();
 
       if (!clientWallet) throw new Error("client wallet not found");
-      if (!lawyerWallet) throw new Error("lawyer wallet not found");
+      if (!adminWallet) throw new Error("admin wallet not found");
 
-      if (lawyerWallet.balance < appointment.amount) {
-        throw new Error("insufficient balance in Lawyer Wallet");
+      if (adminWallet.balance < appointment.amount) {
+        throw new Error("insufficient balance in admin Wallet");
       }
 
-      lawyerWallet.updateBalance(lawyerWallet.balance - appointment.amount);
+      adminWallet.updateBalance(adminWallet.balance - appointment.amount);
       clientWallet.updateBalance(clientWallet.balance + appointment.amount);
 
       await uow.walletRepo.updateBalance(
-        lawyerWallet.user_id,
-        lawyerWallet.balance
+        adminWallet.user_id,
+        adminWallet.balance
       );
       await uow.walletRepo.updateBalance(
         clientWallet.user_id,
         clientWallet.balance
       );
 
-      const lawyerTransaction = WalletTransaction.create({
+      const adminTransaction = WalletTransaction.create({
         amount: appointment.amount,
         type: "debit",
         category: "refund",
@@ -75,7 +73,7 @@ export class RejectAppointmentUseCase implements IRejectAppointmentUseCase {
           type: "debit",
         }),
         status: "completed",
-        walletId: lawyerWallet.id,
+        walletId: adminWallet.id,
       });
 
       const clientTransaction = WalletTransaction.create({
@@ -91,10 +89,12 @@ export class RejectAppointmentUseCase implements IRejectAppointmentUseCase {
         walletId: clientWallet.id,
       });
 
-      await uow.transactionsRepo.create(lawyerTransaction);
+      await uow.transactionsRepo.create(adminTransaction);
       await uow.transactionsRepo.create(clientTransaction);
-      const response = await this.appointmentRepo.updateWithId(input);
-      if (!response) throw new Error("reject appointment failed");
+
+      const response = await uow.appointmentRepo.updateWithId(input);
+      if (!response) throw new Error("appointment cancellation failed");
+
       return response;
     });
   }

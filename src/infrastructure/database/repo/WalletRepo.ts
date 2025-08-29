@@ -29,4 +29,13 @@ export class WalletRepo
     );
     return updatedWallet ? this.mapper.toDomain(updatedWallet) : null;
   }
+
+  async getAdminWallet(): Promise<Wallet | null> {
+    const walet = await this.model.findOne(
+      { isAdmin: true },
+      {},
+      { session: this.session }
+    );
+    return walet ? this.mapper.toDomain(walet) : null;
+  }
 }

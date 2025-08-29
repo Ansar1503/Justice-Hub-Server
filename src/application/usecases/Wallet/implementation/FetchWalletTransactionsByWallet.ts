@@ -21,7 +21,7 @@ export class FetchWalletTransactionsByWallet
     const transactions = await this.transactionsRepo.findTransactionsByWalletId(
       {
         page: input.page,
-        walletId: wallet.isAdmin ? undefined : wallet.id,
+        walletId: wallet.id,
         limit: input.limit,
         endDate: input.endDate,
         startDate: input.startDate,
