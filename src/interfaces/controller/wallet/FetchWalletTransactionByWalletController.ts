@@ -6,6 +6,7 @@ import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
+import { FetchWalletTransactionsQuerySchema } from "@interfaces/middelwares/validator/zod/wallet/fetchWalletTransactionsQuerySchema";
 
 export class FetchWalletTransactionByWalletController implements IController {
   constructor(
@@ -15,7 +16,6 @@ export class FetchWalletTransactionByWalletController implements IController {
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
     let userId = "";
-    let page = 0;
     if (
       httpRequest.user &&
       typeof httpRequest.user === "object" &&
@@ -27,24 +27,19 @@ export class FetchWalletTransactionByWalletController implements IController {
     if (!userId) {
       return this.httpErrors.error_400("user id not found");
     }
-    if (
-      httpRequest.query &&
-      typeof httpRequest.query === "object" &&
-      "page" in httpRequest.query
-    ) {
-      if (isNaN(Number(httpRequest.query.page))) {
-        page = 1;
-      } else {
-        page = Number(httpRequest.query.page);
-      }
-    }
-    if (!page) {
-      page = 1;
+
+    const parsed = FetchWalletTransactionsQuerySchema.safeParse(
+      httpRequest.query
+    );
+    if (!parsed.success) {
+      const err = parsed.error.errors[0];
+      console.log("error", err);
+      return this.httpErrors.error_400(err.message);
     }
     try {
       const result = await this.fetchTransactionByWallet.execute({
+        ...parsed.data,
         userId,
-        page,
       });
       return this.httpSuccess.success_200(result);
     } catch (error) {

@@ -1,4 +1,7 @@
-import { getWalletTransactionsOutputDto } from "@src/application/dtos/wallet/WalletTransactionDto";
+import {
+  getWalletTransactionsInputDto,
+  getWalletTransactionsOutputDto,
+} from "@src/application/dtos/wallet/WalletTransactionDto";
 import { IFetchWalletTransactionsByWallet } from "../IFetchWalletTransactionsByWallet";
 import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
 import { IWalletTransactionsRepo } from "@domain/IRepository/IWalletTransactionsRepo";
@@ -10,14 +13,21 @@ export class FetchWalletTransactionsByWallet
     private walletRepo: IWalletRepo,
     private transactionsRepo: IWalletTransactionsRepo
   ) {}
-  async execute(input: {
-    userId: string;
-    page: number;
-  }): Promise<getWalletTransactionsOutputDto> {
+  async execute(
+    input: getWalletTransactionsInputDto
+  ): Promise<getWalletTransactionsOutputDto> {
     const wallet = await this.walletRepo.getWalletByUserId(input.userId);
     if (!wallet) throw new Error("Wallet not found");
     const transactions = await this.transactionsRepo.findTransactionsByWalletId(
-      { page: input.page, walletId: wallet.id }
+      {
+        page: input.page,
+        walletId: wallet.id,
+        limit: input.limit,
+        endDate: input.endDate,
+        startDate: input.startDate,
+        search: input.search,
+        type: input.type,
+      }
     );
     return {
       page: transactions.page,

@@ -24,6 +24,26 @@ export interface getWalletTransactionsOutputDto {
   page: number;
   totalPages: number;
 }
+
+export interface getWalletTransactionsInputDto {
+  userId: string;
+  page: number;
+  limit: number;
+  search?: string;
+  type?: transactionType;
+  startDate?: Date;
+  endDate?: Date;
+}
+
+export interface getWalletTransactionsRepoInputDto {
+  walletId: string;
+  page: number;
+  limit: number;
+  search?: string;
+  type?: transactionType;
+  startDate?: Date;
+  endDate?: Date;
+}
 // export interface addFundsToWalletInputDto {
 //   userId: string;
 //   amount: number;
