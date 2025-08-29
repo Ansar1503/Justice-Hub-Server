@@ -36,7 +36,7 @@ export interface getWalletTransactionsInputDto {
 }
 
 export interface getWalletTransactionsRepoInputDto {
-  walletId: string;
+  walletId?: string;
   page: number;
   limit: number;
   search?: string;

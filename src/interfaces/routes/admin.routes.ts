@@ -10,7 +10,9 @@ import { FetchReviewDipsutesComposer } from "@infrastructure/services/composers/
 import { FetchChatDisputesComposer } from "@infrastructure/services/composers/Admin/FetchChatDisputesComposer";
 import { UpdateDisputesStatusComposer } from "@infrastructure/services/composers/Admin/UpdateDisputesStatusComposer";
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
-import { AdminRoutes } from "@shared/constant/RouteConstant";
+import { AdminRoutes, WalletRoutes } from "@shared/constant/RouteConstant";
+import { FetchTransactionsByWalletComposer } from "@infrastructure/services/composers/Wallet/FetchTransactionsByWalletComposer";
+import { FetchWalletByUserComposer } from "@infrastructure/services/composers/Wallet/FetchWalletByUserComposer";
 
 const router = Router();
 
@@ -99,6 +101,28 @@ router.put(
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, UpdateDisputesStatusComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  WalletRoutes.base + WalletRoutes.transactions,
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchTransactionsByWalletComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+router.get(
+  WalletRoutes.base,
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchWalletByUserComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }

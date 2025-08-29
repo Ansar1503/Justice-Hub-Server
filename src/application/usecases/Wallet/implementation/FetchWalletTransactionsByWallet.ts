@@ -18,10 +18,12 @@ export class FetchWalletTransactionsByWallet
   ): Promise<getWalletTransactionsOutputDto> {
     const wallet = await this.walletRepo.getWalletByUserId(input.userId);
     if (!wallet) throw new Error("Wallet not found");
+    console.log(wallet
+    )
     const transactions = await this.transactionsRepo.findTransactionsByWalletId(
       {
         page: input.page,
-        walletId: wallet.id,
+        walletId: wallet.isAdmin ? undefined : wallet.id,
         limit: input.limit,
         endDate: input.endDate,
         startDate: input.startDate,

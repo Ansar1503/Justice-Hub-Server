@@ -25,7 +25,10 @@ export class WalletTransactionsRepo
   }> {
     const { limit, page, walletId, endDate, search, startDate, type } = payload;
     const skip = (page - 1) * limit;
-    const query: Record<string, any> = { walletId };
+    const query: Record<string, any> = {};
+    if (walletId) {
+      query.walletId = walletId;
+    }
 
     if (type) {
       query.type = type;
@@ -50,12 +53,11 @@ export class WalletTransactionsRepo
         query.createdAt.$lte = endDate;
       }
     }
-    const transactions = await this.model
-      .find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-    const total = await this.model.countDocuments({ walletId });
+    console.log(query);
+    const [transactions, total] = await Promise.all([
+      this.model.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      this.model.countDocuments(query),
+    ]);
     return {
       data:
         transactions && this.mapper.toDomainArray

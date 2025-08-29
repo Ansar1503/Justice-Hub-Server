@@ -11,6 +11,7 @@ export class WalletMapper implements IMapper<Wallet, IWalletModel> {
       user_id: persistence.user_id,
       createdAt: persistence.createdAt,
       updatedAt: persistence.updatedAt,
+      isAdmin: persistence.isAdmin,
     });
   }
 
@@ -24,6 +25,7 @@ export class WalletMapper implements IMapper<Wallet, IWalletModel> {
       balance: entity.balance,
       status: entity.status,
       user_id: entity.user_id,
+      isAdmin: entity.isAdmin,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     };
