@@ -9,8 +9,6 @@ import { CancelAppointmentUseCase } from "@src/application/usecases/Client/imple
 export function CancelAppointmentComposer(): IController {
   const useCase = new CancelAppointmentUseCase(
     new AppointmentsRepository(),
-    new WalletRepo(),
-    new WalletTransactionsRepo(),
     new MongoUnitofWork()
   );
   return new CancelAppointmentController(useCase);

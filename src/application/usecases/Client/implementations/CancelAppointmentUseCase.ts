@@ -5,8 +5,6 @@ import {
 import { ICancelAppointmentUseCase } from "../ICancelAppointmentUseCase";
 import { STATUS_CODES } from "http";
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
-import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
-import { IWalletTransactionsRepo } from "@domain/IRepository/IWalletTransactionsRepo";
 import { WalletTransaction } from "@domain/entities/WalletTransactions";
 import { generateDescription } from "@shared/utils/helpers/WalletDescriptionsHelper";
 import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
@@ -14,8 +12,6 @@ import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
 export class CancelAppointmentUseCase implements ICancelAppointmentUseCase {
   constructor(
     private appointmentRepo: IAppointmentsRepository,
-    private walletRepo: IWalletRepo,
-    private transactionsRepo: IWalletTransactionsRepo,
     private unitofWork: IUnitofWork
   ) {}
   async execute(
