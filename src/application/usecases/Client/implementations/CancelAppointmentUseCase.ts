@@ -3,11 +3,11 @@ import {
   ChangeAppointmentStatusOutputDto,
 } from "@src/application/dtos/Lawyer/ChangeAppointmentStatusDto";
 import { ICancelAppointmentUseCase } from "../ICancelAppointmentUseCase";
-import { STATUS_CODES } from "http";
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 import { WalletTransaction } from "@domain/entities/WalletTransactions";
 import { generateDescription } from "@shared/utils/helpers/WalletDescriptionsHelper";
 import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
+import { STATUS_CODES } from "@infrastructure/constant/status.codes";
 
 export class CancelAppointmentUseCase implements ICancelAppointmentUseCase {
   constructor(
@@ -44,7 +44,7 @@ export class CancelAppointmentUseCase implements ICancelAppointmentUseCase {
         error.code = STATUS_CODES.BAD_REQUEST;
         throw error;
       }
-      
+
       const clientWallet = await uow.walletRepo.getWalletByUserId(
         appointment.client_id
       );
