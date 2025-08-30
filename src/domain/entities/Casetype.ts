@@ -13,7 +13,7 @@ interface createCasetypeProps {
   practiceareaId: string;
 }
 
-export class Casetype {
+export class CaseType {
   private _id: string;
   private _name: string;
   private _practiceareaId: string;
@@ -45,7 +45,7 @@ export class Casetype {
 
   static create(props: createCasetypeProps) {
     const now = new Date();
-    return new Casetype({
+    return new CaseType({
       id: `ct-${uuidv4()}`,
       name: props.name,
       practiceareaId: props.practiceareaId,
@@ -55,7 +55,7 @@ export class Casetype {
   }
 
   static fromPersistance(props: persistedCasetypes) {
-    return new Casetype(props);
+    return new CaseType(props);
   }
 
   updateName(name: string) {
