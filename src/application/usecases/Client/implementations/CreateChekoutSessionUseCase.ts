@@ -7,7 +7,6 @@ import {
   timeStringToDate,
   timeStringToMinutes,
 } from "@shared/utils/helpers/DateAndTimeHelper";
-import { STATUS_CODES } from "http";
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 import { IScheduleSettingsRepo } from "@domain/IRepository/IScheduleSettingsRepo";
 import { IAvailableSlots } from "@domain/IRepository/IAvailableSlots";
@@ -16,6 +15,7 @@ import { Appointment } from "@domain/entities/Appointment";
 import { getStripeSession } from "@src/application/services/stripe.service";
 import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
 import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
+import { STATUS_CODES } from "@infrastructure/constant/status.codes";
 
 export class CreateCheckoutSessionUseCase
   implements ICreateCheckoutSessionUseCase
