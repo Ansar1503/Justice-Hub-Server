@@ -18,6 +18,7 @@ import {
 import { FetchTransactionsByWalletComposer } from "@infrastructure/services/composers/Wallet/FetchTransactionsByWalletComposer";
 import { FetchWalletByUserComposer } from "@infrastructure/services/composers/Wallet/FetchWalletByUserComposer";
 import { FetchAllSpecializationsComposer } from "@infrastructure/services/composers/Specializations/FetchAllSpecializations";
+import { AddSpecializationComposer } from "@infrastructure/services/composers/Specializations/AddSpecialization";
 
 const router = Router();
 
@@ -133,17 +134,21 @@ router.get(
   }
 );
 
-router.get(
-  SpecializationRoute.base,
-  authenticateUser,
-  async (req: Request, res: Response) => {
+router
+  .route(SpecializationRoute.base)
+  .all(authenticateUser)
+  .get(async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
       req,
       FetchAllSpecializationsComposer()
     );
     res.status(adapter.statusCode).json(adapter.body);
     return;
-  }
-);
+  })
+  .patch(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, AddSpecializationComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  });
 
 export default router;

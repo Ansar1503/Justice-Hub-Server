@@ -48,4 +48,22 @@ export class SpecializationRepo
       totalPage,
     };
   }
+  async findById(id: string): Promise<Specialization | null> {
+    const data = await this.model.findOne({ _id: id });
+    return data ? this.mapper.toDomain(data) : null;
+  }
+  async updateName(id: string, name: string): Promise<Specialization> {
+    const updated = await this.model.findByIdAndUpdate(
+      {
+        _id: id,
+      },
+      { name },
+      { new: true }
+    );
+
+    if (!updated) {
+      throw new Error("update failed");
+    }
+    return this.mapper.toDomain(updated);
+  }
 }
