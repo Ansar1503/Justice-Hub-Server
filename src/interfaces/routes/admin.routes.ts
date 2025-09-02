@@ -17,6 +17,7 @@ import {
 } from "@shared/constant/RouteConstant";
 import { FetchTransactionsByWalletComposer } from "@infrastructure/services/composers/Wallet/FetchTransactionsByWalletComposer";
 import { FetchWalletByUserComposer } from "@infrastructure/services/composers/Wallet/FetchWalletByUserComposer";
+import { FetchAllSpecializationsComposer } from "@infrastructure/services/composers/Specializations/FetchAllSpecializations";
 
 const router = Router();
 
@@ -136,7 +137,12 @@ router.get(
   SpecializationRoute.base,
   authenticateUser,
   async (req: Request, res: Response) => {
-    // const adapter 
+    const adapter = await expressAdapter(
+      req,
+      FetchAllSpecializationsComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
   }
 );
 
