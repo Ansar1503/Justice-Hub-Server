@@ -122,3 +122,7 @@ export const WalletRoutes = {
   base: "/wallet",
   transactions: "/transactions",
 };
+
+export const SpecializationRoute = {
+  base: "/specialization",
+};
