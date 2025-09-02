@@ -66,4 +66,10 @@ export class SpecializationRepo
     }
     return this.mapper.toDomain(updated);
   }
+
+  async findByName(name: string): Promise<Specialization | null> {
+    const data = await this.model.findOne({ name });
+    if (!data) return null;
+    return this.mapper.toDomain(data);
+  }
 }

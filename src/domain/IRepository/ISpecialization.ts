@@ -9,5 +9,6 @@ export interface ISpecializationRepo extends IBaseRepository<Specialization> {
     totalPage: number;
   }>;
   findById(id: string): Promise<Specialization | null>;
+  findByName(name: string): Promise<Specialization | null>;
   updateName(id: string, name: string): Promise<Specialization>;
 }

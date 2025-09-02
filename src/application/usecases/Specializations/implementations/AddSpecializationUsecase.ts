@@ -9,6 +9,10 @@ export class AddSpecializationUsecase implements IAddSpecializationUsecase {
   constructor(private specializationRepo: ISpecializationRepo) {}
   async execute(input: AddSpecializationInputDto): Promise<SpecializationDto> {
     if (!input.id?.trim()) {
+      const exist = await this.specializationRepo.findByName(input.name);
+      if (exist && exist.name == input.name) {
+        throw new Error("Specialization Already exsits");
+      }
       const newSpec = Specialization.create({ name: input.name });
       const specialization = await this.specializationRepo.create(newSpec);
       return specialization;
