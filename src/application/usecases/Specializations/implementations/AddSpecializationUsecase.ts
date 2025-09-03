@@ -15,7 +15,12 @@ export class AddSpecializationUsecase implements IAddSpecializationUsecase {
       }
       const newSpec = Specialization.create({ name: input.name });
       const specialization = await this.specializationRepo.create(newSpec);
-      return specialization;
+      return {
+        createdAt: specialization.createdAt,
+        id: specialization.id,
+        name: specialization.name,
+        updatedAt: specialization.updatedAt,
+      };
     }
     const exist = await this.specializationRepo.findById(input.id);
     if (!exist) throw new ValidationError("No spc found with the id");

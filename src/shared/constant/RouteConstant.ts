@@ -125,4 +125,5 @@ export const WalletRoutes = {
 
 export const SpecializationRoute = {
   base: "/specialization",
+  params: "/:id",
 };

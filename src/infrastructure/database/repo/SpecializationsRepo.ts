@@ -72,4 +72,9 @@ export class SpecializationRepo
     if (!data) return null;
     return this.mapper.toDomain(data);
   }
+  async delete(id: string): Promise<Specialization | null> {
+    const deleted = await this.model.findOneAndDelete({ _id: id });
+    if (!deleted) return null;
+    return this.mapper.toDomain(deleted);
+  }
 }

@@ -19,6 +19,7 @@ import { FetchTransactionsByWalletComposer } from "@infrastructure/services/comp
 import { FetchWalletByUserComposer } from "@infrastructure/services/composers/Wallet/FetchWalletByUserComposer";
 import { FetchAllSpecializationsComposer } from "@infrastructure/services/composers/Specializations/FetchAllSpecializations";
 import { AddSpecializationComposer } from "@infrastructure/services/composers/Specializations/AddSpecialization";
+import { DeleteSpecializationComposer } from "@infrastructure/services/composers/Specializations/DeleteSpecializationComposer";
 
 const router = Router();
 
@@ -150,5 +151,15 @@ router
     res.status(adapter.statusCode).json(adapter.body);
     return;
   });
+
+router.delete(
+  SpecializationRoute.base + SpecializationRoute.params,
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, DeleteSpecializationComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
 
 export default router;
