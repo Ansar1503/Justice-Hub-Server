@@ -8,7 +8,7 @@ import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { AddPracticeAreaUsecase } from "@src/application/usecases/PracitceAreas/Implementation/AddPracticeAreasUsecase";
 
-export function PracticeAreasComposer(): IController {
+export function AddPracticeAreasComposer(): IController {
   const usecase = new AddPracticeAreaUsecase(
     new PracticeAreaRepo(new PracticeAreaMapper()),
     new SpecializationRepo(new SpecializationMapper())
