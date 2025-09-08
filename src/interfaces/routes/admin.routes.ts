@@ -12,6 +12,7 @@ import { UpdateDisputesStatusComposer } from "@infrastructure/services/composers
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 import {
   AdminRoutes,
+  PracticeAreaRoutes,
   SpecializationRoute,
   WalletRoutes,
 } from "@shared/constant/RouteConstant";
@@ -20,6 +21,10 @@ import { FetchWalletByUserComposer } from "@infrastructure/services/composers/Wa
 import { FetchAllSpecializationsComposer } from "@infrastructure/services/composers/Specializations/FetchAllSpecializations";
 import { AddSpecializationComposer } from "@infrastructure/services/composers/Specializations/AddSpecialization";
 import { DeleteSpecializationComposer } from "@infrastructure/services/composers/Specializations/DeleteSpecializationComposer";
+import { AddPracticeAreasComposer } from "@infrastructure/services/composers/PracticeAreas/AddPracticeAreasComposer";
+import { FindAllPracticeAreaComposer } from "@infrastructure/services/composers/PracticeAreas/FindAllPracticeAreaComposer";
+import { UpdatePracticeAreaComposer } from "@infrastructure/services/composers/PracticeAreas/UpdatePracticeAreaComposer";
+import { DeletePracticeAreaComposer } from "@infrastructure/services/composers/PracticeAreas/DeletPracticeAreaComposer";
 
 const router = Router();
 
@@ -157,6 +162,35 @@ router.delete(
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, DeleteSpecializationComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router
+  .route(PracticeAreaRoutes.base)
+  .all(authenticateUser)
+  .post(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, AddPracticeAreasComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  })
+  .get(async (req: Request, res: Response) => {
+    const adaper = await expressAdapter(req, FindAllPracticeAreaComposer());
+    res.status(adaper.statusCode).json(adaper.body);
+    return;
+  })
+  .put(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, UpdatePracticeAreaComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  });
+
+router.delete(
+  PracticeAreaRoutes.base + PracticeAreaRoutes.params,
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, DeletePracticeAreaComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }

@@ -10,5 +10,5 @@ export const FindAllPracticeAreasQuery = z.object({
     .string()
     .transform((val) => parseInt(val))
     .default("10"),
-  filter: z.string().default(""),
+  specId: z.string().default(""),
 });

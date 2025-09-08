@@ -35,8 +35,8 @@ export class PracticeAreaRepo
     if (payload.search.trim()) {
       query["name"] = { $regex: payload.search, $options: "i" };
     }
-    if (payload.filter?.trim()) {
-      query["specializationId"] = payload.filter;
+    if (payload.specId?.trim()) {
+      query["specializationId"] = payload.specId;
     }
     const [data, count] = await Promise.all([
       await this.model.find(query).skip(skip).limit(payload.limit),
@@ -71,5 +71,8 @@ export class PracticeAreaRepo
   async delete(id: string): Promise<PracticeArea | null> {
     const deleted = await this.model.findOneAndDelete({ _id: id });
     return deleted ? this.mapper.toDomain(deleted) : null;
+  }
+  async deleteBySpec(specId: string): Promise<void> {
+    await this.model.deleteMany({ specializationId: specId });
   }
 }

@@ -127,3 +127,7 @@ export const SpecializationRoute = {
   base: "/specialization",
   params: "/:id",
 };
+export const PracticeAreaRoutes = {
+  base: "/practicearea",
+  params: "/:id",
+};

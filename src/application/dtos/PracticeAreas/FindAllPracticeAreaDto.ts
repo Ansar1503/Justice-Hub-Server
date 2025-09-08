@@ -2,7 +2,7 @@ import { PracticeAreaDto } from "./PracticeAreasDto";
 
 export interface FindAllPracticeAreaInputDto {
   search: string;
-  filter: string;
+  specId: string;
   page: number;
   limit: number;
 }
