@@ -17,7 +17,7 @@ export class UpdateCasetypeController implements IController {
     let practiceId = "";
     if (httpRequest.body && typeof httpRequest.body === "object") {
       if ("id" in httpRequest.body) {
-        id = String(httpRequest.body);
+        id = String(httpRequest.body.id);
       }
       if ("name" in httpRequest.body) {
         name = String(httpRequest.body.name);
