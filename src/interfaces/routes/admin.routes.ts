@@ -12,6 +12,7 @@ import { UpdateDisputesStatusComposer } from "@infrastructure/services/composers
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 import {
   AdminRoutes,
+  CasetypeRoutes,
   PracticeAreaRoutes,
   SpecializationRoute,
   WalletRoutes,
@@ -25,6 +26,10 @@ import { AddPracticeAreasComposer } from "@infrastructure/services/composers/Pra
 import { FindAllPracticeAreaComposer } from "@infrastructure/services/composers/PracticeAreas/FindAllPracticeAreaComposer";
 import { UpdatePracticeAreaComposer } from "@infrastructure/services/composers/PracticeAreas/UpdatePracticeAreaComposer";
 import { DeletePracticeAreaComposer } from "@infrastructure/services/composers/PracticeAreas/DeletPracticeAreaComposer";
+import { FindAllCasetypeComposer } from "@infrastructure/services/composers/Casetypes/FindAllCasetypeComposer";
+import { AddCaseTypeComposer } from "@infrastructure/services/composers/Casetypes/AddCaseTypeComposer";
+import { UpdateCasetypeComposer } from "@infrastructure/services/composers/Casetypes/UpdateCasetypeComposer";
+import { DeleteCasetypeComposer } from "@infrastructure/services/composers/Casetypes/DeleteCasetypeComposer";
 
 const router = Router();
 
@@ -191,6 +196,35 @@ router.delete(
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, DeletePracticeAreaComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router
+  .route(CasetypeRoutes.base)
+  .all(authenticateUser)
+  .get(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindAllCasetypeComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  })
+  .post(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, AddCaseTypeComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  })
+  .put(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, UpdateCasetypeComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  });
+
+router.delete(
+  CasetypeRoutes.base + CasetypeRoutes.params,
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, DeleteCasetypeComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }

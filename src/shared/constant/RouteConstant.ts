@@ -131,3 +131,7 @@ export const PracticeAreaRoutes = {
   base: "/practicearea",
   params: "/:id",
 };
+export const CasetypeRoutes = {
+  base: "/casetype",
+  params: "/:id",
+};
