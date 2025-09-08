@@ -5,3 +5,8 @@ export interface CaseTypeDto {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface AddCasetypeInputDto {
+  name: string;
+  practiceareaId: string;
+}
