@@ -93,7 +93,6 @@ export class LawyerDocuments {
     if (change) {
       const now = new Date();
       this._updatedAt = now;
-      this._createdAt = now;
     }
   }
 }
