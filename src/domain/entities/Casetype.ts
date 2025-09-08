@@ -62,7 +62,6 @@ export class CaseType {
     this._name = name;
     this._updatedAt = new Date();
   }
-
   updatePracticeareaId(id: string) {
     this._practiceareaId = id;
     this._updatedAt = new Date();
