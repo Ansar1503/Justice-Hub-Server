@@ -5,42 +5,32 @@ import { ILawyerModel } from "@infrastructure/database/model/LawyerModel";
 export class LawyerMapper implements IMapper<Lawyer, ILawyerModel> {
   toDomain(persistence: ILawyerModel): Lawyer {
     return Lawyer.fromPersistence({
-      barcouncil_number: persistence.barcouncil_number,
-      certificate_of_practice_number: persistence.barcouncil_number,
-      consultation_fee: persistence.consultation_fee,
       createdAt: persistence.createdAt,
       description: persistence.description,
-      documents: persistence.documents?.toString(),
-      enrollment_certificate_number: persistence.enrollment_certificate_number,
       experience: persistence.experience,
       id: persistence._id,
-      practice_areas: persistence.practice_areas,
-      rejectReason: persistence.rejectReason,
-      specialisation: persistence.specialisation,
       updatedAt: persistence.updatedAt,
-      user_id: persistence.user_id,
-      verification_status: persistence.verification_status,
+      consultationFee: persistence.consultationFee,
+      practiceAreas: persistence.practiceAreas,
+      specializations: persistence.specialisations,
+      userId: persistence.userId,
     });
   }
+
   toPersistence(entity: Lawyer): Partial<ILawyerModel> {
     return {
       _id: entity.id,
-      user_id: entity.user_id,
+      userId: entity.userId,
       description: entity.description,
-      barcouncil_number: entity.barcouncil_number,
-      enrollment_certificate_number: entity.enrollment_certificate_number,
-      certificate_of_practice_number: entity.certificate_of_practice_number,
-      verification_status: entity.verification_status,
-      practice_areas: entity.practice_areas,
       experience: entity.experience,
-      specialisation: entity.specialisation,
-      consultation_fee: entity.consultation_fee,
-      documents: entity.documents,
-      rejectReason: entity.rejectReason,
+      consultationFee: entity.consultationFee,
+      practiceAreas: entity.practiceAreas,
+      specialisations: entity.specializations,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     };
   }
+
   toDomainArray(persistence: ILawyerModel[]): Lawyer[] {
     return persistence.map((p) => this.toDomain(p));
   }

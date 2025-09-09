@@ -1,76 +1,47 @@
 import { v4 as uuidv4 } from "uuid";
 
-export type VerificationStatus =
-  | "verified"
-  | "rejected"
-  | "pending"
-  | "requested";
-
 export interface LawyerProps {
   id: string;
-  user_id: string;
+  userId: string;
   description: string;
-  barcouncil_number: string;
-  enrollment_certificate_number: string;
-  certificate_of_practice_number: string;
-  verification_status: VerificationStatus;
-  practice_areas: string[];
+  practiceAreas: string[];
   experience: number;
-  specialisation: string[];
-  consultation_fee: number;
-  documents: string;
-  rejectReason: string;
+  specializations: string[];
+  consultationFee: number;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export class Lawyer {
-  private _id: string;
-  private _user_id: string;
+  private readonly _id: string;
+  private readonly _userId: string;
   private _description: string;
-  private _barcouncil_number: string;
-  private _enrollment_certificate_number: string;
-  private _certificate_of_practice_number: string;
-  private _verification_status: VerificationStatus;
-  private _practice_areas: string[];
+  private _practiceAreas: string[];
   private _experience: number;
-  private _specialisation: string[];
-  private _consultation_fee: number;
-  private _documents: string;
-  private _rejectReason: string;
-  private _createdAt: Date;
+  private _specializations: string[];
+  private _consultationFee: number;
+  private readonly _createdAt: Date;
   private _updatedAt: Date;
 
   private constructor(props: LawyerProps) {
     this._id = props.id;
-    this._user_id = props.user_id;
+    this._userId = props.userId;
     this._description = props.description;
-    this._barcouncil_number = props.barcouncil_number;
-    this._enrollment_certificate_number = props.enrollment_certificate_number;
-    this._certificate_of_practice_number = props.certificate_of_practice_number;
-    this._verification_status = props.verification_status;
-    this._practice_areas = props.practice_areas;
+    this._practiceAreas = props.practiceAreas;
     this._experience = props.experience;
-    this._specialisation = props.specialisation;
-    this._consultation_fee = props.consultation_fee;
-    this._documents = props.documents;
-    this._rejectReason = props.rejectReason;
+    this._specializations = props.specializations;
+    this._consultationFee = props.consultationFee;
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
   }
 
   static create(
-    props: Omit<
-      LawyerProps,
-      "id" | "verification_status" | "createdAt" | "updatedAt"
-    >
+    props: Omit<LawyerProps, "id" | "createdAt" | "updatedAt">
   ): Lawyer {
     const now = new Date();
     return new Lawyer({
       ...props,
-      verification_status: "pending",
       id: uuidv4(),
-      user_id: props.user_id,
       createdAt: now,
       updatedAt: now,
     });
@@ -83,18 +54,12 @@ export class Lawyer {
   toPersistence(): LawyerProps {
     return {
       id: this._id,
-      user_id: this._user_id,
+      userId: this._userId,
       description: this._description,
-      barcouncil_number: this._barcouncil_number,
-      enrollment_certificate_number: this._enrollment_certificate_number,
-      certificate_of_practice_number: this._certificate_of_practice_number,
-      verification_status: this._verification_status,
-      practice_areas: this._practice_areas,
+      practiceAreas: this._practiceAreas,
       experience: this._experience,
-      specialisation: this._specialisation,
-      consultation_fee: this._consultation_fee,
-      documents: this._documents,
-      rejectReason: this._rejectReason,
+      specializations: this._specializations,
+      consultationFee: this._consultationFee,
       createdAt: this._createdAt,
       updatedAt: this._updatedAt,
     };
@@ -104,101 +69,48 @@ export class Lawyer {
     this._updatedAt = new Date();
   }
 
+  // getters
   get id(): string {
     return this._id;
   }
-
-  get user_id(): string {
-    return this._user_id;
+  get userId(): string {
+    return this._userId;
   }
-
   get description(): string {
     return this._description;
   }
-
-  get barcouncil_number(): string {
-    return this._barcouncil_number;
+  get practiceAreas(): string[] {
+    return this._practiceAreas;
   }
-
-  get enrollment_certificate_number(): string {
-    return this._enrollment_certificate_number;
-  }
-
-  get certificate_of_practice_number(): string {
-    return this._certificate_of_practice_number;
-  }
-
-  get verification_status(): VerificationStatus {
-    return this._verification_status;
-  }
-
-  get practice_areas(): string[] {
-    return this._practice_areas;
-  }
-
   get experience(): number {
     return this._experience;
   }
-
-  get specialisation(): string[] {
-    return this._specialisation;
+  get specializations(): string[] {
+    return this._specializations;
   }
-
-  get consultation_fee(): number {
-    return this._consultation_fee;
+  get consultationFee(): number {
+    return this._consultationFee;
   }
-
-  get documents(): string {
-    return this._documents;
-  }
-
-  get rejectReason(): string {
-    return this._rejectReason;
-  }
-
   get createdAt(): Date {
     return this._createdAt;
   }
-
   get updatedAt(): Date {
     return this._updatedAt;
   }
 
-  verify(): void {
-    this._verification_status = "verified";
-    this._rejectReason = "";
-    this.touch();
-  }
-
-  reject(reason: string): void {
-    this._verification_status = "rejected";
-    this._rejectReason = reason;
-    this.touch();
-  }
-
-  requestVerification(): void {
-    this._verification_status = "requested";
-    this.touch();
-  }
-
-  resetVerification(): void {
-    this._verification_status = "pending";
-    this._rejectReason = "";
-    this.touch();
-  }
-
+  // update methods
   updateDescription(newDescription: string): void {
     this._description = newDescription;
     this.touch();
   }
 
   updatePracticeAreas(newAreas: string[]): void {
-    this._practice_areas = newAreas;
+    this._practiceAreas = newAreas;
     this.touch();
   }
 
-  updateSpecialisation(newSpecialisation: string[]): void {
-    this._specialisation = newSpecialisation;
+  updateSpecializations(newSpecializations: string[]): void {
+    this._specializations = newSpecializations;
     this.touch();
   }
 
@@ -208,52 +120,34 @@ export class Lawyer {
   }
 
   updateConsultationFee(newFee: number): void {
-    this._consultation_fee = newFee;
+    this._consultationFee = newFee;
     this.touch();
   }
 
-  update(payload: Partial<LawyerProps>): void {
-    let change = false;
-    if (payload.barcouncil_number) {
-      this._barcouncil_number = payload.barcouncil_number;
-      change = true;
-    }
-    if (payload.certificate_of_practice_number) {
-      this._certificate_of_practice_number =
-        payload.certificate_of_practice_number;
-      change = true;
-    }
-    if (payload.consultation_fee) {
-      this._consultation_fee = payload.consultation_fee;
-      change = true;
-    }
-    if (payload.description) {
+  update(
+    payload: Partial<Omit<LawyerProps, "id" | "userId" | "createdAt">>
+  ): void {
+    let changed = false;
+    if (payload.description !== undefined) {
       this._description = payload.description;
-      change = true;
+      changed = true;
     }
-    if (payload.documents) {
-      this._documents = payload.documents;
-      change = true;
+    if (payload.practiceAreas !== undefined) {
+      this._practiceAreas = payload.practiceAreas;
+      changed = true;
     }
-    if (payload.enrollment_certificate_number) {
-      this._enrollment_certificate_number =
-        payload.enrollment_certificate_number;
-      change = true;
+    if (payload.specializations !== undefined) {
+      this._specializations = payload.specializations;
+      changed = true;
     }
-    if (payload.experience) {
+    if (payload.experience !== undefined) {
       this._experience = payload.experience;
-      change = true;
+      changed = true;
     }
-    if (payload.practice_areas) {
-      this._practice_areas = payload.practice_areas;
-      change = true;
+    if (payload.consultationFee !== undefined) {
+      this._consultationFee = payload.consultationFee;
+      changed = true;
     }
-    if (payload.specialisation) {
-      this._specialisation = payload.specialisation;
-      change = true;
-    }
-    if (change) {
-      this.touch();
-    }
+    if (changed) this.touch();
   }
 }

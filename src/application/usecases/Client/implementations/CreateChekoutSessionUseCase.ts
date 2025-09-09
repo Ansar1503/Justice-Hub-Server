@@ -16,27 +16,32 @@ import { getStripeSession } from "@src/application/services/stripe.service";
 import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
 import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
 import { STATUS_CODES } from "@infrastructure/constant/status.codes";
+import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
 
 export class CreateCheckoutSessionUseCase
   implements ICreateCheckoutSessionUseCase
 {
   constructor(
     private userRepository: IUserRepository,
-    private lawyerRepository: ILawyerRepository,
+    private lawyerVerificationRepository: ILawyerVerificationRepo,
     private appointmentRepo: IAppointmentsRepository,
     private scheduleSettingsRepo: IScheduleSettingsRepo,
     private availableSlotsRepo: IAvailableSlots,
     private overrideSlotsRepo: IOverrideRepo,
-    private walletRepo: IWalletRepo
+    private walletRepo: IWalletRepo,
+    private lawyerRepo: ILawyerRepository
   ) {}
   async execute(input: CreateCheckoutSessionInputDto): Promise<any> {
     const { client_id, date, duration, lawyer_id, reason, timeSlot } = input;
     const user = await this.userRepository.findByuser_id(lawyer_id);
     if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
     if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
-    const lawyer = await this.lawyerRepository.findUserId(lawyer_id);
-    if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
-    if (lawyer.verification_status !== "verified")
+    const lawyerVerificaitionDetails =
+      await this.lawyerVerificationRepository.findByUserId(lawyer_id);
+    const lawyerDetails = await this.lawyerRepo.findUserId(lawyer_id);
+    if (!lawyerDetails) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (!lawyerVerificaitionDetails) throw new Error(ERRORS.USER_NOT_FOUND);
+    if (lawyerVerificaitionDetails.verificationStatus !== "verified")
       throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
     const slotDateTime = timeStringToDate(date, timeSlot);
     if (slotDateTime <= new Date()) {
@@ -128,7 +133,7 @@ export class CreateCheckoutSessionUseCase
           throw error;
         }
         const newappointment = Appointment.create({
-          amount: lawyer.consultation_fee,
+          amount: lawyerDetails.consultationFee,
           client_id,
           date,
           duration,
@@ -139,7 +144,7 @@ export class CreateCheckoutSessionUseCase
         });
         await this.appointmentRepo.createWithTransaction(newappointment);
         const stripe = await getStripeSession({
-          amount: lawyer.consultation_fee,
+          amount: lawyerDetails.consultationFee,
           date: String(date),
           lawyer_name: user.name,
           slot: timeSlot,
@@ -203,7 +208,7 @@ export class CreateCheckoutSessionUseCase
       throw error;
     }
     const newappointment = Appointment.create({
-      amount: lawyer.consultation_fee,
+      amount: lawyerDetails.consultationFee,
       client_id,
       date,
       duration,
@@ -215,7 +220,7 @@ export class CreateCheckoutSessionUseCase
     await this.appointmentRepo.createWithTransaction(newappointment);
 
     const stripe = await getStripeSession({
-      amount: lawyer.consultation_fee,
+      amount: lawyerDetails.consultationFee,
       date: String(date),
       lawyer_name: user.name,
       slot: timeSlot,

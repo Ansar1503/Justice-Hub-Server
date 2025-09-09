@@ -13,3 +13,7 @@ export interface FindAllPracticeAreaOutputDto {
   totalPage: number;
   data: PracticeAreaDto[] | [];
 }
+
+export interface findPracticeAreasBySpecIdsInputDto {
+  specIds: string[];
+}

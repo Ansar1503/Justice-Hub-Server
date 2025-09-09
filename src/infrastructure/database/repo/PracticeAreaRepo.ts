@@ -75,4 +75,10 @@ export class PracticeAreaRepo
   async deleteBySpec(specId: string): Promise<void> {
     await this.model.deleteMany({ specializationId: specId });
   }
+  async findBySpecIds(specIds: string[]): Promise<PracticeArea[] | []> {
+    const data = await this.model.find({ specializationId: { $in: specIds } });
+    return data && this.mapper.toDomainArray
+      ? this.mapper.toDomainArray(data)
+      : [];
+  }
 }

@@ -1,31 +1,31 @@
 import { LawyerDocuments } from "@domain/entities/LawyerDocument";
 import { IMapper } from "../IMapper";
-import { IlawyerDocumentsModel } from "@infrastructure/database/model/LawyerDocumentsModel";
+import { ILawyerDocumentsModel } from "@infrastructure/database/model/LawyerDocumentsModel";
 
 export class lawyerDocumentsMapper
-  implements IMapper<LawyerDocuments, IlawyerDocumentsModel>
+  implements IMapper<LawyerDocuments, ILawyerDocumentsModel>
 {
-  toDomain(persistence: IlawyerDocumentsModel): LawyerDocuments {
+  toDomain(persistence: ILawyerDocumentsModel): LawyerDocuments {
     return LawyerDocuments.fromPersistence({
       id: persistence._id,
-      user_id: persistence.user_id,
-      bar_council_certificate: persistence.bar_council_certificate,
-      certificate_of_practice: persistence.certificate_of_practice,
-      enrollment_certificate: persistence.enrollment_certificate,
+      userId: persistence.userId,
+      barCouncilCertificate: persistence.barCouncilCertificate,
+      certificateOfPractice: persistence.certificateOfPractice,
+      enrollmentCertificate: persistence.enrollmentCertificate,
       createdAt: persistence.createdAt,
       updatedAt: persistence.updatedAt,
     });
   }
-  toDomainArray(persistence: IlawyerDocumentsModel[]): LawyerDocuments[] {
+  toDomainArray(persistence: ILawyerDocumentsModel[]): LawyerDocuments[] {
     return persistence.map((p) => this.toDomain(p));
   }
-  toPersistence(entity: LawyerDocuments): Partial<IlawyerDocumentsModel> {
+  toPersistence(entity: LawyerDocuments): Partial<ILawyerDocumentsModel> {
     return {
       _id: entity.id,
-      user_id: entity.user_id,
-      bar_council_certificate: entity.bar_council_certificate,
-      certificate_of_practice: entity.certificate_of_practice,
-      enrollment_certificate: entity.enrollment_certificate,
+      userId: entity.userId,
+      barCouncilCertificate: entity.barCouncilCertificate,
+      certificateOfPractice: entity.certificateOfPractice,
+      enrollmentCertificate: entity.enrollmentCertificate,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     };

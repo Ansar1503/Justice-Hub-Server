@@ -1,14 +1,14 @@
 import { AddReviewInputDto } from "@src/application/dtos/client/AddReviewDto";
 import { IAddReviewUseCase } from "../IAddReviewUseCase";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
-import { ILawyerRepository } from "@domain/IRepository/ILawyerRepo";
 import { IReviewRepo } from "@domain/IRepository/IReviewRepo";
 import { Review } from "@domain/entities/Review";
+import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
 
 export class AddReviewUseCase implements IAddReviewUseCase {
   constructor(
     private userRepository: IUserRepository,
-    private lawyerRepository: ILawyerRepository,
+    private lawyerRepository: ILawyerVerificationRepo,
     private reviewRepository: IReviewRepo
   ) {}
   async execute(input: AddReviewInputDto): Promise<void> {
@@ -16,9 +16,9 @@ export class AddReviewUseCase implements IAddReviewUseCase {
     if (!user) throw new Error("USER_EMPTY");
     if (!user.is_verified) throw new Error("USER_UNVERIFIED");
     if (user.is_blocked) throw new Error("USER_BLOCKED");
-    const lawyer = await this.lawyerRepository.findUserId(input.lawyer_id);
+    const lawyer = await this.lawyerRepository.findByUserId(input.lawyer_id);
     if (!lawyer) throw new Error("LAWYER_EMPTY");
-    if (lawyer.verification_status !== "verified")
+    if (lawyer.verificationStatus !== "verified")
       throw new Error("LAWYER_UNVERIFIED");
 
     const existingReview = await this.reviewRepository.findBySession_id(

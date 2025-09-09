@@ -4,14 +4,14 @@ import { ClientUpdateDto } from "@src/application/dtos/client.dto";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { IClientRepository } from "@domain/IRepository/IClientRepo";
 import { IAddressRepository } from "@domain/IRepository/IAddressRepo";
-import { ILawyerRepository } from "@domain/IRepository/ILawyerRepo";
+import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
 
 export class FetchClientDataUseCaseDto implements IFetchClientDataUseCase {
   constructor(
     private userRepository: IUserRepository,
     private clientRepository: IClientRepository,
     private addressRepository: IAddressRepository,
-    private lawyerRepository: ILawyerRepository
+    private lawyerRepository: ILawyerVerificationRepo
   ) {}
   async execute(input: string): Promise<FetchClientDto> {
     try {
@@ -21,10 +21,10 @@ export class FetchClientDataUseCaseDto implements IFetchClientDataUseCase {
       }
       const clientdetails = await this.clientRepository.findByUserId(input);
       const addressDetails = await this.addressRepository.find(input);
-      const lawyerData = await this.lawyerRepository.findUserId(input);
+      const lawyerData = await this.lawyerRepository.findByUserId(input);
       let lawyerVerfication;
       if (userDetails.role === "lawyer") {
-        lawyerVerfication = lawyerData?.verification_status;
+        lawyerVerfication = lawyerData?.verificationStatus;
       }
 
       if (!clientdetails) {

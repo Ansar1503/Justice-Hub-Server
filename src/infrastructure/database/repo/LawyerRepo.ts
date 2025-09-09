@@ -23,9 +23,8 @@ export class LawyerRepository implements ILawyerRepository {
   }
   async update(update: Partial<Lawyer>): Promise<Lawyer | null> {
     const mapped = this.mapper.toPersistence(update as Lawyer);
-    console.log("mapped:", mapped);
     const updatedData = await lawyerModel.findOneAndUpdate(
-      { user_id: update.user_id },
+      { user_id: update.userId },
       mapped,
       {
         upsert: true,

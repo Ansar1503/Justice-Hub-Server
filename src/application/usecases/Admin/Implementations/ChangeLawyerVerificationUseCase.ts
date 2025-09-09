@@ -6,19 +6,19 @@ import {
   InternalError,
   ValidationError,
 } from "@interfaces/middelwares/Error/CustomError";
+import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
 
 export class ChangeLawyerVerificationStatus
   implements IChangeLawyerVerificationStatus
 {
   constructor(
     private UserRepo: IUserRepository,
-    private LawyerRepo: ILawyerRepository
+    private _lawyerVerificationRepo: ILawyerVerificationRepo
   ) {}
 
   async execute(
     input: ChangeLawyerVerificationInnOutDto
   ): Promise<ChangeLawyerVerificationInnOutDto> {
-    console.log("input for changeing", input);
     const userDetails = await this.UserRepo.findByuser_id(input.user_id);
     if (!userDetails) {
       throw new ValidationError("USER_NOT_FOUND");
@@ -29,31 +29,29 @@ export class ChangeLawyerVerificationStatus
     if (userDetails.is_blocked) {
       throw new ValidationError("USER_BLOCKED");
     }
-    const lawyerDetails = await this.LawyerRepo.findUserId(input.user_id);
+    const lawyerDetails = await this._lawyerVerificationRepo.findByUserId(
+      input.user_id
+    );
     if (!lawyerDetails) {
       throw new ValidationError("NO_VERFICATION_RECORD");
     }
-    if (lawyerDetails?.verification_status === "rejected") {
+    if (lawyerDetails?.verificationStatus === "rejected") {
       throw new ValidationError("VERIFICATION_REJECT");
     }
-    if (lawyerDetails?.verification_status === "verified") {
+    if (lawyerDetails?.verificationStatus === "verified") {
       throw new ValidationError("LAWYER_ALREADY_VERIFIED");
     }
-    if (input.status === "verified") {
-      lawyerDetails.verify();
-    } else if (input.status === "rejected") {
-      lawyerDetails.reject(input.rejectReason || "");
-    }
+    lawyerDetails.update({ verificationStatus: input.status });
 
-    const updatedData = await this.LawyerRepo.update({
-      verification_status: input.status,
+    const updatedData = await this._lawyerVerificationRepo.update({
+      verificationStatus: input.status,
       rejectReason: input.rejectReason,
-      user_id: input.user_id,
+      userId: input.user_id,
     });
     if (!updatedData) throw new InternalError("Update Failed");
     return {
-      status: updatedData.verification_status,
-      user_id: updatedData.user_id,
+      status: updatedData.verificationStatus,
+      user_id: updatedData.userId,
     };
   }
 }

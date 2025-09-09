@@ -167,6 +167,9 @@ export class VerifyLawyerController implements IController {
         : Number(LawyersPayload.consultation_fee),
       documents,
     };
+    if (payload.specialisation && payload.specialisation.length > 3) {
+      return this.httpErrors.error_400("max 3 specification allowed.");
+    }
     try {
       const result = await this.verifyLawyer.execute(payload);
       return this.httpSuccess.success_200(result);

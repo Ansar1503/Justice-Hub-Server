@@ -1,6 +1,6 @@
 import { ILawyerDocumentsRepository } from "@domain/IRepository/ILawyerDocumentsRepo";
 import LawyerDocumentsModel, {
-  IlawyerDocumentsModel,
+  ILawyerDocumentsModel,
 } from "../model/LawyerDocumentsModel";
 import { LawyerDocuments } from "@domain/entities/LawyerDocument";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
@@ -10,16 +10,16 @@ export class LawyerDocumentsRepository implements ILawyerDocumentsRepository {
   constructor(
     private mapper: IMapper<
       LawyerDocuments,
-      IlawyerDocumentsModel
+      ILawyerDocumentsModel
     > = new lawyerDocumentsMapper()
   ) {}
   async create(documents: LawyerDocuments): Promise<LawyerDocuments> {
     const createdDocument = await LawyerDocumentsModel.findOneAndUpdate(
-      { _id: documents.id, user_id: documents.user_id },
+      { _id: documents.id, user_id: documents.userId },
       {
-        bar_council_certificate: documents.bar_council_certificate,
-        enrollment_certificate: documents.enrollment_certificate,
-        certificate_of_practice: documents.certificate_of_practice,
+        bar_council_certificate: documents.barCouncilCertificate,
+        enrollment_certificate: documents.enrollmentCertificate,
+        certificate_of_practice: documents.certificateOfPractice,
       },
       { upsert: true, new: true }
     );

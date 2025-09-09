@@ -2,10 +2,10 @@ type VerificationStatus = "verified" | "rejected" | "pending" | "requested";
 
 interface LawyerDocumentsOutput {
   id: string;
-  user_id: string;
-  enrollment_certificate: string;
-  certificate_of_practice: string;
-  bar_council_certificate: string;
+  userId: string;
+  enrollmentCertificate: string;
+  certificateOfPractice: string;
+  barCouncilCertificate: string;
   createdAt: Date;
   updatedAt: Date;
 }

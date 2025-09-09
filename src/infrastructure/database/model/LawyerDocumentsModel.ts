@@ -1,28 +1,27 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface IlawyerDocumentsModel extends Document {
+export interface ILawyerDocumentsModel extends Document {
   _id: string;
-  user_id: string;
-  enrollment_certificate: string;
-  certificate_of_practice: string;
-  bar_council_certificate: string;
+  userId: string;
+  enrollmentCertificate: string;
+  certificateOfPractice: string;
+  barCouncilCertificate: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const LawyerDocumentsSchema = new Schema<IlawyerDocumentsModel>(
+const LawyerDocumentsSchema = new Schema<ILawyerDocumentsModel>(
   {
     _id: { type: String },
-    bar_council_certificate: { type: String, required: true },
-    enrollment_certificate: { type: String, required: true },
-    certificate_of_practice: { type: String, required: true },
-    user_id: { type: String, required: true, unique: true },
+    userId: { type: String, required: true, unique: true },
+    enrollmentCertificate: { type: String },
+    certificateOfPractice: { type: String },
+    barCouncilCertificate: { type: String },
   },
   { timestamps: true }
 );
 
-const LawyerDocumentsModel = mongoose.model<IlawyerDocumentsModel>(
+export default mongoose.model<ILawyerDocumentsModel>(
   "LawyerDocuments",
   LawyerDocumentsSchema
 );
-export default LawyerDocumentsModel;

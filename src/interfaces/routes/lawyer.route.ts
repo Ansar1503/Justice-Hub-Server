@@ -32,12 +32,19 @@ import { FetchReviewsBySessionComposer } from "@infrastructure/services/composer
 import { NextFunction } from "express-serve-static-core";
 import { SendMessageFileComposer } from "@infrastructure/services/composers/Client/SendMessageFileComposer";
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
-import { LawyerRoutes, WalletRoutes } from "@shared/constant/RouteConstant";
+import {
+  LawyerRoutes,
+  PracticeAreaRoutes,
+  SpecializationRoute,
+  WalletRoutes,
+} from "@shared/constant/RouteConstant";
 import { FetchAllNotificationsComposer } from "@infrastructure/services/composers/Notification/FetchAllNotificationsComposer";
 import { UpdateNotificationStatusComposer } from "@infrastructure/services/composers/Notification/UpdateNotificationStatusComposer";
 import { MarkAllNotificationAsReadComposer } from "@infrastructure/services/composers/Notification/MarkAllNotificationAsRead";
 import { FetchWalletByUserComposer } from "@infrastructure/services/composers/Wallet/FetchWalletByUserComposer";
 import { FetchTransactionsByWalletComposer } from "@infrastructure/services/composers/Wallet/FetchTransactionsByWalletComposer";
+import { FetchAllSpecializationsComposer } from "@infrastructure/services/composers/Specializations/FetchAllSpecializations";
+import { FindPracticeAreasBySpecIdsComposer } from "@infrastructure/services/composers/PracticeAreas/FindPracticeAreasBySpecIdsComposer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -334,6 +341,34 @@ router.get(
     const adapter = await expressAdapter(
       req,
       FetchTransactionsByWalletComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  SpecializationRoute.base,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchAllSpecializationsComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  PracticeAreaRoutes.base,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FindPracticeAreasBySpecIdsComposer()
     );
     res.status(adapter.statusCode).json(adapter.body);
     return;

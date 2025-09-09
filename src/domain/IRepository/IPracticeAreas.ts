@@ -18,4 +18,5 @@ export interface IPracticAreaRepo extends IBaseRepository<PracticeArea> {
   ): Promise<PracticeArea | null>;
   delete(id: string): Promise<PracticeArea | null>;
   deleteBySpec(specId: string): Promise<void>;
+  findBySpecIds(specIds: string[]): Promise<PracticeArea[] | []>;
 }
