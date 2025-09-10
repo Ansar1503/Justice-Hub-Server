@@ -1,7 +1,6 @@
 import { IChangeLawyerVerificationStatus } from "../IChangeLawyerVerificationStatus";
 import { ChangeLawyerVerificationInnOutDto } from "../../../dtos/Admin/ChangeLawyerVerificationDto";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
-import { ILawyerRepository } from "@domain/IRepository/ILawyerRepo";
 import {
   InternalError,
   ValidationError,

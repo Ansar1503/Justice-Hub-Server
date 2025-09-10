@@ -3,20 +3,25 @@ import { User } from "../../../domain/entities/User";
 import { IUserRepository } from "../../../domain/IRepository/IUserRepo";
 import UserModel, { IUserModel } from "../model/UserModel";
 import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
+import { ClientSession } from "mongoose";
+import { AggregatedLawyerProfile } from "@src/application/dtos/Lawyer/FindLawyersByQueryDto";
 
 export class UserRepository implements IUserRepository {
   constructor(
-    private readonly Mapper: IMapper<User, IUserModel> = new UserMapper()
+    private readonly Mapper: IMapper<User, IUserModel> = new UserMapper(),
+    private readonly _session?: ClientSession
   ) {
     // super(UserModel, Mapper);
   }
   async create(user: User): Promise<User> {
     const mapped = this.Mapper.toPersistence(user);
     // console.log("mapped", mapped);
-    const savedUser = await new UserModel(mapped).save().catch((err) => {
-      console.log("error creating  user", err);
-      throw new Error("Db error creating user");
-    });
+    const savedUser = await new UserModel(mapped)
+      .save({ session: this._session })
+      .catch((err) => {
+        console.log("error creating  user", err);
+        throw new Error("Db error creating user");
+      });
     return this.Mapper.toDomain(savedUser);
   }
 
@@ -237,7 +242,7 @@ export class UserRepository implements IUserRepository {
     limit: number;
     page: number;
   }): Promise<{
-    lawyers: any[];
+    lawyers: AggregatedLawyerProfile[] | [];
     totalCount: number;
     currentPage: number;
     totalPages: number;
@@ -270,7 +275,7 @@ export class UserRepository implements IUserRepository {
         $lookup: {
           from: "lawyers",
           localField: "user_id",
-          foreignField: "user_id",
+          foreignField: "userId",
           as: "lawyerData",
         },
       },
@@ -292,10 +297,34 @@ export class UserRepository implements IUserRepository {
       },
       {
         $lookup: {
+          from: "lawyerverifications",
+          localField: "user_id",
+          foreignField: "userId",
+          as: "lawyerVerificationData",
+        },
+      },
+      {
+        $lookup: {
           from: "lawyerdocuments",
-          localField: "lawyerData.documents",
+          localField: "lawyerVerificationData.documents",
           foreignField: "_id",
           as: "lawyerDocuments",
+        },
+      },
+      {
+        $lookup: {
+          from: "practiceareas",
+          localField: "lawyerData.practiceAreas",
+          foreignField: "_id",
+          as: "practiceAreasData",
+        },
+      },
+      {
+        $lookup: {
+          from: "specializations",
+          localField: "lawyerData.specialisations",
+          foreignField: "_id",
+          as: "specialisationsData",
         },
       },
       {
@@ -304,11 +333,61 @@ export class UserRepository implements IUserRepository {
           clientData: { $arrayElemAt: ["$clientData", 0] },
           addressData: { $arrayElemAt: ["$addressData", 0] },
           lawyerDocuments: { $arrayElemAt: ["$lawyerDocuments", 0] },
+          lawyerVerificationData: {
+            $arrayElemAt: ["$lawyerVerificationData", 0],
+          },
         },
       },
       {
         $project: {
-          password: 0,
+          userId: "$user_id",
+          createdAt: "$createdAt",
+          personalDetails: {
+            name: "$name",
+            email: "$email",
+            isVerified: "$is_verified",
+            profileImage: "$clientData.profile_image",
+            mobile: "$mobile",
+            address: "$addressData",
+          },
+          ProfessionalDetails: {
+            description: "$lawyerData.description",
+            practiceAreas: {
+              $map: {
+                input: "$practiceAreasData",
+                as: "area",
+                in: { id: "$$area._id", name: "$$area.name" },
+              },
+            },
+            specialisations: {
+              $map: {
+                input: "$specialisationsData",
+                as: "spec",
+                in: { id: "$$spec._id", name: "$$spec.name" },
+              },
+            },
+            experience: "lawyerData.experience",
+            consultationFee: "$lawyerData.consultationFee",
+            createdAt: "$lawyerData.createdAt",
+            updatedAt: "$lawyerData.updatedAt",
+          },
+          verificationDetails: {
+            barCouncilNumber: "$lawyerVerificationData.barCouncilNumber",
+            enrollmentCertificateNumber:
+              "$lawyerVerificationData.enrollmentCertificateNumber",
+            certificateOfPracticeNumber:
+              "$lawyerVerificationData.certificateOfPracticeNumber",
+            verificationStatus: "$lawyerVerificationData.verificationStatus",
+            rejectReason: "$lawyerVerificationData.rejectReason",
+            documents: "$lawyerVerificationData.documents",
+            createdAt: "$lawyerVerificationData.createdAt",
+            updatedAt: "$lawyerVerificationData.updatedAt",
+          },
+          verificationDocuments: {
+            enrollmentCertificate: "$lawyerDocuments.enrollmentCertificate",
+            certificateOfPractice: "$lawyerDocuments.certificateOfPractice",
+            barCouncilCertificate: "$lawyerDocuments.barCouncilCertificate",
+          },
         },
       },
     ];
@@ -349,7 +428,6 @@ export class UserRepository implements IUserRepository {
       UserModel.aggregate(dataPipeline),
       UserModel.aggregate(countPipeline),
     ]);
-
     const totalCount = countResult[0]?.total || 0;
     const totalPages = Math.ceil(totalCount / limit);
     return {

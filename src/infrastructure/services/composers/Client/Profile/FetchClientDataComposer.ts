@@ -4,14 +4,15 @@ import { FetchClientDataUseCaseDto } from "@src/application/usecases/Client/impl
 import { UserRepository } from "@infrastructure/database/repo/UserRepo";
 import { ClientRepository } from "@infrastructure/database/repo/ClientRepo";
 import { AddressRepository } from "@infrastructure/database/repo/AddressRepo";
-import { LawyerRepository } from "@infrastructure/database/repo/LawyerRepo";
+import { LawyerVerificationRepo } from "@infrastructure/database/repo/LawyerVerificationRepo";
+import { LawyerVerificationMapper } from "@infrastructure/Mapper/Implementations/LawyerVerificaitionMapper";
 
 export function FetchClientDataComposer(): IController {
   const usecase = new FetchClientDataUseCaseDto(
     new UserRepository(),
     new ClientRepository(),
     new AddressRepository(),
-    new LawyerRepository()
+    new LawyerVerificationRepo(new LawyerVerificationMapper())
   );
   const controller = new FetchClientDataController(usecase);
   return controller;

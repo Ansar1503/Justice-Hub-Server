@@ -1,6 +1,7 @@
 import { BaseRepository } from "@infrastructure/database/repo/base/BaseRepo";
 import { User } from "../entities/User";
 import { IUserModel } from "@infrastructure/database/model/UserModel";
+import { AggregatedLawyerProfile } from "@src/application/dtos/Lawyer/FindLawyersByQueryDto";
 
 export interface IUserRepository {
   create(user: User): Promise<User>;
@@ -29,7 +30,7 @@ export interface IUserRepository {
     limit: number;
     page: number;
   }): Promise<{
-    lawyers: any[];
+    lawyers: AggregatedLawyerProfile[]|[];
     totalCount: number;
     currentPage: number;
     totalPages: number;

@@ -22,6 +22,6 @@ const LawyerDocumentsSchema = new Schema<ILawyerDocumentsModel>(
 );
 
 export default mongoose.model<ILawyerDocumentsModel>(
-  "LawyerDocuments",
+  "lawyerdocuments",
   LawyerDocumentsSchema
 );

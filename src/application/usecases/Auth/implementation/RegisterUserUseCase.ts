@@ -18,75 +18,62 @@ import { IOtpRepository } from "@domain/IRepository/IOtpRepo";
 import { Otp } from "@domain/entities/Otp";
 import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
 import { Wallet } from "@domain/entities/Wallet";
+import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
 
 export class RegisterUserUseCase implements IRegiserUserUseCase {
   constructor(
-    private userRepo: IUserRepository,
-    private clientRepo: IClientRepository,
-    private lawyerRepo: ILawyerRepository,
-    private otpRepo: IOtpRepository,
     private passwordHasher: IPasswordManager,
     private nodemailProvider: INodeMailerProvider,
     private jwtprovider: IJwtProvider,
-    private walletRepo: IWalletRepo
+    private _unitOfWork: IUnitofWork
   ) {}
   async execute(input: RegisterUserDto): Promise<ResposeUserDto> {
-    const existingUser = await this.userRepo.findByEmail(input.email);
-    if (existingUser) {
-      throw new ValidationError("User Already Exists");
-    }
-    const hashedPassword = await this.passwordHasher.hashPassword(
-      input.password
-    );
-    const newUser = User.create(input);
-    newUser.changePassword(hashedPassword);
+    return await this._unitOfWork.startTransaction(async (uow) => {
+      const existingUser = await uow.userRepo.findByEmail(input.email);
+      if (existingUser) {
+        throw new ValidationError("User Already Exists");
+      }
+      const hashedPassword = await this.passwordHasher.hashPassword(
+        input.password
+      );
+      const newUser = User.create(input);
+      newUser.changePassword(hashedPassword);
 
-    const user = await this.userRepo.create(newUser);
-    const client = Client.create({
-      user_id: user.user_id,
-      profile_image: "",
-      address: "",
-      dob: "",
-      gender: "",
-    });
-    await this.clientRepo.create(client);
-    if (input.role === "lawyer") {
-      const lawyerData = Lawyer.create({
-        barcouncil_number: "",
-        certificate_of_practice_number: "",
-        consultation_fee: 0,
-        description: "",
-        documents: "",
-        enrollment_certificate_number: "",
-        experience: 0,
-        practice_areas: [],
-        rejectReason: "",
-        specialisation: [],
-        user_id: newUser.user_id,
+      const user = await uow.userRepo.create(newUser);
+      const client = Client.create({
+        user_id: user.user_id,
+        profile_image: "",
+        address: "",
+        dob: "",
+        gender: "",
       });
-      await this.lawyerRepo.create(lawyerData);
-    }
-    const otp = await generateOtp();
-    const token = await this.jwtprovider.GenerateEmailToken({
-      user_id: user.user_id,
-    });
-    try {
-      const walletPayload = Wallet.create({
+      await uow.clientRepo.create(client);
+      const otp = await generateOtp();
+      const token = await this.jwtprovider.GenerateEmailToken({
         user_id: user.user_id,
       });
-      await this.walletRepo.create(walletPayload);
-    } catch (error) {
-      console.log(error);
-    }
-    try {
-      await this.nodemailProvider.sendVerificationMail(user.email, token, otp);
-      console.log("email send successfully", otp);
-    } catch (error) {
-      console.log(error);
-      throw new Error("MAIL_SEND_ERROR");
-    }
-    const otpdata = Otp.create({ email: user.email, otp });
-    await this.otpRepo.storeOtp(otpdata);
-    return new ResposeUserDto(user);
+      try {
+        const walletPayload = Wallet.create({
+          user_id: user.user_id,
+        });
+        await uow.walletRepo.create(walletPayload);
+      } catch (error) {
+        console.log(error);
+      }
+      const otpdata = Otp.create({ email: user.email, otp });
+      await uow.otpRepo.storeOtp(otpdata);
+      try {
+        await this.nodemailProvider.sendVerificationMail(
+          user.email,
+          token,
+          otp
+        );
+        console.log("email send successfully", otp);
+      } catch (error) {
+        console.log(error);
+        throw new Error("MAIL_SEND_ERROR");
+      }
+      return new ResposeUserDto(user);
+    });
   }
 }

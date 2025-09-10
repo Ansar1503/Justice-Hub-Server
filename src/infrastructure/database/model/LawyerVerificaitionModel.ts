@@ -33,7 +33,7 @@ const LawyerVerificationSchema = new Schema<ILawyerVerificationModel>(
       required: true,
     },
     rejectReason: { type: String },
-    documents: { type: String, ref: "LawyerDocuments" },
+    documents: { type: String, ref: "lawyerdocuments" },
   },
   { timestamps: true }
 );

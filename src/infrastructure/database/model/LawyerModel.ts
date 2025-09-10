@@ -17,9 +17,15 @@ const LawyerSchema = new Schema<ILawyerModel>(
     _id: { type: String },
     userId: { type: String, required: true, unique: true },
     description: { type: String, default: "" },
-    practiceAreas: { type: [String], default: [] },
+    practiceAreas: {
+      type: [{ type: String, ref: "practiceareas" }],
+      default: [],
+    },
     experience: { type: Number, default: 0 },
-    specialisations: { type: [String], default: [] },
+    specialisations: {
+      type: [{ type: String, ref: "specializations" }],
+      default: [],
+    },
     consultationFee: { type: Number, default: 0 },
   },
   { timestamps: true }

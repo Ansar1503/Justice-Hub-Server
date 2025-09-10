@@ -4,15 +4,17 @@ import { Client } from "../../../domain/entities/Client";
 import { IClientRepository } from "../../../domain/IRepository/IClientRepo";
 import ClientModel, { IClientModel } from "../model/ClientModel";
 import { ClientMapper } from "@infrastructure/Mapper/Implementations/ClientMapper";
+import { ClientSession } from "mongoose";
 
 export class ClientRepository implements IClientRepository {
   constructor(
-    private mapper: IMapper<Client, IClientModel> = new ClientMapper()
+    private mapper: IMapper<Client, IClientModel> = new ClientMapper(),
+    private readonly _session?: ClientSession
   ) {}
 
   async create(client: Client): Promise<Client> {
     const mapped = this.mapper.toPersistence(client);
-    const data = await new ClientModel(mapped).save();
+    const data = await new ClientModel(mapped).save({ session: this._session });
     return this.mapper.toDomain(data);
   }
   async findByUserId(user_id: string): Promise<Client | null> {

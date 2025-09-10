@@ -7,16 +7,19 @@ import { ScheduleSettingsRepository } from "@infrastructure/database/repo/Schedu
 import { AvailableSlotRepository } from "@infrastructure/database/repo/AvailableSlotsRepo";
 import { OverrideSlotsRepository } from "@infrastructure/database/repo/OverrideSlotsRepo";
 import { WalletRepo } from "@infrastructure/database/repo/WalletRepo";
+import { LawyerVerificationRepo } from "@infrastructure/database/repo/LawyerVerificationRepo";
+import { LawyerVerificationMapper } from "@infrastructure/Mapper/Implementations/LawyerVerificaitionMapper";
 
 export const CreateCheckoutSessionComposer = () => {
   const useCase = new CreateCheckoutSessionUseCase(
     new UserRepository(),
-    new LawyerRepository(),
+    new LawyerVerificationRepo(new LawyerVerificationMapper()),
     new AppointmentsRepository(),
     new ScheduleSettingsRepository(),
     new AvailableSlotRepository(),
     new OverrideSlotsRepository(),
-    new WalletRepo()
+    new WalletRepo(),
+    new LawyerRepository()
   );
   return new CreateCheckoutSessionController(useCase);
 };

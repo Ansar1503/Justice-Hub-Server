@@ -4,15 +4,21 @@ import { FetchLawyerDataUseCase } from "@src/application/usecases/Lawyer/impleme
 import { UserRepository } from "@infrastructure/database/repo/UserRepo";
 import { LawyerRepository } from "@infrastructure/database/repo/LawyerRepo";
 import { LawyerDocumentsRepository } from "@infrastructure/database/repo/LawyerDocuemtsRepo";
+import { LawyerVerificationRepo } from "@infrastructure/database/repo/LawyerVerificationRepo";
+import { LawyerVerificationMapper } from "@infrastructure/Mapper/Implementations/LawyerVerificaitionMapper";
 
 export function FetchLawyerComposer(): IController {
   const userRepo = new UserRepository();
   const lawyerRepo = new LawyerRepository();
   const lawyerDocsRepo = new LawyerDocumentsRepository();
+  const lawyerVerificationRepo = new LawyerVerificationRepo(
+    new LawyerVerificationMapper()
+  );
   const usecase = new FetchLawyerDataUseCase(
     userRepo,
     lawyerRepo,
-    lawyerDocsRepo
+    lawyerDocsRepo,
+    lawyerVerificationRepo
   );
   return new FetchLawyerController(usecase);
 }

@@ -49,10 +49,7 @@ export class LawyerVerification {
   }
 
   static create(
-    props: Omit<
-      LawyerVerificationProps,
-      "id" | "verificationStatus" | "createdAt" | "updatedAt"
-    >
+    props: Omit<LawyerVerificationProps, "id" | "createdAt" | "updatedAt">
   ): LawyerVerification {
     const now = new Date();
     return new LawyerVerification({

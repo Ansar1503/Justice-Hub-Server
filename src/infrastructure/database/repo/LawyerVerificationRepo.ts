@@ -5,16 +5,24 @@ import LawyerVerificaitionModel, {
   ILawyerVerificationModel,
 } from "../model/LawyerVerificaitionModel";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
+import { ClientSession } from "mongoose";
 
 export class LawyerVerificationRepo
   extends BaseRepository<LawyerVerification, ILawyerVerificationModel>
   implements ILawyerVerificationRepo
 {
-  constructor(mapper: IMapper<LawyerVerification, ILawyerVerificationModel>) {
-    super(LawyerVerificaitionModel, mapper);
+  constructor(
+    mapper: IMapper<LawyerVerification, ILawyerVerificationModel>,
+    session?: ClientSession
+  ) {
+    super(LawyerVerificaitionModel, mapper, session);
   }
   async findByUserId(id: string): Promise<LawyerVerification | null> {
-    const data = await this.model.findOne({ userId: id });
+    const data = await this.model.findOne(
+      { userId: id },
+      {},
+      { session: this.session }
+    );
     return data ? this.mapper.toDomain(data) : null;
   }
   async update(
@@ -47,6 +55,7 @@ export class LawyerVerificationRepo
 
     const updated = await this.model.findByIdAndUpdate(payload.id, update, {
       new: true,
+      session: this.session,
     });
 
     if (!updated) {

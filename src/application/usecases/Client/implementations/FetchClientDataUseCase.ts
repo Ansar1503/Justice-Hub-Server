@@ -21,12 +21,13 @@ export class FetchClientDataUseCaseDto implements IFetchClientDataUseCase {
       }
       const clientdetails = await this.clientRepository.findByUserId(input);
       const addressDetails = await this.addressRepository.find(input);
-      const lawyerData = await this.lawyerRepository.findByUserId(input);
       let lawyerVerfication;
+      let rejectReason;
       if (userDetails.role === "lawyer") {
+        const lawyerData = await this.lawyerRepository.findByUserId(input);
         lawyerVerfication = lawyerData?.verificationStatus;
+        rejectReason = lawyerData?.rejectReason;
       }
-
       if (!clientdetails) {
         throw new Error("CLIENT_NOT_FOUND");
       }
@@ -54,7 +55,7 @@ export class FetchClientDataUseCaseDto implements IFetchClientDataUseCase {
         ...responseClientData,
         address,
         lawyerVerfication,
-        rejectReason: lawyerData?.rejectReason,
+        rejectReason: rejectReason ?? "",
       };
     } catch (error: any) {
       throw new Error(error.message);

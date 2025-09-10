@@ -1,7 +1,6 @@
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IController } from "../Interface/IController";
-import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { IChangeLawyerVerificationStatus } from "@src/application/usecases/Admin/IChangeLawyerVerificationStatus";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
@@ -34,17 +33,25 @@ export class ChangeLawyerVerificationStatusController implements IController {
         "Status not found or Invalid status"
       );
     }
-    const result = await this.ChangeLawyerVerificationUseCase.execute({
-      user_id,
-      status,
-      rejectReason,
-    });
-    if (!result) {
-      const error = this.httpError.error_400();
-      return new HttpResponse(error.statusCode, error.body);
-    } else {
-      const success = this.httpSuccess.success_200(result);
-      return new HttpResponse(success.statusCode, success.body);
+    try {
+      const result = await this.ChangeLawyerVerificationUseCase.execute({
+        user_id,
+        status,
+        rejectReason,
+      });
+      if (!result) {
+        const error = this.httpError.error_400();
+        return new HttpResponse(error.statusCode, error.body);
+      } else {
+        const success = this.httpSuccess.success_200(result);
+        return new HttpResponse(success.statusCode, success.body);
+      }
+    } catch (error) {
+      console.log(error);
+      if (error instanceof Error) {
+        return this.httpError.error_400(error.message);
+      }
+      return this.httpError.error_500();
     }
   }
 }

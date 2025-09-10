@@ -3,21 +3,27 @@ import { Lawyer } from "../../../domain/entities/Lawyer";
 import { ILawyerRepository } from "../../../domain/IRepository/ILawyerRepo";
 import lawyerModel, { ILawyerModel } from "../model/LawyerModel";
 import { LawyerMapper } from "@infrastructure/Mapper/Implementations/LawyerMapper";
+import { ClientSession } from "mongoose";
 
 export class LawyerRepository implements ILawyerRepository {
   constructor(
-    private mapper: IMapper<Lawyer, ILawyerModel> = new LawyerMapper()
+    private mapper: IMapper<Lawyer, ILawyerModel> = new LawyerMapper(),
+    private _session?: ClientSession
   ) {}
 
   async create(lawyer: Lawyer): Promise<Lawyer> {
     const mapped = this.mapper.toPersistence(lawyer);
-    const lawyerData = await lawyerModel.create(mapped);
-    return this.mapper.toDomain(lawyerData);
+    const lawyerData = await lawyerModel.create([mapped], {
+      session: this._session,
+    });
+    return this.mapper.toDomain(lawyerData[0]);
   }
   async findUserId(user_id: string): Promise<Lawyer | null> {
     const lawyerData = await lawyerModel
-      .findOne({ user_id })
-      .populate("documents");
+      .findOne({ user_id }, {}, { session: this._session })
+      .populate("documents")
+      .populate("practiceAreas")
+      .populate("specialisations");
 
     return lawyerData ? this.mapper.toDomain(lawyerData) : null;
   }
@@ -29,6 +35,7 @@ export class LawyerRepository implements ILawyerRepository {
       {
         upsert: true,
         new: true,
+        session: this._session,
       }
     );
     return updatedData ? this.mapper.toDomain(updatedData) : null;

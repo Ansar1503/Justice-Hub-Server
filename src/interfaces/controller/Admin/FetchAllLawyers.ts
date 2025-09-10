@@ -68,12 +68,8 @@ export class FetchAllLawyers implements IController {
 
     try {
       const result = await this.fetchAllLawyerUseCase.execute(input);
-      const body = {
-        success: true,
-        message: "Lawyers fetched Successfully",
-        data: result,
-      };
-      const success = this.httpSuccess.success_200(body);
+
+      const success = this.httpSuccess.success_200(result);
       return new HttpResponse(success.statusCode, success.body);
     } catch (err) {
       const error = this.httpErrors.error_500();

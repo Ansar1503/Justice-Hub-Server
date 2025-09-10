@@ -1,5 +1,4 @@
 import { IController } from "@interfaces/controller/Interface/IController";
-import { lawyerUseCaseComposer } from "../LawyerUseCaseComposer";
 import { FetchAvailableSlotsController } from "@interfaces/controller/Lawyer/Slots/FetchAvailableSlotsController";
 import { FetchAvailableSlotsUseCase } from "@src/application/usecases/Lawyer/implementations/FetchAvailableSlotsUseCase";
 import { AvailableSlotRepository } from "@infrastructure/database/repo/AvailableSlotsRepo";
