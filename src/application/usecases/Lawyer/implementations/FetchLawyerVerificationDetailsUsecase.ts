@@ -11,17 +11,6 @@ export class FetchLawyerVerificationDetailsUsecase
       input
     );
     if (!verificationData) throw new Error("verification data not found");
-    return {
-      barCouncilNumber: verificationData.barCouncilNumber,
-      certificateOfPracticeNumber: verificationData.certificateOfPracticeNumber,
-      createdAt: verificationData.createdAt,
-      documents: verificationData.documents,
-      enrollmentCertificateNumber: verificationData.enrollmentCertificateNumber,
-      id: verificationData.id,
-      updatedAt: verificationData.updatedAt,
-      userId: verificationData.userId,
-      verificationStatus: verificationData.verificationStatus,
-      rejectReason: verificationData.rejectReason,
-    };
+    return verificationData
   }
 }

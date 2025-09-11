@@ -55,7 +55,7 @@ export class LawyerVerification {
     return new LawyerVerification({
       ...props,
       id: uuidv4(),
-      verificationStatus: "pending",
+      verificationStatus: props.verificationStatus,
       createdAt: now,
       updatedAt: now,
     });

@@ -6,6 +6,8 @@ import LawyerVerificaitionModel, {
 } from "../model/LawyerVerificaitionModel";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
 import { ClientSession } from "mongoose";
+import { lawyerVerificationDetails } from "@src/application/dtos/Lawyer/LawyerVerificationDetailsDto";
+import { ILawyerDocumentsModel } from "../model/LawyerDocumentsModel";
 
 export class LawyerVerificationRepo
   extends BaseRepository<LawyerVerification, ILawyerVerificationModel>
@@ -17,13 +19,29 @@ export class LawyerVerificationRepo
   ) {
     super(LawyerVerificaitionModel, mapper, session);
   }
-  async findByUserId(id: string): Promise<LawyerVerification | null> {
-    const data = await this.model.findOne(
-      { userId: id },
-      {},
-      { session: this.session }
-    );
-    return data ? this.mapper.toDomain(data) : null;
+  async findByUserId(id: string): Promise<lawyerVerificationDetails | null> {
+    const data = await this.model
+      .findOne({ userId: id }, {}, { session: this.session })
+      .populate<{ documents: ILawyerDocumentsModel }>("documents");
+    if (!data) return null;
+    return {
+      barCouncilNumber: data.barCouncilNumber,
+      certificateOfPracticeNumber: data.certificateOfPracticeNumber,
+      createdAt: data.createdAt,
+      documents: {
+        barCouncilCertificate: data.documents?.barCouncilCertificate,
+        certificateOfPractice: data?.documents?.certificateOfPractice,
+        enrollmentCertificate: data?.documents?.enrollmentCertificate,
+        id: data?.documents?._id,
+        userId: data?.documents?.userId,
+      },
+      enrollmentCertificateNumber: data.enrollmentCertificateNumber,
+      id: data._id,
+      updatedAt: data.updatedAt,
+      userId: data?.userId,
+      verificationStatus: data.verificationStatus,
+      rejectReason: data.rejectReason,
+    };
   }
   async update(
     payload: Partial<LawyerVerification>

@@ -45,6 +45,7 @@ export class VerifyLawyerUseCase implements IVerifyLawyerUseCase {
       } else {
         await uow.lawyerRepo.update({
           id: lawyerDetails.id,
+          userId: input.user_id,
           consultationFee: input.consultation_fee,
           description: input.description,
           experience: input.experience,
@@ -76,6 +77,7 @@ export class VerifyLawyerUseCase implements IVerifyLawyerUseCase {
       let lawyerData: LawyerVerification | null;
       if (!lawyerVerificationDetails) {
         const lawyerVerificationPayload = LawyerVerification.create({
+          rejectReason: "",
           barCouncilNumber: input.barcouncil_number,
           certificateOfPracticeNumber: input.certificate_of_practice_number,
           documents: newDocument.id,
@@ -87,16 +89,16 @@ export class VerifyLawyerUseCase implements IVerifyLawyerUseCase {
           lawyerVerificationPayload
         );
       } else {
-        lawyerVerificationDetails.update({
+        lawyerData = await uow.lawyerVerificationRepo.update({
+          rejectReason: "",
           barCouncilNumber: input.barcouncil_number,
           certificateOfPracticeNumber: input.certificate_of_practice_number,
           documents: newDocument.id,
           enrollmentCertificateNumber: input.enrollment_certificate_number,
           verificationStatus: "requested",
+          userId: input.user_id,
+          id: lawyerVerificationDetails.id,
         });
-        lawyerData = await uow.lawyerVerificationRepo.update(
-          lawyerVerificationDetails
-        );
       }
       if (!lawyerData) throw new Error("lawyer data update error");
       return {

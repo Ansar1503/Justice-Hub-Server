@@ -48,6 +48,7 @@ import { FetchAllSpecializationsComposer } from "@infrastructure/services/compos
 import { FindPracticeAreasBySpecIdsComposer } from "@infrastructure/services/composers/PracticeAreas/FindPracticeAreasBySpecIdsComposer";
 import { FetchLawyersProfessionalDetailscomposer } from "@infrastructure/services/composers/Lawyer/FetchLawyerProfessionalDetailsComposer";
 import { FetchLawyerVerificationDetailsComposer } from "@infrastructure/services/composers/Lawyer/FetchLawyerVerificationDetailsComposer";
+import { UpdateLawyersProfessionalDetailsComposer } from "@infrastructure/services/composers/Lawyer/UpdateLawyerProfessionalDetailsComposer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -165,7 +166,19 @@ router.get(
     return;
   }
 );
-
+router.post(
+  LawyerRoutes.profile.base + LawyerRoutes.base + LawyerRoutes.professional,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      UpdateLawyersProfessionalDetailsComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
 router.get(
   LawyerRoutes.profile.appointments.base,
   authenticateUser,

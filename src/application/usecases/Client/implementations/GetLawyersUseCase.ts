@@ -21,21 +21,19 @@ export class GetLawyersUseCase implements IGetLawyersUseCase {
       page,
       limit,
     } = input;
-
     const matchStage: any = {
       experience: { $gte: experienceMin, $lte: experienceMax },
-      consultation_fee: { $gte: feeMin, $lte: feeMax },
-      verification_status: "verified",
+      consultationFee: { $gte: feeMin, $lte: feeMax },
     };
 
     if (practiceAreas) {
-      matchStage.practice_areas = {
+      matchStage.practiceAreas = {
         $in: Array.isArray(practiceAreas) ? practiceAreas : [practiceAreas],
       };
     }
 
     if (specialisation) {
-      matchStage.specialisation = {
+      matchStage.specialisations = {
         $in: Array.isArray(specialisation) ? specialisation : [specialisation],
       };
     }
@@ -49,10 +47,10 @@ export class GetLawyersUseCase implements IGetLawyersUseCase {
         sortStage.rating = -1;
         break;
       case "fee-low":
-        sortStage.consultation_fee = 1;
+        sortStage.consultationFee = 1;
         break;
       case "fee-high":
-        sortStage.consultation_fee = -1;
+        sortStage.consultationFee = -1;
         break;
       default:
         sortStage.createdAt = -1;
@@ -69,11 +67,10 @@ export class GetLawyersUseCase implements IGetLawyersUseCase {
       page: page ?? 1,
       limit: limit ?? 10,
     });
-    // console.log("response:", response);
     const lawyers = response?.data?.map(
       (lawyer: any) =>
         new LawyerResponseDto(
-          lawyer.user_id,
+          lawyer.userId,
           lawyer.user.name,
           lawyer.user.email,
           lawyer.user.is_blocked,
@@ -89,12 +86,12 @@ export class GetLawyersUseCase implements IGetLawyersUseCase {
             pincode: lawyer?.address?.pincode,
             state: lawyer?.address?.state,
           },
-          lawyer.barcouncil_number,
-          lawyer.verification_status,
-          lawyer.practice_areas,
-          lawyer.experience,
-          lawyer.specialisation,
-          lawyer.consultation_fee
+          lawyer?.lawyerVerificationDetails?.barCouncilNumber,
+          lawyer?.lawyerVerificationDetails?.verificationStatus,
+          lawyer?.practiceAreasDetails?.map((p: any) => p?.name),
+          lawyer?.experience,
+          lawyer?.specialisationsDetails?.map((s: any) => s?.name),
+          lawyer?.consultationFee
         )
     );
     return {

@@ -61,7 +61,7 @@ export class LawyerRepository implements ILawyerRepository {
   async update(update: Partial<Lawyer>): Promise<Lawyer | null> {
     const mapped = this.mapper.toPersistence(update as Lawyer);
     const updatedData = await lawyerModel.findOneAndUpdate(
-      { user_id: update.userId },
+      { userId: update.userId },
       mapped,
       {
         upsert: true,
@@ -87,7 +87,7 @@ export class LawyerRepository implements ILawyerRepository {
       {
         $lookup: {
           from: "users",
-          localField: "user_id",
+          localField: "userId",
           foreignField: "user_id",
           as: "user",
         },
@@ -105,14 +105,47 @@ export class LawyerRepository implements ILawyerRepository {
       {
         $lookup: {
           from: "addresses",
-          localField: "client.address",
-          foreignField: "_id",
+          localField: "userId",
+          foreignField: "user_id",
           as: "address",
         },
       },
       { $unwind: { path: "$address", preserveNullAndEmptyArrays: true } },
       {
+        $lookup: {
+          from: "lawyerverifications",
+          localField: "userId",
+          foreignField: "userId",
+          as: "lawyerVerificationDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$lawyerVerificationDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "specializations",
+          localField: "specialisations",
+          foreignField: "_id",
+          as: "specialisationsDetails",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "practiceareas",
+          localField: "practiceAreas",
+          foreignField: "_id",
+          as: "practiceAreasDetails",
+        },
+      },
+
+      {
         $match: {
+          "lawyerVerificationDetails.verificationStatus": "verified",
           $or: [
             { "user.name": { $regex: query.search, $options: "i" } },
             { "user.email": { $regex: query.search, $options: "i" } },
@@ -129,7 +162,7 @@ export class LawyerRepository implements ILawyerRepository {
       {
         $lookup: {
           from: "users",
-          localField: "user_id",
+          localField: "userId",
           foreignField: "user_id",
           as: "user",
         },
@@ -154,7 +187,38 @@ export class LawyerRepository implements ILawyerRepository {
       },
       { $unwind: { path: "$address", preserveNullAndEmptyArrays: true } },
       {
+        $lookup: {
+          from: "LawyerVerification",
+          localField: "userId",
+          foreignField: "userId",
+          as: "lawyerVerificationDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$lawyerVerificationDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "specializations",
+          localField: "specialisations",
+          foreignField: "_id",
+          as: "specialisationsDetails",
+        },
+      },
+      {
+        $lookup: {
+          from: "practiceareas",
+          localField: "practiceAreas",
+          foreignField: "_id",
+          as: "practiceAreasDetails",
+        },
+      },
+      {
         $match: {
+          "lawyerVerificationDetails.verificationStatus": "verified",
           $or: [
             { "user.name": { $regex: query.search, $options: "i" } },
             { "user.email": { $regex: query.search, $options: "i" } },

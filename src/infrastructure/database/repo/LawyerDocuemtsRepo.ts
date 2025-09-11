@@ -31,7 +31,7 @@ export class LawyerDocumentsRepository implements ILawyerDocumentsRepository {
 
   async find(user_id: string): Promise<LawyerDocuments | null> {
     const data = await LawyerDocumentsModel.findOne(
-      { user_id },
+      { userId: user_id },
       {},
       { session: this._session }
     );

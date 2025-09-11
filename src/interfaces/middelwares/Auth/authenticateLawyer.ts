@@ -1,14 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
-import { ILawyerRepository } from "../../../domain/IRepository/ILawyerRepo";
-import { LawyerRepository } from "../../../infrastructure/database/repo/LawyerRepo";
 import { UserRepository } from "../../../infrastructure/database/repo/UserRepo";
 import { IUserRepository } from "../../../domain/IRepository/IUserRepo";
 import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
-import { LawyerMapper } from "@infrastructure/Mapper/Implementations/LawyerMapper";
+import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
+import { LawyerVerificationRepo } from "@infrastructure/database/repo/LawyerVerificationRepo";
+import { LawyerVerificationMapper } from "@infrastructure/Mapper/Implementations/LawyerVerificaitionMapper";
 
 const userRepo: IUserRepository = new UserRepository(new UserMapper());
-const LawyerRepo: ILawyerRepository = new LawyerRepository(new LawyerMapper());
+const lawyerverificationsRepo: ILawyerVerificationRepo =
+  new LawyerVerificationRepo(new LawyerVerificationMapper());
 
 export async function authenticateLawyer(
   req: Request & { user?: any },
@@ -39,7 +40,8 @@ export async function authenticateLawyer(
     });
     return;
   }
-  const lawyer = await LawyerRepo.findUserId(lawyer_id);
+  const lawyer = await lawyerverificationsRepo.findByUserId(lawyer_id);
+
   if (!lawyer) {
     res.status(STATUS_CODES.NOT_FOUND).json({
       success: false,
@@ -47,7 +49,7 @@ export async function authenticateLawyer(
     });
     return;
   }
-  if (lawyer.verification_status !== "verified") {
+  if (lawyer.verificationStatus !== "verified") {
     res.status(STATUS_CODES.FORBIDDEN).json({
       success: false,
       message: "Lawyer are not verified",

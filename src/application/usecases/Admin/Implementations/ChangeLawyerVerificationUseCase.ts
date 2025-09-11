@@ -40,9 +40,8 @@ export class ChangeLawyerVerificationStatus
     if (lawyerDetails?.verificationStatus === "verified") {
       throw new ValidationError("LAWYER_ALREADY_VERIFIED");
     }
-    lawyerDetails.update({ verificationStatus: input.status });
-
     const updatedData = await this._lawyerVerificationRepo.update({
+      id: lawyerDetails.id,
       verificationStatus: input.status,
       rejectReason: input.rejectReason,
       userId: input.user_id,

@@ -3,7 +3,7 @@ export type VerificationStatus =
   | "rejected"
   | "pending"
   | "requested";
-  
+
 export interface lawyerVerificationDetails {
   id: string;
   userId: string;
@@ -12,7 +12,13 @@ export interface lawyerVerificationDetails {
   certificateOfPracticeNumber: string;
   verificationStatus: VerificationStatus;
   rejectReason?: string;
-  documents: string;
+  documents: {
+    id: string;
+    userId: string;
+    enrollmentCertificate: string;
+    certificateOfPractice: string;
+    barCouncilCertificate: string;
+  };
   createdAt: Date;
   updatedAt: Date;
 }
