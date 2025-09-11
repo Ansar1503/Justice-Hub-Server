@@ -81,6 +81,7 @@ export const ClientRoutes = {
 export const LawyerRoutes = {
   base: "/lawyers",
   verification: "/verification",
+  professional: "/professional",
   root: "/",
 
   schedule: {
@@ -90,6 +91,7 @@ export const LawyerRoutes = {
   },
 
   profile: {
+    base: "/profile",
     appointments: {
       base: "/profile/appointments",
       reject: "/profile/appointments/reject",
@@ -133,5 +135,8 @@ export const PracticeAreaRoutes = {
 };
 export const CasetypeRoutes = {
   base: "/casetypes",
+  params: "/:id",
+};
+export const CommonParamsRoute = {
   params: "/:id",
 };

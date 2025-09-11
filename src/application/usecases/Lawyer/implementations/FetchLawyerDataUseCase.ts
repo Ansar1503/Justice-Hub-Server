@@ -55,9 +55,9 @@ export class FetchLawyerDataUseCase implements IFetchLawyerDataUseCase {
       enrollment_certificate_number:
         lawyerVerificaitionDetails.enrollmentCertificateNumber,
       experience: lawyerDetails.experience,
-      practice_areas: lawyerDetails.practiceAreas,
+      practice_areas: lawyerDetails.practiceAreas?.map((p) => p?.id),
       rejectReason: lawyerVerificaitionDetails.rejectReason || "",
-      specialisation: lawyerDetails.specializations,
+      specialisation: lawyerDetails.specializations?.map((s) => s?.id),
       user_id: lawyerDetails.userId,
       verification_status: lawyerVerificaitionDetails.verificationStatus,
       createdAt: lawyerDetails.createdAt,

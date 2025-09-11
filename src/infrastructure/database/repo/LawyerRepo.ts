@@ -4,6 +4,9 @@ import { ILawyerRepository } from "../../../domain/IRepository/ILawyerRepo";
 import lawyerModel, { ILawyerModel } from "../model/LawyerModel";
 import { LawyerMapper } from "@infrastructure/Mapper/Implementations/LawyerMapper";
 import { ClientSession } from "mongoose";
+import { LawyerprofessionalDetailsDto } from "@src/application/dtos/Lawyer/LawyerProfessionalDetailsDto";
+import { IPracticeareaModel } from "../model/PracticeAreaModel";
+import { ISpecializationModel } from "../model/SpecializationModel";
 
 export class LawyerRepository implements ILawyerRepository {
   constructor(
@@ -18,14 +21,42 @@ export class LawyerRepository implements ILawyerRepository {
     });
     return this.mapper.toDomain(lawyerData[0]);
   }
-  async findUserId(user_id: string): Promise<Lawyer | null> {
+  async findUserId(
+    user_id: string
+  ): Promise<LawyerprofessionalDetailsDto | null> {
     const lawyerData = await lawyerModel
-      .findOne({ user_id }, {}, { session: this._session })
-      .populate("documents")
-      .populate("practiceAreas")
-      .populate("specialisations");
-
-    return lawyerData ? this.mapper.toDomain(lawyerData) : null;
+      .findOne({ userId: user_id }, {}, { session: this._session })
+      .populate<{ practiceAreas: IPracticeareaModel[] | [] }>("practiceAreas")
+      .populate<{ specialisations: ISpecializationModel[] | [] }>(
+        "specialisations"
+      );
+    if (!lawyerData) return null;
+    return {
+      consultationFee: lawyerData.consultationFee,
+      createdAt: lawyerData.createdAt,
+      description: lawyerData.description,
+      experience: lawyerData.experience,
+      id: lawyerData._id,
+      practiceAreas: !lawyerData.practiceAreas
+        ? []
+        : lawyerData.practiceAreas.map((p) => ({
+            createdAt: p?.createdAt,
+            id: p._id,
+            name: p.name,
+            specializationId: p.specializationId,
+            updatedAt: p.updatedAt,
+          })),
+      specializations: !lawyerData.specialisations
+        ? []
+        : lawyerData.specialisations.map((p) => ({
+            createdAt: p.createdAt,
+            id: p._id,
+            name: p.name,
+            updatedAt: p.updatedAt,
+          })),
+      updatedAt: lawyerData.updatedAt,
+      userId: lawyerData.userId,
+    };
   }
   async update(update: Partial<Lawyer>): Promise<Lawyer | null> {
     const mapped = this.mapper.toPersistence(update as Lawyer);

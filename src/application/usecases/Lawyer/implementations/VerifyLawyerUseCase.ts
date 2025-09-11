@@ -43,15 +43,16 @@ export class VerifyLawyerUseCase implements IVerifyLawyerUseCase {
         });
         await uow.lawyerRepo.create(lawyerPayload);
       } else {
-        lawyerDetails.update({
+        await uow.lawyerRepo.update({
+          id: lawyerDetails.id,
           consultationFee: input.consultation_fee,
           description: input.description,
           experience: input.experience,
           practiceAreas: input.practice_areas,
           specializations: input.specialisation,
+          createdAt: lawyerDetails.createdAt,
           updatedAt: new Date(),
         });
-        await uow.lawyerRepo.update(lawyerDetails);
       }
 
       let newDocument: LawyerDocuments;

@@ -339,6 +339,11 @@ export class UserRepository implements IUserRepository {
         },
       },
       {
+        $match: {
+          lawyerVerificationData: { $ne: null },
+        },
+      },
+      {
         $project: {
           userId: "$user_id",
           createdAt: "$createdAt",

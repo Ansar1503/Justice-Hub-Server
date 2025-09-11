@@ -33,6 +33,7 @@ import { NextFunction } from "express-serve-static-core";
 import { SendMessageFileComposer } from "@infrastructure/services/composers/Client/SendMessageFileComposer";
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 import {
+  CommonParamsRoute,
   LawyerRoutes,
   PracticeAreaRoutes,
   SpecializationRoute,
@@ -45,6 +46,8 @@ import { FetchWalletByUserComposer } from "@infrastructure/services/composers/Wa
 import { FetchTransactionsByWalletComposer } from "@infrastructure/services/composers/Wallet/FetchTransactionsByWalletComposer";
 import { FetchAllSpecializationsComposer } from "@infrastructure/services/composers/Specializations/FetchAllSpecializations";
 import { FindPracticeAreasBySpecIdsComposer } from "@infrastructure/services/composers/PracticeAreas/FindPracticeAreasBySpecIdsComposer";
+import { FetchLawyersProfessionalDetailscomposer } from "@infrastructure/services/composers/Lawyer/FetchLawyerProfessionalDetailsComposer";
+import { FetchLawyerVerificationDetailsComposer } from "@infrastructure/services/composers/Lawyer/FetchLawyerVerificationDetailsComposer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -129,6 +132,40 @@ router
   });
 
 // profiles
+router.get(
+  LawyerRoutes.profile.base +
+    LawyerRoutes.base +
+    LawyerRoutes.professional +
+    CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchLawyersProfessionalDetailscomposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  LawyerRoutes.profile.base +
+    LawyerRoutes.base +
+    LawyerRoutes.verification +
+    CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchLawyerVerificationDetailsComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
 router.get(
   LawyerRoutes.profile.appointments.base,
   authenticateUser,
