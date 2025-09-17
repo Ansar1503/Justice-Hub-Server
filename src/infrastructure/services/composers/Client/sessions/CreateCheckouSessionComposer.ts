@@ -9,8 +9,11 @@ import { OverrideSlotsRepository } from "@infrastructure/database/repo/OverrideS
 import { WalletRepo } from "@infrastructure/database/repo/WalletRepo";
 import { LawyerVerificationRepo } from "@infrastructure/database/repo/LawyerVerificationRepo";
 import { LawyerVerificationMapper } from "@infrastructure/Mapper/Implementations/LawyerVerificaitionMapper";
+import { RedisService } from "@infrastructure/Redis/RedisService";
+import { connectRedis } from "@infrastructure/Redis/Config/RedisConfig";
 
-export const CreateCheckoutSessionComposer = () => {
+export const CreateCheckoutSessionComposer = async () => {
+  const client = await connectRedis();
   const useCase = new CreateCheckoutSessionUseCase(
     new UserRepository(),
     new LawyerVerificationRepo(new LawyerVerificationMapper()),
@@ -19,7 +22,8 @@ export const CreateCheckoutSessionComposer = () => {
     new AvailableSlotRepository(),
     new OverrideSlotsRepository(),
     new WalletRepo(),
-    new LawyerRepository()
+    new LawyerRepository(),
+    new RedisService(client)
   );
   return new CreateCheckoutSessionController(useCase);
 };
