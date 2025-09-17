@@ -1,16 +1,12 @@
 import { v2 as cloudinary } from "cloudinary";
 import { ValidationError } from "../../interfaces/middelwares/Error/CustomError";
+import { ICloudinaryService } from "./Interfaces/ICloudinaryService";
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
   api_key: process.env.CLOUDINARY_API_KEY!,
   api_secret: process.env.CLOUDINARY_API_SECRET!,
 });
-
-export interface ICloudinaryService {
-  deleteFile(url: string): Promise<void>;
-  extractPublicIdFromUrl(url: string): string;
-}
 
 export class CloudinaryService implements ICloudinaryService {
   private cloudinary;
@@ -33,5 +29,12 @@ export class CloudinaryService implements ICloudinaryService {
       console.error("Failed to delete file:", error);
       throw error;
     }
+  }
+  async genrateSecureUrl(publicId: string): Promise<string> {
+    const signedUrl = cloudinary.url(publicId, {
+      sign_url: true,
+      expires_at: Math.floor(Date.now() / 1000) + 300,
+    });
+    return signedUrl;
   }
 }

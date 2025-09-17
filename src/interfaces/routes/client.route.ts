@@ -60,6 +60,7 @@ import { FetchWalletByUserComposer } from "@infrastructure/services/composers/Wa
 import { FetchTransactionsByWalletComposer } from "@infrastructure/services/composers/Wallet/FetchTransactionsByWalletComposer";
 import { FetchAllSpecializationsComposer } from "@infrastructure/services/composers/Specializations/FetchAllSpecializations";
 import { FindPracticeAreasBySpecIdsComposer } from "@infrastructure/services/composers/PracticeAreas/FindPracticeAreasBySpecIdsComposer";
+import { FetchProfileImageComposer } from "@infrastructure/services/composers/Client/Profile/FetchProfileImageComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -92,6 +93,16 @@ const chatFile = multer({
 const router = express.Router();
 
 // profile area
+router.get(
+  ClientRoutes.profile.base + ClientRoutes.profile.image,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchProfileImageComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+  }
+);
+
 router.get(
   ClientRoutes.profile.base,
   authenticateUser,

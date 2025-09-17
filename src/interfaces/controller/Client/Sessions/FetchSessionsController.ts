@@ -1,4 +1,3 @@
-import { I_clientUsecase } from "@src/application/usecases/I_usecases/I_clientusecase";
 import { IController } from "../../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";

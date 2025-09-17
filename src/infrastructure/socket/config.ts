@@ -7,7 +7,11 @@ export function InitialiseSocketServer(server: HTTPServer): SocketIOServer {
   const FRONTEND_URL = process.env.FRONTEND_URL;
   const io = new SocketIOServer(server, {
     cors: {
-      origin: [`${FRONTEND_URL}`, "http://localhost:4000"],
+      origin: [
+        `${FRONTEND_URL}`,
+        "http://localhost:4000",
+        "https://myapp.loca.lt/",
+      ],
       credentials: true,
       methods: ["GET", "POST"],
     },

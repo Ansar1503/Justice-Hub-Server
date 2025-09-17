@@ -28,11 +28,10 @@ const rateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
-
 connectDB();
 app.use(
   cors({
-    origin: `${process.env.FRONTEND_URL}`,
+    origin: [`${process.env.FRONTEND_URL}`],
     methods: ["PUT", "POST", "GET", "PATCH", "DELETE"],
     credentials: true,
   })

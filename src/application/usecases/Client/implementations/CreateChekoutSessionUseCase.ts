@@ -17,28 +17,31 @@ import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
 import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
 import { STATUS_CODES } from "@infrastructure/constant/status.codes";
 import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
+import { GetAppointmentKey } from "@shared/utils/helpers/GetAppointmentKey";
+import { IRedisService } from "@domain/IRepository/Redis/IRedisService";
 
 export class CreateCheckoutSessionUseCase
   implements ICreateCheckoutSessionUseCase
 {
   constructor(
-    private userRepository: IUserRepository,
-    private lawyerVerificationRepository: ILawyerVerificationRepo,
-    private appointmentRepo: IAppointmentsRepository,
-    private scheduleSettingsRepo: IScheduleSettingsRepo,
-    private availableSlotsRepo: IAvailableSlots,
-    private overrideSlotsRepo: IOverrideRepo,
-    private walletRepo: IWalletRepo,
-    private lawyerRepo: ILawyerRepository
+    private _userRepository: IUserRepository,
+    private _lawyerVerificationRepository: ILawyerVerificationRepo,
+    private _appointmentRepo: IAppointmentsRepository,
+    private _scheduleSettingsRepo: IScheduleSettingsRepo,
+    private _availableSlotsRepo: IAvailableSlots,
+    private _overrideSlotsRepo: IOverrideRepo,
+    private _walletRepo: IWalletRepo,
+    private _lawyerRepo: ILawyerRepository,
+    private _redisService: IRedisService
   ) {}
   async execute(input: CreateCheckoutSessionInputDto): Promise<any> {
     const { client_id, date, duration, lawyer_id, reason, timeSlot } = input;
-    const user = await this.userRepository.findByuser_id(lawyer_id);
+    const user = await this._userRepository.findByuser_id(lawyer_id);
     if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
     if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
     const lawyerVerificaitionDetails =
-      await this.lawyerVerificationRepository.findByUserId(lawyer_id);
-    const lawyerDetails = await this.lawyerRepo.findUserId(lawyer_id);
+      await this._lawyerVerificationRepository.findByUserId(lawyer_id);
+    const lawyerDetails = await this._lawyerRepo.findUserId(lawyer_id);
     if (!lawyerDetails) throw new Error(ERRORS.USER_NOT_FOUND);
     if (!lawyerVerificaitionDetails) throw new Error(ERRORS.USER_NOT_FOUND);
     if (lawyerVerificaitionDetails.verificationStatus !== "verified")
@@ -49,7 +52,7 @@ export class CreateCheckoutSessionUseCase
       err.code = STATUS_CODES.BAD_REQUEST;
       throw err;
     }
-    const slotSettings = await this.scheduleSettingsRepo.fetchScheduleSettings(
+    const slotSettings = await this._scheduleSettingsRepo.fetchScheduleSettings(
       lawyer_id
     );
     if (!slotSettings) {
@@ -57,11 +60,11 @@ export class CreateCheckoutSessionUseCase
       error.code = 404;
       throw error;
     }
-    const wallet = await this.walletRepo.getWalletByUserId(lawyer_id);
+    const wallet = await this._walletRepo.getWalletByUserId(lawyer_id);
     if (!wallet) {
       throw new Error("wallet not found for the lawyer");
     }
-    const availableSlots = await this.availableSlotsRepo.findAvailableSlots(
+    const availableSlots = await this._availableSlotsRepo.findAvailableSlots(
       lawyer_id
     );
     if (!availableSlots) {
@@ -69,11 +72,11 @@ export class CreateCheckoutSessionUseCase
       error.code = 404;
       throw error;
     }
-    const override = await this.overrideSlotsRepo.fetcghOverrideSlotByDate(
+    const override = await this._overrideSlotsRepo.fetcghOverrideSlotByDate(
       lawyer_id,
       date
     );
-    const appointment = await this.appointmentRepo.findByDateandLawyer_id({
+    const appointment = await this._appointmentRepo.findByDateandLawyer_id({
       lawyer_id,
       date,
     });
@@ -87,13 +90,13 @@ export class CreateCheckoutSessionUseCase
       throw error;
     }
     const existingApointmentonDate =
-      await this.appointmentRepo.findByDateandClientId({ client_id, date });
+      await this._appointmentRepo.findByDateandClientId({ client_id, date });
     const bookingExist = existingApointmentonDate?.some(
       (appointment) =>
         appointment.time === timeSlot && appointment.payment_status !== "failed"
     );
     if (bookingExist) {
-      const error: any = new Error("booking exist on same time");
+      const error: any = new Error("you have booking on same time");
       error.code = STATUS_CODES.BAD_REQUEST;
       throw error;
     }
@@ -142,7 +145,7 @@ export class CreateCheckoutSessionUseCase
           time: timeSlot,
           type: "consultation",
         });
-        await this.appointmentRepo.createWithTransaction(newappointment);
+        // await this._appointmentRepo.createWithTransaction(newappointment);
         const stripe = await getStripeSession({
           amount: lawyerDetails.consultationFee,
           date: String(date),
@@ -207,7 +210,7 @@ export class CreateCheckoutSessionUseCase
       error.code = 404;
       throw error;
     }
-    const newappointment = Appointment.create({
+    const newappointment = {
       amount: lawyerDetails.consultationFee,
       client_id,
       date,
@@ -216,9 +219,8 @@ export class CreateCheckoutSessionUseCase
       reason,
       time: timeSlot,
       type: "consultation",
-    });
-    await this.appointmentRepo.createWithTransaction(newappointment);
-
+    };
+    const key = GetAppointmentKey(lawyer_id, date, timeSlot);
     const stripe = await getStripeSession({
       amount: lawyerDetails.consultationFee,
       date: String(date),

@@ -22,6 +22,7 @@ export const AdminRoutes = {
 export const ClientRoutes = {
   profile: {
     base: "/profile",
+    image: "/image",
     basic: "/profile/basic",
     personal: "/profile/personal",
     verifyMail: "/profile/verifyMail",

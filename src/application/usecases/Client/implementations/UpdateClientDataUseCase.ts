@@ -3,23 +3,31 @@ import { IUpdateClientDataUseCase } from "../IUpdateClientDataUseCase";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { IClientRepository } from "@domain/IRepository/IClientRepo";
 import { UpdateBasicInfoInputDto } from "@src/application/dtos/client/UpdateBasicInfoDto";
+import { ICloudinaryService } from "@src/application/services/Interfaces/ICloudinaryService";
 
 export class UpdateClientDataUseCase implements IUpdateClientDataUseCase {
   constructor(
-    private userRepository: IUserRepository,
-    private clientRepository: IClientRepository
+    private _userRepository: IUserRepository,
+    private _clientRepository: IClientRepository,
+    private _Cloudinary: ICloudinaryService
   ) {}
   async execute(input: UpdateBasicInfoInputDto): Promise<ClientUpdateDto> {
     try {
-      const userDetails = await this.userRepository.findByuser_id(
+      const userDetails = await this._userRepository.findByuser_id(
         input.user_id
       );
       if (!userDetails) {
         throw new Error("USER_NOT_FOUND");
       }
-      const clientDetails = await this.clientRepository.findByUserId(
+      const clientDetails = await this._clientRepository.findByUserId(
         input.user_id
       );
+      let securedUrl;
+      if (input.profile_image?.trim()) {
+        securedUrl = await this._Cloudinary.genrateSecureUrl(
+          input.profile_image
+        );
+      }
 
       const updateData = new ClientUpdateDto({
         email: userDetails.email,
@@ -35,9 +43,16 @@ export class UpdateClientDataUseCase implements IUpdateClientDataUseCase {
         is_blocked: userDetails.is_blocked ?? false,
         is_verified: userDetails.is_verified ?? true,
       });
-      await this.userRepository.update(updateData);
-      await this.clientRepository.update(updateData);
-      return updateData;
+      await this._userRepository.update(updateData);
+      await this._clientRepository.update(updateData);
+      return {
+        ...updateData,
+        profile_image:
+          securedUrl ||
+          input.profile_image ||
+          clientDetails?.profile_image ||
+          "",
+      };
     } catch (error: any) {
       throw new Error(error.message);
     }

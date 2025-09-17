@@ -10,9 +10,9 @@ import { IUpdateClientDataUseCase } from "@src/application/usecases/Client/IUpda
 
 export class UpdateBasicInfoController implements IController {
   constructor(
-    private udpateClientData: IUpdateClientDataUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+    private _udpateClientData: IUpdateClientDataUseCase,
+    private _errors: IHttpErrors = new HttpErrors(),
+    private _success: IHttpSuccess = new HttpSuccess()
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
     const { name, mobile, dob, gender } = httpRequest.body as Record<
@@ -20,13 +20,13 @@ export class UpdateBasicInfoController implements IController {
       any
     >;
     if (!name || !mobile) {
-      const err = this.httpErrors.error_400();
+      const err = this._errors.error_400();
       return new HttpResponse(err.statusCode, err.body);
     }
-    const profile_image = (httpRequest as Record<string, any>)?.file?.path;
+    const profile_image = (httpRequest as Record<string, any>)?.file?.filename;
     const user_id = (httpRequest as Record<string, any>)?.user?.id;
     try {
-      const updateData = await this.udpateClientData.execute({
+      const updateData = await this._udpateClientData.execute({
         profile_image,
         user_id,
         name,
@@ -35,14 +35,17 @@ export class UpdateBasicInfoController implements IController {
         gender,
       });
       if (!updateData) {
-        const err = this.httpErrors.error_500();
+        const err = this._errors.error_500();
         return new HttpResponse(err.statusCode, err.body);
       }
-      const success = this.httpSuccess.success_200(updateData);
+      const success = this._success.success_200(updateData);
       return new HttpResponse(success.statusCode, success.body);
     } catch (error) {
-      const err = this.httpErrors.error_500();
-      return new HttpResponse(err.statusCode, err.body);
+      console.log("error",error)
+      if (error instanceof Error) {
+        return this._errors.error_400(error.message);
+      }
+      return this._errors.error_500();
     }
   }
 }

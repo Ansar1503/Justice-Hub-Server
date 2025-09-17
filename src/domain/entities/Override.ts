@@ -1,15 +1,15 @@
 import { v4 as uuidv4 } from "uuid";
 
-interface TimeRange {
-  start: string;
-  end: string;
-}
+  interface TimeRange {
+    start: string;
+    end: string;
+  }
 
-interface OverrideDate {
-  date: Date;
-  isUnavailable: boolean;
-  timeRanges: TimeRange[];
-}
+  interface OverrideDate {
+    date: Date;
+    isUnavailable: boolean;
+    timeRanges: TimeRange[];
+  }
 
 interface PersistedOverrideSlots {
   id: string;
