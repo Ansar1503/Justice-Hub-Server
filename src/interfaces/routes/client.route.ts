@@ -369,7 +369,10 @@ router.post(
   ClientRoutes.slots.checkout,
   authenticateUser,
   async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, CreateCheckoutSessionComposer());
+    const adapter = await expressAdapter(
+      req,
+      await CreateCheckoutSessionComposer()
+    );
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }

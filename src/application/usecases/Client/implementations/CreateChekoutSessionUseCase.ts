@@ -17,7 +17,7 @@ import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
 import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
 import { STATUS_CODES } from "@infrastructure/constant/status.codes";
 import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
-import { GetAppointmentKey } from "@shared/utils/helpers/GetAppointmentKey";
+import { GetAppointmentRedisKey } from "@shared/utils/helpers/GetAppointmentKey";
 import { IRedisService } from "@domain/IRepository/Redis/IRedisService";
 
 export class CreateCheckoutSessionUseCase
@@ -220,7 +220,16 @@ export class CreateCheckoutSessionUseCase
       time: timeSlot,
       type: "consultation",
     };
-    const key = GetAppointmentKey(lawyer_id, date, timeSlot);
+    const key = GetAppointmentRedisKey(lawyer_id, date, timeSlot);
+    const isLocked = await this._redisService.setWithNx(
+      key,
+      JSON.stringify(newappointment),
+      60 * 10
+    );
+    if (!isLocked)
+      throw new Error(
+        "Slot already temporarily reserved, please choose another."
+      );
     const stripe = await getStripeSession({
       amount: lawyerDetails.consultationFee,
       date: String(date),

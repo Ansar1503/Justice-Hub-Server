@@ -1,9 +1,6 @@
 export interface IRedisService {
-  set(key: string, value: string, ttlSeconds?: number): Promise<void>;
-
+  setWithNx(key: string, value: string, ttlSeconds?: number): Promise<boolean>;
   get(key: string): Promise<string | null>;
-
-  del(key: string): Promise<void>;
-
+  del(key: string): Promise<number>;
   exists(key: string): Promise<boolean>;
 }

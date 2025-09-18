@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
 type StatusType = "open" | "closed" | "onhold";
-
 interface PersistedCaseProps {
   id: string;
   title: string;
