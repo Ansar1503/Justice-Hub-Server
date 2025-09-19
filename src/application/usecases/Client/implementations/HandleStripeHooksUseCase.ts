@@ -27,9 +27,9 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
       duration,
       payment_status,
       amount,
-      caseId,
       reason,
       title,
+      caseTypeId,
     } = result;
     if (
       !client_id ||
@@ -39,7 +39,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
       !duration ||
       !payment_status ||
       !amount ||
-      !caseId ||
+      !caseTypeId ||
       !title
     ) {
       throw new Error("no metadata found");
