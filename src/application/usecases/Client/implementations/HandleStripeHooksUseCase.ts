@@ -45,70 +45,76 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
     ) {
       throw new Error("no metadata found");
     }
-    const scheduleSettings =
-      await this._scheduleSettingsRepo.fetchScheduleSettings(lawyer_id);
-    let status:
-      | "confirmed"
-      | "pending"
-      | "completed"
-      | "cancelled"
-      | "rejected" = "pending";
-    if (scheduleSettings && scheduleSettings.autoConfirm) {
-      status = "confirmed";
+    if (payment_status === "success") {
+      const scheduleSettings =
+        await this._scheduleSettingsRepo.fetchScheduleSettings(lawyer_id);
+      let status:
+        | "confirmed"
+        | "pending"
+        | "completed"
+        | "cancelled"
+        | "rejected" = "pending";
+      if (scheduleSettings && scheduleSettings.autoConfirm) {
+        status = "confirmed";
+      }
+      this._unitofwork.startTransaction(async (uow) => {
+        const casepayload = Case.create({
+          caseType: caseTypeId,
+          clientId: client_id,
+          lawyerId: lawyer_id,
+          title: title,
+          summary: reason,
+        });
+        await uow.caseRepo.create(casepayload);
+        const appointmentPayload = Appointment.create({
+          amount: Number(amount),
+          client_id: client_id,
+          date: new Date(date),
+          duration: Number(duration),
+          lawyer_id: lawyer_id,
+          reason: reason || "",
+          time: time,
+          type: "consultation",
+        });
+        const appointment = await uow.appointmentRepo.createWithTransaction(
+          appointmentPayload
+        );
+        if (!appointment) {
+          throw new Error("Appointment update failed");
+        }
+        const wallet = await uow.walletRepo.getAdminWallet();
+        if (!wallet) {
+          throw new Error("lawyer wallet not found");
+        }
+        const desc = generateDescription({
+          amount: appointment.amount,
+          category: "transfer",
+          type: "credit",
+        });
+        wallet.updateBalance(wallet.balance + appointment.amount);
+        try {
+          await uow.walletRepo.updateBalance(wallet.user_id, wallet.balance);
+        } catch (error) {
+          console.log("wallet update error");
+        }
+        const transaction = WalletTransaction.create({
+          amount: appointment.amount,
+          category: "transfer",
+          description: desc,
+          status: "completed",
+          type: "credit",
+          walletId: wallet.id,
+        });
+        try {
+          await uow.transactionsRepo.create(transaction);
+        } catch (error) {
+          console.log("error creatinmg wallet transaction", error);
+        }
+      });
+    } else if (payment_status === "failed") {
+      console.log("payment failed");
+    } else {
+      console.log("payment  pending check the stripe listen");
     }
-    this._unitofwork.startTransaction(async (uow) => {
-      const casepayload = Case.create({
-        caseType: caseTypeId,
-        clientId: client_id,
-        lawyerId: lawyer_id,
-        title: title,
-        summary: reason,
-      });
-      await uow.caseRepo.create(casepayload);
-      const appointmentPayload = Appointment.create({
-        amount: Number(amount),
-        client_id: client_id,
-        date: new Date(date),
-        duration: Number(duration),
-        lawyer_id: lawyer_id,
-        reason: reason || "",
-        time: time,
-        type: "consultation",
-      });
-      const appointment = await uow.appointmentRepo.createWithTransaction(
-        appointmentPayload
-      );
-      if (!appointment) {
-        throw new Error("Appointment update failed");
-      }
-      const wallet = await uow.walletRepo.getAdminWallet();
-      if (!wallet) {
-        throw new Error("lawyer wallet not found");
-      }
-      const desc = generateDescription({
-        amount: appointment.amount,
-        category: "transfer",
-        type: "credit",
-      });
-      wallet.updateBalance(wallet.balance + appointment.amount);
-      try {
-        await uow.walletRepo.updateBalance(wallet.user_id, wallet.balance);
-      } catch (error) {
-        console.log("wallet update error");
-      }
-      const transaction = WalletTransaction.create({
-        amount: appointment.amount,
-        category: "transfer",
-        description: desc,
-        status: "completed",
-        type: "credit",
-        walletId: wallet.id,
-      });
-      try {
-        await uow.transactionsRepo.create(transaction);
-      } catch (error) {
-        console.log("error creatinmg wallet transaction", error);
-      }
-    });
   }
 }
