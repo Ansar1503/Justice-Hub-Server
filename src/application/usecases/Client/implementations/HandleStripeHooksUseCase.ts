@@ -5,6 +5,7 @@ import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
 import { generateDescription } from "@shared/utils/helpers/WalletDescriptionsHelper";
 import { WalletTransaction } from "@domain/entities/WalletTransactions";
 import { Appointment } from "@domain/entities/Appointment";
+import { Case } from "@domain/entities/Case";
 
 export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
   constructor(
@@ -56,6 +57,14 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
       status = "confirmed";
     }
     this._unitofwork.startTransaction(async (uow) => {
+      const casepayload = Case.create({
+        caseType: caseTypeId,
+        clientId: client_id,
+        lawyerId: lawyer_id,
+        title: title,
+        summary: reason,
+      });
+      await uow.caseRepo.create(casepayload);
       const appointmentPayload = Appointment.create({
         amount: Number(amount),
         client_id: client_id,
