@@ -48,6 +48,7 @@ import { JoinVideoSessionComposer } from "@infrastructure/services/composers/Law
 import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
 import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsByUserIdComposer";
 import {
+  CasetypeRoutes,
   ClientRoutes,
   PracticeAreaRoutes,
   SpecializationRoute,
@@ -61,6 +62,7 @@ import { FetchTransactionsByWalletComposer } from "@infrastructure/services/comp
 import { FetchAllSpecializationsComposer } from "@infrastructure/services/composers/Specializations/FetchAllSpecializations";
 import { FindPracticeAreasBySpecIdsComposer } from "@infrastructure/services/composers/PracticeAreas/FindPracticeAreasBySpecIdsComposer";
 import { FetchProfileImageComposer } from "@infrastructure/services/composers/Client/Profile/FetchProfileImageComposer";
+import { FindCaseTypesByPracticeAreasComposer } from "@infrastructure/services/composers/Casetypes/FindCasetypesByPracticeareas";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -531,6 +533,20 @@ router.get(
     const adapter = await expressAdapter(
       req,
       FindPracticeAreasBySpecIdsComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  CasetypeRoutes.base,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FindCaseTypesByPracticeAreasComposer()
     );
     res.status(adapter.statusCode).json(adapter.body);
     return;
