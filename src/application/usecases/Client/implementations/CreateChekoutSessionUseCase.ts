@@ -135,7 +135,7 @@ export class CreateCheckoutSessionUseCase
           error.code = 404;
           throw error;
         }
-        const newappointment = Appointment.create({
+        const newappointment = {
           amount: lawyerDetails.consultationFee,
           client_id,
           date,
@@ -144,8 +144,18 @@ export class CreateCheckoutSessionUseCase
           reason,
           time: timeSlot,
           type: "consultation",
-        });
-        // await this._appointmentRepo.createWithTransaction(newappointment);
+        };
+        const key = GetAppointmentRedisKey(lawyer_id, date, timeSlot);
+        const isLocked = await this._redisService.setWithNx(
+          key,
+          JSON.stringify(newappointment),
+          60 * 10
+        );
+        if (!isLocked)
+          throw new Error(
+            "Slot already temporarily reserved, please choose another."
+          );
+
         const stripe = await getStripeSession({
           amount: lawyerDetails.consultationFee,
           date: String(date),
@@ -155,6 +165,9 @@ export class CreateCheckoutSessionUseCase
           lawyer_id,
           duration,
           client_id,
+          caseType: input.caseId,
+          title: input.title,
+          reason: input.reason,
         });
         return stripe;
       }
@@ -239,6 +252,9 @@ export class CreateCheckoutSessionUseCase
       lawyer_id,
       duration,
       client_id,
+      caseType: input.caseId,
+      title: input.title,
+      reason: input.reason,
     });
     return stripe;
   }

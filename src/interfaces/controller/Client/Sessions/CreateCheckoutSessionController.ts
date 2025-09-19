@@ -10,28 +10,27 @@ interface IHttpRequest extends BaseIHttpRequest {
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
-import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
-import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { ERRORS } from "@infrastructure/constant/errors";
 import { ICreateCheckoutSessionUseCase } from "@src/application/usecases/Client/ICreateCheckoutSessionUseCase";
 
 export class CreateCheckoutSessionController implements IController {
   constructor(
-    private readonly createCheckoutSession: ICreateCheckoutSessionUseCase,
-    private readonly httpErrors: IHttpErrors = new HttpErrors(),
-    private readonly httpSuccess: IHttpSuccess = new HttpSuccess()
+    private readonly _createCheckoutSession: ICreateCheckoutSessionUseCase,
+    private readonly _errors: IHttpErrors,
+    private readonly _success: IHttpSuccess
   ) {}
 
   async handle(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
       const user_id = httpRequest.user?.id;
-      const { lawyer_id, date, timeSlot, duration, reason } =
+      const { lawyer_id, date, timeSlot, duration, reason, caseTypeId, title } =
         (httpRequest.body as {
           lawyer_id?: string;
           date?: string;
           timeSlot?: string;
           duration?: number;
           reason?: string;
+          caseTypeId: string;
+          title: string;
         }) || {};
 
       if (
@@ -40,38 +39,34 @@ export class CreateCheckoutSessionController implements IController {
         !timeSlot ||
         !user_id ||
         !duration ||
-        !reason
+        !reason ||
+        !title ||
+        !caseTypeId
       ) {
-        console.log("invalid creds", {
-          lawyer_id,
-          date,
-          timeSlot,
-          user_id,
-          duration,
-          reason,
-        });
-        return this.httpErrors.error_400("Invalid Credentials");
+        return this._errors.error_400("Invalid Credentials");
       }
 
       const dateObj = new Date(
         new Date(date).getTime() - new Date(date).getTimezoneOffset() * 60000
       );
 
-      const response = await this.createCheckoutSession.execute({
+      const response = await this._createCheckoutSession.execute({
         client_id: user_id,
         date: dateObj,
         duration,
         lawyer_id,
         reason,
         timeSlot,
+        caseId: caseTypeId,
+        title: title,
       });
 
-      return this.httpSuccess.success_200(response);
+      return this._success.success_200(response);
     } catch (error) {
       if (error instanceof Error) {
-        return this.httpErrors.error_400(error.message);
+        return this._errors.error_400(error.message);
       }
-      return this.httpErrors.error_500();
+      return this._errors.error_500();
     }
   }
 }

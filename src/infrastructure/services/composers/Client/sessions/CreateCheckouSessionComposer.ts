@@ -11,6 +11,8 @@ import { LawyerVerificationRepo } from "@infrastructure/database/repo/LawyerVeri
 import { LawyerVerificationMapper } from "@infrastructure/Mapper/Implementations/LawyerVerificaitionMapper";
 import { RedisService } from "@infrastructure/Redis/RedisService";
 import { connectRedis } from "@infrastructure/Redis/Config/RedisConfig";
+import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
+import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 
 export const CreateCheckoutSessionComposer = async () => {
   const client = await connectRedis();
@@ -25,5 +27,9 @@ export const CreateCheckoutSessionComposer = async () => {
     new LawyerRepository(),
     new RedisService(client)
   );
-  return new CreateCheckoutSessionController(useCase);
+  return new CreateCheckoutSessionController(
+    useCase,
+    new HttpErrors(),
+    new HttpSuccess()
+  );
 };

@@ -5,4 +5,6 @@ export interface CreateCheckoutSessionInputDto {
   timeSlot: string;
   duration: number;
   reason: string;
+  caseId: string;
+  title: string;
 }

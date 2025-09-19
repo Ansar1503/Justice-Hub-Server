@@ -25,6 +25,9 @@ import { LawyerVerificationRepo } from "@infrastructure/database/repo/LawyerVeri
 import { LawyerVerificationMapper } from "@infrastructure/Mapper/Implementations/LawyerVerificaitionMapper";
 import { LawyerDocumentsRepository } from "@infrastructure/database/repo/LawyerDocuemtsRepo";
 import { lawyerDocumentsMapper } from "@infrastructure/Mapper/Implementations/LawyerDocumentMapper";
+import { ICaseRepo } from "@domain/IRepository/ICaseRepo";
+import { CaseRepository } from "@infrastructure/database/repo/CaseRepository";
+import { CaseMapper } from "@infrastructure/Mapper/Implementations/CaseMapper";
 
 export class MongoUnitofWork implements IUnitofWork {
   private _session?: ClientSession;
@@ -38,9 +41,22 @@ export class MongoUnitofWork implements IUnitofWork {
   private _lawyerRepo: ILawyerRepository | undefined;
   private _lawyerVerificationRepo: ILawyerVerificationRepo | undefined;
   private _lawyerDocumentsRepo: ILawyerDocumentsRepository | undefined;
+  private _caseRepo: ICaseRepo | undefined;
 
   constructor(session?: ClientSession) {
     this._session = session;
+  }
+
+  get caseRepo(): ICaseRepo {
+    if (!this._session) {
+      throw new Error(
+        "Unit of Work session not initialized. Call startTransaction() first."
+      );
+    }
+    if (!this._caseRepo) {
+      this._caseRepo = new CaseRepository(new CaseMapper(), this._session);
+    }
+    return this._caseRepo;
   }
 
   get appointmentRepo(): IAppointmentsRepository {

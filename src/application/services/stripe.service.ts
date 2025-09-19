@@ -9,7 +9,10 @@ type WebhookResult = {
   client_id?: string;
   date?: string;
   time?: string;
-  duration?: string | number;
+  duration?: string;
+  reason?: string;
+  title?: string;
+  caseId?: string;
   payment_status?: "pending" | "success" | "failed";
   eventHandled: boolean;
 };
@@ -23,6 +26,9 @@ type payloadType = {
   lawyer_id: string;
   duration: number;
   client_id: string;
+  reason?: string;
+  title: string;
+  caseType: string;
 };
 
 export async function getStripeSession(payload: payloadType) {
@@ -30,7 +36,6 @@ export async function getStripeSession(payload: payloadType) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   const formattedDate = format(payload.date, "MMMM d yyyy");
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
     customer_email: payload.userEmail,
     line_items: [
       {
@@ -54,11 +59,15 @@ export async function getStripeSession(payload: payloadType) {
       lawyer_id: payload.lawyer_id,
       time: payload.slot,
       date: payload.date,
-      amount: payload.amount,
+      amount: String(payload.amount),
       clientId: payload.client_id,
-      duration: payload.duration,
+      duration: String(payload.duration),
+      reason: payload?.reason ?? "",
+      caseId: payload.caseType,
+      title: payload.title,
     },
   });
+
   return session;
 }
 
@@ -141,5 +150,8 @@ function pluckMeta(md: Stripe.Metadata | null | undefined) {
     date: md?.date,
     time: md?.time,
     duration: md?.duration,
+    reason: md?.reason,
+    caseId: md?.caseId,
+    title: md?.title,
   };
 }

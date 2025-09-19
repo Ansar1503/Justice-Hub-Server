@@ -1,4 +1,5 @@
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
+import { ICaseRepo } from "@domain/IRepository/ICaseRepo";
 import { IClientRepository } from "@domain/IRepository/IClientRepo";
 import { ILawyerDocumentsRepository } from "@domain/IRepository/ILawyerDocumentsRepo";
 import { ILawyerRepository } from "@domain/IRepository/ILawyerRepo";
@@ -12,6 +13,7 @@ export interface IUnitofWork {
   startTransaction<T>(callback: (uow: IUnitofWork) => Promise<T>): Promise<T>;
   rollback(): Promise<void>;
 
+  caseRepo: ICaseRepo;
   walletRepo: IWalletRepo;
   transactionsRepo: IWalletTransactionsRepo;
   appointmentRepo: IAppointmentsRepository;
