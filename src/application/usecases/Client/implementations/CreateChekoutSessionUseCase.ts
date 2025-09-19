@@ -165,7 +165,7 @@ export class CreateCheckoutSessionUseCase
           lawyer_id,
           duration,
           client_id,
-          caseType: input.caseId,
+          caseTypeId: input.caseId,
           title: input.title,
           reason: input.reason,
         });
@@ -252,7 +252,7 @@ export class CreateCheckoutSessionUseCase
       lawyer_id,
       duration,
       client_id,
-      caseType: input.caseId,
+      caseTypeId: input.caseId,
       title: input.title,
       reason: input.reason,
     });
