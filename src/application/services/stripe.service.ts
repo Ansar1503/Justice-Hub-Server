@@ -151,7 +151,7 @@ function pluckMeta(md: Stripe.Metadata | null | undefined) {
     time: md?.time,
     duration: md?.duration,
     reason: md?.reason,
-    caseId: md?.caseTypeId,
+    caseTypeId: md?.caseTypeId,
     title: md?.title,
   };
 }
