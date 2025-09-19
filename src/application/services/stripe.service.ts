@@ -12,7 +12,7 @@ type WebhookResult = {
   duration?: string;
   reason?: string;
   title?: string;
-  caseId?: string;
+  caseTypeId?: string;
   payment_status?: "pending" | "success" | "failed";
   eventHandled: boolean;
 };
@@ -28,7 +28,7 @@ type payloadType = {
   client_id: string;
   reason?: string;
   title: string;
-  caseType: string;
+  caseTypeId: string;
 };
 
 export async function getStripeSession(payload: payloadType) {
@@ -63,7 +63,7 @@ export async function getStripeSession(payload: payloadType) {
       clientId: payload.client_id,
       duration: String(payload.duration),
       reason: payload?.reason ?? "",
-      caseId: payload.caseType,
+      caseId: payload.caseTypeId,
       title: payload.title,
     },
   });
@@ -151,7 +151,7 @@ function pluckMeta(md: Stripe.Metadata | null | undefined) {
     time: md?.time,
     duration: md?.duration,
     reason: md?.reason,
-    caseId: md?.caseId,
+    caseId: md?.caseTypeId,
     title: md?.title,
   };
 }
