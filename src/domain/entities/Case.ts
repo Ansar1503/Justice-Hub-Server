@@ -7,8 +7,10 @@ interface PersistedCaseProps {
   clientId: string;
   lawyerId: string;
   caseType: string;
-  summary?: string;
   status: StatusType;
+  summary?: string;
+  estimatedValue?: number;
+  nextHearing?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -29,6 +31,8 @@ export class Case {
   private _caseType: string;
   private _summary?: string;
   private _status: StatusType;
+  private _estimatedValue?: number;
+  private _nextHearing?: Date;
   private _createdAt: Date;
   private _updatedAt: Date;
 
@@ -65,6 +69,14 @@ export class Case {
 
   get id() {
     return this._id;
+  }
+
+  get estimatedValue() {
+    return this._estimatedValue;
+  }
+
+  get nextHearing() {
+    return this._nextHearing;
   }
 
   get status() {

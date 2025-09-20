@@ -141,3 +141,7 @@ export const CasetypeRoutes = {
 export const CommonParamsRoute = {
   params: "/:id",
 };
+
+export const CasesRoutes = {
+  base: "/cases",
+};

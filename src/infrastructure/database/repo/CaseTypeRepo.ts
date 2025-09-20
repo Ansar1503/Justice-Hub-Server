@@ -57,8 +57,8 @@ export class CaseTypeRepo
     };
   }
 
-  async findByPracticeAreas(query: string[]): Promise<CaseType[] | []> {
-    const data = await this.model.find({ practiceareaId: { $in: query } });
+  async findAll(): Promise<CaseType[] | []> {
+    const data = await this.model.find();
     return this.mapper.toDomainArray && data
       ? this.mapper.toDomainArray(data)
       : [];

@@ -48,6 +48,7 @@ import { JoinVideoSessionComposer } from "@infrastructure/services/composers/Law
 import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
 import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsByUserIdComposer";
 import {
+  CasesRoutes,
   CasetypeRoutes,
   ClientRoutes,
   PracticeAreaRoutes,
@@ -62,7 +63,8 @@ import { FetchTransactionsByWalletComposer } from "@infrastructure/services/comp
 import { FetchAllSpecializationsComposer } from "@infrastructure/services/composers/Specializations/FetchAllSpecializations";
 import { FindPracticeAreasBySpecIdsComposer } from "@infrastructure/services/composers/PracticeAreas/FindPracticeAreasBySpecIdsComposer";
 import { FetchProfileImageComposer } from "@infrastructure/services/composers/Client/Profile/FetchProfileImageComposer";
-import { FindCaseTypesByPracticeAreasComposer } from "@infrastructure/services/composers/Casetypes/FindCasetypesByPracticeareas";
+import { FindAllCaseTypesComposer } from "@infrastructure/services/composers/Casetypes/FindAllCasetypes";
+import { FindAllCasesByQueryComposer } from "@infrastructure/services/composers/Cases/FindAllCasesByQueryComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -544,10 +546,18 @@ router.get(
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(
-      req,
-      FindCaseTypesByPracticeAreasComposer()
-    );
+    const adapter = await expressAdapter(req, FindAllCaseTypesComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  CasesRoutes.base,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindAllCasesByQueryComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }
