@@ -63,7 +63,7 @@ export async function getStripeSession(payload: payloadType) {
       clientId: payload.client_id,
       duration: String(payload.duration),
       reason: payload?.reason ?? "",
-      caseId: payload.caseTypeId,
+      caseTypeId: payload.caseTypeId,
       title: payload.title,
     },
   });
@@ -144,6 +144,7 @@ export async function getSessionMetaData(sessionId: string) {
 }
 
 function pluckMeta(md: Stripe.Metadata | null | undefined) {
+  console.log(md);
   return {
     lawyer_id: md?.lawyer_id,
     client_id: md?.clientId,

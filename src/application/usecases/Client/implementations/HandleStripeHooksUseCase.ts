@@ -19,7 +19,6 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
     const { body, signature } = input;
     const result = await handleStripeWebHook(body, signature);
     if (!result.eventHandled) return;
-
     const {
       lawyer_id,
       client_id,
