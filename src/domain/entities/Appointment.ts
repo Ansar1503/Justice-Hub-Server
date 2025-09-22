@@ -31,6 +31,7 @@ interface CreateAppointmentProps {
   client_id: string;
   caseId: string;
   date: Date;
+  payment_status: PaymentStatus;
   time: string;
   duration: number;
   reason: string;
@@ -83,7 +84,7 @@ export class Appointment {
       duration: props.duration,
       reason: props.reason,
       amount: props.amount,
-      payment_status: "pending",
+      payment_status: props.payment_status,
       type: props.type,
       status: "pending",
       createdAt: now,

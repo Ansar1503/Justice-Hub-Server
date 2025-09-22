@@ -21,7 +21,7 @@ export class FetchAllCasesByQueryController implements IController {
     ) {
       userId = String(httpRequest.user.id);
     }
-    const parsed = FindCasesQueryInputZodSchema.safeParse(httpRequest.body);
+    const parsed = FindCasesQueryInputZodSchema.safeParse(httpRequest.query);
     if (!userId) {
       return this._errors.error_400("userId not found");
     }

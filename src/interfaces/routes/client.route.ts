@@ -51,6 +51,7 @@ import {
   CasesRoutes,
   CasetypeRoutes,
   ClientRoutes,
+  CommonParamsRoute,
   PracticeAreaRoutes,
   SpecializationRoute,
   WalletRoutes,
@@ -66,6 +67,7 @@ import { FetchProfileImageComposer } from "@infrastructure/services/composers/Cl
 import { FindAllCaseTypesComposer } from "@infrastructure/services/composers/Casetypes/FindAllCasetypes";
 import { FindAllCasesByQueryComposer } from "@infrastructure/services/composers/Cases/FindAllCasesByQueryComposer";
 import { FindCaseTypesByPracticeAreasComposer } from "@infrastructure/services/composers/Casetypes/FetchCaseTypesByPracitceAreaIds";
+import { FindCaseDetailsComposer } from "@infrastructure/services/composers/Cases/FindCaseDetailsComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -575,6 +577,16 @@ router.get(
     const adapter = await expressAdapter(req, FindAllCasesByQueryComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
+  }
+);
+
+router.get(
+  CasesRoutes.base + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindCaseDetailsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
   }
 );
 

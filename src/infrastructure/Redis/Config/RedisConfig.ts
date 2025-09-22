@@ -5,7 +5,7 @@ import "dotenv/config";
 const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
 let redisClient: RedisClientType | null = null;
 
-export async function connectRedis(retry = 0): Promise<RedisClientType> {
+export async function connectRedis(): Promise<RedisClientType> {
   try {
     if (!redisClient) {
       redisClient = createClient({
@@ -29,14 +29,7 @@ export async function connectRedis(retry = 0): Promise<RedisClientType> {
     return redisClient;
   } catch (err) {
     console.error("Redis connect error:", err);
-    retry++;
-    if (retry > 5) {
-      console.error("Redis: max retries reached. Exiting.");
-      process.exit(1);
-    }
-    const backoff = Math.min(1000 * retry, 5000);
-    await new Promise((r) => setTimeout(r, backoff));
-    return connectRedis(retry);
+    throw err;
   }
 }
 
