@@ -9,6 +9,7 @@ export class AppointmentMapper
     return Appointment.fromPersistence({
       amount: persistence.amount,
       client_id: persistence.client_id,
+      caseId: persistence.caseId,
       createdAt: persistence.createdAt,
       date: persistence.date,
       duration: persistence.duration,
@@ -18,7 +19,7 @@ export class AppointmentMapper
       reason: persistence.reason,
       status: persistence.status,
       time: persistence.time,
-      type: persistence.type, 
+      type: persistence.type,
       updatedAt: persistence.updatedAt,
     });
   }
@@ -27,6 +28,7 @@ export class AppointmentMapper
       _id: entity.id,
       client_id: entity.client_id,
       lawyer_id: entity.lawyer_id,
+      caseId: entity.caseId,
       date: entity.date,
       time: entity.time,
       duration: entity.duration,
@@ -40,6 +42,6 @@ export class AppointmentMapper
     };
   }
   toDomainArray(persistence: IAppointmentModel[]): Appointment[] {
-      return persistence.map(per=>this.toDomain(per))
+    return persistence.map((per) => this.toDomain(per));
   }
 }

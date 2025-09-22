@@ -65,6 +65,7 @@ import { FindPracticeAreasBySpecIdsComposer } from "@infrastructure/services/com
 import { FetchProfileImageComposer } from "@infrastructure/services/composers/Client/Profile/FetchProfileImageComposer";
 import { FindAllCaseTypesComposer } from "@infrastructure/services/composers/Casetypes/FindAllCasetypes";
 import { FindAllCasesByQueryComposer } from "@infrastructure/services/composers/Cases/FindAllCasesByQueryComposer";
+import { FindCaseTypesByPracticeAreasComposer } from "@infrastructure/services/composers/Casetypes/FetchCaseTypesByPracitceAreaIds";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -547,6 +548,20 @@ router.get(
   authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FindAllCaseTypesComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  CasetypeRoutes.base + PracticeAreaRoutes.base,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FindCaseTypesByPracticeAreasComposer()
+    );
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }

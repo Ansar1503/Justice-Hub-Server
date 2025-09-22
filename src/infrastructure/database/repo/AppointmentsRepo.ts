@@ -509,6 +509,7 @@ export class AppointmentsRepository
           "lawyerData.gender": 1,
           _id: 0,
           id: "$_id",
+          caseId: 1,
           lawyer_id: 1,
           client_id: 1,
           date: 1,

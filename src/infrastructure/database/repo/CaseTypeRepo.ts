@@ -76,4 +76,10 @@ export class CaseTypeRepo
     const data = await this.model.findOneAndDelete({ _id: id });
     return data ? this.mapper.toDomain(data) : null;
   }
+  async findByPracticeAreas(query: string[]): Promise<CaseType[] | []> {
+    const data = await this.model.find({ practiceareaId: { $in: query } });
+    return this.mapper.toDomainArray && data
+      ? this.mapper.toDomainArray(data)
+      : [];
+  }
 }

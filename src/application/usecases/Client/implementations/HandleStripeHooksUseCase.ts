@@ -70,6 +70,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
           amount: Number(amount),
           client_id: client_id,
           date: new Date(date),
+          caseId: casepayload.id,
           duration: Number(duration),
           lawyer_id: lawyer_id,
           reason: reason || "",

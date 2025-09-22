@@ -2,6 +2,7 @@ export interface Appointment {
   id: string;
   lawyer_id: string;
   client_id: string;
+  caseId: string;
   date: Date;
   time: string;
   duration: number;

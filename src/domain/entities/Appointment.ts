@@ -13,6 +13,7 @@ interface PersistedAppointmentProps {
   id: string;
   lawyer_id: string;
   client_id: string;
+  caseId: string;
   date: Date;
   time: string;
   duration: number;
@@ -28,6 +29,7 @@ interface PersistedAppointmentProps {
 interface CreateAppointmentProps {
   lawyer_id: string;
   client_id: string;
+  caseId: string;
   date: Date;
   time: string;
   duration: number;
@@ -40,6 +42,7 @@ export class Appointment {
   private _id: string;
   private _lawyer_id: string;
   private _client_id: string;
+  private _caseId: string;
   private _date: Date;
   private _time: string;
   private _duration: number;
@@ -55,6 +58,7 @@ export class Appointment {
     this._id = props.id;
     this._lawyer_id = props.lawyer_id;
     this._client_id = props.client_id;
+    this._caseId = props.caseId;
     this._date = props.date;
     this._time = props.time;
     this._duration = props.duration;
@@ -73,6 +77,7 @@ export class Appointment {
       id: `amt-${uuidv4()}`,
       lawyer_id: props.lawyer_id,
       client_id: props.client_id,
+      caseId: props.caseId,
       date: props.date,
       time: props.time,
       duration: props.duration,
@@ -92,6 +97,10 @@ export class Appointment {
 
   get id(): string {
     return this._id;
+  }
+
+  get caseId() {
+    return this._caseId;
   }
 
   get lawyer_id(): string {
