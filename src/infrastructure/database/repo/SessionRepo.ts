@@ -275,10 +275,8 @@ export class SessionsRepository implements ISessionsRepo {
       matchStage["$or"] = [{ client_id: user_id }, { lawyer_id: user_id }];
     }
     if (status && status !== "all") matchStage.status = status;
-    if (consultation_type && consultation_type !== "all")
-      matchStage.type = consultation_type;
 
-    const matchStage2 = {
+    let matchStage2: Record<string, any> = {
       $or: [
         { "clientData.name": { $regex: search, $options: "i" } },
         { "clientData.email": { $regex: search, $options: "i" } },
@@ -286,6 +284,12 @@ export class SessionsRepository implements ISessionsRepo {
         { "lawyerData.email": { $regex: search, $options: "i" } },
       ],
     };
+
+    if (consultation_type && consultation_type !== "all") {
+      matchStage2 = {
+        $and: [matchStage2, { "appointmentDetails.type": consultation_type }],
+      };
+    }
 
     const sortStage: Record<string, any> = (() => {
       switch (sortBy) {
@@ -305,29 +309,47 @@ export class SessionsRepository implements ISessionsRepo {
     const projectStage = {
       $project: {
         id: "$_id",
-        _id: 0,
-        appointment_id: 1,
-        lawyer_id: 1,
-        client_id: 1,
-        caseId: 1,
-        bookingId: 1,
-        status: 1,
-        notes: 1,
-        summary: 1,
-        follow_up_suggested: 1,
-        follow_up_session_id: 1,
-        start_time: 1,
-        room_id: 1,
-        end_time: 1,
-        client_joined_at: 1,
-        client_left_at: 1,
-        lawyer_joined_at: 1,
-        lawyer_left_at: 1,
-        end_reason: 1,
-        callDuration: 1,
-        createdAt: 1,
-        updatedAt: 1,
 
+        // appointment details
+        appointmentDetals: {
+          id: "$appointmentDetails._id",
+          bookingId: "$appointmentDetails.bookingId",
+          lawyer_id: "$appointmentDetails.lawyer_id",
+          client_id: "$appointmentDetails.client_id",
+          caseId: "$appointmentDetails.caseId",
+          date: "$appointmentDetails.date",
+          time: "$appointmentDetails.time",
+          duration: "$appointmentDetails.duration",
+          reason: "$appointmentDetails.reason",
+          amount: "$appointmentDetails.amount",
+          payment_status: "$appointmentDetails.payment_status",
+          type: "$appointmentDetails.type",
+          status: "$appointmentDetails.status",
+        },
+
+        // session fields
+        lawyer_id: "$lawyer_id",
+        client_id: "$client_id",
+        caseId: "$caseId",
+        bookingId: "$bookingId",
+        status: "$status",
+        notes: "$notes",
+        summary: "$summary",
+        follow_up_suggested: "$follow_up_suggested",
+        follow_up_session_id: "$follow_up_session_id",
+        room_id: "$room_id",
+        start_time: "$start_time",
+        end_time: "$end_time",
+        client_joined_at: "$client_joined_at",
+        client_left_at: "$client_left_at",
+        lawyer_joined_at: "$lawyer_joined_at",
+        lawyer_left_at: "$lawyer_left_at",
+        end_reason: "$end_reason",
+        callDuration: "$callDuration",
+        createdAt: "$createdAt",
+        updatedAt: "$updatedAt",
+
+        // client info
         clientData: {
           name: "$clientData.name",
           email: "$clientData.email",
@@ -338,6 +360,7 @@ export class SessionsRepository implements ISessionsRepo {
           gender: "$clientData.gender",
         },
 
+        // lawyer info
         lawyerData: {
           name: "$lawyerData.name",
           email: "$lawyerData.email",
@@ -409,6 +432,21 @@ export class SessionsRepository implements ISessionsRepo {
           preserveNullAndEmptyArrays: true,
         },
       },
+      {
+        $lookup: {
+          from: "appointments",
+          localField: "appointment_id",
+          foreignField: "_id",
+          as: "appointmentDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$appointmentDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
       {
         $addFields: {
           lawyerData: {
