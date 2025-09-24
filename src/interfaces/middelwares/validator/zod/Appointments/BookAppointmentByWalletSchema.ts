@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const BookAppointmentsByWalletZodSchema = z.object({
-  client_id: z.string().min(1, "Client ID is required"),
   lawyer_id: z.string().min(1, "Lawyer ID is required"),
   date: z.preprocess((val) => {
     if (typeof val === "string" || val instanceof Date) return new Date(val);
@@ -9,6 +8,6 @@ export const BookAppointmentsByWalletZodSchema = z.object({
   timeSlot: z.string().min(1, "Time slot is required"),
   duration: z.number().min(1, "Duration must be greater than 0"),
   reason: z.string().min(1, "Reason is required"),
-  caseId: z.string().min(1, "Case ID is required"),
+  caseTypeId: z.string().min(1, "Case ID is required"),
   title: z.string().min(1, "Title is required"),
 });
