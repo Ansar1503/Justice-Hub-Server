@@ -28,6 +28,12 @@ import { lawyerDocumentsMapper } from "@infrastructure/Mapper/Implementations/La
 import { ICaseRepo } from "@domain/IRepository/ICaseRepo";
 import { CaseRepository } from "@infrastructure/database/repo/CaseRepository";
 import { CaseMapper } from "@infrastructure/Mapper/Implementations/CaseMapper";
+import { IScheduleSettingsRepo } from "@domain/IRepository/IScheduleSettingsRepo";
+import { IAvailableSlots } from "@domain/IRepository/IAvailableSlots";
+import { IOverrideRepo } from "@domain/IRepository/IOverrideRepo";
+import { ScheduleSettingsRepository } from "@infrastructure/database/repo/ScheduleSettingsRepo";
+import { AvailableSlotRepository } from "@infrastructure/database/repo/AvailableSlotsRepo";
+import { OverrideSlotsRepository } from "@infrastructure/database/repo/OverrideSlotsRepo";
 
 export class MongoUnitofWork implements IUnitofWork {
   private _session?: ClientSession;
@@ -42,6 +48,9 @@ export class MongoUnitofWork implements IUnitofWork {
   private _lawyerVerificationRepo: ILawyerVerificationRepo | undefined;
   private _lawyerDocumentsRepo: ILawyerDocumentsRepository | undefined;
   private _caseRepo: ICaseRepo | undefined;
+  private _scheduleSettingsRepo: IScheduleSettingsRepo | undefined;
+  private _availableSlotsRepo: IAvailableSlots | undefined;
+  private _overrideSlotsRepo: IOverrideRepo | undefined;
 
   constructor(session?: ClientSession) {
     this._session = session;
@@ -176,6 +185,42 @@ export class MongoUnitofWork implements IUnitofWork {
       );
     }
     return this._lawyerDocumentsRepo;
+  }
+
+  get scheduleSettingsRepo(): IScheduleSettingsRepo {
+    if (!this._session) {
+      throw new Error(
+        "Unit of Work session not initialized. Call startTransaction() first."
+      );
+    }
+    if (!this._scheduleSettingsRepo) {
+      this._scheduleSettingsRepo = new ScheduleSettingsRepository();
+    }
+    return this._scheduleSettingsRepo;
+  }
+
+  get availableSlotsRepo(): IAvailableSlots {
+    if (!this._session) {
+      throw new Error(
+        "Unit of Work session not initialized. Call startTransaction() first."
+      );
+    }
+    if (!this._availableSlotsRepo) {
+      this._availableSlotsRepo = new AvailableSlotRepository();
+    }
+    return this._availableSlotsRepo;
+  }
+
+  get overrideSlotsRepo(): IOverrideRepo {
+    if (!this._session) {
+      throw new Error(
+        "Unit of Work session not initialized. Call startTransaction() first."
+      );
+    }
+    if (!this._overrideSlotsRepo) {
+      this._overrideSlotsRepo = new OverrideSlotsRepository();
+    }
+    return this._overrideSlotsRepo;
   }
 
   async startTransaction<T>(
