@@ -1,14 +1,6 @@
 import { Appointment } from "@src/application/dtos/Appointments/BaseAppointmentDto";
 import { CreateCheckoutSessionInputDto } from "@src/application/dtos/client/CreateCheckoutSessionDto";
 import { IBookAppointmentsByWalletUsecase } from "../IBookAppointmentsByWalletUsecase";
-import { IUserRepository } from "@domain/IRepository/IUserRepo";
-import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
-import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
-import { IScheduleSettingsRepo } from "@domain/IRepository/IScheduleSettingsRepo";
-import { IAvailableSlots } from "@domain/IRepository/IAvailableSlots";
-import { IOverrideRepo } from "@domain/IRepository/IOverrideRepo";
-import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
-import { ILawyerRepository } from "@domain/IRepository/ILawyerRepo";
 import { STATUS_CODES } from "@infrastructure/constant/status.codes";
 import { Appointment as AppointmentEntity } from "@domain/entities/Appointment";
 import {
@@ -18,7 +10,6 @@ import {
 import { ERRORS } from "@infrastructure/constant/errors";
 import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
 import { Case } from "@domain/entities/Case";
-import { ICaseRepo } from "@domain/IRepository/ICaseRepo";
 import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
 
 export class BookAppointmentByWalletUsecase
@@ -37,12 +28,12 @@ export class BookAppointmentByWalletUsecase
       title,
     } = input;
     return this._uow.startTransaction(async (uow) => {
-      const user = await this._uow.userRepo.findByuser_id(lawyer_id);
+      const user = await uow.userRepo.findByuser_id(lawyer_id);
       if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
       if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
       const lawyerVerificaitionDetails =
-        await this._uow.lawyerVerificationRepo.findByUserId(lawyer_id);
-      const lawyerDetails = await this._uow.lawyerRepo.findUserId(lawyer_id);
+        await uow.lawyerVerificationRepo.findByUserId(lawyer_id);
+      const lawyerDetails = await uow.lawyerRepo.findUserId(lawyer_id);
       if (!lawyerDetails) throw new Error(ERRORS.USER_NOT_FOUND);
       if (!lawyerVerificaitionDetails) throw new Error(ERRORS.USER_NOT_FOUND);
       if (lawyerVerificaitionDetails.verificationStatus !== "verified")
@@ -53,35 +44,35 @@ export class BookAppointmentByWalletUsecase
         err.code = STATUS_CODES.BAD_REQUEST;
         throw err;
       }
-      const slotSettings =
-        await this._uow.scheduleSettingsRepo.fetchScheduleSettings(lawyer_id);
+      const slotSettings = await uow.scheduleSettingsRepo.fetchScheduleSettings(
+        lawyer_id
+      );
       if (!slotSettings) {
         const error: any = new Error("slot settings not found for the lawyer");
         error.code = 404;
         throw error;
       }
-      const myWallet = await this._uow.walletRepo.getWalletByUserId(client_id);
+      const myWallet = await uow.walletRepo.getWalletByUserId(client_id);
       if (!myWallet) throw new Error("wallet not found");
       if (myWallet.balance < lawyerDetails.consultationFee) {
         throw new Error("Insufficient balance");
       }
-      const availableSlots =
-        await this._uow.availableSlotsRepo.findAvailableSlots(lawyer_id);
+      const availableSlots = await uow.availableSlotsRepo.findAvailableSlots(
+        lawyer_id
+      );
       if (!availableSlots) {
         const error: any = new Error("No available slots found for the lawyer");
         error.code = 404;
         throw error;
       }
-      const override =
-        await this._uow.overrideSlotsRepo.fetcghOverrideSlotByDate(
-          lawyer_id,
-          date
-        );
-      const appointment =
-        await this._uow.appointmentRepo.findByDateandLawyer_id({
-          lawyer_id,
-          date,
-        });
+      const override = await uow.overrideSlotsRepo.fetcghOverrideSlotByDate(
+        lawyer_id,
+        date
+      );
+      const appointment = await uow.appointmentRepo.findByDateandLawyer_id({
+        lawyer_id,
+        date,
+      });
       const timeSlotExist = appointment?.some(
         (appointment) =>
           appointment.time === timeSlot &&
@@ -93,7 +84,7 @@ export class BookAppointmentByWalletUsecase
         throw error;
       }
       const existingApointmentonDate =
-        await this._uow.appointmentRepo.findByDateandClientId({
+        await uow.appointmentRepo.findByDateandClientId({
           client_id,
           date,
         });
@@ -149,7 +140,7 @@ export class BookAppointmentByWalletUsecase
             title: title,
             summary: reason,
           });
-          const caseCreated = await this._uow.caseRepo.create(newCase);
+          const caseCreated = await uow.caseRepo.create(newCase);
           const newappointment = AppointmentEntity.create({
             amount: lawyerDetails.consultationFee,
             caseId: caseCreated.id,
@@ -162,10 +153,10 @@ export class BookAppointmentByWalletUsecase
             time: timeSlot,
             type: "consultation",
           });
-          const appointmentCreated = await this._uow.appointmentRepo.create(
+          const appointmentCreated = await uow.appointmentRepo.create(
             newappointment
           );
-          await this._uow.walletRepo.updateBalance(
+          await uow.walletRepo.updateBalance(
             myWallet.user_id,
             Math.max(0, myWallet.balance - appointmentCreated.amount)
           );
@@ -245,7 +236,7 @@ export class BookAppointmentByWalletUsecase
         title: title,
         summary: reason,
       });
-      const caseCreated = await this._uow.caseRepo.create(newCase);
+      const caseCreated = await uow.caseRepo.create(newCase);
       const newappointment = AppointmentEntity.create({
         amount: lawyerDetails.consultationFee,
         caseId: caseCreated.id,
@@ -258,10 +249,10 @@ export class BookAppointmentByWalletUsecase
         time: timeSlot,
         type: "consultation",
       });
-      const appointmentCreated = await this._uow.appointmentRepo.create(
+      const appointmentCreated = await uow.appointmentRepo.create(
         newappointment
       );
-      await this._uow.walletRepo.updateBalance(
+      await uow.walletRepo.updateBalance(
         myWallet.user_id,
         Math.max(0, myWallet.balance - appointmentCreated.amount)
       );
