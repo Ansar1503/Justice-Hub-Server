@@ -20,7 +20,7 @@ export class FindAppointmentsByCaseUsecase
       ? existingAppointments.map((a) => ({
           amount: a.amount,
           caseId: a.caseId,
-          bookingId:a.booingId,
+          bookingId: a.booingId,
           client_id: a.client_id,
           createdAt: a.createdAt,
           id: a.id,

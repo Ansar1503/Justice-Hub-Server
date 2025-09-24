@@ -33,6 +33,7 @@ import { NextFunction } from "express-serve-static-core";
 import { SendMessageFileComposer } from "@infrastructure/services/composers/Client/SendMessageFileComposer";
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 import {
+  CasesRoutes,
   CommonParamsRoute,
   LawyerRoutes,
   PracticeAreaRoutes,
@@ -49,6 +50,9 @@ import { FindPracticeAreasBySpecIdsComposer } from "@infrastructure/services/com
 import { FetchLawyersProfessionalDetailscomposer } from "@infrastructure/services/composers/Lawyer/FetchLawyerProfessionalDetailsComposer";
 import { FetchLawyerVerificationDetailsComposer } from "@infrastructure/services/composers/Lawyer/FetchLawyerVerificationDetailsComposer";
 import { UpdateLawyersProfessionalDetailsComposer } from "@infrastructure/services/composers/Lawyer/UpdateLawyerProfessionalDetailsComposer";
+import { FindAllCasesByQueryComposer } from "@infrastructure/services/composers/Cases/FindAllCasesByQueryComposer";
+import { FindCaseDetailsComposer } from "@infrastructure/services/composers/Cases/FindCaseDetailsComposer";
+import { FindAppointmentByCaseComposer } from "@infrastructure/services/composers/Appointments/FindAppointmentByCaseComposer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -420,6 +424,38 @@ router.get(
       req,
       FindPracticeAreasBySpecIdsComposer()
     );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  CasesRoutes.base,
+  authenticateUser,
+  authenticateClient,
+  authenticateLawyer,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindAllCasesByQueryComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+router.get(
+  CasesRoutes.base + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindCaseDetailsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+  }
+);
+
+router.get(
+  CasesRoutes.base + CasesRoutes.appointments + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindAppointmentByCaseComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }

@@ -7,4 +7,5 @@ export interface CreateCheckoutSessionInputDto {
   reason: string;
   caseId: string;
   title: string;
+  paymentMethod: "wallet" | "stripe";
 }
