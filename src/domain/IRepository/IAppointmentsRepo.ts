@@ -6,6 +6,7 @@ import { Appointment } from "../entities/Appointment";
 import { Client } from "../entities/Client";
 
 export interface IAppointmentsRepository {
+  create(payload: Appointment): Promise<Appointment>;
   findByDateandLawyer_id(payload: {
     lawyer_id: string;
     date: Date;

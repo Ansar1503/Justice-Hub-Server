@@ -22,16 +22,7 @@ export class CreateCheckoutSessionController implements IController {
   async handle(httpRequest: IHttpRequest): Promise<IHttpResponse> {
     try {
       const user_id = httpRequest.user?.id;
-      const {
-        lawyer_id,
-        date,
-        timeSlot,
-        duration,
-        reason,
-        caseTypeId,
-        title,
-        paymanetMethod,
-      } =
+      const { lawyer_id, date, timeSlot, duration, reason, caseTypeId, title } =
         (httpRequest.body as {
           lawyer_id?: string;
           date?: string;
@@ -40,7 +31,6 @@ export class CreateCheckoutSessionController implements IController {
           reason?: string;
           caseTypeId: string;
           title: string;
-          paymanetMethod: "wallet" | "stripe";
         }) || {};
 
       if (
@@ -51,8 +41,7 @@ export class CreateCheckoutSessionController implements IController {
         !duration ||
         !reason ||
         !title ||
-        !caseTypeId ||
-        !paymanetMethod
+        !caseTypeId
       ) {
         return this._errors.error_400("Invalid Credentials");
       }
@@ -70,7 +59,6 @@ export class CreateCheckoutSessionController implements IController {
         timeSlot,
         caseId: caseTypeId,
         title: title,
-        paymentMethod: paymanetMethod,
       });
 
       return this._success.success_200(response);

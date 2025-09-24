@@ -69,6 +69,7 @@ import { FindAllCasesByQueryComposer } from "@infrastructure/services/composers/
 import { FindCaseTypesByPracticeAreasComposer } from "@infrastructure/services/composers/Casetypes/FetchCaseTypesByPracitceAreaIds";
 import { FindCaseDetailsComposer } from "@infrastructure/services/composers/Cases/FindCaseDetailsComposer";
 import { FindAppointmentByCaseComposer } from "@infrastructure/services/composers/Appointments/FindAppointmentByCaseComposer";
+import { BookAppointmentByWalletComposer } from "@infrastructure/services/composers/Client/Appointment/BookAppointmentByWalletComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -597,6 +598,20 @@ router.get(
   authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FindAppointmentByCaseComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.post(
+  ClientRoutes.lawyers.walletbook,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      BookAppointmentByWalletComposer()
+    );
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }

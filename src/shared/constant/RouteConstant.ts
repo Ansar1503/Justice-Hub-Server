@@ -53,6 +53,7 @@ export const ClientRoutes = {
 
   lawyers: {
     base: "/lawyers",
+    walletbook:"/lawyer/slots/book-wallet",
     byId: "/lawyers/:id",
     review: "/lawyers/review",
     reviewsByLawyer: "/lawyers/reviews/:id",
