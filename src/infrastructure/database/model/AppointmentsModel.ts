@@ -5,6 +5,7 @@ export interface IAppointmentModel extends Document {
   lawyer_id: string;
   client_id: string;
   caseId: string;
+  bookingId: string;
   date: Date;
   time: string;
   duration: number;
@@ -23,6 +24,7 @@ const appointmentSchema = new Schema<IAppointmentModel>(
     lawyer_id: { type: String, required: true },
     client_id: { type: String, required: true },
     caseId: { type: String, required: true },
+    bookingId: { type: String, required: true },
     date: { type: Date, required: true },
     time: { type: String, required: true },
     duration: { type: Number, required: true },

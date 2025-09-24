@@ -2,8 +2,9 @@ import { UploadSessionDocumentOutPutDto } from "@src/application/dtos/client/Upl
 import { IRemoveSessionDocumentsUseCase } from "../IRemoveSessionDocumentsUseCase";
 import { ISessionDocumentRepo } from "@domain/IRepository/ISessionDocumentsRepo";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
-import { ICloudinaryService } from "@src/application/services/cloudinary.service";
+
 import e from "express";
+import { ICloudinaryService } from "@src/application/services/Interfaces/ICloudinaryService";
 
 export class RemoveSessionDocumentsUseCase
   implements IRemoveSessionDocumentsUseCase
@@ -37,6 +38,7 @@ export class RemoveSessionDocumentsUseCase
       return null;
     }
     return {
+      caseId: deleted.caseId,
       client_id: deleted.clientId,
       createdAt: deleted.createdAt,
       document: deleted.documents,

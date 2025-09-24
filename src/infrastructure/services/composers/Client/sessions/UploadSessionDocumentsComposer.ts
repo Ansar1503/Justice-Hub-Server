@@ -3,11 +3,13 @@ import { UploadSessionDocumentsController } from "@interfaces/controller/Client/
 import { UploadSessionDocument } from "@src/application/usecases/Client/implementations/UploadSessionDocumentUseCase";
 import { SessionDocumentsRepository } from "@infrastructure/database/repo/SessionsDocumentRepo";
 import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
+import { AppointmentsRepository } from "@infrastructure/database/repo/AppointmentsRepo";
 
 export function UploadSessionDocumentsComposer(): IController {
   const usecase = new UploadSessionDocument(
     new SessionDocumentsRepository(),
-    new SessionsRepository()
+    new SessionsRepository(),
+    new AppointmentsRepository()
   );
   return new UploadSessionDocumentsController(usecase);
 }

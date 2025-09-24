@@ -512,12 +512,7 @@ export class AppointmentsRepository
           caseId: 1,
           lawyer_id: 1,
           client_id: 1,
-          date: 1,
-          time: 1,
-          reason: 1,
-          duration: 1,
-          amount: 1,
-          type: 1,
+          bookingId: 1,
           payment_status: 1,
           status: 1,
           createdAt: 1,
@@ -555,5 +550,15 @@ export class AppointmentsRepository
     return this.mapper.toDomainArray && data
       ? this.mapper.toDomainArray(data)
       : [];
+  }
+  async findByCaseId(id: string): Promise<Appointment[] | []> {
+    const data = await AppointmentModel.find({ caseId: id });
+    return this.mapper.toDomainArray && data
+      ? this.mapper.toDomainArray(data)
+      : [];
+  }
+  async findByBookingId(id: string): Promise<Appointment | null> {
+    const data = await this.model.findOne({ bookingId: id });
+    return data ? this.mapper.toDomain(data) : null;
   }
 }

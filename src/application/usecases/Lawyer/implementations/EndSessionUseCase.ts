@@ -4,17 +4,23 @@ import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { timeStringToDate } from "@shared/utils/helpers/DateAndTimeHelper";
 import { ICallLogs } from "@domain/IRepository/ICallLogs";
+import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 
 export class EndSessionUseCase implements IEndSessionUseCase {
   constructor(
-    private sessionsRepo: ISessionsRepo,
-    private callLogsRepo: ICallLogs
+    private _sessionsRepo: ISessionsRepo,
+    private _callLogsRepo: ICallLogs,
+    private _appointmentRepo: IAppointmentsRepository
   ) {}
   async execute(input: { sessionId: string }): Promise<CancelSessionOutputDto> {
-    const session = await this.sessionsRepo.findById({
+    const session = await this._sessionsRepo.findById({
       session_id: input.sessionId,
     });
     if (!session) throw new ValidationError("Session not found");
+    const appointmentDetails = await this._appointmentRepo.findByBookingId(
+      session.bookingId
+    );
+    if (!appointmentDetails) throw new Error("appointment not found");
     switch (session.status) {
       case "cancelled":
         throw new ValidationError("Session has been cancelled");
@@ -26,8 +32,8 @@ export class EndSessionUseCase implements IEndSessionUseCase {
         throw new ValidationError("session has not started yet");
     }
     const sessionStartAt = timeStringToDate(
-      session.scheduled_date,
-      session.scheduled_time
+      appointmentDetails?.date,
+      appointmentDetails.time
     );
     const currentDate = new Date();
     if (currentDate < sessionStartAt) {
@@ -39,7 +45,7 @@ export class EndSessionUseCase implements IEndSessionUseCase {
         )
       : 0;
 
-    const updatedSession = await this.sessionsRepo.update({
+    const updatedSession = await this._sessionsRepo.update({
       session_id: input.sessionId,
       lawyer_left_at: currentDate,
       room_id: "",
@@ -49,7 +55,7 @@ export class EndSessionUseCase implements IEndSessionUseCase {
       end_reason: "session completed",
     });
     if (!updatedSession) throw new Error("End Session Failed");
-    await this.callLogsRepo.updateByRoomId({
+    await this._callLogsRepo.updateByRoomId({
       roomId: session?.room_id,
       lawyer_left_at: currentDate,
       end_time: currentDate,
@@ -58,23 +64,19 @@ export class EndSessionUseCase implements IEndSessionUseCase {
       end_reason: "session completed",
     });
     return {
-      amount: updatedSession.amount,
+      bookingId: updatedSession.bookingId,
+      caseId: updatedSession.caseId,
+      end_reason: updatedSession.end_reason,
       appointment_id: updatedSession.appointment_id,
       client_id: updatedSession.client_id,
       createdAt: updatedSession.createdAt,
-      duration: updatedSession.duration,
       id: updatedSession.id,
       lawyer_id: updatedSession.lawyer_id,
-      reason: updatedSession.reason,
-      scheduled_date: updatedSession.scheduled_date,
-      scheduled_time: updatedSession.scheduled_time,
       status: updatedSession.status,
-      type: updatedSession.type,
       updatedAt: updatedSession.updatedAt,
       callDuration: updatedSession.callDuration,
       client_joined_at: updatedSession.client_joined_at,
       client_left_at: updatedSession.client_left_at,
-      end_reason: updatedSession.reason,
       end_time: updatedSession.end_time,
       follow_up_session_id: updatedSession.follow_up_session_id,
       follow_up_suggested: updatedSession.follow_up_suggested,

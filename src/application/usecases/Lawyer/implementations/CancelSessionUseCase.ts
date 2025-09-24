@@ -9,48 +9,52 @@ import {
 } from "@interfaces/middelwares/Error/CustomError";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { timeStringToDate } from "@shared/utils/helpers/DateAndTimeHelper";
+import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 
 export class CancelSessionUseCase implements ICancelSessionUseCase {
-  constructor(private sessionsRepo: ISessionsRepo) {}
+  constructor(
+    private _sessionsRepo: ISessionsRepo,
+    private _appointmentRepo: IAppointmentsRepository
+  ) {}
   async execute(input: CancelSessionInputDto): Promise<CancelSessionOutputDto> {
-    const sessionExist = await this.sessionsRepo.findById({
+    const sessionExist = await this._sessionsRepo.findById({
       session_id: input.session_id,
     });
     if (!sessionExist) {
       throw new NotFoundError("Session not found");
     }
+    const appointmentDetails = await this._appointmentRepo.findByBookingId(
+      sessionExist.bookingId
+    );
+    if (!appointmentDetails) throw new Error("Appointment does not exists");
     const sessionStartAt = timeStringToDate(
-      sessionExist.scheduled_date,
-      sessionExist.scheduled_time
+      appointmentDetails.date,
+      appointmentDetails.time
     );
     const currentDate = new Date();
     if (currentDate >= sessionStartAt) {
       throw new ValidationError("Session has already started!");
     }
     // console.log("sessionExist", sessionExist);
-    const updated = await this.sessionsRepo.update({
+    const updated = await this._sessionsRepo.update({
       session_id: input.session_id,
       status: "cancelled",
     });
     if (!updated) throw new Error("cancelation failed");
     return {
-      amount: updated.amount,
+      bookingId: updated.bookingId,
+      caseId: updated.caseId,
+      end_reason: updated.end_reason,
       appointment_id: updated.appointment_id,
       client_id: updated.client_id,
       createdAt: updated.createdAt,
-      duration: updated.duration,
       id: updated.id,
       lawyer_id: updated.lawyer_id,
-      reason: updated.reason,
-      scheduled_date: updated.scheduled_date,
-      scheduled_time: updated.scheduled_time,
       status: updated.status,
-      type: updated.type,
       updatedAt: updated.updatedAt,
       callDuration: updated.callDuration,
       client_joined_at: updated.client_joined_at,
       client_left_at: updated.client_left_at,
-      end_reason: updated.reason,
       end_time: updated.end_time,
       follow_up_session_id: updated.follow_up_session_id,
       follow_up_suggested: updated.follow_up_suggested,

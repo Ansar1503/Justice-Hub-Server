@@ -15,6 +15,7 @@ export class FetchExistingSessionDocumentUseCase
       client_id: documents.clientId,
       createdAt: documents.createdAt,
       document: documents.documents,
+      caseId: documents.caseId,
       id: documents.id,
       session_id: documents.sessionId,
       updatedAt: documents.updatedAt,

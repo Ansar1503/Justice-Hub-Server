@@ -47,9 +47,9 @@ export class GetLawyerDetailsUseCase implements IGetLawyerDetailUseCase {
       dob: client?.dob,
       experience: lawyer.experience,
       gender: client?.gender as "male" | "female" | "others",
-      practice_areas: lawyer.practiceAreas,
+      practice_areas: lawyer?.practiceAreas,
       profile_image: client?.profile_image,
-      specialisation: lawyer.specializations,
+      specialisation: lawyer?.specializations,
       verification_status: lawyerVerification.verificationStatus,
       description: lawyer.description || "",
       certificate_of_practice_number:

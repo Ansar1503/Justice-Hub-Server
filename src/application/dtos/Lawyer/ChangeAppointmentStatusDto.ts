@@ -16,6 +16,8 @@ export interface ChangeAppointmentStatusOutputDto {
   id: string;
   lawyer_id: string;
   client_id: string;
+  caseId: string;
+  bookingId: string;
   date: Date;
   time: string;
   duration: number;

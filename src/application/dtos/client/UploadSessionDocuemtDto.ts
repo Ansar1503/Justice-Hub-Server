@@ -14,8 +14,8 @@ export interface UploadSessionDocumentOutPutDto {
   id: string;
   session_id: string;
   client_id: string;
+  caseId: string;
   document: DocumentItem[];
   createdAt: Date;
   updatedAt: Date;
 }
-

@@ -13,12 +13,8 @@ export interface PersistedSessionProps {
   appointment_id: string;
   lawyer_id: string;
   client_id: string;
-  scheduled_date: Date;
-  scheduled_time: string;
-  duration: number;
-  reason: string;
-  amount: number;
-  type: SessionType;
+  caseId: string;
+  bookingId: string;
   status: SessionStatus;
   notes?: string;
   summary?: string;
@@ -41,12 +37,8 @@ export interface CreateSessionProps {
   appointment_id: string;
   lawyer_id: string;
   client_id: string;
-  scheduled_date: Date;
-  scheduled_time: string;
-  duration: number;
-  reason: string;
-  amount: number;
-  type: SessionType;
+  caseId: string;
+  bookingId: string;
   status: SessionStatus;
 }
 
@@ -55,14 +47,9 @@ export class Session {
   private _appointment_id: string;
   private _lawyer_id: string;
   private _client_id: string;
-  private _scheduled_date: Date;
-  private _scheduled_time: string;
-  private _duration: number;
-  private _reason: string;
-  private _amount: number;
-  private _type: SessionType;
+  private _caseId: string;
+  private _bookingId: string;
   private _status: SessionStatus;
-
   private _notes?: string;
   private _summary?: string;
   private _follow_up_suggested?: boolean;
@@ -84,13 +71,9 @@ export class Session {
     this._appointment_id = props.appointment_id;
     this._lawyer_id = props.lawyer_id;
     this._client_id = props.client_id;
-    this._scheduled_date = props.scheduled_date;
-    this._scheduled_time = props.scheduled_time;
-    this._duration = props.duration;
-    this._reason = props.reason;
-    this._amount = props.amount;
-    this._type = props.type;
+    this._caseId = props.caseId;
     this._status = props.status;
+    this._bookingId = props.bookingId;
     this._notes = props.notes;
     this._summary = props.summary;
     this._follow_up_suggested = props.follow_up_suggested;
@@ -113,7 +96,7 @@ export class Session {
     return new Session({
       id: uuidv4(),
       ...props,
-      createdAt: now, 
+      createdAt: now,
       updatedAt: now,
     });
   }
@@ -126,7 +109,15 @@ export class Session {
   get id() {
     return this._id;
   }
+  
+  get caseId() {
+    return this._caseId;
+  }
 
+  get bookingId() {
+    return this._bookingId;
+  }
+  
   get appointment_id() {
     return this._appointment_id;
   }
@@ -137,30 +128,6 @@ export class Session {
 
   get client_id() {
     return this._client_id;
-  }
-
-  get scheduled_date() {
-    return this._scheduled_date;
-  }
-
-  get scheduled_time() {
-    return this._scheduled_time;
-  }
-
-  get duration() {
-    return this._duration;
-  }
-
-  get reason() {
-    return this._reason;
-  }
-
-  get amount() {
-    return this._amount;
-  }
-
-  get type() {
-    return this._type;
   }
 
   get status() {
@@ -247,7 +214,7 @@ export class Session {
     if (this._start_time && this._end_time) {
       this._callDuration = Math.floor(
         (this._end_time.getTime() - this._start_time.getTime()) / 1000
-      ); // in seconds
+      );
       this.touch();
     }
   }

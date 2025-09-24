@@ -95,7 +95,23 @@ export class RejectAppointmentUseCase implements IRejectAppointmentUseCase {
       const response = await uow.appointmentRepo.updateWithId(input);
       if (!response) throw new Error("appointment cancellation failed");
 
-      return response;
+      return {
+        amount: response.amount,
+        bookingId: response.booingId,
+        caseId: response.caseId,
+        client_id: response.client_id,
+        createdAt: response.createdAt,
+        date: response.date,
+        duration: response.duration,
+        id: response.id,
+        lawyer_id: response.lawyer_id,
+        payment_status: response.payment_status,
+        reason: response.reason,
+        status: response.status,
+        time: response.time,
+        type: response.type,
+        updatedAt: response.updatedAt,
+      };
     });
   }
 }

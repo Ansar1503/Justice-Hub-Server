@@ -56,16 +56,12 @@ export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
       throw error;
     }
     const sessionPayload = Session.create({
-      amount: appointment.amount,
       appointment_id: input.id,
       client_id: appointment.client_id,
-      duration: appointment.duration,
       lawyer_id: appointment.lawyer_id,
-      reason: appointment.reason,
-      scheduled_date: appointment.date,
-      scheduled_time: appointment.time,
       status: "upcoming",
-      type: appointment.type,
+      bookingId: appointment.booingId,
+      caseId: appointment.caseId,
     });
     const newsession = await this.sessionRepo.create(sessionPayload);
 
@@ -88,6 +84,8 @@ export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
     });
     await this.chatRepo.create(chatSessionpayload);
     return {
+      bookingId: response.booingId,
+      caseId: response.caseId,
       amount: response.amount,
       client_id: response.client_id,
       createdAt: response.createdAt,

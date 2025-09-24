@@ -10,18 +10,23 @@ import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { createToken } from "@src/application/services/ZegoCloud.service";
 import { CallLogs } from "@domain/entities/CallLogs";
 import { ICallLogs } from "@domain/IRepository/ICallLogs";
+import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 
 export class StartSessionUseCase implements IStartSessionUseCase {
   constructor(
-    private sessionsRepo: ISessionsRepo,
-    private callLogsRepo: ICallLogs
+    private _sessionsRepo: ISessionsRepo,
+    private _callLogsRepo: ICallLogs,
+    private _appointmentDetails: IAppointmentsRepository
   ) {}
   async execute(input: StartSessionInputDto): Promise<StartSessionOutputDto> {
-    const existingSession = await this.sessionsRepo.findById({
+    const existingSession = await this._sessionsRepo.findById({
       session_id: input.sessionId,
     });
     if (!existingSession) throw new ValidationError("session not found");
-
+    const appointmentDetails = await this._appointmentDetails.findByBookingId(
+      existingSession.bookingId
+    );
+    if (!appointmentDetails) throw new Error("Appointment not found");
     switch (existingSession.status) {
       case "cancelled":
         throw new ValidationError("Session is cancelled");
@@ -33,15 +38,15 @@ export class StartSessionUseCase implements IStartSessionUseCase {
         break;
     }
     const slotDateTime = timeStringToDate(
-      existingSession.scheduled_date,
-      existingSession.scheduled_time
+      appointmentDetails.date,
+      appointmentDetails.time
     );
     const newDate = new Date();
     if (newDate < slotDateTime) {
       throw new ValidationError("Scheduled time is not reached");
     }
     slotDateTime.setMinutes(
-      slotDateTime.getMinutes() + existingSession.duration + 5
+      slotDateTime.getMinutes() + appointmentDetails.duration + 5
     );
     if (newDate > slotDateTime)
       throw new ValidationError("session time is over");
@@ -50,7 +55,7 @@ export class StartSessionUseCase implements IStartSessionUseCase {
     const { appId, token } = await createToken({
       userId: existingSession.lawyer_id,
       roomId: roomId,
-      expiry: existingSession?.duration * 60,
+      expiry: appointmentDetails?.duration * 60,
     });
     const newcallLog = CallLogs.create({
       status: "ongoing",
@@ -60,11 +65,11 @@ export class StartSessionUseCase implements IStartSessionUseCase {
       roomId: roomId,
     });
     try {
-      await this.callLogsRepo.create(newcallLog);
+      await this._callLogsRepo.create(newcallLog);
     } catch (error) {
       console.log("clalllogs erro", error);
     }
-    const session = await this.sessionsRepo.update({
+    const session = await this._sessionsRepo.update({
       start_time: newDate,
       room_id: roomId,
       lawyer_joined_at: newDate,
@@ -73,18 +78,14 @@ export class StartSessionUseCase implements IStartSessionUseCase {
     });
     if (!session) throw new Error("session start failed");
     return {
-      amount: session.amount,
+      bookingId: session.bookingId,
+      caseId: session.caseId,
       appointment_id: session.appointment_id,
       client_id: session.client_id,
       createdAt: session.createdAt,
-      duration: session.duration,
       id: session.id,
       lawyer_id: session.lawyer_id,
-      reason: session.reason,
-      scheduled_date: session.scheduled_date,
-      scheduled_time: session.scheduled_time,
       status: session.status,
-      type: session.type,
       updatedAt: session.updatedAt,
       callDuration: session.callDuration,
       client_joined_at: session.client_joined_at,

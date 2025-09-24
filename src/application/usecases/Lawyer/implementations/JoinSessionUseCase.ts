@@ -4,14 +4,22 @@ import { createToken } from "@src/application/services/ZegoCloud.service";
 import { timeStringToDate } from "@shared/utils/helpers/DateAndTimeHelper";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
+import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 
 export class JoinSessionUseCase implements IJoinSessionUseCase {
-  constructor(private sessionsRepo: ISessionsRepo) {}
+  constructor(
+    private _sessionsRepo: ISessionsRepo,
+    private _appointmentRepo: IAppointmentsRepository
+  ) {}
   async execute(input: { sessionId: string }): Promise<StartSessionOutputDto> {
-    const existingSession = await this.sessionsRepo.findById({
+    const existingSession = await this._sessionsRepo.findById({
       session_id: input.sessionId,
     });
     if (!existingSession) throw new ValidationError("session not found");
+    const appointmentDetails = await this._appointmentRepo.findByBookingId(
+      existingSession.bookingId
+    );
+    if (!appointmentDetails) throw new Error("Appointment not found");
     switch (existingSession.status) {
       case "cancelled":
         throw new ValidationError("Session is cancelled");
@@ -23,15 +31,15 @@ export class JoinSessionUseCase implements IJoinSessionUseCase {
         break;
     }
     const slotDateTime = timeStringToDate(
-      existingSession.scheduled_date,
-      existingSession.scheduled_time
+      appointmentDetails.date,
+      appointmentDetails.time
     );
     const newDate = new Date();
     if (newDate < slotDateTime) {
       throw new ValidationError("Scheduled time is not reached");
     }
     slotDateTime.setMinutes(
-      slotDateTime.getMinutes() + existingSession.duration + 5
+      slotDateTime.getMinutes() + appointmentDetails.duration + 5
     );
     if (newDate > slotDateTime)
       throw new ValidationError("session time is over");
@@ -39,22 +47,18 @@ export class JoinSessionUseCase implements IJoinSessionUseCase {
     const { appId, token } = await createToken({
       userId: existingSession.client_id,
       roomId: existingSession.room_id,
-      expiry: existingSession.duration * 60,
+      expiry: appointmentDetails.duration * 60,
     });
 
     return {
-      amount: existingSession.amount,
+      bookingId: existingSession.bookingId,
+      caseId: existingSession.caseId,
       appointment_id: existingSession.appointment_id,
       client_id: existingSession.client_id,
       createdAt: existingSession.createdAt,
-      duration: existingSession.duration,
       id: existingSession.id,
       lawyer_id: existingSession.lawyer_id,
-      reason: existingSession.reason,
-      scheduled_date: existingSession.scheduled_date,
-      scheduled_time: existingSession.scheduled_time,
       status: existingSession.status,
-      type: existingSession.type,
       updatedAt: existingSession.updatedAt,
       callDuration: existingSession.callDuration,
       client_joined_at: existingSession.client_joined_at,

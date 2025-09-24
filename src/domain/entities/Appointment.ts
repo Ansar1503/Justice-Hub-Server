@@ -11,6 +11,7 @@ type AppointmentStatus =
 
 interface PersistedAppointmentProps {
   id: string;
+  bookingId: string;
   lawyer_id: string;
   client_id: string;
   caseId: string;
@@ -43,6 +44,7 @@ export class Appointment {
   private _id: string;
   private _lawyer_id: string;
   private _client_id: string;
+  private _bookingId: string;
   private _caseId: string;
   private _date: Date;
   private _time: string;
@@ -57,6 +59,7 @@ export class Appointment {
 
   private constructor(props: PersistedAppointmentProps) {
     this._id = props.id;
+    this._bookingId = props.bookingId;
     this._lawyer_id = props.lawyer_id;
     this._client_id = props.client_id;
     this._caseId = props.caseId;
@@ -84,6 +87,7 @@ export class Appointment {
       duration: props.duration,
       reason: props.reason,
       amount: props.amount,
+      bookingId: `BK-${uuidv4().split("-")[0].toUpperCase()}`,
       payment_status: props.payment_status,
       type: props.type,
       status: "pending",
@@ -98,6 +102,10 @@ export class Appointment {
 
   get id(): string {
     return this._id;
+  }
+
+  get booingId(): string {
+    return this._bookingId;
   }
 
   get caseId() {

@@ -64,8 +64,10 @@ export interface IAppointmentsRepository {
     status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
   }): Promise<Appointment | null>;
   findById(id: string): Promise<Appointment | null>;
+  findByBookingId(id: string): Promise<Appointment | null>;
   findAllAggregate(
     payload: FetchAppointmentsInputDto
   ): Promise<FetchAppointmentsOutputDto>;
   findByClientID(client: string): Promise<Appointment[] | []>;
+  findByCaseId(id: string): Promise<Appointment[] | []>;
 }

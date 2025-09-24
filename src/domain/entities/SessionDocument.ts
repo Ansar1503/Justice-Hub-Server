@@ -10,6 +10,7 @@ export interface DocumentItem {
 export interface PersistedSessionDocumentProps {
   id: string;
   session_id: string;
+  caseId: string;
   client_id: string;
   document: DocumentItem[];
   createdAt: Date;
@@ -19,6 +20,7 @@ export interface PersistedSessionDocumentProps {
 export interface CreateSessionDocumentProps {
   session_id: string;
   client_id: string;
+  caseId: string;
   document: DocumentItem[];
 }
 
@@ -26,6 +28,7 @@ export class SessionDocument {
   private _id: string;
   private _session_id: string;
   private _client_id: string;
+  private _caseId: string;
   private _document: DocumentItem[];
   private _createdAt: Date;
   private _updatedAt: Date;
@@ -34,6 +37,7 @@ export class SessionDocument {
     this._id = props.id;
     this._session_id = props.session_id;
     this._client_id = props.client_id;
+    this._caseId = props.caseId;
     this._document = props.document;
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
@@ -44,6 +48,7 @@ export class SessionDocument {
     return new SessionDocument({
       id: uuidv4(),
       session_id: props.session_id,
+      caseId: props.caseId,
       client_id: props.client_id,
       document: props.document,
       createdAt: now,
@@ -51,7 +56,9 @@ export class SessionDocument {
     });
   }
 
-  static fromPersistence(props: PersistedSessionDocumentProps): SessionDocument {
+  static fromPersistence(
+    props: PersistedSessionDocumentProps
+  ): SessionDocument {
     return new SessionDocument(props);
   }
 
@@ -62,6 +69,10 @@ export class SessionDocument {
 
   get sessionId(): string {
     return this._session_id;
+  }
+
+  get caseId() {
+    return this._caseId;
   }
 
   get clientId(): string {

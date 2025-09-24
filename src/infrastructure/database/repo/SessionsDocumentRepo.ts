@@ -15,7 +15,6 @@ export class SessionDocumentsRepository implements ISessionDocumentRepo {
   ) {}
   async create(payload: SessionDocument): Promise<SessionDocument> {
     const newpayload = this.mapper.toPersistence(payload);
-    console.log("new payload : ", newpayload);
     const newSession = new SessionDocumentsModel(newpayload);
     await newSession.save();
     return this.mapper.toDomain(newSession);

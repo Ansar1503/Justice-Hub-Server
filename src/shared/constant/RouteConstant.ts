@@ -144,4 +144,5 @@ export const CommonParamsRoute = {
 
 export const CasesRoutes = {
   base: "/cases",
+  appointments: "/appointments",
 };

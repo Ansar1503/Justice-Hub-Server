@@ -12,6 +12,7 @@ export class FetchSessionsDocumentsUseCase
     });
     if (!result) throw new Error("session docuemt not found");
     return {
+      caseId: result.caseId,
       client_id: result.clientId,
       createdAt: result.createdAt,
       document: result.documents,

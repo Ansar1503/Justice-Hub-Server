@@ -5,12 +5,8 @@ export interface ISessionModel extends Document {
   appointment_id: string;
   lawyer_id: string;
   client_id: string;
-  scheduled_date: Date;
-  scheduled_time: string;
-  duration: number;
-  reason: string;
-  amount: number;
-  type: "consultation" | "follow-up";
+  caseId: string;
+  bookingId: string;
   status: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
   notes?: string;
   summary?: string;
@@ -44,33 +40,8 @@ const sessionSchema = new Schema<ISessionModel>(
       type: String,
       required: true,
     },
-    scheduled_date: {
-      type: Date,
-      required: true,
-    },
-    scheduled_time: {
-      type: String,
-      required: true,
-    },
-    duration: {
-      type: Number,
-      required: true,
-      min: 15,
-    },
-    reason: {
-      type: String,
-      required: true,
-    },
-    amount: {
-      type: Number,
-      required: true,
-      min: 0,
-    },
-    type: {
-      type: String,
-      required: true,
-      enum: ["consultation", "follow-up"],
-    },
+    caseId: { type: String, required: true },
+    bookingId: { type: String, required: true },
     status: {
       type: String,
       required: true,

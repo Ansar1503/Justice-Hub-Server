@@ -1,4 +1,3 @@
-type SessionType = "consultation" | "follow-up";
 type SessionStatus =
   | "upcoming"
   | "ongoing"
@@ -15,12 +14,8 @@ export interface StartSessionOutputDto {
   appointment_id: string;
   lawyer_id: string;
   client_id: string;
-  scheduled_date: Date;
-  scheduled_time: string;
-  duration: number;
-  reason: string;
-  amount: number;
-  type: SessionType;
+  caseId: string;
+  bookingId: string;
   status: SessionStatus;
   notes?: string;
   summary?: string;
@@ -37,5 +32,5 @@ export interface StartSessionOutputDto {
   callDuration?: number;
   createdAt: Date;
   updatedAt: Date;
-  zc: { appId: number; token: string }; 
+  zc: { appId: number; token: string };
 }

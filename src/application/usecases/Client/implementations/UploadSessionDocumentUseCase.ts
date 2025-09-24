@@ -8,19 +8,21 @@ import { timeStringToDate } from "@shared/utils/helpers/DateAndTimeHelper";
 import { ISessionDocumentRepo } from "@domain/IRepository/ISessionDocumentsRepo";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { SessionDocument } from "@domain/entities/SessionDocument";
+import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 
 export class UploadSessionDocument implements IUploadSessionDocumentUseCase {
   constructor(
-    private sessionDocumentRepo: ISessionDocumentRepo,
-    private sessionRepo: ISessionsRepo
+    private _sessionDocumentRepo: ISessionDocumentRepo,
+    private _sessionRepo: ISessionsRepo,
+    private _appointmentRepo: IAppointmentsRepository
   ) {}
   async execute(
     input: UploadSessionDocumentInputDto
   ): Promise<UploadSessionDocumentOutPutDto> {
-    const session = await this.sessionRepo.findById({
+    const session = await this._sessionRepo.findById({
       session_id: input.sessionId,
     });
-    const sessionDocument = await this.sessionDocumentRepo.findBySessionId({
+    const sessionDocument = await this._sessionDocumentRepo.findBySessionId({
       session_id: input.sessionId,
     });
     if (sessionDocument) {
@@ -34,6 +36,10 @@ export class UploadSessionDocument implements IUploadSessionDocumentUseCase {
     if (!session) {
       throw new ValidationError("Session not found");
     }
+    const appointmentDetails = await this._appointmentRepo.findByBookingId(
+      session.bookingId
+    );
+    if (!appointmentDetails) throw new Error("Appointment not found");
     switch (session.status) {
       case "cancelled":
         throw new ValidationError("Session is cancelled");
@@ -47,8 +53,8 @@ export class UploadSessionDocument implements IUploadSessionDocumentUseCase {
         break;
     }
     const slotDateTime = timeStringToDate(
-      session.scheduled_date,
-      session.scheduled_time
+      appointmentDetails.date,
+      appointmentDetails.time
     );
     if (slotDateTime <= new Date()) {
       throw new ValidationError("Session is already begun");
@@ -57,9 +63,11 @@ export class UploadSessionDocument implements IUploadSessionDocumentUseCase {
       client_id: session.client_id,
       document: input.document,
       session_id: session.id,
+      caseId: session.caseId,
     });
-    const newDocument = await this.sessionDocumentRepo.create(sessionPayload);
+    const newDocument = await this._sessionDocumentRepo.create(sessionPayload);
     return {
+      caseId: newDocument.caseId,
       client_id: newDocument.clientId,
       createdAt: newDocument.createdAt,
       document: newDocument.documents,

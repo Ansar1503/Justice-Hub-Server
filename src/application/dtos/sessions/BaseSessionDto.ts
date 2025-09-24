@@ -3,12 +3,8 @@ export interface BaseSessionDto {
   appointment_id: string;
   lawyer_id: string;
   client_id: string;
-  scheduled_date: Date;
-  scheduled_time: string;
-  duration: number;
-  reason: string;
-  amount: number;
-  type: "consultation" | "follow-up";
+  caseId: string;
+  bookingId: string;
   status: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
 
   notes?: string;

@@ -1,6 +1,7 @@
-import { Address } from "../../domain/entities/Address";
 import { Client } from "../../domain/entities/Client";
 import { User } from "../../domain/entities/User";
+import { PracticeAreaDto } from "./PracticeAreas/PracticeAreasDto";
+import { SpecializationDto } from "./Specializations/SpecializationDto";
 
 export class LawyerResponseDto implements Partial<Client>, Partial<User> {
   constructor(
@@ -26,9 +27,9 @@ export class LawyerResponseDto implements Partial<Client>, Partial<User> {
       | "rejected"
       | "pending"
       | "requested",
-    public practice_areas?: string[],
+    public practice_areas?: PracticeAreaDto[] | [],
     public experience?: number,
-    public specialisation?: string[],
+    public specialisation?: SpecializationDto[] | [],
     public consultation_fee?: number,
     public description?: string,
     public certificate_of_practice_number?: string,
