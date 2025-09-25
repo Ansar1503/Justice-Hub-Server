@@ -9,9 +9,9 @@ import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 
 export class GetChatsController implements IController {
   constructor(
-    private readonly chatUseCase: IChatusecase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+    private readonly _chatUseCase: IChatusecase,
+    private _httpErrors: IHttpErrors = new HttpErrors(),
+    private _httpSuccess: IHttpSuccess = new HttpSuccess()
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
     const { cursor, search } = httpRequest.query as {
@@ -23,15 +23,19 @@ export class GetChatsController implements IController {
     const role = user?.role === "lawyer" ? "lawyer" : "client";
 
     try {
-      const result = await this.chatUseCase.fetchChats({
+      const result = await this._chatUseCase.fetchChats({
         page: Number(cursor),
         search: String(search),
         role: role,
         user_id: String(user_id),
       });
-      return this.httpSuccess.success_200(result);
+      return this._httpSuccess.success_200(result);
     } catch (error) {
-      return this.httpErrors.error_500();
+      console.log("error", error);
+      if (error instanceof Error) {
+        return this._httpErrors.error_400(error.message);
+      }
+      return this._httpErrors.error_500();
     }
   }
 }

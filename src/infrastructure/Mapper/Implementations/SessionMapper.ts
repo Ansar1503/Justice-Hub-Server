@@ -36,6 +36,7 @@ export class SessionMapper implements IMapper<Session, ISessionModel> {
     return {
       _id: entity.id,
       appointment_id: entity.appointment_id,
+      bookingId: entity.bookingId,
       client_id: entity.client_id,
       lawyer_id: entity.lawyer_id,
       caseId: entity.caseId,

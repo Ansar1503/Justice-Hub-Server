@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
 
-type SessionType = "consultation" | "follow-up";
 type SessionStatus =
   | "upcoming"
   | "ongoing"
@@ -96,6 +95,7 @@ export class Session {
     return new Session({
       id: uuidv4(),
       ...props,
+      bookingId: props.bookingId,
       createdAt: now,
       updatedAt: now,
     });
@@ -109,7 +109,7 @@ export class Session {
   get id() {
     return this._id;
   }
-  
+
   get caseId() {
     return this._caseId;
   }
@@ -117,7 +117,7 @@ export class Session {
   get bookingId() {
     return this._bookingId;
   }
-  
+
   get appointment_id() {
     return this._appointment_id;
   }

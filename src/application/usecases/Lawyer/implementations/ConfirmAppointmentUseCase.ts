@@ -60,9 +60,11 @@ export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
       client_id: appointment.client_id,
       lawyer_id: appointment.lawyer_id,
       status: "upcoming",
-      bookingId: appointment.booingId,
+      bookingId: appointment.bookingId,
       caseId: appointment.caseId,
     });
+    console.log("appointment", appointment);
+    console.log("session payload", sessionPayload);
     const newsession = await this.sessionRepo.create(sessionPayload);
 
     if (!newsession || !newsession.id) {
@@ -75,7 +77,7 @@ export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
     if (!response) throw new Error("session creation failed");
     const chatSessionpayload = ChatSession.create({
       last_message: "",
-      name: `${lawyer?.name}-${appointment.booingId}`,
+      name: `${lawyer?.name}-${appointment.bookingId}`,
       participants: {
         client_id: newsession.client_id,
         lawyer_id: newsession.lawyer_id,
@@ -84,7 +86,7 @@ export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
     });
     await this.chatRepo.create(chatSessionpayload);
     return {
-      bookingId: response.booingId,
+      bookingId: response.bookingId,
       caseId: response.caseId,
       amount: response.amount,
       client_id: response.client_id,

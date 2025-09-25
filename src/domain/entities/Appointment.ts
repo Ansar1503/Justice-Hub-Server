@@ -104,7 +104,7 @@ export class Appointment {
     return this._id;
   }
 
-  get booingId(): string {
+  get bookingId(): string {
     return this._bookingId;
   }
 

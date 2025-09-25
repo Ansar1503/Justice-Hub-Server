@@ -34,6 +34,9 @@ import { IOverrideRepo } from "@domain/IRepository/IOverrideRepo";
 import { ScheduleSettingsRepository } from "@infrastructure/database/repo/ScheduleSettingsRepo";
 import { AvailableSlotRepository } from "@infrastructure/database/repo/AvailableSlotsRepo";
 import { OverrideSlotsRepository } from "@infrastructure/database/repo/OverrideSlotsRepo";
+import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
+import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
+import { SessionMapper } from "@infrastructure/Mapper/Implementations/SessionMapper";
 
 export class MongoUnitofWork implements IUnitofWork {
   private _session?: ClientSession;
@@ -51,6 +54,7 @@ export class MongoUnitofWork implements IUnitofWork {
   private _scheduleSettingsRepo: IScheduleSettingsRepo | undefined;
   private _availableSlotsRepo: IAvailableSlots | undefined;
   private _overrideSlotsRepo: IOverrideRepo | undefined;
+  private _sessionRepo: ISessionsRepo | undefined;
 
   constructor(session?: ClientSession) {
     this._session = session;
@@ -221,6 +225,21 @@ export class MongoUnitofWork implements IUnitofWork {
       this._overrideSlotsRepo = new OverrideSlotsRepository();
     }
     return this._overrideSlotsRepo;
+  }
+
+  get sessionRepo(): ISessionsRepo {
+    if (!this._session) {
+      throw new Error(
+        "Unit of Work session not initialized. Call startTransaction() first."
+      );
+    }
+    if (!this._sessionRepo) {
+      this._sessionRepo = new SessionsRepository(
+        new SessionMapper(),
+        this._session
+      );
+    }
+    return this._sessionRepo;
   }
 
   async startTransaction<T>(

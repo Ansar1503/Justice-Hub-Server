@@ -134,7 +134,21 @@ export class ChatSessionRepository implements IChatSessionRepo {
       {
         $unwind: { path: "$sessionDetails", preserveNullAndEmptyArrays: true },
       },
-
+      // apointment
+      {
+        $lookup: {
+          from: "appointments",
+          localField: "sessionDetails.bookingId",
+          foreignField: "bookingId",
+          as: "appointmentDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$appointmentDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       //  last message
       {
         $lookup: {

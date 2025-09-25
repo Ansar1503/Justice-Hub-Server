@@ -168,7 +168,7 @@ export class BookAppointmentByWalletUsecase
           );
           return {
             amount: appointmentCreated.amount,
-            bookingId: appointmentCreated.booingId,
+            bookingId: appointmentCreated.bookingId,
             caseId: appointmentCreated.caseId,
             client_id: appointmentCreated.client_id,
             createdAt: appointmentCreated.createdAt,
@@ -264,7 +264,7 @@ export class BookAppointmentByWalletUsecase
       );
       return {
         amount: appointmentCreated.amount,
-        bookingId: appointmentCreated.booingId,
+        bookingId: appointmentCreated.bookingId,
         caseId: appointmentCreated.caseId,
         client_id: appointmentCreated.client_id,
         createdAt: appointmentCreated.createdAt,

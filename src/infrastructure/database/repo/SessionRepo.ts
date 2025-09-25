@@ -7,10 +7,12 @@ import {
   FetchSessionsOutputtDto,
 } from "@src/application/dtos/sessions/FetchSessionsDto";
 import { SessionMapper } from "@infrastructure/Mapper/Implementations/SessionMapper";
+import { ClientSession } from "mongoose";
 
 export class SessionsRepository implements ISessionsRepo {
   constructor(
-    private mapper: IMapper<Session, ISessionModel> = new SessionMapper()
+    private mapper: IMapper<Session, ISessionModel> = new SessionMapper(),
+    private clientSession?: ClientSession
   ) {}
   async aggregate(payload: {
     user_id: string;
@@ -172,9 +174,10 @@ export class SessionsRepository implements ISessionsRepo {
 
   async create(payload: Session): Promise<Session> {
     const newpayload = this.mapper.toPersistence(payload);
-    console.log("newpayload :", newpayload);
     const newSessions = new SessionModel(newpayload);
-    const savedSession = await newSessions.save();
+    const savedSession = await newSessions.save({
+      session: this.clientSession,
+    });
     return this.mapper.toDomain(savedSession);
   }
   async update(payload: {
@@ -245,7 +248,7 @@ export class SessionsRepository implements ISessionsRepo {
         _id: payload.session_id,
       },
       { $set: update },
-      { new: true }
+      { new: true, session: this.clientSession   }
     );
 
     return sessions ? this.mapper.toDomain(sessions) : null;
@@ -311,7 +314,7 @@ export class SessionsRepository implements ISessionsRepo {
         id: "$_id",
 
         // appointment details
-        appointmentDetals: {
+        appointmentDetails: {
           id: "$appointmentDetails._id",
           bookingId: "$appointmentDetails.bookingId",
           lawyer_id: "$appointmentDetails.lawyer_id",

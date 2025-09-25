@@ -8,6 +8,7 @@ import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerification
 import { IOtpRepository } from "@domain/IRepository/IOtpRepo";
 import { IOverrideRepo } from "@domain/IRepository/IOverrideRepo";
 import { IScheduleSettingsRepo } from "@domain/IRepository/IScheduleSettingsRepo";
+import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
 import { IWalletTransactionsRepo } from "@domain/IRepository/IWalletTransactionsRepo";
@@ -29,4 +30,5 @@ export interface IUnitofWork {
   lawyerRepo: ILawyerRepository;
   lawyerVerificationRepo: ILawyerVerificationRepo;
   lawyerDocumentsRepo: ILawyerDocumentsRepository;
+  sessionRepo: ISessionsRepo;
 }

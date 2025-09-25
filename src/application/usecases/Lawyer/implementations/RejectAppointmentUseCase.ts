@@ -97,7 +97,7 @@ export class RejectAppointmentUseCase implements IRejectAppointmentUseCase {
 
       return {
         amount: response.amount,
-        bookingId: response.booingId,
+        bookingId: response.bookingId,
         caseId: response.caseId,
         client_id: response.client_id,
         createdAt: response.createdAt,

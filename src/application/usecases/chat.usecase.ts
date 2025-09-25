@@ -19,9 +19,9 @@ import { Disputes } from "@domain/entities/Disputes";
 
 export class ChatUseCase implements IChatusecase {
   constructor(
-    private chatSessionRepo: IChatSessionRepo,
-    private chatMessageRepo: IChatMessagesRepo,
-    private sessionRepo: ISessionsRepo,
+    private _chatSessionRepo: IChatSessionRepo,
+    private _chatMessageRepo: IChatMessagesRepo,
+    private _sessionRepo: ISessionsRepo,
     private _disputesRepo: IDisputes
   ) {}
   async fetchChats(payload: {
@@ -30,7 +30,7 @@ export class ChatUseCase implements IChatusecase {
     page: number;
     role: "lawyer" | "client";
   }): Promise<{ data: any[]; nextCursor?: number }> {
-    const aggregateresult = await this.chatSessionRepo.aggregate(payload);
+    const aggregateresult = await this._chatSessionRepo.aggregate(payload);
     // console.log("aggregation resltu;", aggregateresult);
     return aggregateresult;
   }
@@ -38,7 +38,7 @@ export class ChatUseCase implements IChatusecase {
   async getChatSessionById(
     sessionId: string
   ): Promise<FetchChatSessionOutPutDto | null> {
-    const chatSession = await this.chatSessionRepo.findById(sessionId);
+    const chatSession = await this._chatSessionRepo.findById(sessionId);
     if (!chatSession) return null;
     return {
       createdAt: chatSession.createdAt,
@@ -61,10 +61,10 @@ export class ChatUseCase implements IChatusecase {
       attachments: message.attachments,
       content: message.content,
     });
-    const newChatMessage = await this.chatMessageRepo.create(messagepayload);
+    const newChatMessage = await this._chatMessageRepo.create(messagepayload);
     if (!newChatMessage) return null;
 
-    await this.chatSessionRepo.update({
+    await this._chatSessionRepo.update({
       id: newChatMessage?.sessionId || "",
       last_message: newChatMessage?.id || "",
     });
@@ -85,7 +85,7 @@ export class ChatUseCase implements IChatusecase {
     session_id: string;
     page: number;
   }): Promise<{ data: ChatMessageOutputDto[]; nextCursor?: number }> {
-    const messages = await this.chatMessageRepo.findMessagesBySessionId(
+    const messages = await this._chatMessageRepo.findMessagesBySessionId(
       payload.session_id,
       payload.page
     );
@@ -111,7 +111,7 @@ export class ChatUseCase implements IChatusecase {
     chatName: string;
   }): Promise<ChatSession | null> {
     const { chatId, chatName } = payload;
-    const updatedChat = await this.chatSessionRepo.update({
+    const updatedChat = await this._chatSessionRepo.update({
       name: chatName,
       id: chatId,
     });
@@ -124,11 +124,11 @@ export class ChatUseCase implements IChatusecase {
   }): Promise<ChatMessageOutputDto | null> {
     if (!payload.messageId) throw new ValidationError("MessageId not found");
     // console.log("delete paylaod :: ", payload);
-    await this.chatMessageRepo.update({
+    await this._chatMessageRepo.update({
       messageId: payload.messageId,
       active: false,
     });
-    const messages = await this.chatMessageRepo.findMessagesBySessionId(
+    const messages = await this._chatMessageRepo.findMessagesBySessionId(
       payload.sessionId,
       1
     );
@@ -136,7 +136,7 @@ export class ChatUseCase implements IChatusecase {
       messages.data.length > 0
         ? messages?.data[messages?.data?.length - 1]
         : null;
-    await this.chatSessionRepo.update({
+    await this._chatSessionRepo.update({
       id: payload.sessionId,
       last_message: lastMessage?.id || "no message",
     });
@@ -160,7 +160,7 @@ export class ChatUseCase implements IChatusecase {
     reason: string;
     reportedAt: Date;
   }): Promise<void> {
-    const chatExists = await this.chatMessageRepo.findById(payload.messageId);
+    const chatExists = await this._chatMessageRepo.findById(payload.messageId);
     if (!chatExists) throw new Error("message doesnt exist");
     const disputePayload = Disputes.create({
       contentId: payload.messageId,
@@ -173,7 +173,7 @@ export class ChatUseCase implements IChatusecase {
     await this._disputesRepo.create(disputePayload);
   }
   async getSessionDetails(sessionId: string): Promise<Session | null> {
-    return await this.sessionRepo.findById({ session_id: sessionId });
+    return await this._sessionRepo.findById({ session_id: sessionId });
   }
   async fetchDisputes(payload: {
     search: string;
@@ -195,6 +195,6 @@ export class ChatUseCase implements IChatusecase {
     currentPage: number;
     totalPage: number;
   }> {
-    return await this.chatMessageRepo.fetchDisputesAggregation(payload);
+    return await this._chatMessageRepo.fetchDisputesAggregation(payload);
   }
 }

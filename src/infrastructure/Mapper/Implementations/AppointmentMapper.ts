@@ -30,7 +30,7 @@ export class AppointmentMapper
       client_id: entity.client_id,
       lawyer_id: entity.lawyer_id,
       caseId: entity.caseId,
-      bookingId: entity.booingId,
+      bookingId: entity.bookingId,
       date: entity.date,
       time: entity.time,
       duration: entity.duration,

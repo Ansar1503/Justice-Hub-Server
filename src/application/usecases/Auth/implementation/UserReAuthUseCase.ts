@@ -6,9 +6,7 @@ export class UserReAuthUseCase implements IUserReAuth {
 
   async execute(input: string): Promise<string> {
     const userpayload = this.jwtManager.VerifyRefreshToken(input);
-    const accesstoken = this.jwtManager.GenerateAccessToken(
-      userpayload as Record<string, unknown>
-    );
+    const accesstoken = this.jwtManager.GenerateAccessToken(userpayload as any);
     return accesstoken;
   }
 }
