@@ -13,6 +13,7 @@ import { BaseRepository } from "./base/BaseRepo";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
 import { AppointmentMapper } from "@infrastructure/Mapper/Implementations/AppointmentMapper";
 import {
+  appointmentOutputDto,
   FetchAppointmentsInputDto,
   FetchAppointmentsOutputDto,
 } from "@src/application/dtos/Appointments/FetchAppointmentsDto";
@@ -522,7 +523,7 @@ export class AppointmentsRepository
           reason: "$reason",
           amount: "$amount",
           payment_status: "$payment_status",
-          type:"$type",
+          type: "$type",
           status: "$status",
           createdAt: "$createdAt",
           updatedAt: "$updatedAt",
@@ -560,11 +561,120 @@ export class AppointmentsRepository
       ? this.mapper.toDomainArray(data)
       : [];
   }
-  async findByCaseId(id: string): Promise<Appointment[] | []> {
-    const data = await AppointmentModel.find({ caseId: id });
-    return this.mapper.toDomainArray && data
-      ? this.mapper.toDomainArray(data)
-      : [];
+  async findByCaseId(id: string): Promise<appointmentOutputDto[] | []> {
+    const data = await this.model.aggregate([
+      { $match: { caseId: id } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "client_id",
+          foreignField: "user_id",
+          as: "clientsUserData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$clientsUserData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "clients",
+          localField: "client_id",
+          foreignField: "user_id",
+          as: "clientsClientData",
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$clientsClientData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          clientData: {
+            $mergeObjects: ["$clientsUserData", "$clientsClientData"],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "lawyer_id",
+          foreignField: "user_id",
+          as: "lawyersUserData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$lawyersUserData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "clients",
+          localField: "lawyer_id",
+          foreignField: "user_id",
+          as: "lawyersClientData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$lawyersClientData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          lawyerData: {
+            $mergeObjects: ["$lawyersUserData", "$lawyersClientData"],
+          },
+        },
+      },
+      {
+        $project: {
+          clientData: {
+            name: "$clientData.name",
+            email: "$clientData.email",
+            mobile: "$clientData.mobile",
+            user_id: "$clientData.user_id",
+            profile_image: "$clientData.profile_image",
+            dob: "$clientData.dob",
+            gender: "$clientData.gender",
+          },
+
+          lawyerData: {
+            name: "$lawyerData.name",
+            email: "$lawyerData.email",
+            mobile: "$lawyerData.mobile",
+            user_id: "$lawyerData.user_id",
+            profile_image: "$lawyerData.profile_image",
+            dob: "$lawyerData.dob",
+            gender: "$lawyerData.gender",
+          },
+          id: "$_id",
+          caseId: "$caseId",
+          lawyer_id: "$lawyer_id",
+          client_id: "$client_id",
+          bookingId: "$bookingId",
+          date: "$date",
+          time: "$time",
+          duration: "$duration",
+          reason: "$reason",
+          amount: "$amount",
+          payment_status: "$payment_status",
+          type: "$type",
+          status: "$status",
+          createdAt: "$createdAt",
+          updatedAt: "$updatedAt",
+        },
+      },
+    ]);
+    return data;
   }
   async findByBookingId(id: string): Promise<Appointment | null> {
     const data = await this.model.findOne({ bookingId: id });

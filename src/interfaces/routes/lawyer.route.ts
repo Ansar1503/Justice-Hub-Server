@@ -53,6 +53,7 @@ import { UpdateLawyersProfessionalDetailsComposer } from "@infrastructure/servic
 import { FindAllCasesByQueryComposer } from "@infrastructure/services/composers/Cases/FindAllCasesByQueryComposer";
 import { FindCaseDetailsComposer } from "@infrastructure/services/composers/Cases/FindCaseDetailsComposer";
 import { FindAppointmentByCaseComposer } from "@infrastructure/services/composers/Appointments/FindAppointmentByCaseComposer";
+import { FindSessionsByCaseComposer } from "@infrastructure/services/composers/Sessions/FindSessionsByCase";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -456,6 +457,18 @@ router.get(
   authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FindAppointmentByCaseComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  CasesRoutes.base + CasesRoutes.sessions + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  authenticateLawyer,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindSessionsByCaseComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }

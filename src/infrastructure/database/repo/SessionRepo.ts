@@ -5,6 +5,7 @@ import SessionModel, { ISessionModel } from "../model/SessionModel";
 import {
   FetchSessionsInputDto,
   FetchSessionsOutputtDto,
+  SessionData,
 } from "@src/application/dtos/sessions/FetchSessionsDto";
 import { SessionMapper } from "@infrastructure/Mapper/Implementations/SessionMapper";
 import { ClientSession } from "mongoose";
@@ -248,7 +249,7 @@ export class SessionsRepository implements ISessionsRepo {
         _id: payload.session_id,
       },
       { $set: update },
-      { new: true, session: this.clientSession   }
+      { new: true, session: this.clientSession }
     );
 
     return sessions ? this.mapper.toDomain(sessions) : null;
@@ -484,5 +485,157 @@ export class SessionsRepository implements ISessionsRepo {
       currentPage: page,
       totalPage,
     };
+  }
+
+  async findByCase(id: string): Promise<SessionData[] | []> {
+    const data = await SessionModel.aggregate([
+      { $match: { caseId: id } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "client_id",
+          foreignField: "user_id",
+          as: "clientsUserData",
+        },
+      },
+      {
+        $unwind: { path: "$clientsUserData", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $lookup: {
+          from: "clients",
+          localField: "client_id",
+          foreignField: "user_id",
+          as: "clientsClientData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$clientsClientData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          clientData: {
+            $mergeObjects: ["$clientsUserData", "$clientsClientData"],
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "lawyer_id",
+          foreignField: "user_id",
+          as: "lawyersUserData",
+        },
+      },
+      {
+        $unwind: { path: "$lawyersUserData", preserveNullAndEmptyArrays: true },
+      },
+      {
+        $lookup: {
+          from: "clients",
+          localField: "lawyer_id",
+          foreignField: "user_id",
+          as: "lawyersClientData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$lawyersClientData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "appointments",
+          localField: "appointment_id",
+          foreignField: "_id",
+          as: "appointmentDetails",
+        },
+      },
+      {
+        $unwind: {
+          path: "$appointmentDetails",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $addFields: {
+          lawyerData: {
+            $mergeObjects: ["$lawyersUserData", "$lawyersClientData"],
+          },
+        },
+      },
+      {
+        $project: {
+          id: "$_id",
+
+          // appointment details
+          appointmentDetails: {
+            id: "$appointmentDetails._id",
+            bookingId: "$appointmentDetails.bookingId",
+            lawyer_id: "$appointmentDetails.lawyer_id",
+            client_id: "$appointmentDetails.client_id",
+            caseId: "$appointmentDetails.caseId",
+            date: "$appointmentDetails.date",
+            time: "$appointmentDetails.time",
+            duration: "$appointmentDetails.duration",
+            reason: "$appointmentDetails.reason",
+            amount: "$appointmentDetails.amount",
+            payment_status: "$appointmentDetails.payment_status",
+            type: "$appointmentDetails.type",
+            status: "$appointmentDetails.status",
+          },
+
+          // session fields
+          lawyer_id: "$lawyer_id",
+          client_id: "$client_id",
+          caseId: "$caseId",
+          bookingId: "$bookingId",
+          status: "$status",
+          notes: "$notes",
+          summary: "$summary",
+          follow_up_suggested: "$follow_up_suggested",
+          follow_up_session_id: "$follow_up_session_id",
+          room_id: "$room_id",
+          start_time: "$start_time",
+          end_time: "$end_time",
+          client_joined_at: "$client_joined_at",
+          client_left_at: "$client_left_at",
+          lawyer_joined_at: "$lawyer_joined_at",
+          lawyer_left_at: "$lawyer_left_at",
+          end_reason: "$end_reason",
+          callDuration: "$callDuration",
+          createdAt: "$createdAt",
+          updatedAt: "$updatedAt",
+
+          // client info
+          clientData: {
+            name: "$clientData.name",
+            email: "$clientData.email",
+            mobile: "$clientData.mobile",
+            user_id: "$clientData.user_id",
+            profile_image: "$clientData.profile_image",
+            dob: "$clientData.dob",
+            gender: "$clientData.gender",
+          },
+
+          // lawyer info
+          lawyerData: {
+            name: "$lawyerData.name",
+            email: "$lawyerData.email",
+            mobile: "$lawyerData.mobile",
+            user_id: "$lawyerData.user_id",
+            profile_image: "$lawyerData.profile_image",
+            dob: "$lawyerData.dob",
+            gender: "$lawyerData.gender",
+          },
+        },
+      },
+    ]);
+    return data;
   }
 }

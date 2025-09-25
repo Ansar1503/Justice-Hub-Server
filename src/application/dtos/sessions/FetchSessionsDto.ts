@@ -2,7 +2,7 @@ import { Appointment } from "../Appointments/BaseAppointmentDto";
 import { UserProfile } from "../user.dto";
 import { BaseSessionDto } from "./BaseSessionDto";
 
-interface SessionData extends BaseSessionDto {
+export interface SessionData extends BaseSessionDto {
   clientData: UserProfile;
   lawyerData: UserProfile;
   appointmentDetails: Appointment;

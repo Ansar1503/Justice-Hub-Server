@@ -1,6 +1,7 @@
 import {
   FetchSessionsInputDto,
   FetchSessionsOutputtDto,
+  SessionData,
 } from "@src/application/dtos/sessions/FetchSessionsDto";
 import { Session } from "../entities/Session";
 
@@ -43,4 +44,5 @@ export interface ISessionsRepo {
   findSessionsAggregate(
     payload: FetchSessionsInputDto
   ): Promise<FetchSessionsOutputtDto>;
+  findByCase(id: string): Promise<SessionData[] | []>;
 }

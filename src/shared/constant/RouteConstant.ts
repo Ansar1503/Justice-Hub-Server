@@ -53,7 +53,7 @@ export const ClientRoutes = {
 
   lawyers: {
     base: "/lawyers",
-    walletbook:"/lawyer/slots/book-wallet",
+    walletbook: "/lawyer/slots/book-wallet",
     byId: "/lawyers/:id",
     review: "/lawyers/review",
     reviewsByLawyer: "/lawyers/reviews/:id",
@@ -146,4 +146,5 @@ export const CommonParamsRoute = {
 export const CasesRoutes = {
   base: "/cases",
   appointments: "/appointments",
+  sessions: "/sessions",
 };

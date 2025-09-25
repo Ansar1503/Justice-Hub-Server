@@ -1,4 +1,5 @@
 import {
+  appointmentOutputDto,
   FetchAppointmentsInputDto,
   FetchAppointmentsOutputDto,
 } from "@src/application/dtos/Appointments/FetchAppointmentsDto";
@@ -70,5 +71,5 @@ export interface IAppointmentsRepository {
     payload: FetchAppointmentsInputDto
   ): Promise<FetchAppointmentsOutputDto>;
   findByClientID(client: string): Promise<Appointment[] | []>;
-  findByCaseId(id: string): Promise<Appointment[] | []>;
+  findByCaseId(id: string): Promise<appointmentOutputDto[] | []>;
 }

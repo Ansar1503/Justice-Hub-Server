@@ -18,7 +18,7 @@ export interface FetchAppointmentsInputDto {
   limit: number;
 }
 
-interface appointmentOutputDto extends Appointment {
+export interface appointmentOutputDto extends Appointment {
   clientData: UserProfile;
   lawyerData: UserProfile;
 }
