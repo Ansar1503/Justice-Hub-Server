@@ -156,9 +156,15 @@ export class BookAppointmentByWalletUsecase
           const appointmentCreated = await uow.appointmentRepo.create(
             newappointment
           );
+          const adminWallet = await uow.walletRepo.getAdminWallet();
+          if (!adminWallet) throw new Error("admins wallet not found");
           await uow.walletRepo.updateBalance(
             myWallet.user_id,
             Math.max(0, myWallet.balance - appointmentCreated.amount)
+          );
+          await uow.walletRepo.updateBalance(
+            adminWallet.user_id,
+            adminWallet.balance + appointmentCreated.amount
           );
           return {
             amount: appointmentCreated.amount,

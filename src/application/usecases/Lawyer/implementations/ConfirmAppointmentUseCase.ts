@@ -75,7 +75,7 @@ export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
     if (!response) throw new Error("session creation failed");
     const chatSessionpayload = ChatSession.create({
       last_message: "",
-      name: `${lawyer?.name}-${newsession.id}`,
+      name: `${lawyer?.name}-${appointment.booingId}`,
       participants: {
         client_id: newsession.client_id,
         lawyer_id: newsession.lawyer_id,
