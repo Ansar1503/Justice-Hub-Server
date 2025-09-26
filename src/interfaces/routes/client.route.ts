@@ -110,6 +110,7 @@ router.get(
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchProfileImageComposer());
     res.status(adapter.statusCode).json(adapter.body);
+    return
   }
 );
 
