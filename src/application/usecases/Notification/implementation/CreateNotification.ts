@@ -60,7 +60,6 @@ export class NotificationUsecase implements ICreateNotification {
     const newNotification = await this._notificationRep.addNotification(
       newNotificationPayload
     );
-
     return {
       createdAt: newNotification.createdAt,
       id: newNotification.id,

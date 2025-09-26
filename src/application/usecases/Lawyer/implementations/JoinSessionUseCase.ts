@@ -35,14 +35,14 @@ export class JoinSessionUseCase implements IJoinSessionUseCase {
       appointmentDetails.time
     );
     const newDate = new Date();
-    if (newDate < slotDateTime) {
-      throw new ValidationError("Scheduled time is not reached");
-    }
+    // if (newDate < slotDateTime) {
+    //   throw new ValidationError("Scheduled time is not reached");
+    // }
     slotDateTime.setMinutes(
       slotDateTime.getMinutes() + appointmentDetails.duration + 5
     );
-    if (newDate > slotDateTime)
-      throw new ValidationError("session time is over");
+    // if (newDate > slotDateTime)
+    //   throw new ValidationError("session time is over");
     // console.log("sessssion", existingSession.);
     const { appId, token } = await createToken({
       userId: existingSession.client_id,

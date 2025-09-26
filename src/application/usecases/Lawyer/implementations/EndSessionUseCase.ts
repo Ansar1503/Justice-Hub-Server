@@ -36,9 +36,9 @@ export class EndSessionUseCase implements IEndSessionUseCase {
       appointmentDetails.time
     );
     const currentDate = new Date();
-    if (currentDate < sessionStartAt) {
-      throw new ValidationError("Session has not started yet");
-    }
+    // if (currentDate < sessionStartAt) {
+    //   throw new ValidationError("Session has not started yet");
+    // }
     const durationInMinutes = session.start_time
       ? Math.floor(
           (currentDate.getTime() - session.start_time.getTime()) / (1000 * 60)

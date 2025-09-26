@@ -4,7 +4,6 @@ export interface DocumentItem {
   name: string;
   type: string;
   url: string;
-  _id?: string;
 }
 
 export interface PersistedCaseDocumentProps {
@@ -12,7 +11,7 @@ export interface PersistedCaseDocumentProps {
   caseId: string;
   clientId?: string;
   lawyerId?: string;
-  documents: DocumentItem;
+  document: DocumentItem;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,7 +20,7 @@ export interface CreateCaseDocumentProps {
   caseId: string;
   clientId?: string;
   lawyerId?: string;
-  documents: DocumentItem;
+  document: DocumentItem;
 }
 
 export class CaseDocument {
@@ -29,7 +28,7 @@ export class CaseDocument {
   private _caseId: string;
   private _clientId?: string;
   private _lawyerId?: string;
-  private _documents: DocumentItem;
+  private _document: DocumentItem;
   private _createdAt: Date;
   private _updatedAt: Date;
 
@@ -38,7 +37,7 @@ export class CaseDocument {
     this._caseId = props.caseId;
     this._clientId = props.clientId;
     this._lawyerId = props.lawyerId;
-    this._documents = props.documents;
+    this._document = props.document;
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
   }
@@ -50,7 +49,7 @@ export class CaseDocument {
       caseId: props.caseId,
       clientId: props.clientId,
       lawyerId: props.lawyerId,
-      documents: props.documents,
+      document: props.document,
       createdAt: now,
       updatedAt: now,
     });
@@ -69,16 +68,16 @@ export class CaseDocument {
     return this._caseId;
   }
 
-  get clientId() {
+  get clientId(): string | undefined {
     return this._clientId;
   }
 
-  get lawyerId() {
+  get lawyerId(): string | undefined {
     return this._lawyerId;
   }
 
-  get documents(): DocumentItem {
-    return this._documents;
+  get document(): DocumentItem {
+    return this._document;
   }
 
   get createdAt(): Date {
@@ -87,5 +86,15 @@ export class CaseDocument {
 
   get updatedAt(): Date {
     return this._updatedAt;
+  }
+
+  // Business methods
+  updateDocument(newDoc: DocumentItem): void {
+    this._document = newDoc;
+    this.touch();
+  }
+
+  private touch(): void {
+    this._updatedAt = new Date();
   }
 }

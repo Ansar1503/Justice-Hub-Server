@@ -14,6 +14,7 @@ import {
 } from "@src/application/dtos/chats/ChatMessageDto";
 import { DisputesRepo } from "@infrastructure/database/repo/DisputesRepo";
 import { NotificationDto } from "@src/application/dtos/Notification/BaseNotification";
+import { AppointmentsRepository } from "@infrastructure/database/repo/AppointmentsRepo";
 
 const chatUsecase = new ChatUseCase(
   new ChatSessionRepository(),
@@ -24,7 +25,8 @@ const chatUsecase = new ChatUseCase(
 const CreateNotification = new NotificationUsecase(
   new NotificationRepository(),
   new SessionsRepository(),
-  new ChatSessionRepository()
+  new ChatSessionRepository(),
+  new AppointmentsRepository()
 );
 
 export class SocketHandlers {
