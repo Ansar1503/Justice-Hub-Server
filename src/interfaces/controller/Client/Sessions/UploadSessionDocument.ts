@@ -48,7 +48,6 @@ export class UploadSessionDocumentsController implements IController {
             });
         });
         try {
-            console.log({ sessionId, documents });
             const result = await this.uploadSessionDocument.execute({
                 sessionId,
                 document: documents,
@@ -56,7 +55,6 @@ export class UploadSessionDocumentsController implements IController {
             const success = this.httpSuccess.success_200(result);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            console.log("error in upload session documents : ", error);
             const err = this.httpErrors.error_500();
             return new HttpResponse(err.statusCode, err.body);
         }

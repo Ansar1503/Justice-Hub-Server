@@ -61,8 +61,6 @@ export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
             bookingId: appointment.bookingId,
             caseId: appointment.caseId,
         });
-        console.log("appointment", appointment);
-        console.log("session payload", sessionPayload);
         const newsession = await this.sessionRepo.create(sessionPayload);
 
         if (!newsession || !newsession.id) {

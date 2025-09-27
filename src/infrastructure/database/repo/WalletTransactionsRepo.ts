@@ -48,7 +48,6 @@ export class WalletTransactionsRepo
                 query.createdAt.$lte = endDate;
             }
         }
-        console.log(query);
         const [transactions, total] = await Promise.all([
             this.model.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
             this.model.countDocuments(query),

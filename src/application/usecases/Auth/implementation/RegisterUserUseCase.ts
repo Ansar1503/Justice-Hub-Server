@@ -1,6 +1,9 @@
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { User } from "@domain/entities/User";
-import { RegisterUserDto, ResposeUserDto } from "@src/application/dtos/user.dto";
+import {
+    RegisterUserDto,
+    ResposeUserDto,
+} from "@src/application/dtos/user.dto";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { IPasswordManager } from "@src/application/providers/PasswordHasher";
 import { Client } from "@domain/entities/Client";
@@ -19,10 +22,10 @@ import { IRegiserUserUseCase } from "../IRegisterUserUseCase";
 
 export class RegisterUserUseCase implements IRegiserUserUseCase {
     constructor(
-        private passwordHasher: IPasswordManager,
-        private nodemailProvider: INodeMailerProvider,
-        private jwtprovider: IJwtProvider,
-        private _unitOfWork: IUnitofWork,
+    private passwordHasher: IPasswordManager,
+    private nodemailProvider: INodeMailerProvider,
+    private jwtprovider: IJwtProvider,
+    private _unitOfWork: IUnitofWork
     ) {}
     async execute(input: RegisterUserDto): Promise<ResposeUserDto> {
         return await this._unitOfWork.startTransaction(async (uow) => {
@@ -30,7 +33,9 @@ export class RegisterUserUseCase implements IRegiserUserUseCase {
             if (existingUser) {
                 throw new ValidationError("User Already Exists");
             }
-            const hashedPassword = await this.passwordHasher.hashPassword(input.password);
+            const hashedPassword = await this.passwordHasher.hashPassword(
+                input.password
+            );
             const newUser = User.create(input);
             newUser.changePassword(hashedPassword);
 
@@ -52,16 +57,16 @@ export class RegisterUserUseCase implements IRegiserUserUseCase {
                     user_id: user.user_id,
                 });
                 await uow.walletRepo.create(walletPayload);
-            } catch (error) {
-                console.log(error);
-            }
+            } catch (error) {}
             const otpdata = Otp.create({ email: user.email, otp });
             await uow.otpRepo.storeOtp(otpdata);
             try {
-                await this.nodemailProvider.sendVerificationMail(user.email, token, otp);
-                console.log("email send successfully", otp);
+                await this.nodemailProvider.sendVerificationMail(
+                    user.email,
+                    token,
+                    otp
+                );
             } catch (error) {
-                console.log(error);
                 throw new Error("MAIL_SEND_ERROR");
             }
             return new ResposeUserDto(user);

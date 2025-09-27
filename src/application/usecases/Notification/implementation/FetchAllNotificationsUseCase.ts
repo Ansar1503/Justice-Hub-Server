@@ -8,7 +8,6 @@ export class FetchAllNotificationsUseCase implements IFetchAllNotificationsUseCa
         user_id: string;
         cursor: number;
     }): Promise<{ data: NotificationDto[] | []; nextCursor?: number }> {
-        console.log("input", input);
         const notification = await this.notificationRepo.findAllByUserId({
             userId: input.user_id,
             cursor: input.cursor,

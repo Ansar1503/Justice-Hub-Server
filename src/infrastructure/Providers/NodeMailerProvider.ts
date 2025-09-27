@@ -36,7 +36,6 @@ export class NodeMailerProvider implements INodeMailerProvider {
         try {
             await this.transporter.sendMail(mailoptions);
         } catch (error) {
-            console.log("mail send error", error);
             throw new Error("MAIL_SEND_ERROR");
         }
     }

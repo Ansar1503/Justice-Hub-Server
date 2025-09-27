@@ -13,7 +13,6 @@ export async function setUpChatSocket(io: SocketIOServer) {
         const userId = user?.id;
 
         socket.join(userId);
-        console.log("user joined", userId);
         socketStore.onlineUsers.add(userId);
         io.emit(SocketEventEnum.ONLINE_USERS, {
             users: Array.from(socketStore.onlineUsers),
@@ -26,7 +25,6 @@ export async function setUpChatSocket(io: SocketIOServer) {
 
         // listen for error events
         socket.on(SocketEventEnum.SOCKET_ERROR_EVENT, (error) => {
-            console.error("Socket authentication error:", error.message);
             socketHandler.handleEmiter(userId, SocketEventEnum.SOCKET_ERROR_EVENT, {
                 message: error.message,
             });

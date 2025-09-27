@@ -75,7 +75,6 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
                 try {
                     await uow.walletRepo.updateBalance(wallet.user_id, wallet.balance);
                 } catch (error) {
-                    console.log("wallet update error");
                 }
                 const transaction = WalletTransaction.create({
                     amount: appointment.amount,
@@ -88,13 +87,11 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
                 try {
                     await uow.transactionsRepo.create(transaction);
                 } catch (error) {
-                    console.log("error creatinmg wallet transaction", error);
                 }
             });
         } else if (payment_status === "failed") {
-            console.log("payment failed");
+            
         } else {
-            console.log("payment  pending check the stripe listen");
         }
     }
 }

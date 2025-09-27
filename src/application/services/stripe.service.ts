@@ -136,7 +136,6 @@ export async function getSessionMetaData(sessionId: string) {
 }
 
 function pluckMeta(md: Stripe.Metadata | null | undefined) {
-    console.log(md);
     return {
         lawyer_id: md?.lawyer_id,
         client_id: md?.clientId,

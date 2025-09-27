@@ -29,7 +29,6 @@ export class FetchSessions implements IController {
         }
         const parsedData = zodSessionQuerySchema.safeParse(httpRequest.query);
         if (!parsedData.success) {
-            console.log("parsed Error :", parsedData.error);
             const err = parsedData.error.errors[0];
             return this.httpErrors.error_400(err.message);
         }

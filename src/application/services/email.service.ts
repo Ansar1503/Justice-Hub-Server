@@ -33,7 +33,6 @@ export const sendVerificationEmail = async (email: string, user_id: string, otp:
     try {
         await transporter.sendMail(mailoptions);
     } catch (error) {
-        console.log("mail send error", error);
         throw new Error("MAIL_SEND_ERROR");
     }
 };

@@ -38,7 +38,6 @@ export class ChangeLawyerVerificationStatusController implements IController {
                 return new HttpResponse(success.statusCode, success.body);
             }
         } catch (error) {
-            console.log(error);
             if (error instanceof Error) {
                 return this.httpError.error_400(error.message);
             }

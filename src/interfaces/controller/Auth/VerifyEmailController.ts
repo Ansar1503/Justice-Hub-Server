@@ -34,7 +34,6 @@ export class VerifyEmailController implements IController {
             });
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            console.log("verify email error ", error);
             const err = this.httpErrors.error_500();
             return new HttpResponse(err.statusCode, err.body);
         }

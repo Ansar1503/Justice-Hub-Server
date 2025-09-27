@@ -39,7 +39,6 @@ export class UpdateNotificationStatusController implements IController {
                 id,
                 status,
             });
-            console.log(result);
             return this.httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {

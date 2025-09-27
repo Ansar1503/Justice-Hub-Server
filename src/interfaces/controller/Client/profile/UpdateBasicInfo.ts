@@ -38,7 +38,6 @@ export class UpdateBasicInfoController implements IController {
             const success = this._success.success_200(updateData);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            console.log("error", error);
             if (error instanceof Error) {
                 return this._errors.error_400(error.message);
             }

@@ -54,7 +54,6 @@ export class AddReviewController implements IController {
             const success = this.httpSuccess.success_200({ message: "review added" });
             return new HttpResponse(success.statusCode, success.body);
         } catch (error: any) {
-            console.log("error in adding review", error);
             switch (error.message) {
             case "USER_EMPTY":
                 return new HttpResponse(404, {

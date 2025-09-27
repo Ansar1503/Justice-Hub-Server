@@ -27,7 +27,6 @@ export class StartSessionController implements IController {
             const result = await this.startSessionUseCase.execute({ sessionId });
             return this.httpSuccess.success_200(result);
         } catch (error) {
-            console.log("error in start session controller ::", error);
             if (error instanceof AppError) {
                 return new HttpResponse(error.statusCode, error.message);
             }

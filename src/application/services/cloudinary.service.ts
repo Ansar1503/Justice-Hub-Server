@@ -26,7 +26,6 @@ export class CloudinaryService implements ICloudinaryService {
             //   console.log("fileId:", fileId);
             await this.cloudinary.uploader.destroy(fileId, { resource_type: "raw" });
         } catch (error) {
-            console.error("Failed to delete file:", error);
             throw error;
         }
     }

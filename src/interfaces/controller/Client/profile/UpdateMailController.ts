@@ -22,7 +22,6 @@ export class UpdateEmailController implements IController {
             return new HttpResponse(err.statusCode, err.body);
         }
         const user_id = req.user?.id;
-        // console.log("email:", email);
         try {
             const responserUser = await this.changeEmail.execute({ email, user_id });
             if (!responserUser) {
@@ -34,7 +33,6 @@ export class UpdateEmailController implements IController {
             const success = this.httpSuccess.success_200(responserUser);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            console.log("email update error : ", error);
             if (error instanceof Error) {
                 return this.httpErrors.error_400(error.message);
             }

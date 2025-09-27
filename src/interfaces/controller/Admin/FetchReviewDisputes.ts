@@ -26,7 +26,6 @@ export class FetchReviewDisputes implements IController {
             const success = this.httpSuccess.success_200(result);
             return success;
         } catch (error) {
-            console.log("error in fetch review disputes controller : ", error);
             if (error instanceof Error) {
                 return this.httpErrors.error_400(error.message);
             }

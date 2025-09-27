@@ -28,7 +28,6 @@ export class LoginController implements IController {
             const success = this.httpSuccess.success_200(responsedata);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            console.log("error occured during login : ---- ", error);
             if (error instanceof Error) {
                 return this.httpErrors.error_400(error.message);
             }

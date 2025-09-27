@@ -25,7 +25,6 @@ export class VerifyEmailOtpController implements IController {
             const success = this.httpSuccess.success_200();
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            console.log("verify email otp controller", error);
             if (error instanceof Error) {
                 return this.httpErrors.error_400(error.message);
             }

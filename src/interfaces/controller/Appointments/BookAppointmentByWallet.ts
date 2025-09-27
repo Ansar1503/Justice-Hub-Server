@@ -23,7 +23,6 @@ export class BookAppointmentByWalletController implements IController {
         }
         if (!parsed.success) {
             const er = parsed.error.errors[0];
-            console.log("errors", parsed.error.errors);
             return this._errors.error_400(er.message);
         }
         try {

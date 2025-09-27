@@ -48,7 +48,6 @@ export class ConfirmClientAppointment implements IController {
                 data: result,
             });
         } catch (error) {
-            console.log("error:", error);
             if (error && typeof error === "object" && "code" in error && "message" in error) {
                 const statusCode =
                     typeof error?.code === "number" && error.code >= 100 && error.code < 600 ? error.code : 500;

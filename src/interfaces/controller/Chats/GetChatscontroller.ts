@@ -31,7 +31,6 @@ export class GetChatsController implements IController {
             });
             return this._httpSuccess.success_200(result);
         } catch (error) {
-            console.log("error", error);
             if (error instanceof Error) {
                 return this._httpErrors.error_400(error.message);
             }

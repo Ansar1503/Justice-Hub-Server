@@ -4,40 +4,44 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export interface GenerateToken {
-    userId: string;
-    roomId?: string;
-    expiry?: number;
+  userId: string;
+  roomId?: string;
+  expiry?: number;
 }
 
 export enum ErrorCode {
-    success = 0,
-    appIDInvalid = 1,
-    userIDInvalid = 3,
-    secretInvalid = 5,
-    effectiveTimeInSecondsInvalid = 6,
+  success = 0,
+  appIDInvalid = 1,
+  userIDInvalid = 3,
+  secretInvalid = 5,
+  effectiveTimeInSecondsInvalid = 6,
 }
 
 export const enum KPrivilegeKey {
-    PrivilegeKeyLogin = 1,
-    PrivilegeKeyPublish = 2,
+  PrivilegeKeyLogin = 1,
+  PrivilegeKeyPublish = 2,
 }
 
 export const enum KPrivilegeVal {
-    PrivilegeEnable = 1,
-    PrivilegeDisable = 0,
+  PrivilegeEnable = 1,
+  PrivilegeDisable = 0,
 }
 
 export interface ErrorInfo {
-    errorCode: ErrorCode;
-    errorMessage: string;
+  errorCode: ErrorCode;
+  errorMessage: string;
 }
 
 if (!process.env.ZC_APP_ID || isNaN(Number(process.env.ZC_APP_ID))) {
-    throw new ValidationError("Invalid or missing ZEGO_APP_ID in environment variables.");
+    throw new ValidationError(
+        "Invalid or missing ZEGO_APP_ID in environment variables."
+    );
 }
 
 if (!process.env.ZC_SERVERSECRET) {
-    throw new ValidationError("ZEGO_SERVER_SECRET is missing in environment variables.");
+    throw new ValidationError(
+        "ZEGO_SERVER_SECRET is missing in environment variables."
+    );
 }
 
 const RndNum = (a: any, b: any) => {
@@ -73,7 +77,11 @@ const getAlgorithm = (keyBase64: string): string => {
 };
 
 // AES encryption, using mode: CBC/PKCS5Padding
-const aesEncrypt = (plainText: string, key: string, iv: string): ArrayBuffer => {
+const aesEncrypt = (
+    plainText: string,
+    key: string,
+    iv: string
+): ArrayBuffer => {
     const cipher = createCipheriv(getAlgorithm(key), key, iv);
     cipher.setAutoPadding(true);
     const encrypted = cipher.update(plainText);
@@ -95,7 +103,7 @@ export const generateToken04 = (
     userId: string,
     secret: string,
     effectiveTimeInSeconds: number,
-    payload?: string,
+    payload?: string
 ): string => {
     if (!appId || typeof appId !== "number") {
         throw {
@@ -136,19 +144,21 @@ export const generateToken04 = (
     };
 
     const plaintText = JSON.stringify(tokenInfo);
-    console.log("plain text: ", plaintText);
 
     // A randomly generated 16-byte string used as the AES encryption vector,
     // which is Base64 encoded with the ciphertext to generate the final token
     const iv: string = makeRandomIv();
-    console.log("iv", iv);
 
     // Encrypt
     const encryptBuf = aesEncrypt(plaintText, secret, iv);
 
     // Token binary splicing: expiration time + Base64(iv length + iv + encrypted
     // information length + encrypted information)
-    const [b1, b2, b3] = [new Uint8Array(8), new Uint8Array(2), new Uint8Array(2)];
+    const [b1, b2, b3] = [
+        new Uint8Array(8),
+        new Uint8Array(2),
+        new Uint8Array(2),
+    ];
     new DataView(b1.buffer).setBigInt64(0, BigInt(tokenInfo.expire), false);
     new DataView(b2.buffer).setUint16(0, iv.length, false);
     new DataView(b3.buffer).setUint16(0, encryptBuf.byteLength, false);

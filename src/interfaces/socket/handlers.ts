@@ -3,7 +3,10 @@ import { ChatMessageRepository } from "@infrastructure/database/repo/ChatMessage
 import { ChatSessionRepository } from "@infrastructure/database/repo/ChatSessionRepo";
 import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
 import { NotificationRepository } from "@infrastructure/database/repo/NotificationRepo";
-import { ChatMessageInputDto, ChatMessageOutputDto } from "@src/application/dtos/chats/ChatMessageDto";
+import {
+    ChatMessageInputDto,
+    ChatMessageOutputDto,
+} from "@src/application/dtos/chats/ChatMessageDto";
 import { DisputesRepo } from "@infrastructure/database/repo/DisputesRepo";
 import { NotificationDto } from "@src/application/dtos/Notification/BaseNotification";
 import { AppointmentsRepository } from "@infrastructure/database/repo/AppointmentsRepo";
@@ -17,24 +20,23 @@ const chatUsecase = new ChatUseCase(
     new ChatSessionRepository(),
     new ChatMessageRepository(),
     new SessionsRepository(),
-    new DisputesRepo(),
+    new DisputesRepo()
 );
 const CreateNotification = new NotificationUsecase(
     new NotificationRepository(),
     new SessionsRepository(),
     new ChatSessionRepository(),
-    new AppointmentsRepository(),
+    new AppointmentsRepository()
 );
 
 export class SocketHandlers {
     private eventEnum = SocketEventEnum;
     constructor(
-        private socket: Socket,
-        private io: SocketIOServer,
+    private socket: Socket,
+    private io: SocketIOServer
     ) {}
     handleEmiter(id: string, event: SocketEventEnum, payload: any) {
         this.socket.to(id).emit(event, payload);
-        // console.log(`Emitting ${event} to user ${id}`, payload);
     }
     getChatSessionDetails(sessionId: string) {
         return chatUsecase.getChatSessionById(sessionId);
@@ -45,10 +47,13 @@ export class SocketHandlers {
 
     async handleSendMessage(
         newMessage: ChatMessageInputDto,
-        cb: (payload: { success: boolean; savedMessage?: ChatMessageOutputDto; error?: string }) => {},
+        cb: (payload: {
+      success: boolean;
+      savedMessage?: ChatMessageOutputDto;
+      error?: string;
+    }) => {}
     ) {
         try {
-            // console.log("newmessage:", newMcessage);
             const chatSend = await chatUsecase.createChatMessage({
                 receiverId: newMessage.receiverId,
                 senderId: newMessage.senderId,
@@ -57,15 +62,17 @@ export class SocketHandlers {
                 content: newMessage.content,
             });
             cb({ success: true, savedMessage: chatSend || undefined });
-            this.handleEmiter(chatSend?.receiverId || "", this.eventEnum.MESSAGE_RECEIVED_EVENT, chatSend);
+            this.handleEmiter(
+                chatSend?.receiverId || "",
+                this.eventEnum.MESSAGE_RECEIVED_EVENT,
+                chatSend
+            );
         } catch (error: any) {
-            console.log("error sending message", error);
             cb({ success: false, error: error.message });
         }
     }
 
     handleSocketDisconnect() {
-        console.log("user has disconnected 🚫. userId: " + this.socket.data.user?.id);
         const userId = this.socket.data.user?.id;
         if (userId) {
             for (const room of this.socket.rooms) {
@@ -108,8 +115,8 @@ export class SocketHandlers {
         }
 
         const isParticipant =
-            chatSessionDetails.participants.client_id === userId ||
-            chatSessionDetails.participants.lawyer_id === userId;
+      chatSessionDetails.participants.client_id === userId ||
+      chatSessionDetails.participants.lawyer_id === userId;
 
         if (!isParticipant) {
             this.handleEmiter(userId, SocketEventEnum.SOCKET_ERROR_EVENT, {
@@ -122,9 +129,10 @@ export class SocketHandlers {
 
         const socketsInRoom = await this.io.in(sessionId).fetchSockets();
 
-        const userAlreadyInRoom = socketsInRoom.some((s) => s.data.userId === userId);
+        const userAlreadyInRoom = socketsInRoom.some(
+            (s) => s.data.userId === userId
+        );
         if (userAlreadyInRoom) {
-            console.log("User already in chat session room");
             return;
         }
         const uniqueUserIds = new Set(socketsInRoom.map((s) => s.data.userId));
@@ -138,12 +146,15 @@ export class SocketHandlers {
         this.socket.emit(SocketEventEnum.CONNECTED_EVENT, {
             isConnected: true,
         });
-        console.log(`User ${userId} joined chat session ${sessionId}`);
     }
 
     async handleChangeChatName(
         data: { chatId: string; chatName: string; userId: string },
-        cb: (response: { success: boolean; updatedChat?: any; error?: string }) => void,
+        cb: (response: {
+      success: boolean;
+      updatedChat?: any;
+      error?: string;
+    }) => void
     ) {
         try {
             const updatedChat = await chatUsecase.updateChatName({
@@ -152,38 +163,41 @@ export class SocketHandlers {
             });
             if (updatedChat) {
                 cb({ success: true, updatedChat });
-                this.handleEmiter(data.userId, SocketEventEnum.CHANGE_CHAT_NAME_EVENT, updatedChat);
+                this.handleEmiter(
+                    data.userId,
+                    SocketEventEnum.CHANGE_CHAT_NAME_EVENT,
+                    updatedChat
+                );
             } else {
                 cb({ success: false, error: "Chat not found or update failed" });
             }
         } catch (error: any) {
-            console.error("Error updating chat name:", error);
             cb({ success: false, error: error?.message || "Internal server error" });
         }
     }
 
     async handleDeleteMessage(payload: { messageId: string; sessionId: string }) {
         try {
-            // console.log("payload", payload);
             const lastMessage = await chatUsecase.deleteMessage(payload);
-            // console.log("lastmessage", lastMessage);
             this.io.in(payload.sessionId).emit(this.eventEnum.MESSAGE_DELETE_EVENT, {
                 ...payload,
                 lastMessage: lastMessage,
             });
-        } catch (error: any) {
-            console.log("error occured while deleting message: " + " " + error);
-        }
+        } catch (error: any) {}
     }
 
     async handleReportMessage(
         payload: {
-            messageId: string;
-            sessionId: string;
-            reason: string;
-            reportedBy: string;
-        },
-        cb: (response: { success: boolean; reportedMessage?: any | null; error?: string }) => void,
+      messageId: string;
+      sessionId: string;
+      reason: string;
+      reportedBy: string;
+    },
+        cb: (response: {
+      success: boolean;
+      reportedMessage?: any | null;
+      error?: string;
+    }) => void
     ) {
         try {
             const { messageId, reason, reportedBy } = payload;
@@ -206,7 +220,6 @@ export class SocketHandlers {
 
             cb({ success: true });
         } catch (error: any) {
-            console.log("error reporting message :", error);
             cb({ success: false, error: error?.message });
         }
     }
@@ -214,18 +227,25 @@ export class SocketHandlers {
     async handleSendNotification(payload: NotificationDto) {
         try {
             if (payload.type === "message") {
-                const socketsInRoom = await this.io.in(payload?.sessionId || "").fetchSockets();
-                const userAlreadyInRoom = socketsInRoom.some((s) => s.data.userId === payload?.recipientId);
+                const socketsInRoom = await this.io
+                    .in(payload?.sessionId || "")
+                    .fetchSockets();
+                const userAlreadyInRoom = socketsInRoom.some(
+                    (s) => s.data.userId === payload?.recipientId
+                );
                 if (!userAlreadyInRoom) {
                     const newNotification = await CreateNotification.execute(payload);
-                    this.io.to(payload.recipientId).emit(this.eventEnum.NOTIFICATION_RECEIVED, newNotification);
+                    this.io
+                        .to(payload.recipientId)
+                        .emit(this.eventEnum.NOTIFICATION_RECEIVED, newNotification);
                 }
             } else if (payload.type === "session") {
                 const newNotification = await CreateNotification.execute(payload);
-                this.io.to(payload.recipientId).emit(this.eventEnum.NOTIFICATION_RECEIVED, newNotification);
+                this.io
+                    .to(payload.recipientId)
+                    .emit(this.eventEnum.NOTIFICATION_RECEIVED, newNotification);
             }
         } catch (error: any) {
-            console.log("error :", error);
             this.io.to(payload.senderId).emit(this.eventEnum.ERROR, error.message);
         }
     }

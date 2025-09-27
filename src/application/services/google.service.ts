@@ -15,19 +15,17 @@ export async function verifyAuthCode(code: string) {
 
         const ticket = await oauth2Client.verifyIdToken({
             idToken:
-                tokens.id_token ??
-                (() => {
-                    throw new Error("TOKEN_MISSING");
-                })(),
+        tokens.id_token ??
+        (() => {
+            throw new Error("TOKEN_MISSING");
+        })(),
             audience: CLIENT_ID,
         });
 
         const payload = ticket.getPayload();
-        console.log("payload", payload);
 
         return payload;
     } catch (err) {
-        console.error("Error verifying auth code:", err);
         throw err;
     }
 }

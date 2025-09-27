@@ -9,10 +9,10 @@ import { IResendOtpUseCase } from "../IResendOtpUseCase";
 
 export class ResendOtpUseCase implements IResendOtpUseCase {
     constructor(
-        private userRepo: IUserRepository,
-        private otpRepo: IOtpRepository,
-        private emailProvider: INodeMailerProvider,
-        private tokenProvider: IJwtProvider,
+    private userRepo: IUserRepository,
+    private otpRepo: IOtpRepository,
+    private emailProvider: INodeMailerProvider,
+    private tokenProvider: IJwtProvider
     ) {}
     async execute(input: string): Promise<void> {
         const user = await this.userRepo.findByEmail(input);
@@ -31,9 +31,7 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
         });
         try {
             await this.emailProvider.sendVerificationMail(user.email, token, otp);
-            console.log("email send successfully");
         } catch (error: any) {
-            console.log(error.message);
             throw new Error("MAIL_SEND_ERROR");
         }
         try {

@@ -25,7 +25,6 @@ export class FetchOverrideSlots implements IController {
             const response = await this.fetchOverrideSlots.execute(user_id);
             return this.httpSuccess.success_200(response);
         } catch (error) {
-            console.log("error in fetging override slots", error);
             if (error instanceof Error) {
                 return this.httpErrors.error_400(error.message);
             }

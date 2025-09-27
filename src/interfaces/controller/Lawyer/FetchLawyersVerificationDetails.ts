@@ -26,7 +26,6 @@ export class FetchLawyersVerificationDataController implements IController {
             const result = await this._fetchVerificationDataUsecase.execute(userId);
             return this._success.success_200(result);
         } catch (error) {
-            console.log("error ", error);
             if (error instanceof Error) {
                 return this._errors.error_400(error.message);
             }

@@ -15,9 +15,8 @@ export class UserRepository implements IUserRepository {
     }
     async create(user: User): Promise<User> {
         const mapped = this.Mapper.toPersistence(user);
-        // console.log("mapped", mapped);
         const savedUser = await new UserModel(mapped).save({ session: this._session }).catch((err) => {
-            console.log("error creating  user", err);
+      
             throw new Error("Db error creating user");
         });
         return this.Mapper.toDomain(savedUser);

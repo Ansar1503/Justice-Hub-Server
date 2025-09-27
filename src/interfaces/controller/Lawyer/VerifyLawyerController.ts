@@ -49,7 +49,6 @@ export class VerifyLawyerController implements IController {
             specialisation: [],
             consultation_fee: "",
         };
-        // console.log("req.files.", httpRequest.files);
         if (httpRequest.user && typeof httpRequest.user === "object" && "id" in httpRequest.user) {
             DocumentsPayload.user_id = String(httpRequest.user.id);
         }
@@ -145,7 +144,6 @@ export class VerifyLawyerController implements IController {
             const result = await this.verifyLawyer.execute(payload);
             return this.httpSuccess.success_200(result);
         } catch (error) {
-            console.log("error ", error);
             if (error instanceof Error) {
                 return this.httpErrors.error_400(error.message);
             }

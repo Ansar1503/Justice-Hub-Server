@@ -31,7 +31,6 @@ export class FetchSlotSettingsController implements IController {
                 data: response || {},
             });
         } catch (error) {
-            console.log("error in fetching slot Settings: ", error);
             if (error instanceof Error) {
                 return this.httpErrors.error_500(error.message);
             }

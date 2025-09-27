@@ -27,6 +27,5 @@ export async function createToken({
     if (!token.startsWith("04")) {
         throw new ValidationError("Token must start with 04");
     }
-    console.log(`Token created ${token} video call`);
     return { token: token, appId: ZEGO_APP_ID };
 }

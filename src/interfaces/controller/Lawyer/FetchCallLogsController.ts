@@ -39,7 +39,6 @@ export class FetchCallLogsController implements IController {
                 page,
                 sessionId: id,
             });
-            console.log("result : ", result);
             return this.httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof AppError) {

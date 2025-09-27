@@ -24,7 +24,6 @@ export class FetchChatDisputesController implements IController {
             const response = await this.fetchChatDisputes.execute(parsed.data);
             return this.httpSuccess.success_200(response);
         } catch (error) {
-            console.log("error in fetching chat disputes", error);
             if (error instanceof Error) {
                 return this.httpErrors.error_400(error.message);
             }

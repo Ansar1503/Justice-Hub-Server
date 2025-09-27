@@ -32,7 +32,6 @@ export class CancelAppointmentController implements IController {
             const success = this.httpSuccess.success_200(result);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            console.log("error in ", error);
             if (error instanceof Error) {
                 return this.httpErrors.error_400(error.message);
             }

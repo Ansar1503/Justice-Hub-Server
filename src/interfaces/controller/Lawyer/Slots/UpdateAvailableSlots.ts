@@ -36,7 +36,6 @@ export class UpdateAvailableSlotsController implements IController {
             return this.httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                console.log("error in updating avaliable slots:", error);
                 return this.httpErrors.error_500(error.message);
             }
             return this.httpErrors.error_500();

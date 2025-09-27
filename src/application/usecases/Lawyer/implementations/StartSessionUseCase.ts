@@ -57,7 +57,6 @@ export class StartSessionUseCase implements IStartSessionUseCase {
         try {
             await this._callLogsRepo.create(newcallLog);
         } catch (error) {
-            console.log("clalllogs erro", error);
         }
         const session = await this._sessionsRepo.update({
             start_time: newDate,

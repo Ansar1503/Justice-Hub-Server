@@ -51,7 +51,6 @@ export class AppointmentsRepository
             await session.commitTransaction();
             return this.mapper.toDomain(newAppointment);
         } catch (error) {
-            console.log("error in transaction ", error);
             await session.abortTransaction();
         } finally {
             session.endSession();
@@ -215,7 +214,6 @@ export class AppointmentsRepository
             AppointmentModel.aggregate(dataPipeline),
             AppointmentModel.aggregate(countPipeline),
         ]);
-        // console.log("dataResult", dataResult);
         const totalCount = countResult[0]?.total || 0;
         const totalPage = Math.ceil(totalCount / limit);
         return {
@@ -325,7 +323,6 @@ export class AppointmentsRepository
             AppointmentModel.aggregate(dataPipeline),
             AppointmentModel.aggregate(countPipeline),
         ]);
-        // console.log("dataResult", dataResult);
         const totalCount = countResult[0]?.total || 0;
         const totalPage = Math.ceil(totalCount / limit);
         return {

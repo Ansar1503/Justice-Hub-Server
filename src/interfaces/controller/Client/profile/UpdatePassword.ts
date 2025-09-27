@@ -42,7 +42,6 @@ export class UpdatePasswordController implements IController {
             const success = this.httpSuccess.success_200();
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            console.log("password updater ", error);
             if (error instanceof Error) {
                 return this.httpErrors.error_400(error.message);
             }
