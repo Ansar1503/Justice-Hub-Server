@@ -5,9 +5,6 @@ import { ScheduleSettingsRepository } from "@infrastructure/database/repo/Schedu
 import { AvailableSlotRepository } from "@infrastructure/database/repo/AvailableSlotsRepo";
 
 export function UpdateAvailableSlotsComposer(): IController {
-    const usecase = new UpdateAvailableSlotUseCase(
-        new ScheduleSettingsRepository(),
-        new AvailableSlotRepository()
-    );
+    const usecase = new UpdateAvailableSlotUseCase(new ScheduleSettingsRepository(), new AvailableSlotRepository());
     return new UpdateAvailableSlotsController(usecase);
 }

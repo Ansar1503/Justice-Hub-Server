@@ -1,4 +1,3 @@
-import { IController } from "../../Interface/IController";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
@@ -7,12 +6,13 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IFetchClientDataUseCase } from "@src/application/usecases/Client/IFetchClientData";
+import { IController } from "../../Interface/IController";
 
 export class FetchClientDataController implements IController {
     constructor(
-    private fetchClientData: IFetchClientDataUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private fetchClientData: IFetchClientDataUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const user_id = (httpRequest as Record<string, any>)?.user?.id;

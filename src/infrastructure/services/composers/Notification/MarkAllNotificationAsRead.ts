@@ -4,8 +4,6 @@ import { MarkAllNotificationAsReadController } from "@interfaces/controller/Noti
 import { MarkAllNotificationAsReadUseCase } from "@src/application/usecases/Notification/implementation/MarkAllNotificationAsRead";
 
 export function MarkAllNotificationAsReadComposer(): IController {
-    const usecase = new MarkAllNotificationAsReadUseCase(
-        new NotificationRepository()
-    );
+    const usecase = new MarkAllNotificationAsReadUseCase(new NotificationRepository());
     return new MarkAllNotificationAsReadController(usecase);
 }

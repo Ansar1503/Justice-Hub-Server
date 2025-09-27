@@ -1,16 +1,14 @@
 import { NotificationDto } from "@src/application/dtos/Notification/BaseNotification";
-import { IFetchAllNotificationsUseCase } from "../IFetchAllNotificationsUseCase";
 import { INotificationRepo } from "@domain/IRepository/INotificationRepo";
+import { IFetchAllNotificationsUseCase } from "../IFetchAllNotificationsUseCase";
 
-export class FetchAllNotificationsUseCase
-implements IFetchAllNotificationsUseCase
-{
+export class FetchAllNotificationsUseCase implements IFetchAllNotificationsUseCase {
     constructor(private notificationRepo: INotificationRepo) {}
     async execute(input: {
-    user_id: string;
-    cursor: number;
-  }): Promise<{ data: NotificationDto[] | []; nextCursor?: number }> {
-        console.log("input",input);
+        user_id: string;
+        cursor: number;
+    }): Promise<{ data: NotificationDto[] | []; nextCursor?: number }> {
+        console.log("input", input);
         const notification = await this.notificationRepo.findAllByUserId({
             userId: input.user_id,
             cursor: input.cursor,

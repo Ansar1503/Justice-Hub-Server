@@ -18,11 +18,7 @@ export class NodeMailerProvider implements INodeMailerProvider {
         });
     }
 
-    async sendVerificationMail(
-        email: string,
-        token: string,
-        otp: string
-    ): Promise<void> {
+    async sendVerificationMail(email: string, token: string, otp: string): Promise<void> {
         const mailoptions = {
             from: this.smtpUser,
             to: email,
@@ -33,7 +29,7 @@ export class NodeMailerProvider implements INodeMailerProvider {
 }/api/user/verify-email?token=${token}&email=${email}">here</a></button> to verify your email.</p><br/>
             ${
     otp &&
-              `<h4>or</h4> <br/>
+                `<h4>or</h4> <br/>
             <p>use this <h3>${otp}</h3> otp to verify your email</p>`
 }`,
         };

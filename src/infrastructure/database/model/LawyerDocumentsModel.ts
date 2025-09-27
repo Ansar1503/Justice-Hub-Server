@@ -1,13 +1,13 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ILawyerDocumentsModel extends Document {
-  _id: string;
-  userId: string;
-  enrollmentCertificate: string;
-  certificateOfPractice: string;
-  barCouncilCertificate: string;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    userId: string;
+    enrollmentCertificate: string;
+    certificateOfPractice: string;
+    barCouncilCertificate: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const LawyerDocumentsSchema = new Schema<ILawyerDocumentsModel>(
@@ -18,10 +18,7 @@ const LawyerDocumentsSchema = new Schema<ILawyerDocumentsModel>(
         certificateOfPractice: { type: String },
         barCouncilCertificate: { type: String },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
-export default mongoose.model<ILawyerDocumentsModel>(
-    "lawyerdocuments",
-    LawyerDocumentsSchema
-);
+export default mongoose.model<ILawyerDocumentsModel>("lawyerdocuments", LawyerDocumentsSchema);

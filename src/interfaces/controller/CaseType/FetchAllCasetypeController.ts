@@ -1,16 +1,16 @@
 import { IFechAllCasetypeUsecase } from "@src/application/usecases/CaseType/IFetchAllCasetypeUsecase";
-import { IController } from "../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { CasetypeQueryValidationSchema } from "@interfaces/middelwares/validator/zod/Casetype/CasetypeQueryValidation";
+import { IController } from "../Interface/IController";
 
 export class FetchAllCasetypeController implements IController {
     constructor(
-    private _usecase: IFechAllCasetypeUsecase,
-    private _errors: IHttpErrors,
-    private _success: IHttpSuccess
+        private _usecase: IFechAllCasetypeUsecase,
+        private _errors: IHttpErrors,
+        private _success: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const parsed = CasetypeQueryValidationSchema.safeParse(httpRequest.query);

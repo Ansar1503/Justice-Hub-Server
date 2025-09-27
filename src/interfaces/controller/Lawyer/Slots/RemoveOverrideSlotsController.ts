@@ -9,18 +9,14 @@ import { IRemoveOverrideSlotUseCase } from "@src/application/usecases/Lawyer/IRe
 
 export class RemoveOverrideSlotsController implements IController {
     constructor(
-    private removeOverrideSlots: IRemoveOverrideSlotUseCase,
-    private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    private httpErrors: IHttpErrors = new HttpErrors()
+        private removeOverrideSlots: IRemoveOverrideSlotUseCase,
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
         let date: string = "";
-        if (
-            httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user
-        ) {
+        if (httpRequest.user && typeof httpRequest.user === "object" && "id" in httpRequest.user) {
             user_id = String(httpRequest.user.id);
         }
         if (!user_id) {
@@ -32,9 +28,9 @@ export class RemoveOverrideSlotsController implements IController {
         if (typeof httpRequest.query === "object" && httpRequest.query !== null) {
             if ("date" in httpRequest.query) {
                 date =
-          typeof httpRequest.query.date === "string"
-              ? httpRequest.query.date
-              : String(httpRequest.query.date);
+                    typeof httpRequest.query.date === "string"
+                        ? httpRequest.query.date
+                        : String(httpRequest.query.date);
             }
         }
 

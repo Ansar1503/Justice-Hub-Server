@@ -3,17 +3,17 @@ import mongoose, { Document, Schema } from "mongoose";
 type NotificationType = "message" | "session";
 
 export interface INotificationModel extends Document {
-  _id: string;
-  recipientId: string;
-  senderId: string;
-  type: NotificationType;
-  roomId: string;
-  sessionId: string;
-  title: string;
-  message: string;
-  isRead: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    recipientId: string;
+    senderId: string;
+    type: NotificationType;
+    roomId: string;
+    sessionId: string;
+    title: string;
+    message: string;
+    isRead: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const NotificationSchema = new Schema<INotificationModel>(
@@ -28,10 +28,7 @@ const NotificationSchema = new Schema<INotificationModel>(
         roomId: { type: String, required: false },
         sessionId: { type: String, required: false },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
-export const NotificationModel = mongoose.model<INotificationModel>(
-    "Notification",
-    NotificationSchema
-);
+export const NotificationModel = mongoose.model<INotificationModel>("Notification", NotificationSchema);

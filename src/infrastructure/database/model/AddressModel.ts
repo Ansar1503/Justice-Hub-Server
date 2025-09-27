@@ -1,14 +1,14 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IAddresModel extends Document {
-  _id: string;
-  user_id: string;
-  state: string;
-  city: string;
-  locality: string;
-  pincode: string;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    user_id: string;
+    state: string;
+    city: string;
+    locality: string;
+    pincode: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const AddressSchema = new Schema<IAddresModel>(
@@ -21,7 +21,7 @@ const AddressSchema = new Schema<IAddresModel>(
         user_id: { type: String, required: false, unique: true },
     },
 
-    { timestamps: true }
+    { timestamps: true },
 );
 
 const AddressModel = mongoose.model("Address", AddressSchema);

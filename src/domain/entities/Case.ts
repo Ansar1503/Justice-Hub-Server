@@ -2,25 +2,25 @@ import { v4 as uuidv4 } from "uuid";
 
 type StatusType = "open" | "closed" | "onhold";
 interface PersistedCaseProps {
-  id: string;
-  title: string;
-  clientId: string;
-  lawyerId: string;
-  caseType: string;
-  status: StatusType;
-  summary?: string;
-  estimatedValue?: number;
-  nextHearing?: Date;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    title: string;
+    clientId: string;
+    lawyerId: string;
+    caseType: string;
+    status: StatusType;
+    summary?: string;
+    estimatedValue?: number;
+    nextHearing?: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 interface CreateCaseProps {
-  title: string;
-  clientId: string;
-  lawyerId: string;
-  caseType: string;
-  summary?: string;
+    title: string;
+    clientId: string;
+    lawyerId: string;
+    caseType: string;
+    summary?: string;
 }
 
 export class Case {

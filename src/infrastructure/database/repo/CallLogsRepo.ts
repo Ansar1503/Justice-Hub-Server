@@ -1,38 +1,26 @@
 import { IMapper } from "@infrastructure/Mapper/IMapper";
+import { CallLogsMapper } from "@infrastructure/Mapper/Implementations/CallLogsMapper";
 import { CallLogs as CallLogsEntity } from "../../../domain/entities/CallLogs";
 import { ICallLogs } from "../../../domain/IRepository/ICallLogs";
 import { CallLogsModel, IcallLogModel } from "../model/CallLogsModel";
-import { CallLogsMapper } from "@infrastructure/Mapper/Implementations/CallLogsMapper";
 
 export class CallLogsRepository implements ICallLogs {
-    constructor(
-    private mapper: IMapper<
-      CallLogsEntity,
-      IcallLogModel
-    > = new CallLogsMapper()
-    ) {}
+    constructor(private mapper: IMapper<CallLogsEntity, IcallLogModel> = new CallLogsMapper()) {}
 
     async create(payload: CallLogsEntity): Promise<CallLogsEntity> {
         const newLog = new CallLogsModel(this.mapper.toPersistence(payload));
         await newLog.save();
         return this.mapper.toDomain(newLog);
     }
-    async findBySessionId(payload: {
-    sessionId: string;
-    limit: number;
-    page: number;
-  }): Promise<{
-    data: CallLogsEntity[] | [];
-    totalCount: number;
-    currentPage: number;
-    totalPages: number;
-  }> {
+    async findBySessionId(payload: { sessionId: string; limit: number; page: number }): Promise<{
+        data: CallLogsEntity[] | [];
+        totalCount: number;
+        currentPage: number;
+        totalPages: number;
+    }> {
         const { limit, page, sessionId } = payload;
         const skip = (page - 1) * limit;
-        const data = await CallLogsModel.find({ session_id: sessionId })
-            .limit(limit)
-            .skip(skip)
-            .lean();
+        const data = await CallLogsModel.find({ session_id: sessionId }).limit(limit).skip(skip).lean();
 
         const totalCount = await CallLogsModel.countDocuments({
             session_id: sessionId,
@@ -40,18 +28,13 @@ export class CallLogsRepository implements ICallLogs {
         const totalPages = Math.ceil(totalCount / limit);
         const currentPage = page;
         return {
-            data:
-        data && this.mapper.toDomainArray
-            ? this.mapper.toDomainArray(data)
-            : [],
+            data: data && this.mapper.toDomainArray ? this.mapper.toDomainArray(data) : [],
             totalCount,
             currentPage,
             totalPages,
         };
     }
-    async updateByRoomId(
-        payload: Partial<CallLogsEntity>
-    ): Promise<CallLogsEntity | null> {
+    async updateByRoomId(payload: Partial<CallLogsEntity>): Promise<CallLogsEntity | null> {
         const {
             roomId,
             callDuration,
@@ -100,11 +83,7 @@ export class CallLogsRepository implements ICallLogs {
         if (status) {
             update.status = status;
         }
-        const updatedLog = await CallLogsModel.findOneAndUpdate(
-            { roomId: roomId },
-            { $set: update },
-            { new: true }
-        );
+        const updatedLog = await CallLogsModel.findOneAndUpdate({ roomId: roomId }, { $set: update }, { new: true });
         // console.log("updatedLogs:", updatedLog);
         if (!updatedLog) return null;
         return this.mapper.toDomain(updatedLog);

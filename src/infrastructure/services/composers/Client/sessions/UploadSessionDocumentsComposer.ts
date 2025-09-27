@@ -9,7 +9,7 @@ export function UploadSessionDocumentsComposer(): IController {
     const usecase = new UploadSessionDocument(
         new SessionDocumentsRepository(),
         new SessionsRepository(),
-        new AppointmentsRepository()
+        new AppointmentsRepository(),
     );
     return new UploadSessionDocumentsController(usecase);
 }

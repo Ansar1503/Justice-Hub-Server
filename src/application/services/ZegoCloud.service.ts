@@ -22,13 +22,7 @@ export async function createToken({
         stream_id_list: null,
     });
 
-    const token = generateToken04(
-        ZEGO_APP_ID,
-        userId,
-        ZEGO_SERVER_SECRET,
-        expiry,
-        payload
-    );
+    const token = generateToken04(ZEGO_APP_ID, userId, ZEGO_SERVER_SECRET, expiry, payload);
 
     if (!token.startsWith("04")) {
         throw new ValidationError("Token must start with 04");

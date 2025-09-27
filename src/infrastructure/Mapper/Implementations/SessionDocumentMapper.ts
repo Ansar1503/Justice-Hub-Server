@@ -1,10 +1,8 @@
 import { SessionDocument } from "@domain/entities/SessionDocument";
-import { IMapper } from "../IMapper";
 import { ISessionDocumentModel } from "@infrastructure/database/model/SessionDocumentsModel";
+import { IMapper } from "../IMapper";
 
-export class SessionDocumentMapper
-implements IMapper<SessionDocument, ISessionDocumentModel>
-{
+export class SessionDocumentMapper implements IMapper<SessionDocument, ISessionDocumentModel> {
     toDomain(persistence: ISessionDocumentModel): SessionDocument {
         return SessionDocument.fromPersistence({
             id: persistence._id,

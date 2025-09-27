@@ -1,29 +1,23 @@
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
-import { IController } from "../Interface/IController";
 import { BookAppointmentsByWalletZodSchema } from "@interfaces/middelwares/validator/zod/Appointments/BookAppointmentByWalletSchema";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IBookAppointmentsByWalletUsecase } from "@src/application/usecases/Appointments/IBookAppointmentsByWalletUsecase";
+import { IController } from "../Interface/IController";
 
 export class BookAppointmentByWalletController implements IController {
     constructor(
-    private _bookAppointmentUsecase: IBookAppointmentsByWalletUsecase,
-    private _errors: IHttpErrors,
-    private _success: IHttpSuccess
+        private _bookAppointmentUsecase: IBookAppointmentsByWalletUsecase,
+        private _errors: IHttpErrors,
+        private _success: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let userId = "";
-        if (
-            httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user
-        ) {
+        if (httpRequest.user && typeof httpRequest.user === "object" && "id" in httpRequest.user) {
             userId = String(httpRequest.user.id);
         }
-        const parsed = BookAppointmentsByWalletZodSchema.safeParse(
-            httpRequest.body
-        );
+        const parsed = BookAppointmentsByWalletZodSchema.safeParse(httpRequest.body);
         if (!userId) {
             return this._errors.error_400("no userId found");
         }

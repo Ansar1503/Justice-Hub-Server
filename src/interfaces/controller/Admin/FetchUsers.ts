@@ -1,6 +1,5 @@
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
-import { IController } from "../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
@@ -8,12 +7,13 @@ import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IFetchUsersUseCase } from "@src/application/usecases/Admin/IFetchUsersUseCase";
 import { UseCaseInputDto } from "@src/application/dtos/Admin/FetchAllUsersDto";
+import { IController } from "../Interface/IController";
 
 export class FetchALLUsers implements IController {
     constructor(
-    private fetchUserUseCase: IFetchUsersUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private fetchUserUseCase: IFetchUsersUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     private isValidRole(value: unknown): value is UseCaseInputDto["role"] {

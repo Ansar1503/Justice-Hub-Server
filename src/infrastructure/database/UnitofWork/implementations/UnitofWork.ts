@@ -1,5 +1,4 @@
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
-import { IUnitofWork } from "../IUnitofWork";
 import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
 import { IWalletTransactionsRepo } from "@domain/IRepository/IWalletTransactionsRepo";
 import type { ClientSession } from "mongoose";
@@ -37,6 +36,7 @@ import { OverrideSlotsRepository } from "@infrastructure/database/repo/OverrideS
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
 import { SessionMapper } from "@infrastructure/Mapper/Implementations/SessionMapper";
+import { IUnitofWork } from "../IUnitofWork";
 
 export class MongoUnitofWork implements IUnitofWork {
     private _session?: ClientSession;
@@ -62,9 +62,7 @@ export class MongoUnitofWork implements IUnitofWork {
 
     get caseRepo(): ICaseRepo {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._caseRepo) {
             this._caseRepo = new CaseRepository(new CaseMapper(), this._session);
@@ -74,9 +72,7 @@ export class MongoUnitofWork implements IUnitofWork {
 
     get appointmentRepo(): IAppointmentsRepository {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._appointmentRepo) {
             this._appointmentRepo = new AppointmentsRepository(this._session);
@@ -86,9 +82,7 @@ export class MongoUnitofWork implements IUnitofWork {
 
     get walletRepo(): IWalletRepo {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._walletRepo) {
             this._walletRepo = new WalletRepo(this._session);
@@ -98,9 +92,7 @@ export class MongoUnitofWork implements IUnitofWork {
 
     get transactionsRepo(): IWalletTransactionsRepo {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._transactionsRepo) {
             this._transactionsRepo = new WalletTransactionsRepo(this._session);
@@ -110,9 +102,7 @@ export class MongoUnitofWork implements IUnitofWork {
 
     get userRepo(): IUserRepository {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._userRepo) {
             this._userRepo = new UserRepository(new UserMapper(), this._session);
@@ -122,24 +112,17 @@ export class MongoUnitofWork implements IUnitofWork {
 
     get clientRepo(): IClientRepository {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._clientRepo) {
-            this._clientRepo = new ClientRepository(
-                new ClientMapper(),
-                this._session
-            );
+            this._clientRepo = new ClientRepository(new ClientMapper(), this._session);
         }
         return this._clientRepo;
     }
 
     get otpRepo(): IOtpRepository {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._otpRepo) {
             this._otpRepo = new OtpRepository(new OtpMapper(), this._session);
@@ -149,53 +132,37 @@ export class MongoUnitofWork implements IUnitofWork {
 
     get lawyerRepo(): ILawyerRepository {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._lawyerRepo) {
-            this._lawyerRepo = new LawyerRepository(
-                new LawyerMapper(),
-                this._session
-            );
+            this._lawyerRepo = new LawyerRepository(new LawyerMapper(), this._session);
         }
         return this._lawyerRepo;
     }
 
     get lawyerVerificationRepo(): ILawyerVerificationRepo {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._lawyerVerificationRepo) {
-            this._lawyerVerificationRepo = new LawyerVerificationRepo(
-                new LawyerVerificationMapper(),
-                this._session
-            );
+            this._lawyerVerificationRepo = new LawyerVerificationRepo(new LawyerVerificationMapper(), this._session);
         }
         return this._lawyerVerificationRepo;
     }
 
     get lawyerDocumentsRepo(): ILawyerDocumentsRepository {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._lawyerDocumentsRepo) {
-            this._lawyerDocumentsRepo = new LawyerDocumentsRepository(
-                new lawyerDocumentsMapper()
-            );
+            this._lawyerDocumentsRepo = new LawyerDocumentsRepository(new lawyerDocumentsMapper());
         }
         return this._lawyerDocumentsRepo;
     }
 
     get scheduleSettingsRepo(): IScheduleSettingsRepo {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._scheduleSettingsRepo) {
             this._scheduleSettingsRepo = new ScheduleSettingsRepository();
@@ -205,9 +172,7 @@ export class MongoUnitofWork implements IUnitofWork {
 
     get availableSlotsRepo(): IAvailableSlots {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._availableSlotsRepo) {
             this._availableSlotsRepo = new AvailableSlotRepository();
@@ -217,9 +182,7 @@ export class MongoUnitofWork implements IUnitofWork {
 
     get overrideSlotsRepo(): IOverrideRepo {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._overrideSlotsRepo) {
             this._overrideSlotsRepo = new OverrideSlotsRepository();
@@ -229,22 +192,15 @@ export class MongoUnitofWork implements IUnitofWork {
 
     get sessionRepo(): ISessionsRepo {
         if (!this._session) {
-            throw new Error(
-                "Unit of Work session not initialized. Call startTransaction() first."
-            );
+            throw new Error("Unit of Work session not initialized. Call startTransaction() first.");
         }
         if (!this._sessionRepo) {
-            this._sessionRepo = new SessionsRepository(
-                new SessionMapper(),
-                this._session
-            );
+            this._sessionRepo = new SessionsRepository(new SessionMapper(), this._session);
         }
         return this._sessionRepo;
     }
 
-    async startTransaction<T>(
-        callback: (uow: IUnitofWork) => Promise<T>
-    ): Promise<T> {
+    async startTransaction<T>(callback: (uow: IUnitofWork) => Promise<T>): Promise<T> {
         if (this._session) {
             return await callback(this);
         }

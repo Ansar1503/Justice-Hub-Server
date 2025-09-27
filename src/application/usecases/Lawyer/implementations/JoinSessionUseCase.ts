@@ -1,24 +1,22 @@
 import { StartSessionOutputDto } from "@src/application/dtos/Lawyer/StartSessionDto";
-import { IJoinSessionUseCase } from "../IJoinSessionUseCase";
 import { createToken } from "@src/application/services/ZegoCloud.service";
 import { timeStringToDate } from "@shared/utils/helpers/DateAndTimeHelper";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
+import { IJoinSessionUseCase } from "../IJoinSessionUseCase";
 
 export class JoinSessionUseCase implements IJoinSessionUseCase {
     constructor(
-    private _sessionsRepo: ISessionsRepo,
-    private _appointmentRepo: IAppointmentsRepository
+        private _sessionsRepo: ISessionsRepo,
+        private _appointmentRepo: IAppointmentsRepository,
     ) {}
     async execute(input: { sessionId: string }): Promise<StartSessionOutputDto> {
         const existingSession = await this._sessionsRepo.findById({
             session_id: input.sessionId,
         });
         if (!existingSession) throw new ValidationError("session not found");
-        const appointmentDetails = await this._appointmentRepo.findByBookingId(
-            existingSession.bookingId
-        );
+        const appointmentDetails = await this._appointmentRepo.findByBookingId(existingSession.bookingId);
         if (!appointmentDetails) throw new Error("Appointment not found");
         switch (existingSession.status) {
         case "cancelled":
@@ -30,17 +28,12 @@ export class JoinSessionUseCase implements IJoinSessionUseCase {
         default:
             break;
         }
-        const slotDateTime = timeStringToDate(
-            appointmentDetails.date,
-            appointmentDetails.time
-        );
+        const slotDateTime = timeStringToDate(appointmentDetails.date, appointmentDetails.time);
         const newDate = new Date();
         // if (newDate < slotDateTime) {
         //   throw new ValidationError("Scheduled time is not reached");
         // }
-        slotDateTime.setMinutes(
-            slotDateTime.getMinutes() + appointmentDetails.duration + 5
-        );
+        slotDateTime.setMinutes(slotDateTime.getMinutes() + appointmentDetails.duration + 5);
         // if (newDate > slotDateTime)
         //   throw new ValidationError("session time is over");
         // console.log("sessssion", existingSession.);

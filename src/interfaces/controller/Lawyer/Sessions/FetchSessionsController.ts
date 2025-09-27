@@ -10,25 +10,20 @@ import { IFetchSessionUseCase } from "@src/application/usecases/Lawyer/IFetchSes
 
 export class FetchSessionsController implements IController {
     constructor(
-    private fetchSession: IFetchSessionUseCase,
-    private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    private httpErrors: IHttpErrors = new HttpErrors()
+        private fetchSession: IFetchSessionUseCase,
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
         let search: string = "";
-        let status: "completed" | "cancelled" | "upcoming" | "ongoing" | "missed" =
-      "upcoming";
+        let status: "completed" | "cancelled" | "upcoming" | "ongoing" | "missed" = "upcoming";
         let sort: "name" | "date" | "amount" | "created_at" = "date";
         let order: "asc" | "desc" = "asc";
         let consultation_type: "consultation" | "follow-up" = "consultation";
         let page: number = 1;
         let limit: number = 10;
-        if (
-            httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user
-        ) {
+        if (httpRequest.user && typeof httpRequest.user === "object" && "id" in httpRequest.user) {
             user_id = String(httpRequest.user.id);
         }
         if (!user_id) {
@@ -40,46 +35,41 @@ export class FetchSessionsController implements IController {
             }
             if (
                 "status" in httpRequest.query &&
-        (httpRequest.query.status === "completed" ||
-          httpRequest.query.status === "cancelled" ||
-          httpRequest.query.status === "upcoming" ||
-          httpRequest.query.status === "ongoing" ||
-          httpRequest.query.status === "missed")
+                (httpRequest.query.status === "completed" ||
+                    httpRequest.query.status === "cancelled" ||
+                    httpRequest.query.status === "upcoming" ||
+                    httpRequest.query.status === "ongoing" ||
+                    httpRequest.query.status === "missed")
             ) {
                 status = httpRequest.query.status;
             }
             if (
                 "sort" in httpRequest.query &&
-        (httpRequest.query.sort === "name" ||
-          httpRequest.query.sort === "date" ||
-          httpRequest.query.sort === "amount" ||
-          httpRequest.query.sort === "created_at")
+                (httpRequest.query.sort === "name" ||
+                    httpRequest.query.sort === "date" ||
+                    httpRequest.query.sort === "amount" ||
+                    httpRequest.query.sort === "created_at")
             ) {
                 sort = httpRequest.query.sort;
             }
             if (
                 "order" in httpRequest.query &&
-        (httpRequest.query.order === "asc" ||
-          httpRequest.query.order === "desc")
+                (httpRequest.query.order === "asc" || httpRequest.query.order === "desc")
             ) {
                 order = httpRequest.query.order;
             }
             if (
                 "consultation_type" in httpRequest.query &&
-        (httpRequest.query.consultation_type === "consultation" ||
-          httpRequest.query.consultation_type === "follow-up")
+                (httpRequest.query.consultation_type === "consultation" ||
+                    httpRequest.query.consultation_type === "follow-up")
             ) {
                 consultation_type = httpRequest.query.consultation_type;
             }
             if ("page" in httpRequest.query) {
-                page = isNaN(Number(httpRequest.query.page))
-                    ? Number(httpRequest.query.page)
-                    : 1;
+                page = isNaN(Number(httpRequest.query.page)) ? Number(httpRequest.query.page) : 1;
             }
             if ("limit" in httpRequest.query) {
-                limit = isNaN(Number(httpRequest.query.limit))
-                    ? Number(httpRequest.query.limit)
-                    : 10;
+                limit = isNaN(Number(httpRequest.query.limit)) ? Number(httpRequest.query.limit) : 10;
             }
         }
         try {
@@ -102,18 +92,9 @@ export class FetchSessionsController implements IController {
                 totalCount: result.totalCount,
             });
         } catch (error) {
-            if (
-                error &&
-        typeof error === "object" &&
-        "code" in error &&
-        "message" in error
-            ) {
+            if (error && typeof error === "object" && "code" in error && "message" in error) {
                 const statusCode =
-          typeof error?.code === "number" &&
-          error.code >= 100 &&
-          error.code < 600
-              ? error.code
-              : 500;
+                    typeof error?.code === "number" && error.code >= 100 && error.code < 600 ? error.code : 500;
                 return new HttpResponse(statusCode, { message: error.message });
             }
             return this.httpErrors.error_500();

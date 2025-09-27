@@ -1,19 +1,19 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 interface DocumentItem {
-  name: string;
-  type: string;
-  url: string;
+    name: string;
+    type: string;
+    url: string;
 }
 
 export interface ICaseDocumentModel extends Document {
-  _id: string;
-  caseId: string;
-  clientId?: string;
-  lawyerId?: string;
-  document: DocumentItem;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    caseId: string;
+    clientId?: string;
+    lawyerId?: string;
+    document: DocumentItem;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const DocumentItemSchema = new Schema<DocumentItem>(
@@ -22,7 +22,7 @@ const DocumentItemSchema = new Schema<DocumentItem>(
         type: { type: String, required: true },
         url: { type: String, required: true },
     },
-    { _id: false }
+    { _id: false },
 );
 
 const caseDocumentSchema = new Schema<ICaseDocumentModel>(
@@ -36,10 +36,7 @@ const caseDocumentSchema = new Schema<ICaseDocumentModel>(
         lawyerId: { type: String, ref: "lawyers" },
         document: { type: DocumentItemSchema, required: true },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
-export default mongoose.model<ICaseDocumentModel>(
-    "caseDocuments",
-    caseDocumentSchema
-);
+export default mongoose.model<ICaseDocumentModel>("caseDocuments", caseDocumentSchema);

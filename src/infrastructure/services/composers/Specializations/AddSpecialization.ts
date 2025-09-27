@@ -7,12 +7,6 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { AddSpecializationUsecase } from "@src/application/usecases/Specializations/implementations/AddSpecializationUsecase";
 
 export function AddSpecializationComposer(): IController {
-    const usecase = new AddSpecializationUsecase(
-        new SpecializationRepo(new SpecializationMapper())
-    );
-    return new AddSpecializationController(
-        usecase,
-        new HttpErrors(),
-        new HttpSuccess()
-    );
+    const usecase = new AddSpecializationUsecase(new SpecializationRepo(new SpecializationMapper()));
+    return new AddSpecializationController(usecase, new HttpErrors(), new HttpSuccess());
 }

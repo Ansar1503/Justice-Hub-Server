@@ -10,7 +10,7 @@ export function AddReviewComposer(): IController {
     const usecase = new AddReviewUseCase(
         new UserRepository(),
         new LawyerVerificationRepo(new LawyerVerificationMapper()),
-        new ReviewRepo()
+        new ReviewRepo(),
     );
     return new AddReviewController(usecase);
 }

@@ -14,21 +14,21 @@ import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
 import { IWalletTransactionsRepo } from "@domain/IRepository/IWalletTransactionsRepo";
 
 export interface IUnitofWork {
-  startTransaction<T>(callback: (uow: IUnitofWork) => Promise<T>): Promise<T>;
-  rollback(): Promise<void>;
+    startTransaction<T>(callback: (uow: IUnitofWork) => Promise<T>): Promise<T>;
+    rollback(): Promise<void>;
 
-  caseRepo: ICaseRepo;
-  walletRepo: IWalletRepo;
-  transactionsRepo: IWalletTransactionsRepo;
-  appointmentRepo: IAppointmentsRepository;
-  scheduleSettingsRepo: IScheduleSettingsRepo;
-  availableSlotsRepo: IAvailableSlots;
-  overrideSlotsRepo: IOverrideRepo;
-  userRepo: IUserRepository;
-  clientRepo: IClientRepository;
-  otpRepo: IOtpRepository;
-  lawyerRepo: ILawyerRepository;
-  lawyerVerificationRepo: ILawyerVerificationRepo;
-  lawyerDocumentsRepo: ILawyerDocumentsRepository;
-  sessionRepo: ISessionsRepo;
+    caseRepo: ICaseRepo;
+    walletRepo: IWalletRepo;
+    transactionsRepo: IWalletTransactionsRepo;
+    appointmentRepo: IAppointmentsRepository;
+    scheduleSettingsRepo: IScheduleSettingsRepo;
+    availableSlotsRepo: IAvailableSlots;
+    overrideSlotsRepo: IOverrideRepo;
+    userRepo: IUserRepository;
+    clientRepo: IClientRepository;
+    otpRepo: IOtpRepository;
+    lawyerRepo: ILawyerRepository;
+    lawyerVerificationRepo: ILawyerVerificationRepo;
+    lawyerDocumentsRepo: ILawyerDocumentsRepository;
+    sessionRepo: ISessionsRepo;
 }

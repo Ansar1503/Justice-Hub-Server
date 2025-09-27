@@ -1,10 +1,8 @@
 import { CaseTypeDto } from "@src/application/dtos/CaseType/CaseTypeDto";
-import { IFindCaseTypesByPracticeAreas } from "../IFetchCasesTypesByPracticeAreaIds";
 import { ICasetype } from "@domain/IRepository/ICasetype";
+import { IFindCaseTypesByPracticeAreas } from "../IFetchCasesTypesByPracticeAreaIds";
 
-export class FindCaseTypesByPracticeAreas
-implements IFindCaseTypesByPracticeAreas
-{
+export class FindCaseTypesByPracticeAreas implements IFindCaseTypesByPracticeAreas {
     constructor(private _caseTypeRepo: ICasetype) {}
     async execute(input: string[]): Promise<CaseTypeDto[] | []> {
         const caseTypes = await this._caseTypeRepo.findByPracticeAreas(input);

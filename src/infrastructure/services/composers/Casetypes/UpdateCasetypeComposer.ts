@@ -12,9 +12,5 @@ export function UpdateCasetypeComposer(): IController {
     const practiceAreaRepo = new PracticeAreaRepo(new PracticeAreaMapper());
     const casetypeRepo = new CaseTypeRepo(new CaseTypeMapper());
     const usecase = new UpdateCasetypeUsecase(casetypeRepo, practiceAreaRepo);
-    return new UpdateCasetypeController(
-        usecase,
-        new HttpErrors(),
-        new HttpSuccess()
-    );
+    return new UpdateCasetypeController(usecase, new HttpErrors(), new HttpSuccess());
 }

@@ -1,16 +1,16 @@
 import { v4 as uuidv4 } from "uuid";
 
 interface persistedPracticeAreaProps {
-  id: string;
-  name: string;
-  specializationId: string;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    name: string;
+    specializationId: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 interface createProps {
-  name: string;
-  specializationId: string;
+    name: string;
+    specializationId: string;
 }
 
 export class PracticeArea {

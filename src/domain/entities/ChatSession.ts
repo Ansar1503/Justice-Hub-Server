@@ -1,25 +1,25 @@
 import { v4 as uuidv4 } from "uuid";
 
 export interface ChatParticipants {
-  lawyer_id: string;
-  client_id: string;
+    lawyer_id: string;
+    client_id: string;
 }
 
 export interface PersistedChatSessionProps {
-  id: string;
-  name: string;
-  participants: ChatParticipants;
-  last_message: string;
-  session_id: string;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    name: string;
+    participants: ChatParticipants;
+    last_message: string;
+    session_id: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface CreateChatSessionProps {
-  name: string;
-  participants: ChatParticipants;
-  last_message: string;
-  session_id: string;
+    name: string;
+    participants: ChatParticipants;
+    last_message: string;
+    session_id: string;
 }
 
 export class ChatSession {

@@ -10,19 +10,13 @@ import { IConfirmAppointmentUseCase } from "@src/application/usecases/Lawyer/ICo
 
 export class ConfirmClientAppointment implements IController {
     constructor(
-    private confirmAppointment: IConfirmAppointmentUseCase,
-    private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    private httpErrors: IHttpErrors = new HttpErrors()
+        private confirmAppointment: IConfirmAppointmentUseCase,
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let id: string = "";
-        let status:
-      | "confirmed"
-      | "pending"
-      | "completed"
-      | "cancelled"
-      | "rejected"
-      | "" = "";
+        let status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected" | "" = "";
         if (!httpRequest.body) {
             return this.httpErrors.error_400("Invalid query");
         }
@@ -32,10 +26,10 @@ export class ConfirmClientAppointment implements IController {
         if (typeof httpRequest.body === "object" && "status" in httpRequest.body) {
             if (
                 httpRequest.body.status === "confirmed" ||
-        httpRequest.body.status === "pending" ||
-        httpRequest.body.status === "completed" ||
-        httpRequest.body.status === "cancelled" ||
-        httpRequest.body.status === "rejected"
+                httpRequest.body.status === "pending" ||
+                httpRequest.body.status === "completed" ||
+                httpRequest.body.status === "cancelled" ||
+                httpRequest.body.status === "rejected"
             ) {
                 status = httpRequest.body.status;
             }
@@ -55,18 +49,9 @@ export class ConfirmClientAppointment implements IController {
             });
         } catch (error) {
             console.log("error:", error);
-            if (
-                error &&
-        typeof error === "object" &&
-        "code" in error &&
-        "message" in error
-            ) {
+            if (error && typeof error === "object" && "code" in error && "message" in error) {
                 const statusCode =
-          typeof error?.code === "number" &&
-          error.code >= 100 &&
-          error.code < 600
-              ? error.code
-              : 500;
+                    typeof error?.code === "number" && error.code >= 100 && error.code < 600 ? error.code : 500;
                 return new HttpResponse(statusCode, { message: error.message });
             }
             return this.httpErrors.error_500();

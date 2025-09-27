@@ -1,9 +1,6 @@
-import {
-    FetchCallLogsInputDto,
-    FetchCallLogsOutputDto,
-} from "@src/application/dtos/Lawyer/FetchCallLogsDto";
-import { IFetchCallLogsUseCase } from "../IFetchCallLogsUseCase";
+import { FetchCallLogsInputDto, FetchCallLogsOutputDto } from "@src/application/dtos/Lawyer/FetchCallLogsDto";
 import { ICallLogs } from "@domain/IRepository/ICallLogs";
+import { IFetchCallLogsUseCase } from "../IFetchCallLogsUseCase";
 
 export class FetchCallLogsUseCase implements IFetchCallLogsUseCase {
     constructor(private callLogsRepo: ICallLogs) {}

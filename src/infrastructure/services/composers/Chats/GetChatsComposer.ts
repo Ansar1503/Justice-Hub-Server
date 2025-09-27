@@ -11,7 +11,7 @@ export function GetChatsComposer(): IController {
         new ChatSessionRepository(),
         new ChatMessageRepository(),
         new SessionsRepository(),
-        new DisputesRepo()
+        new DisputesRepo(),
     );
     return new GetChatsController(usecase);
 }

@@ -4,10 +4,7 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { Request } from "express";
 
-export async function expressAdapter(
-    request: Request,
-    apiRoute: IController
-): Promise<IHttpResponse> {
+export async function expressAdapter(request: Request, apiRoute: IController): Promise<IHttpResponse> {
     const httpRequest: IHttpRequest = new HttpRequest({
         header: request.header,
         body: request.body,

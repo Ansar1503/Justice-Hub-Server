@@ -11,17 +11,13 @@ import { IStartSessionUseCase } from "@src/application/usecases/Lawyer/IStartSes
 
 export class StartSessionController implements IController {
     constructor(
-    private startSessionUseCase: IStartSessionUseCase,
-    private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    private httpErrors: IHttpErrors = new HttpErrors()
+        private startSessionUseCase: IStartSessionUseCase,
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let sessionId: string = "";
-        if (
-            httpRequest.body &&
-      typeof httpRequest.body === "object" &&
-      "sessionId" in httpRequest.body
-        ) {
+        if (httpRequest.body && typeof httpRequest.body === "object" && "sessionId" in httpRequest.body) {
             sessionId = String(httpRequest.body.sessionId);
         }
         if (!sessionId) {

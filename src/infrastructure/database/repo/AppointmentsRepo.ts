@@ -1,15 +1,4 @@
 import mongoose, { ClientSession } from "mongoose";
-import { Appointment } from "../../../domain/entities/Appointment";
-import { IAppointmentsRepository } from "../../../domain/IRepository/IAppointmentsRepo";
-import {
-    AppointmentModel,
-    IAppointmentModel,
-} from "../model/AppointmentsModel";
-// import {
-//   FetchAppointmentsInputDto,
-//   FetchAppointmentsOutputDto,
-// } from "@src/application/dtos/Admin/FetchAppointmentsDto";
-import { BaseRepository } from "./base/BaseRepo";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
 import { AppointmentMapper } from "@infrastructure/Mapper/Implementations/AppointmentMapper";
 import {
@@ -17,6 +6,14 @@ import {
     FetchAppointmentsInputDto,
     FetchAppointmentsOutputDto,
 } from "@src/application/dtos/Appointments/FetchAppointmentsDto";
+import { Appointment } from "../../../domain/entities/Appointment";
+import { IAppointmentsRepository } from "../../../domain/IRepository/IAppointmentsRepo";
+import { AppointmentModel, IAppointmentModel } from "../model/AppointmentsModel";
+// import {
+//   FetchAppointmentsInputDto,
+//   FetchAppointmentsOutputDto,
+// } from "@src/application/dtos/Admin/FetchAppointmentsDto";
+import { BaseRepository } from "./base/BaseRepo";
 
 export class AppointmentsRepository
     extends BaseRepository<Appointment, IAppointmentModel>
@@ -48,9 +45,7 @@ export class AppointmentsRepository
                 throw error;
             }
 
-            const newAppointment = new AppointmentModel(
-                this.mapper.toPersistence(payload)
-            );
+            const newAppointment = new AppointmentModel(this.mapper.toPersistence(payload));
             await newAppointment.save({ session });
 
             await session.commitTransaction();
@@ -66,24 +61,16 @@ export class AppointmentsRepository
         throw error;
     }
 
-    async findByDateandLawyer_id(payload: {
-    lawyer_id: string;
-    date: Date;
-  }): Promise<Appointment[] | null> {
+    async findByDateandLawyer_id(payload: { lawyer_id: string; date: Date }): Promise<Appointment[] | null> {
         const startOfDay = new Date(payload.date).setUTCHours(0, 0, 0, 0);
         const endOfDay = new Date(payload.date).setUTCHours(23, 59, 59, 999);
         const data = await AppointmentModel.find({
             lawyer_id: payload.lawyer_id,
             date: { $gte: startOfDay, $lte: endOfDay },
         });
-        return this.mapper.toDomainArray && data
-            ? this.mapper.toDomainArray(data)
-            : null;
+        return this.mapper.toDomainArray && data ? this.mapper.toDomainArray(data) : null;
     }
-    async findByDateandClientId(payload: {
-    client_id: string;
-    date: Date;
-  }): Promise<Appointment[] | null> {
+    async findByDateandClientId(payload: { client_id: string; date: Date }): Promise<Appointment[] | null> {
         const startOfDay = new Date(payload.date).setUTCHours(0, 0, 0, 0);
         const endOfDay = new Date(payload.date).setUTCHours(23, 59, 59, 999);
         return await AppointmentModel.find({
@@ -113,7 +100,7 @@ export class AppointmentsRepository
             },
             {
                 new: true,
-            }
+            },
         );
         return updated ? this.mapper.toDomain(updated) : null;
     }
@@ -133,26 +120,20 @@ export class AppointmentsRepository
         return afterDelete ? this.mapper.toDomain(afterDelete) : null;
     }
     async findForClientsUsingAggregation(payload: {
-    client_id: string;
-    search: string;
-    appointmentStatus:
-      | "all"
-      | "confirmed"
-      | "pending"
-      | "completed"
-      | "cancelled"
-      | "rejected";
-    appointmentType: "all" | "consultation" | "follow-up";
-    sortField: "name" | "date" | "consultation_fee" | "created_at";
-    sortOrder: "asc" | "desc";
-    page: number;
-    limit: number;
-  }): Promise<{
-    data: any;
-    totalCount: number;
-    currentPage: number;
-    totalPage: number;
-  }> {
+        client_id: string;
+        search: string;
+        appointmentStatus: "all" | "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
+        appointmentType: "all" | "consultation" | "follow-up";
+        sortField: "name" | "date" | "consultation_fee" | "created_at";
+        sortOrder: "asc" | "desc";
+        page: number;
+        limit: number;
+    }): Promise<{
+        data: any;
+        totalCount: number;
+        currentPage: number;
+        totalPage: number;
+    }> {
         const {
             client_id,
             search = "",
@@ -226,7 +207,7 @@ export class AppointmentsRepository
             { $project: { "userData.password": 0, "lawyerData.documents": 0 } },
             { $sort: sortStage },
             { $skip: (page - 1) * limit },
-            { $limit: limit }
+            { $limit: limit },
         );
 
         countPipeline.push(...lookups, { $count: "total" });
@@ -245,26 +226,20 @@ export class AppointmentsRepository
         };
     }
     async findForLawyersUsingAggregation(payload: {
-    lawyer_id: string;
-    search: string;
-    appointmentStatus:
-      | "all"
-      | "confirmed"
-      | "pending"
-      | "completed"
-      | "cancelled"
-      | "rejected";
-    appointmentType: "all" | "consultation" | "follow-up";
-    sortField: "name" | "date" | "consultation_fee" | "created_at";
-    sortOrder: "asc" | "desc";
-    page: number;
-    limit: number;
-  }): Promise<{
-    data: any;
-    totalCount: number;
-    currentPage: number;
-    totalPage: number;
-  }> {
+        lawyer_id: string;
+        search: string;
+        appointmentStatus: "all" | "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
+        appointmentType: "all" | "consultation" | "follow-up";
+        sortField: "name" | "date" | "consultation_fee" | "created_at";
+        sortOrder: "asc" | "desc";
+        page: number;
+        limit: number;
+    }): Promise<{
+        data: any;
+        totalCount: number;
+        currentPage: number;
+        totalPage: number;
+    }> {
         const {
             lawyer_id,
             search = "",
@@ -342,7 +317,7 @@ export class AppointmentsRepository
             { $project: { "userData.password": 0, "lawyerData.documents": 0 } },
             { $sort: sortStage },
             { $skip: (page - 1) * limit },
-            { $limit: limit }
+            { $limit: limit },
         );
 
         countPipeline.push(...lookups, { $count: "total" });
@@ -361,31 +336,20 @@ export class AppointmentsRepository
         };
     }
     async updateWithId(payload: {
-    id: string;
-    status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
-  }): Promise<Appointment | null> {
+        id: string;
+        status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected";
+    }): Promise<Appointment | null> {
         return await AppointmentModel.findOneAndUpdate(
             { _id: payload.id },
             { $set: { status: payload.status } },
-            { new: true, session: this.session }
+            { new: true, session: this.session },
         );
     }
     async findById(id: string): Promise<Appointment | null> {
         return await AppointmentModel.findOne({ _id: id });
     }
-    async findAllAggregate(
-        payload: FetchAppointmentsInputDto
-    ): Promise<FetchAppointmentsOutputDto> {
-        const {
-            search,
-            limit,
-            page,
-            sortBy,
-            sortOrder,
-            appointmentStatus,
-            consultationType,
-            user_id,
-        } = payload;
+    async findAllAggregate(payload: FetchAppointmentsInputDto): Promise<FetchAppointmentsOutputDto> {
+        const { search, limit, page, sortBy, sortOrder, appointmentStatus, consultationType, user_id } = payload;
         const skip = (page - 1) * limit;
         const order = sortOrder === "asc" ? 1 : -1;
         const matchStage: Record<string, any> = {};
@@ -557,9 +521,7 @@ export class AppointmentsRepository
     }
     async findByClientID(client: string): Promise<Appointment[] | []> {
         const data = await AppointmentModel.find({ client_id: client });
-        return this.mapper.toDomainArray && data
-            ? this.mapper.toDomainArray(data)
-            : [];
+        return this.mapper.toDomainArray && data ? this.mapper.toDomainArray(data) : [];
     }
     async findByCaseId(id: string): Promise<appointmentOutputDto[] | []> {
         const data = await this.model.aggregate([

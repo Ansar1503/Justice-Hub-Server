@@ -1,12 +1,12 @@
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
-import { IVerifyEmailByOtp } from "../IVerifyEmailByOtp";
 import { IOtpRepository } from "@domain/IRepository/IOtpRepo";
 import { VerifyEmailByOtpInput } from "@src/application/dtos/Auth/VerifyEmailDto";
+import { IVerifyEmailByOtp } from "../IVerifyEmailByOtp";
 
 export class VerifyEmailByOtpUseCase implements IVerifyEmailByOtp {
     constructor(
-    private userRepo: IUserRepository,
-    private otpRepo: IOtpRepository
+        private userRepo: IUserRepository,
+        private otpRepo: IOtpRepository,
     ) {}
     async execute(input: VerifyEmailByOtpInput): Promise<void> {
         try {

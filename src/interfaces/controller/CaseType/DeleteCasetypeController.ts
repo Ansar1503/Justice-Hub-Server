@@ -1,23 +1,19 @@
 import { IDeleteCasetypeUsecase } from "@src/application/usecases/CaseType/IDeleteCasetypeUsecase";
-import { IController } from "../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
+import { IController } from "../Interface/IController";
 
 export class DeleteCaseTypeController implements IController {
     constructor(
-    private _deleteUsecase: IDeleteCasetypeUsecase,
-    private _errors: IHttpErrors,
-    private _success: IHttpSuccess
+        private _deleteUsecase: IDeleteCasetypeUsecase,
+        private _errors: IHttpErrors,
+        private _success: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let id = "";
-        if (
-            httpRequest.params &&
-      typeof httpRequest.params === "object" &&
-      "id" in httpRequest.params
-        ) {
+        if (httpRequest.params && typeof httpRequest.params === "object" && "id" in httpRequest.params) {
             id = String(httpRequest.params.id);
         }
         if (!id) {

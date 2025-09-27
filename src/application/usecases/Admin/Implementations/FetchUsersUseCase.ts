@@ -1,10 +1,7 @@
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { InternalError } from "@interfaces/middelwares/Error/CustomError";
 import { IFetchUsersUseCase } from "../IFetchUsersUseCase";
-import {
-    UseCaseInputDto,
-    UseCaseOutputDto,
-} from "../../../dtos/Admin/FetchAllUsersDto";
+import { UseCaseInputDto, UseCaseOutputDto } from "../../../dtos/Admin/FetchAllUsersDto";
 
 export class FetchUsersUseCase implements IFetchUsersUseCase {
     constructor(private userRepo: IUserRepository) {}

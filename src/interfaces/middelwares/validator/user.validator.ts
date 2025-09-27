@@ -7,12 +7,7 @@ export const validateUser = [
         .withMessage("Name is Required")
         .isLength({ min: 3 })
         .withMessage("Name must be atleast 3 characters long"),
-    body("email")
-        .trim()
-        .notEmpty()
-        .withMessage("Email is required")
-        .isEmail()
-        .withMessage("Invalid email format"),
+    body("email").trim().notEmpty().withMessage("Email is required").isEmail().withMessage("Invalid email format"),
     body("password")
         .trim()
         .notEmpty()

@@ -1,6 +1,6 @@
 import { Address } from "@domain/entities/Address";
-import { IMapper } from "../IMapper";
 import { IAddresModel } from "@infrastructure/database/model/AddressModel";
+import { IMapper } from "../IMapper";
 
 export class AddressMapper implements IMapper<Address, IAddresModel> {
     toDomain(persistence: IAddresModel): Address {

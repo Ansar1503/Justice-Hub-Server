@@ -1,5 +1,4 @@
 import { IFetchLawyerUseCase } from "@src/application/usecases/Admin/IFetchLawyersUseCase";
-import { IController } from "../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
@@ -7,38 +6,25 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
+import { IController } from "../Interface/IController";
 
 export class FetchAllLawyers implements IController {
     constructor(
-    private fetchAllLawyerUseCase: IFetchLawyerUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private fetchAllLawyerUseCase: IFetchLawyerUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
-    private isValidSortField(
-        value: unknown
-    ): value is "name" | "experience" | "consultation_fee" | "createdAt" {
-        return (
-            value === "name" ||
-      value === "experience" ||
-      value === "consultation_fee" ||
-      value === "createdAt"
-        );
+    private isValidSortField(value: unknown): value is "name" | "experience" | "consultation_fee" | "createdAt" {
+        return value === "name" || value === "experience" || value === "consultation_fee" || value === "createdAt";
     }
 
     private isValidSortOrder(value: unknown): value is "asc" | "desc" {
         return value === "asc" || value === "desc";
     }
 
-    private isValidStatus(
-        value: unknown
-    ): value is "verified" | "rejected" | "pending" | "requested" {
-        return (
-            value === "verified" ||
-      value === "rejected" ||
-      value === "pending" ||
-      value === "requested"
-        );
+    private isValidStatus(value: unknown): value is "verified" | "rejected" | "pending" | "requested" {
+        return value === "verified" || value === "rejected" || value === "pending" || value === "requested";
     }
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {

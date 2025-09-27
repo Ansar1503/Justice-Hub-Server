@@ -5,4 +5,4 @@ import {
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IFetchReviewDisputesUseCase
-  extends IUseCase<FetchReviewDisputesInputDto, FetchReviewDisputesOutputDto> {}
+    extends IUseCase<FetchReviewDisputesInputDto, FetchReviewDisputesOutputDto> {}

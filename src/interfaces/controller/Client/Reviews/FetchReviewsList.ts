@@ -10,18 +10,18 @@ import { IFetchReviewUseCase } from "@src/application/usecases/Review/IFetchRevi
 
 export class FetchReviewsList implements IController {
     constructor(
-    private fetchReviews: IFetchReviewUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private fetchReviews: IFetchReviewUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
         let role: "admin" | "client" | "lawyer" | "" = "";
         if (
             httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user &&
-      "role" in httpRequest.user
+            typeof httpRequest.user === "object" &&
+            "id" in httpRequest.user &&
+            "role" in httpRequest.user
         ) {
             user_id = String(httpRequest.user.id);
             role = httpRequest.user.role as "admin" | "client" | "lawyer";

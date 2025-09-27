@@ -2,7 +2,4 @@ import { NotificationDto } from "@src/application/dtos/Notification/BaseNotifica
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IFetchAllNotificationsUseCase
-  extends IUseCase<
-    { user_id: string; cursor: number },
-    { data: NotificationDto[] | []; nextCursor?: number }
-  > {}
+    extends IUseCase<{ user_id: string; cursor: number }, { data: NotificationDto[] | []; nextCursor?: number }> {}

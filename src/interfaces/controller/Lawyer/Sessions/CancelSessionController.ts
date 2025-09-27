@@ -11,17 +11,13 @@ import { ICancelSessionUseCase } from "@src/application/usecases/Lawyer/ICancell
 
 export class CancelSessionController implements IController {
     constructor(
-    private cancelSession: ICancelSessionUseCase,
-    private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    private httpErrors: IHttpErrors = new HttpErrors()
+        private cancelSession: ICancelSessionUseCase,
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let id: string = "";
-        if (
-            httpRequest.body &&
-      typeof httpRequest.body === "object" &&
-      "id" in httpRequest.body
-        ) {
+        if (httpRequest.body && typeof httpRequest.body === "object" && "id" in httpRequest.body) {
             id = String(httpRequest.body.id);
         }
         try {

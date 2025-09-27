@@ -1,35 +1,28 @@
 import { v4 as uuid } from "uuid";
 
-type Daytype =
-  | "monday"
-  | "tuesday"
-  | "wednesday"
-  | "thursday"
-  | "friday"
-  | "saturday"
-  | "sunday";
+type Daytype = "monday" | "tuesday" | "wednesday" | "thursday" | "friday" | "saturday" | "sunday";
 
 interface TimeSlot {
-  start: string;
-  end: string;
+    start: string;
+    end: string;
 }
 
 interface DayAvailability {
-  enabled: boolean;
-  timeSlots: TimeSlot[];
+    enabled: boolean;
+    timeSlots: TimeSlot[];
 }
 interface AvailabilityProps {
-  id: string;
-  lawyer_id: string;
-  monday: DayAvailability;
-  tuesday: DayAvailability;
-  wednesday: DayAvailability;
-  thursday: DayAvailability;
-  friday: DayAvailability;
-  saturday: DayAvailability;
-  sunday: DayAvailability;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    lawyer_id: string;
+    monday: DayAvailability;
+    tuesday: DayAvailability;
+    wednesday: DayAvailability;
+    thursday: DayAvailability;
+    friday: DayAvailability;
+    saturday: DayAvailability;
+    sunday: DayAvailability;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export class Availability {

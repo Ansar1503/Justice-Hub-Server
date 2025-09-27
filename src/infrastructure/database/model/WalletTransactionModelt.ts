@@ -1,23 +1,18 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-type transactionCategory =
-  | "deposit"
-  | "withdrawal"
-  | "payment"
-  | "refund"
-  | "transfer";
+type transactionCategory = "deposit" | "withdrawal" | "payment" | "refund" | "transfer";
 type transactionStatus = "pending" | "completed" | "failed" | "cancelled";
 
 export interface IWalletTransactionModel extends Document {
-  _id: string;
-  walletId: string;
-  amount: number;
-  type: "debit" | "credit";
-  description: string;
-  category: transactionCategory;
-  status: transactionStatus;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    walletId: string;
+    amount: number;
+    type: "debit" | "credit";
+    description: string;
+    category: transactionCategory;
+    status: transactionStatus;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const walletTransactionSchema = new Schema<IWalletTransactionModel>(
@@ -38,10 +33,7 @@ const walletTransactionSchema = new Schema<IWalletTransactionModel>(
             enum: ["pending", "completed", "failed", "cancelled"],
         },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
-export const walletTransactionModel = mongoose.model<IWalletTransactionModel>(
-    "transactions",
-    walletTransactionSchema
-);
+export const walletTransactionModel = mongoose.model<IWalletTransactionModel>("transactions", walletTransactionSchema);

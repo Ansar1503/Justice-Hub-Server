@@ -1,15 +1,15 @@
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
-import { IController } from "../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IFindAllCaseTypes } from "@src/application/usecases/CaseType/IFindAllCaseTypes";
+import { IController } from "../Interface/IController";
 
 export class FindAllCaseTypes implements IController {
     constructor(
-    private _findCaseTypes: IFindAllCaseTypes,
-    private _errors: IHttpErrors,
-    private _success: IHttpSuccess
+        private _findCaseTypes: IFindAllCaseTypes,
+        private _errors: IHttpErrors,
+        private _success: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         try {

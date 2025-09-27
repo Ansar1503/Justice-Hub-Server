@@ -1,7 +1,7 @@
 export function generateDescription(transactionData: {
-  type: "debit" | "credit";
-  category: "deposit" | "withdrawal" | "payment" | "refund" | "transfer";
-  amount: number;
+    type: "debit" | "credit";
+    category: "deposit" | "withdrawal" | "payment" | "refund" | "transfer";
+    amount: number;
 }) {
     const { type, category, amount } = transactionData;
 

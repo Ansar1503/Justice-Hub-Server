@@ -1,17 +1,17 @@
 import { IMapper } from "@infrastructure/Mapper/IMapper";
-import { Lawyer } from "../../../domain/entities/Lawyer";
-import { ILawyerRepository } from "../../../domain/IRepository/ILawyerRepo";
-import lawyerModel, { ILawyerModel } from "../model/LawyerModel";
 import { LawyerMapper } from "@infrastructure/Mapper/Implementations/LawyerMapper";
 import { ClientSession } from "mongoose";
 import { LawyerprofessionalDetailsDto } from "@src/application/dtos/Lawyer/LawyerProfessionalDetailsDto";
+import { Lawyer } from "../../../domain/entities/Lawyer";
+import { ILawyerRepository } from "../../../domain/IRepository/ILawyerRepo";
+import lawyerModel, { ILawyerModel } from "../model/LawyerModel";
 import { IPracticeareaModel } from "../model/PracticeAreaModel";
 import { ISpecializationModel } from "../model/SpecializationModel";
 
 export class LawyerRepository implements ILawyerRepository {
     constructor(
-    private mapper: IMapper<Lawyer, ILawyerModel> = new LawyerMapper(),
-    private _session?: ClientSession
+        private mapper: IMapper<Lawyer, ILawyerModel> = new LawyerMapper(),
+        private _session?: ClientSession,
     ) {}
 
     async create(lawyer: Lawyer): Promise<Lawyer> {
@@ -21,15 +21,11 @@ export class LawyerRepository implements ILawyerRepository {
         });
         return this.mapper.toDomain(lawyerData[0]);
     }
-    async findUserId(
-        user_id: string
-    ): Promise<LawyerprofessionalDetailsDto | null> {
+    async findUserId(user_id: string): Promise<LawyerprofessionalDetailsDto | null> {
         const lawyerData = await lawyerModel
             .findOne({ userId: user_id }, {}, { session: this._session })
             .populate<{ practiceAreas: IPracticeareaModel[] | [] }>("practiceAreas")
-            .populate<{ specialisations: ISpecializationModel[] | [] }>(
-                "specialisations"
-            );
+            .populate<{ specialisations: ISpecializationModel[] | [] }>("specialisations");
         if (!lawyerData) return null;
         return {
             consultationFee: lawyerData.consultationFee,
@@ -60,28 +56,24 @@ export class LawyerRepository implements ILawyerRepository {
     }
     async update(update: Partial<Lawyer>): Promise<Lawyer | null> {
         const mapped = this.mapper.toPersistence(update as Lawyer);
-        const updatedData = await lawyerModel.findOneAndUpdate(
-            { userId: update.userId },
-            mapped,
-            {
-                upsert: true,
-                new: true,
-                session: this._session,
-            }
-        );
+        const updatedData = await lawyerModel.findOneAndUpdate({ userId: update.userId }, mapped, {
+            upsert: true,
+            new: true,
+            session: this._session,
+        });
         return updatedData ? this.mapper.toDomain(updatedData) : null;
     }
     async findAll(): Promise<Lawyer[] | []> {
         const lawyerData = await lawyerModel.find({}).populate("documents");
-        return lawyerData ? this.mapper?.toDomainArray?.(lawyerData) ?? [] : [];
+        return lawyerData ? (this.mapper?.toDomainArray?.(lawyerData) ?? []) : [];
     }
     async findAllLawyersWithQuery(query: {
-    matchStage: any;
-    sortStage: any;
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<any> {
+        matchStage: any;
+        sortStage: any;
+        search: string;
+        page: number;
+        limit: number;
+    }): Promise<any> {
         const pipeline = [
             { $match: query.matchStage },
             {

@@ -1,16 +1,16 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IDisputesModel extends Document {
-  _id: string;
-  disputeType: "reviews" | "messages";
-  contentId: string;
-  reason: string;
-  reportedBy: string;
-  reportedUser: string;
-  status: "pending" | "resolved" | "rejected";
-  resolveAction?: "deleted" | "blocked";
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    disputeType: "reviews" | "messages";
+    contentId: string;
+    reason: string;
+    reportedBy: string;
+    reportedUser: string;
+    status: "pending" | "resolved" | "rejected";
+    resolveAction?: "deleted" | "blocked";
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const diputesSchema = new Schema<IDisputesModel>(
@@ -41,10 +41,7 @@ const diputesSchema = new Schema<IDisputesModel>(
             enum: ["deleted", "blocked"],
         },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
-export const DisputesModel = mongoose.model<IDisputesModel>(
-    "Disputes",
-    diputesSchema
-);
+export const DisputesModel = mongoose.model<IDisputesModel>("Disputes", diputesSchema);

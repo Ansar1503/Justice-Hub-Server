@@ -1,9 +1,9 @@
-import { IController } from "../Interface/IController";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { STATUS_CODES } from "@infrastructure/constant/status.codes";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
+import { IController } from "../Interface/IController";
 
 export class SendMessageFileController implements IController {
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
@@ -20,9 +20,7 @@ export class SendMessageFileController implements IController {
             fileType = "image";
         } else if (subtype === "pdf") {
             fileType = "pdf";
-        } else if (
-            subtype === "vnd.openxmlformats-officedocument.wordprocessingml.document"
-        ) {
+        } else if (subtype === "vnd.openxmlformats-officedocument.wordprocessingml.document") {
             fileType = "docx";
         } else {
             fileType = "unknown";

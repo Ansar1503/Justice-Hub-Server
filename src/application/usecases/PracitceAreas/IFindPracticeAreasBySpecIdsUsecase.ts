@@ -1,9 +1,6 @@
 import { findPracticeAreasBySpecIdsInputDto } from "@src/application/dtos/PracticeAreas/FindAllPracticeAreaDto";
-import { IUseCase } from "../IUseCases/IUseCase";
 import { PracticeAreaDto } from "@src/application/dtos/PracticeAreas/PracticeAreasDto";
+import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IFindPracticeareasByspecIdsUsecase
-  extends IUseCase<
-    findPracticeAreasBySpecIdsInputDto,
-    PracticeAreaDto[] | []
-  > {}
+    extends IUseCase<findPracticeAreasBySpecIdsInputDto, PracticeAreaDto[] | []> {}

@@ -4,8 +4,6 @@ import { FetchExistingSessionDocumentUseCase } from "@src/application/usecases/C
 import { SessionDocumentsRepository } from "@infrastructure/database/repo/SessionsDocumentRepo";
 
 export function FetchSessionDocumentsComposer(): IController {
-    const usecase = new FetchExistingSessionDocumentUseCase(
-        new SessionDocumentsRepository()
-    );
+    const usecase = new FetchExistingSessionDocumentUseCase(new SessionDocumentsRepository());
     return new FetchSessionsDocumentsController(usecase);
 }

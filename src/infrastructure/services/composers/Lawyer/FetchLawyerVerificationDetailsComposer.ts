@@ -8,11 +8,7 @@ import { FetchLawyerVerificationDetailsUsecase } from "@src/application/usecases
 
 export function FetchLawyerVerificationDetailsComposer(): IController {
     const usecase = new FetchLawyerVerificationDetailsUsecase(
-        new LawyerVerificationRepo(new LawyerVerificationMapper())
+        new LawyerVerificationRepo(new LawyerVerificationMapper()),
     );
-    return new FetchLawyersVerificationDataController(
-        usecase,
-        new HttpErrors(),
-        new HttpSuccess()
-    );
+    return new FetchLawyersVerificationDataController(usecase, new HttpErrors(), new HttpSuccess());
 }

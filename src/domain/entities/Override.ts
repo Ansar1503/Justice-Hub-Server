@@ -1,27 +1,27 @@
 import { v4 as uuidv4 } from "uuid";
 
-  interface TimeRange {
+interface TimeRange {
     start: string;
     end: string;
-  }
+}
 
-  interface OverrideDate {
+interface OverrideDate {
     date: Date;
     isUnavailable: boolean;
     timeRanges: TimeRange[];
-  }
+}
 
 interface PersistedOverrideSlots {
-  id: string;
-  lawyer_id: string;
-  overrideDates: OverrideDate[];
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    lawyer_id: string;
+    overrideDates: OverrideDate[];
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 interface CreateOverrideSlots {
-  lawyer_id: string;
-  overrideDates: OverrideDate[];
+    lawyer_id: string;
+    overrideDates: OverrideDate[];
 }
 
 export class Override {
@@ -85,8 +85,6 @@ export class Override {
     }
 
     removeOverrideDate(dateToRemove: Date): void {
-        this._overrideDates = this._overrideDates.filter(
-            (entry) => entry.date.getTime() !== dateToRemove.getTime()
-        );
+        this._overrideDates = this._overrideDates.filter((entry) => entry.date.getTime() !== dateToRemove.getTime());
     }
 }

@@ -6,6 +6,6 @@ import { ClientRepository } from "@infrastructure/database/repo/ClientRepo";
 import { AddressRepository } from "@infrastructure/database/repo/AddressRepo";
 
 export function UpdateAddressComposer(): IController {
-    const usecase = new UpdateAddressUseCase(new UserRepository(),new ClientRepository(),new AddressRepository());
+    const usecase = new UpdateAddressUseCase(new UserRepository(), new ClientRepository(), new AddressRepository());
     return new UpdateAddressController(usecase);
 }

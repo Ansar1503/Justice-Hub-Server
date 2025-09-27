@@ -6,10 +6,6 @@ import { NodeMailerProvider } from "@infrastructure/Providers/NodeMailerProvider
 import { JwtProvider } from "@infrastructure/Providers/JwtProvider";
 
 export function UpdateEmailComposer(): IController {
-    const usecase = new ChangeMailUseCase(
-        new UserRepository(),
-        new NodeMailerProvider(),
-        new JwtProvider()
-    );
+    const usecase = new ChangeMailUseCase(new UserRepository(), new NodeMailerProvider(), new JwtProvider());
     return new UpdateEmailController(usecase);
 }

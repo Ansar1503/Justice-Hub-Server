@@ -1,13 +1,13 @@
 import mongoose, { Schema } from "mongoose";
 
 export interface IscheduleSettingsModel extends Document {
-  _id: string;
-  lawyer_id: string;
-  slotDuration: number;
-  maxDaysInAdvance: number;
-  autoConfirm: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    lawyer_id: string;
+    slotDuration: number;
+    maxDaysInAdvance: number;
+    autoConfirm: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const schedulesettings = new Schema<IscheduleSettingsModel>({
@@ -18,7 +18,4 @@ const schedulesettings = new Schema<IscheduleSettingsModel>({
     autoConfirm: { type: Boolean, required: true, default: false },
 });
 
-export default mongoose.model<IscheduleSettingsModel>(
-    "schedule_settings",
-    schedulesettings
-);
+export default mongoose.model<IscheduleSettingsModel>("schedule_settings", schedulesettings);

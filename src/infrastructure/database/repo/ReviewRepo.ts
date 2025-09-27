@@ -1,33 +1,20 @@
 import { IMapper } from "@infrastructure/Mapper/IMapper";
+import { ReviewMapper } from "@infrastructure/Mapper/Implementations/ReviewMapper";
+import { FetchReviewInputDto, FetchReviewOutputDto } from "@src/application/dtos/Reviews/review.dto";
+import { FetchReviewsBySessionOutputDto, FetchReviewsOutputDto } from "@src/application/dtos/client/FetchReviewDto";
 import { Review } from "../../../domain/entities/Review";
 import { IReviewRepo } from "../../../domain/IRepository/IReviewRepo";
 import reviewModel, { IreviewModel } from "../model/ReviewModel";
 import ReviewModel from "../model/ReviewModel";
-import { ReviewMapper } from "@infrastructure/Mapper/Implementations/ReviewMapper";
-import {
-    FetchReviewInputDto,
-    FetchReviewOutputDto,
-} from "@src/application/dtos/Reviews/review.dto";
-import {
-    FetchReviewsBySessionOutputDto,
-    FetchReviewsOutputDto,
-} from "@src/application/dtos/client/FetchReviewDto";
 
 export class ReviewRepo implements IReviewRepo {
-    constructor(
-    private mappper: IMapper<Review, IreviewModel> = new ReviewMapper()
-    ) {}
+    constructor(private mappper: IMapper<Review, IreviewModel> = new ReviewMapper()) {}
 
     async create(payload: Review): Promise<Review> {
-        const review = await new ReviewModel(
-            this.mappper.toPersistence(payload)
-        ).save();
+        const review = await new ReviewModel(this.mappper.toPersistence(payload)).save();
         return this.mappper.toDomain(review);
     }
-    async update(payload: {
-    review_id: string;
-    updates: Partial<Review>;
-  }): Promise<Review | null> {
+    async update(payload: { review_id: string; updates: Partial<Review> }): Promise<Review | null> {
         const { heading, rating, review, active } = payload.updates;
         const update: any = {};
         if (heading) {
@@ -44,17 +31,11 @@ export class ReviewRepo implements IReviewRepo {
                 update.active = active;
             }
         }
-        const updatedData = await reviewModel.findOneAndUpdate(
-            { _id: payload.review_id },
-            update,
-            { new: true }
-        );
+        const updatedData = await reviewModel.findOneAndUpdate({ _id: payload.review_id }, update, { new: true });
         if (!updatedData) return null;
         return this.mappper.toDomain(updatedData);
     }
-    async findBySession_id(
-        session_id: string
-    ): Promise<FetchReviewsBySessionOutputDto[] | []> {
+    async findBySession_id(session_id: string): Promise<FetchReviewsBySessionOutputDto[] | []> {
         const result = await reviewModel.aggregate([
             { $match: { active: true, session_id: session_id } },
 
@@ -115,10 +96,7 @@ export class ReviewRepo implements IReviewRepo {
         return result;
     }
 
-    async findByLawyer_id(payload: {
-    lawyer_id: string;
-    page: number;
-  }): Promise<FetchReviewsOutputDto> {
+    async findByLawyer_id(payload: { lawyer_id: string; page: number }): Promise<FetchReviewsOutputDto> {
         const { lawyer_id, page } = payload;
         const limit = 10;
         const skip = page > 0 ? Math.abs(page - 1) * limit : 0;
@@ -201,9 +179,7 @@ export class ReviewRepo implements IReviewRepo {
         const data = await reviewModel.findOne({ _id: id });
         return data ? this.mappper.toDomain(data) : null;
     }
-    async findReviewsByUser_id(
-        payload: FetchReviewInputDto
-    ): Promise<FetchReviewOutputDto> {
+    async findReviewsByUser_id(payload: FetchReviewInputDto): Promise<FetchReviewOutputDto> {
         const { limit, page, role, search, sortBy, sortOrder, user_id } = payload;
         const order = sortOrder === "asc" ? 1 : -1;
         const skip = page > 0 ? Math.abs(page - 1) * limit : 0;
@@ -315,7 +291,7 @@ export class ReviewRepo implements IReviewRepo {
             },
             { $sort: sortQuery },
             { $skip: skip },
-            { $limit: limit }
+            { $limit: limit },
         );
         countPipeline.push({ $count: "total" });
         const [data, count] = await Promise.all([

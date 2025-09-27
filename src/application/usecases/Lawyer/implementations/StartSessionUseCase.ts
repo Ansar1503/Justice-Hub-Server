@@ -1,9 +1,5 @@
-import {
-    StartSessionInputDto,
-    StartSessionOutputDto,
-} from "@src/application/dtos/Lawyer/StartSessionDto";
-import { IStartSessionUseCase } from "../IStartSessionUseCase";
 import { randomUUID } from "crypto";
+import { StartSessionInputDto, StartSessionOutputDto } from "@src/application/dtos/Lawyer/StartSessionDto";
 import { timeStringToDate } from "@shared/utils/helpers/DateAndTimeHelper";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
@@ -11,21 +7,20 @@ import { createToken } from "@src/application/services/ZegoCloud.service";
 import { CallLogs } from "@domain/entities/CallLogs";
 import { ICallLogs } from "@domain/IRepository/ICallLogs";
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
+import { IStartSessionUseCase } from "../IStartSessionUseCase";
 
 export class StartSessionUseCase implements IStartSessionUseCase {
     constructor(
-    private _sessionsRepo: ISessionsRepo,
-    private _callLogsRepo: ICallLogs,
-    private _appointmentDetails: IAppointmentsRepository
+        private _sessionsRepo: ISessionsRepo,
+        private _callLogsRepo: ICallLogs,
+        private _appointmentDetails: IAppointmentsRepository,
     ) {}
     async execute(input: StartSessionInputDto): Promise<StartSessionOutputDto> {
         const existingSession = await this._sessionsRepo.findById({
             session_id: input.sessionId,
         });
         if (!existingSession) throw new ValidationError("session not found");
-        const appointmentDetails = await this._appointmentDetails.findByBookingId(
-            existingSession.bookingId
-        );
+        const appointmentDetails = await this._appointmentDetails.findByBookingId(existingSession.bookingId);
         if (!appointmentDetails) throw new Error("Appointment not found");
         switch (existingSession.status) {
         case "cancelled":
@@ -37,17 +32,12 @@ export class StartSessionUseCase implements IStartSessionUseCase {
         default:
             break;
         }
-        const slotDateTime = timeStringToDate(
-            appointmentDetails.date,
-            appointmentDetails.time
-        );
+        const slotDateTime = timeStringToDate(appointmentDetails.date, appointmentDetails.time);
         const newDate = new Date();
         // if (newDate < slotDateTime) {
         //   throw new ValidationError("Scheduled time is not reached");
         // }
-        slotDateTime.setMinutes(
-            slotDateTime.getMinutes() + appointmentDetails.duration + 5
-        );
+        slotDateTime.setMinutes(slotDateTime.getMinutes() + appointmentDetails.duration + 5);
         // if (newDate > slotDateTime)
         //   throw new ValidationError("session time is over");
         const roomId = `Room_${randomUUID()}`;

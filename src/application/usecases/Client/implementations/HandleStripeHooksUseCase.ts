@@ -1,58 +1,39 @@
 import { handleStripeWebHook } from "@src/application/services/stripe.service";
-import { IHandleStripeHookUseCase } from "../IHandleStripeHookUseCase";
 import { IScheduleSettingsRepo } from "@domain/IRepository/IScheduleSettingsRepo";
 import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
 import { generateDescription } from "@shared/utils/helpers/WalletDescriptionsHelper";
 import { WalletTransaction } from "@domain/entities/WalletTransactions";
 import { Appointment } from "@domain/entities/Appointment";
 import { Case } from "@domain/entities/Case";
+import { IHandleStripeHookUseCase } from "../IHandleStripeHookUseCase";
 
 export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
     constructor(
-    private _scheduleSettingsRepo: IScheduleSettingsRepo,
-    private _unitofwork: IUnitofWork
+        private _scheduleSettingsRepo: IScheduleSettingsRepo,
+        private _unitofwork: IUnitofWork,
     ) {}
-    async execute(input: {
-    body: any;
-    signature: string | string[];
-  }): Promise<void> {
+    async execute(input: { body: any; signature: string | string[] }): Promise<void> {
         const { body, signature } = input;
         const result = await handleStripeWebHook(body, signature);
         if (!result.eventHandled) return;
-        const {
-            lawyer_id,
-            client_id,
-            date,
-            time,
-            duration,
-            payment_status,
-            amount,
-            reason,
-            title,
-            caseTypeId,
-        } = result;
+        const { lawyer_id, client_id, date, time, duration, payment_status, amount, reason, title, caseTypeId } =
+            result;
         if (
             !client_id ||
-      !lawyer_id ||
-      !date ||
-      !time ||
-      !duration ||
-      !payment_status ||
-      !amount ||
-      !caseTypeId ||
-      !title
+            !lawyer_id ||
+            !date ||
+            !time ||
+            !duration ||
+            !payment_status ||
+            !amount ||
+            !caseTypeId ||
+            !title
         ) {
             throw new Error("no metadata found");
         }
         if (payment_status === "success") {
-            const scheduleSettings =
-        await this._scheduleSettingsRepo.fetchScheduleSettings(lawyer_id);
-            let status:
-        | "confirmed"
-        | "pending"
-        | "completed"
-        | "cancelled"
-        | "rejected" = "pending";
+            const scheduleSettings = await this._scheduleSettingsRepo.fetchScheduleSettings(lawyer_id);
+            let status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected" = "pending";
             if (scheduleSettings && scheduleSettings.autoConfirm) {
                 status = "confirmed";
             }
@@ -77,9 +58,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
                     time: time,
                     type: "consultation",
                 });
-                const appointment = await uow.appointmentRepo.createWithTransaction(
-                    appointmentPayload
-                );
+                const appointment = await uow.appointmentRepo.createWithTransaction(appointmentPayload);
                 if (!appointment) {
                     throw new Error("Appointment update failed");
                 }

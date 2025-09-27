@@ -5,8 +5,6 @@ import { FetchAllSpecializationsController } from "@interfaces/controller/Specia
 import { FetchAllSpecializationsUsecase } from "@src/application/usecases/Specializations/implementations/FetchAllSpecializationsUsecase";
 
 export function FetchAllSpecializationsComposer(): IController {
-    const usecase = new FetchAllSpecializationsUsecase(
-        new SpecializationRepo(new SpecializationMapper())
-    );
+    const usecase = new FetchAllSpecializationsUsecase(new SpecializationRepo(new SpecializationMapper()));
     return new FetchAllSpecializationsController(usecase);
 }

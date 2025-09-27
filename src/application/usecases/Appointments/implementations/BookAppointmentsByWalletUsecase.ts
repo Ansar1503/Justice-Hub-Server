@@ -1,38 +1,23 @@
 import { Appointment } from "@src/application/dtos/Appointments/BaseAppointmentDto";
 import { CreateCheckoutSessionInputDto } from "@src/application/dtos/client/CreateCheckoutSessionDto";
-import { IBookAppointmentsByWalletUsecase } from "../IBookAppointmentsByWalletUsecase";
 import { STATUS_CODES } from "@infrastructure/constant/status.codes";
 import { Appointment as AppointmentEntity } from "@domain/entities/Appointment";
-import {
-    timeStringToDate,
-    timeStringToMinutes,
-} from "@shared/utils/helpers/DateAndTimeHelper";
+import { timeStringToDate, timeStringToMinutes } from "@shared/utils/helpers/DateAndTimeHelper";
 import { ERRORS } from "@infrastructure/constant/errors";
 import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
 import { Case } from "@domain/entities/Case";
 import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
+import { IBookAppointmentsByWalletUsecase } from "../IBookAppointmentsByWalletUsecase";
 
-export class BookAppointmentByWalletUsecase
-implements IBookAppointmentsByWalletUsecase
-{
+export class BookAppointmentByWalletUsecase implements IBookAppointmentsByWalletUsecase {
     constructor(private _uow: IUnitofWork) {}
     async execute(input: CreateCheckoutSessionInputDto): Promise<Appointment> {
-        const {
-            client_id,
-            date,
-            duration,
-            lawyer_id,
-            reason,
-            timeSlot,
-            caseId,
-            title,
-        } = input;
+        const { client_id, date, duration, lawyer_id, reason, timeSlot, caseId, title } = input;
         return this._uow.startTransaction(async (uow) => {
             const user = await uow.userRepo.findByuser_id(lawyer_id);
             if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
             if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
-            const lawyerVerificaitionDetails =
-        await uow.lawyerVerificationRepo.findByUserId(lawyer_id);
+            const lawyerVerificaitionDetails = await uow.lawyerVerificationRepo.findByUserId(lawyer_id);
             const lawyerDetails = await uow.lawyerRepo.findUserId(lawyer_id);
             if (!lawyerDetails) throw new Error(ERRORS.USER_NOT_FOUND);
             if (!lawyerVerificaitionDetails) throw new Error(ERRORS.USER_NOT_FOUND);
@@ -44,9 +29,7 @@ implements IBookAppointmentsByWalletUsecase
                 err.code = STATUS_CODES.BAD_REQUEST;
                 throw err;
             }
-            const slotSettings = await uow.scheduleSettingsRepo.fetchScheduleSettings(
-                lawyer_id
-            );
+            const slotSettings = await uow.scheduleSettingsRepo.fetchScheduleSettings(lawyer_id);
             if (!slotSettings) {
                 const error: any = new Error("slot settings not found for the lawyer");
                 error.code = 404;
@@ -57,41 +40,31 @@ implements IBookAppointmentsByWalletUsecase
             if (myWallet.balance < lawyerDetails.consultationFee) {
                 throw new Error("Insufficient balance");
             }
-            const availableSlots = await uow.availableSlotsRepo.findAvailableSlots(
-                lawyer_id
-            );
+            const availableSlots = await uow.availableSlotsRepo.findAvailableSlots(lawyer_id);
             if (!availableSlots) {
                 const error: any = new Error("No available slots found for the lawyer");
                 error.code = 404;
                 throw error;
             }
-            const override = await uow.overrideSlotsRepo.fetcghOverrideSlotByDate(
-                lawyer_id,
-                date
-            );
+            const override = await uow.overrideSlotsRepo.fetcghOverrideSlotByDate(lawyer_id, date);
             const appointment = await uow.appointmentRepo.findByDateandLawyer_id({
                 lawyer_id,
                 date,
             });
             const timeSlotExist = appointment?.some(
-                (appointment) =>
-                    appointment.time === timeSlot &&
-          appointment.payment_status !== "failed"
+                (appointment) => appointment.time === timeSlot && appointment.payment_status !== "failed",
             );
             if (timeSlotExist) {
                 const error: any = new Error("slot already booked");
                 error.code = 404;
                 throw error;
             }
-            const existingApointmentonDate =
-        await uow.appointmentRepo.findByDateandClientId({
-            client_id,
-            date,
-        });
+            const existingApointmentonDate = await uow.appointmentRepo.findByDateandClientId({
+                client_id,
+                date,
+            });
             const bookingExist = existingApointmentonDate?.some(
-                (appointment) =>
-                    appointment.time === timeSlot &&
-          appointment.payment_status !== "failed"
+                (appointment) => appointment.time === timeSlot && appointment.payment_status !== "failed",
             );
             if (bookingExist) {
                 const error: any = new Error("you have booking on same time");
@@ -127,9 +100,7 @@ implements IBookAppointmentsByWalletUsecase
                         return bookTimeMins >= startMins && bookTimeMins <= endMins;
                     });
                     if (!isValidTime) {
-                        const error: any = new Error(
-                            "Time slots are not valid for the selected time slot"
-                        );
+                        const error: any = new Error("Time slots are not valid for the selected time slot");
                         error.code = 404;
                         throw error;
                     }
@@ -153,18 +124,16 @@ implements IBookAppointmentsByWalletUsecase
                         time: timeSlot,
                         type: "consultation",
                     });
-                    const appointmentCreated = await uow.appointmentRepo.create(
-                        newappointment
-                    );
+                    const appointmentCreated = await uow.appointmentRepo.create(newappointment);
                     const adminWallet = await uow.walletRepo.getAdminWallet();
                     if (!adminWallet) throw new Error("admins wallet not found");
                     await uow.walletRepo.updateBalance(
                         myWallet.user_id,
-                        Math.max(0, myWallet.balance - appointmentCreated.amount)
+                        Math.max(0, myWallet.balance - appointmentCreated.amount),
                     );
                     await uow.walletRepo.updateBalance(
                         adminWallet.user_id,
-                        adminWallet.balance + appointmentCreated.amount
+                        adminWallet.balance + appointmentCreated.amount,
                     );
                     return {
                         amount: appointmentCreated.amount,
@@ -185,37 +154,22 @@ implements IBookAppointmentsByWalletUsecase
                     };
                 }
             }
-            const days: Daytype[] = [
-                "sunday",
-                "monday",
-                "tuesday",
-                "wednesday",
-                "thursday",
-                "friday",
-                "saturday",
-            ];
+            const days: Daytype[] = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
             const index = date.getDay();
             const day = days[index];
             if (!availableSlots.getDayAvailability(day)) {
-                const error: any = new Error(
-                    "No available slots found for the selected date"
-                );
+                const error: any = new Error("No available slots found for the selected date");
                 error.code = 404;
                 throw error;
             }
             if (!availableSlots.getDayAvailability(day).enabled) {
-                const error: any = new Error(
-                    "Slots are not available for the selected date"
-                );
+                const error: any = new Error("Slots are not available for the selected date");
                 error.code = 404;
                 throw error;
             }
-            const timeSlots: { start: string; end: string }[] =
-        availableSlots.getDayAvailability(day).timeSlots;
+            const timeSlots: { start: string; end: string }[] = availableSlots.getDayAvailability(day).timeSlots;
             if (!timeSlots || timeSlots.length === 0) {
-                const error: any = new Error(
-                    "Slots are not available for the selected date"
-                );
+                const error: any = new Error("Slots are not available for the selected date");
                 error.code = 404;
                 throw error;
             }
@@ -255,12 +209,10 @@ implements IBookAppointmentsByWalletUsecase
                 time: timeSlot,
                 type: "consultation",
             });
-            const appointmentCreated = await uow.appointmentRepo.create(
-                newappointment
-            );
+            const appointmentCreated = await uow.appointmentRepo.create(newappointment);
             await uow.walletRepo.updateBalance(
                 myWallet.user_id,
-                Math.max(0, myWallet.balance - appointmentCreated.amount)
+                Math.max(0, myWallet.balance - appointmentCreated.amount),
             );
             return {
                 amount: appointmentCreated.amount,

@@ -1,13 +1,13 @@
 import mongoose, { Schema } from "mongoose";
 
 export interface IWalletModel extends Document {
-  _id: string;
-  user_id: string;
-  balance: number;
-  status: boolean;
-  isAdmin: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    user_id: string;
+    balance: number;
+    status: boolean;
+    isAdmin: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const walletSchema = new Schema<IWalletModel>(
@@ -18,10 +18,7 @@ const walletSchema = new Schema<IWalletModel>(
         status: { type: Boolean, default: true },
         isAdmin: { type: Boolean, default: false },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
-export const WalletModel = mongoose.model<IWalletModel>(
-    "wallets",
-    walletSchema
-);
+export const WalletModel = mongoose.model<IWalletModel>("wallets", walletSchema);

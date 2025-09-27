@@ -5,7 +5,4 @@ import {
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IFetchWalletTransactionsByWallet
-  extends IUseCase<
-    getWalletTransactionsInputDto,
-    getWalletTransactionsOutputDto
-  > {}
+    extends IUseCase<getWalletTransactionsInputDto, getWalletTransactionsOutputDto> {}

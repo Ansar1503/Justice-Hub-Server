@@ -1,27 +1,25 @@
 import { IMapper } from "@infrastructure/Mapper/IMapper";
-import { User } from "../../../domain/entities/User";
-import { IUserRepository } from "../../../domain/IRepository/IUserRepo";
-import UserModel, { IUserModel } from "../model/UserModel";
 import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
 import { ClientSession } from "mongoose";
 import { AggregatedLawyerProfile } from "@src/application/dtos/Lawyer/FindLawyersByQueryDto";
+import { User } from "../../../domain/entities/User";
+import { IUserRepository } from "../../../domain/IRepository/IUserRepo";
+import UserModel, { IUserModel } from "../model/UserModel";
 
 export class UserRepository implements IUserRepository {
     constructor(
-    private readonly Mapper: IMapper<User, IUserModel> = new UserMapper(),
-    private readonly _session?: ClientSession
+        private readonly Mapper: IMapper<User, IUserModel> = new UserMapper(),
+        private readonly _session?: ClientSession,
     ) {
-    // super(UserModel, Mapper);
+        // super(UserModel, Mapper);
     }
     async create(user: User): Promise<User> {
         const mapped = this.Mapper.toPersistence(user);
         // console.log("mapped", mapped);
-        const savedUser = await new UserModel(mapped)
-            .save({ session: this._session })
-            .catch((err) => {
-                console.log("error creating  user", err);
-                throw new Error("Db error creating user");
-            });
+        const savedUser = await new UserModel(mapped).save({ session: this._session }).catch((err) => {
+            console.log("error creating  user", err);
+            throw new Error("Db error creating user");
+        });
         return this.Mapper.toDomain(savedUser);
     }
 
@@ -36,16 +34,7 @@ export class UserRepository implements IUserRepository {
     }
 
     async update(user: Partial<User>): Promise<User | null> {
-        const {
-            user_id,
-            email,
-            is_blocked,
-            is_verified,
-            mobile,
-            name,
-            password,
-            role,
-        } = user;
+        const { user_id, email, is_blocked, is_verified, mobile, name, password, role } = user;
         const query: { user_id?: string; email?: string } = {};
         const update: Record<string, any> = {};
         if (user_id) {
@@ -81,28 +70,20 @@ export class UserRepository implements IUserRepository {
         return updated ? this.Mapper.toDomain(updated) : null;
     }
     async findAll(query: {
-    role: "lawyer" | "client";
-    search?: string;
-    page?: number;
-    limit?: number;
-    sort?: string;
-    order?: string;
-    status: "all" | "verified" | "blocked";
-  }): Promise<{
-    data: any[];
-    totalCount: number;
-    currentPage: number;
-    totalPages: number;
-  }> {
-        const {
-            role,
-            search = "",
-            page = 1,
-            limit = 10,
-            sort = "createdAt",
-            order = "desc",
-            status = "all",
-        } = query;
+        role: "lawyer" | "client";
+        search?: string;
+        page?: number;
+        limit?: number;
+        sort?: string;
+        order?: string;
+        status: "all" | "verified" | "blocked";
+    }): Promise<{
+        data: any[];
+        totalCount: number;
+        currentPage: number;
+        totalPages: number;
+    }> {
+        const { role, search = "", page = 1, limit = 10, sort = "createdAt", order = "desc", status = "all" } = query;
 
         const matchStage: Record<string, any> = { role };
         if (status === "verified") {
@@ -214,7 +195,7 @@ export class UserRepository implements IUserRepository {
             { $project: { password: 0 } },
             { $sort: sortStage },
             { $skip: (page - 1) * limit },
-            { $limit: limit }
+            { $limit: limit },
         );
 
         countPipeline.push({ $count: "total" });
@@ -235,26 +216,19 @@ export class UserRepository implements IUserRepository {
         };
     }
     async findLawyersByQuery(query: {
-    search?: string;
-    status?: "verified" | "rejected" | "pending" | "requested";
-    sort: "name" | "experience" | "consultation_fee" | "createdAt";
-    sortBy: "asc" | "desc";
-    limit: number;
-    page: number;
-  }): Promise<{
-    lawyers: AggregatedLawyerProfile[] | [];
-    totalCount: number;
-    currentPage: number;
-    totalPages: number;
-  }> {
-        const {
-            limit = 10,
-            page = 1,
-            sort = "name",
-            sortBy = "asc",
-            search,
-            status,
-        } = query;
+        search?: string;
+        status?: "verified" | "rejected" | "pending" | "requested";
+        sort: "name" | "experience" | "consultation_fee" | "createdAt";
+        sortBy: "asc" | "desc";
+        limit: number;
+        page: number;
+    }): Promise<{
+        lawyers: AggregatedLawyerProfile[] | [];
+        totalCount: number;
+        currentPage: number;
+        totalPages: number;
+    }> {
+        const { limit = 10, page = 1, sort = "name", sortBy = "asc", search, status } = query;
 
         const matchStage: Record<string, any> = { role: "lawyer" };
         const matchStage2: Record<string, any> = {};
@@ -378,10 +352,8 @@ export class UserRepository implements IUserRepository {
                     },
                     verificationDetails: {
                         barCouncilNumber: "$lawyerVerificationData.barCouncilNumber",
-                        enrollmentCertificateNumber:
-              "$lawyerVerificationData.enrollmentCertificateNumber",
-                        certificateOfPracticeNumber:
-              "$lawyerVerificationData.certificateOfPracticeNumber",
+                        enrollmentCertificateNumber: "$lawyerVerificationData.enrollmentCertificateNumber",
+                        certificateOfPracticeNumber: "$lawyerVerificationData.certificateOfPracticeNumber",
                         verificationStatus: "$lawyerVerificationData.verificationStatus",
                         rejectReason: "$lawyerVerificationData.rejectReason",
                         documents: "$lawyerVerificationData.documents",
@@ -421,13 +393,9 @@ export class UserRepository implements IUserRepository {
             { $project: { password: 0 } },
             { $sort: sortStage },
             { $skip: (page - 1) * limit },
-            { $limit: limit }
+            { $limit: limit },
         );
-        countPipeline.push(
-            ...lookupStage,
-            { $match: matchStage2 },
-            { $count: "total" }
-        );
+        countPipeline.push(...lookupStage, { $match: matchStage2 }, { $count: "total" });
 
         const [lawyers, countResult] = await Promise.all([
             UserModel.aggregate(dataPipeline),

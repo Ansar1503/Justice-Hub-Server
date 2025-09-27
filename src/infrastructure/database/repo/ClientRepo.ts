@@ -1,15 +1,15 @@
 import { IMapper } from "@infrastructure/Mapper/IMapper";
+import { ClientMapper } from "@infrastructure/Mapper/Implementations/ClientMapper";
+import { ClientSession } from "mongoose";
 import { ClientUpdateDto } from "../../../application/dtos/client.dto";
 import { Client } from "../../../domain/entities/Client";
 import { IClientRepository } from "../../../domain/IRepository/IClientRepo";
 import ClientModel, { IClientModel } from "../model/ClientModel";
-import { ClientMapper } from "@infrastructure/Mapper/Implementations/ClientMapper";
-import { ClientSession } from "mongoose";
 
 export class ClientRepository implements IClientRepository {
     constructor(
-    private mapper: IMapper<Client, IClientModel> = new ClientMapper(),
-    private readonly _session?: ClientSession
+        private mapper: IMapper<Client, IClientModel> = new ClientMapper(),
+        private readonly _session?: ClientSession,
     ) {}
 
     async create(client: Client): Promise<Client> {
@@ -30,13 +30,11 @@ export class ClientRepository implements IClientRepository {
                     profile_image: clientData.profile_image,
                     address: clientData.address,
                 },
-            }
+            },
         );
     }
     async findAll(): Promise<Client[] | []> {
         const data = await ClientModel.find({}).populate("address");
-        return data && this.mapper.toDomainArray
-            ? this.mapper.toDomainArray(data)
-            : [];
+        return data && this.mapper.toDomainArray ? this.mapper.toDomainArray(data) : [];
     }
 }

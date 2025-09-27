@@ -1,3 +1,3 @@
 export interface IBaseRepository<TDomain> {
-  create(entity: TDomain): Promise<TDomain>;
+    create(entity: TDomain): Promise<TDomain>;
 }

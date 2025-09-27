@@ -11,7 +11,7 @@ export function ConfirmClientAppointmentComposer(): IController {
         new AppointmentsRepository(),
         new SessionsRepository(),
         new UserRepository(),
-        new ChatSessionRepository()
+        new ChatSessionRepository(),
     );
     return new ConfirmClientAppointment(usecase);
 }

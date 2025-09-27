@@ -1,5 +1,4 @@
 import { IFetchSessionUseCase } from "@src/application/usecases/Admin/IFetchSessionUseCase";
-import { IController } from "../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
@@ -8,22 +7,23 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { zodSessionQuerySchema } from "@interfaces/middelwares/validator/zod/zod.validate";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
+import { IController } from "../Interface/IController";
 
 export class FetchSessions implements IController {
     constructor(
-    private fetchSessionUseCase: IFetchSessionUseCase,
-    private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    private httpErrors: IHttpErrors = new HttpErrors()
+        private fetchSessionUseCase: IFetchSessionUseCase,
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id = "";
         if (
             httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user &&
-      typeof httpRequest.user.id === "string" &&
-      "role" in httpRequest.user &&
-      httpRequest.user.role !== "admin"
+            typeof httpRequest.user === "object" &&
+            "id" in httpRequest.user &&
+            typeof httpRequest.user.id === "string" &&
+            "role" in httpRequest.user &&
+            httpRequest.user.role !== "admin"
         ) {
             user_id = httpRequest.user.id;
         }

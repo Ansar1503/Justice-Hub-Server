@@ -1,5 +1,4 @@
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
-import { IController } from "../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
@@ -7,12 +6,13 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { ILoginUserUseCase } from "@src/application/usecases/Auth/ILoginUserUseCase";
+import { IController } from "../Interface/IController";
 
 export class LoginController implements IController {
     constructor(
-    private loginUseCase: ILoginUserUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private loginUseCase: ILoginUserUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const { email, password } = httpRequest.body as Record<string, any>;

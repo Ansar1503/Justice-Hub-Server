@@ -1,15 +1,11 @@
-import {
-    ForbiddenError,
-    InternalError,
-    UnauthorizedError,
-} from "../Error/CustomError";
+import { ForbiddenError, InternalError, UnauthorizedError } from "../Error/CustomError";
 import "dotenv/config";
 import { verifyAccessToken } from "../../../application/services/jwt.service";
 import { DefaultEventsMap, ExtendedError, Socket } from "socket.io";
 
 export function authenticateClientSocket(
     socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
-    next: (err?: ExtendedError) => void
+    next: (err?: ExtendedError) => void,
 ) {
     let { token } = socket.handshake.auth;
     token = token?.split(" ")[1];

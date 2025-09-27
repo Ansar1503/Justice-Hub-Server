@@ -3,27 +3,27 @@ import { v4 as uuidv4 } from "uuid";
 export type NotificationType = "message" | "session";
 
 export interface PersistedNotificationProps {
-  id: string;
-  recipientId: string;
-  senderId: string;
-  type: NotificationType;
-  roomId?: string;
-  sessionId?: string;
-  title: string;
-  message: string;
-  isRead: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    recipientId: string;
+    senderId: string;
+    type: NotificationType;
+    roomId?: string;
+    sessionId?: string;
+    title: string;
+    message: string;
+    isRead: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface CreateNotificationProps {
-  recipientId: string;
-  senderId: string;
-  type: NotificationType;
-  roomId?: string;
-  sessionId?: string;
-  title: string;
-  message: string;
+    recipientId: string;
+    senderId: string;
+    type: NotificationType;
+    roomId?: string;
+    sessionId?: string;
+    title: string;
+    message: string;
 }
 
 export class Notification {

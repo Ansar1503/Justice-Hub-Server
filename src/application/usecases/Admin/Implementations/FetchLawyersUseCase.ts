@@ -1,8 +1,5 @@
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
-import {
-    UseCaseInputDto,
-    UseCaseOutputDto,
-} from "../../../dtos/Admin/FetchLawyersDto";
+import { UseCaseInputDto, UseCaseOutputDto } from "../../../dtos/Admin/FetchLawyersDto";
 import { IFetchLawyerUseCase } from "../IFetchLawyersUseCase";
 
 export class FetchLawyersUseCase implements IFetchLawyerUseCase {

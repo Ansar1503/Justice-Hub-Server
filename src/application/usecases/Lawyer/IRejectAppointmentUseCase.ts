@@ -5,7 +5,4 @@ import {
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IRejectAppointmentUseCase
-  extends IUseCase<
-    ChangeAppointmentStatusInputDto,
-    ChangeAppointmentStatusOutputDto
-  > {}
+    extends IUseCase<ChangeAppointmentStatusInputDto, ChangeAppointmentStatusOutputDto> {}

@@ -1,14 +1,14 @@
 import { v4 as uuidv4 } from "uuid";
 
 interface PersistedSpescializationProps {
-  id: string;
-  name: string;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    name: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 interface createProps {
-  name: string;
+    name: string;
 }
 
 export class Specialization {

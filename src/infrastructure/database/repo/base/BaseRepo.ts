@@ -2,13 +2,11 @@ import { IBaseRepository } from "@domain/IRepository/IBaseRepo";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
 import { ClientSession, Model } from "mongoose";
 
-export abstract class BaseRepository<TDomain, TPersistence>
-implements IBaseRepository<TDomain>
-{
+export abstract class BaseRepository<TDomain, TPersistence> implements IBaseRepository<TDomain> {
     constructor(
-    protected readonly model: Model<TPersistence>,
-    protected readonly mapper: IMapper<TDomain, TPersistence>,
-    protected readonly session?: ClientSession
+        protected readonly model: Model<TPersistence>,
+        protected readonly mapper: IMapper<TDomain, TPersistence>,
+        protected readonly session?: ClientSession,
     ) {}
 
     async create(entity: TDomain): Promise<TDomain> {

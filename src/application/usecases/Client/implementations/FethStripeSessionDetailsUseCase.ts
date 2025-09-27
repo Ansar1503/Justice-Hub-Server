@@ -1,9 +1,7 @@
 import { getSessionDetails } from "@src/application/services/stripe.service";
 import { IFetchStripeSessionDetailsUseCase } from "../IFetchStripeSessionDetailsUseCase";
 
-export class FetchStripeSessionDetailsUseCase
-implements IFetchStripeSessionDetailsUseCase
-{
+export class FetchStripeSessionDetailsUseCase implements IFetchStripeSessionDetailsUseCase {
     async execute(input: string): Promise<any> {
         const sessionDetails = await getSessionDetails(input);
         return {

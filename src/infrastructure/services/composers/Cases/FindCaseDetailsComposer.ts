@@ -7,12 +7,6 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { FindCaseDetailsUsecase } from "@src/application/usecases/Case/Implimentations/FindCaseDetailsUsecase";
 
 export function FindCaseDetailsComposer(): IController {
-    const usecase = new FindCaseDetailsUsecase(
-        new CaseRepository(new CaseMapper())
-    );
-    return new FetchCaseDetailsControlller(
-        usecase,
-        new HttpErrors(),
-        new HttpSuccess()
-    );
+    const usecase = new FindCaseDetailsUsecase(new CaseRepository(new CaseMapper()));
+    return new FetchCaseDetailsControlller(usecase, new HttpErrors(), new HttpSuccess());
 }

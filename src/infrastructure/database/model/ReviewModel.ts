@@ -1,16 +1,16 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IreviewModel extends Document {
-  _id: string;
-  review: string;
-  session_id: string;
-  heading: string;
-  rating: number;
-  active: boolean;
-  client_id: string;
-  lawyer_id: string;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    review: string;
+    session_id: string;
+    heading: string;
+    rating: number;
+    active: boolean;
+    client_id: string;
+    lawyer_id: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const reviewSchema = new Schema<IreviewModel>(
@@ -24,7 +24,7 @@ const reviewSchema = new Schema<IreviewModel>(
         client_id: { type: String, required: true },
         lawyer_id: { type: String, required: true },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
 export default mongoose.model<IreviewModel>("reviews", reviewSchema);

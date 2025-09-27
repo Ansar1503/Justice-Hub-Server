@@ -1,10 +1,8 @@
 import { Availability } from "@domain/entities/Availability";
-import { IMapper } from "../IMapper";
 import { IAvailabilityModel } from "@infrastructure/database/model/AvailabilityModel";
+import { IMapper } from "../IMapper";
 
-export class AvailableSlotsMapper
-implements IMapper<Availability, IAvailabilityModel>
-{
+export class AvailableSlotsMapper implements IMapper<Availability, IAvailabilityModel> {
     toDomain(persistence: IAvailabilityModel): Availability {
         return Availability.fromPersistence({
             id: persistence._id,

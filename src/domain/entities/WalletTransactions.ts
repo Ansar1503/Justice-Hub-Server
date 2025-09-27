@@ -1,33 +1,28 @@
 import { v4 as uuidv4 } from "uuid";
 
-type transactionCategory =
-  | "deposit"
-  | "withdrawal"
-  | "payment"
-  | "refund"
-  | "transfer";
+type transactionCategory = "deposit" | "withdrawal" | "payment" | "refund" | "transfer";
 type transactionStatus = "pending" | "completed" | "failed" | "cancelled";
 type transactionType = "debit" | "credit";
 
 interface PersistedWalletTransactionProps {
-  id: string;
-  walletId: string;
-  amount: number;
-  type: transactionType;
-  description: string;
-  category: transactionCategory;
-  status: transactionStatus;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    walletId: string;
+    amount: number;
+    type: transactionType;
+    description: string;
+    category: transactionCategory;
+    status: transactionStatus;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 interface createWalletTransactionProps {
-  walletId: string;
-  amount: number;
-  type: transactionType;
-  description: string;
-  category: transactionCategory;
-  status: transactionStatus;
+    walletId: string;
+    amount: number;
+    type: transactionType;
+    description: string;
+    category: transactionCategory;
+    status: transactionStatus;
 }
 
 export class WalletTransaction {

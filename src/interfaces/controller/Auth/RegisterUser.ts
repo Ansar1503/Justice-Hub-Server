@@ -1,5 +1,4 @@
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { IController } from "../Interface/IController";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
@@ -8,12 +7,13 @@ import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IRegiserUserUseCase } from "@src/application/usecases/Auth/IRegisterUserUseCase";
 import { RegisterUserDto } from "@src/application/dtos/user.dto";
+import { IController } from "../Interface/IController";
 
 export class RegisterUser implements IController {
     constructor(
-    private registerUseCase: IRegiserUserUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private registerUseCase: IRegiserUserUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
@@ -25,22 +25,13 @@ export class RegisterUser implements IController {
         const payload: Partial<RegisterUserDto> = {};
 
         if (typeof httpRequest.body === "object" && httpRequest.body !== null) {
-            if (
-                "name" in httpRequest.body &&
-        typeof httpRequest.body.name === "string"
-            ) {
+            if ("name" in httpRequest.body && typeof httpRequest.body.name === "string") {
                 payload.name = httpRequest.body.name;
             }
-            if (
-                "email" in httpRequest.body &&
-        typeof httpRequest.body.email === "string"
-            ) {
+            if ("email" in httpRequest.body && typeof httpRequest.body.email === "string") {
                 payload.email = httpRequest.body.email;
             }
-            if (
-                "mobile" in httpRequest.body &&
-        typeof httpRequest.body.mobile === "string"
-            ) {
+            if ("mobile" in httpRequest.body && typeof httpRequest.body.mobile === "string") {
                 payload.mobile = httpRequest.body.mobile;
             }
             if ("role" in httpRequest.body) {
@@ -54,21 +45,12 @@ export class RegisterUser implements IController {
                     payload.role = httpRequest.body.role;
                 }
             }
-            if (
-                "password" in httpRequest.body &&
-        typeof httpRequest.body.password === "string"
-            ) {
+            if ("password" in httpRequest.body && typeof httpRequest.body.password === "string") {
                 payload.password = httpRequest.body.password;
             }
         }
         try {
-            if (
-                !payload.email ||
-        !payload.mobile ||
-        !payload.name ||
-        !payload.password ||
-        !payload.role
-            ) {
+            if (!payload.email || !payload.mobile || !payload.name || !payload.password || !payload.role) {
                 return this.httpErrors.error_400("Invalid Credentials");
             }
             const dto = new RegisterUserDto(payload as RegisterUserDto);

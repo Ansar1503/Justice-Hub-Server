@@ -1,23 +1,19 @@
 import { IFetchLawyerVerificationDetailsUsecase } from "@src/application/usecases/Lawyer/IFetchLawyerVerificatoinDetails";
-import { IController } from "../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
+import { IController } from "../Interface/IController";
 
 export class FetchLawyersVerificationDataController implements IController {
     constructor(
-    private _fetchVerificationDataUsecase: IFetchLawyerVerificationDetailsUsecase,
-    private _errors: IHttpErrors,
-    private _success: IHttpSuccess
+        private _fetchVerificationDataUsecase: IFetchLawyerVerificationDetailsUsecase,
+        private _errors: IHttpErrors,
+        private _success: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let userId = "";
-        if (
-            httpRequest.params &&
-      typeof httpRequest.params === "object" &&
-      "id" in httpRequest.params
-        ) {
+        if (httpRequest.params && typeof httpRequest.params === "object" && "id" in httpRequest.params) {
             if (typeof httpRequest.params.id === "object") {
                 return this._errors.error_400("invalid userid type");
             }

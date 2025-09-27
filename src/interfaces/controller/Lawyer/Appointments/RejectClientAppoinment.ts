@@ -10,19 +10,13 @@ import { IRejectAppointmentUseCase } from "@src/application/usecases/Lawyer/IRej
 
 export class RejectClientAppointmentController implements IController {
     constructor(
-    private RejectAppointment: IRejectAppointmentUseCase,
-    private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    private httpErrors: IHttpErrors = new HttpErrors()
+        private RejectAppointment: IRejectAppointmentUseCase,
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let id: string = "";
-        let status:
-      | "confirmed"
-      | "pending"
-      | "completed"
-      | "cancelled"
-      | "rejected"
-      | "" = "";
+        let status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected" | "" = "";
         if (!httpRequest.body) {
             return this.httpErrors.error_400("Invalid query");
         }
@@ -32,10 +26,10 @@ export class RejectClientAppointmentController implements IController {
         if (typeof httpRequest.body === "object" && "status" in httpRequest.body) {
             if (
                 httpRequest.body.status === "confirmed" ||
-        httpRequest.body.status === "pending" ||
-        httpRequest.body.status === "completed" ||
-        httpRequest.body.status === "cancelled" ||
-        httpRequest.body.status === "rejected"
+                httpRequest.body.status === "pending" ||
+                httpRequest.body.status === "completed" ||
+                httpRequest.body.status === "cancelled" ||
+                httpRequest.body.status === "rejected"
             ) {
                 status = httpRequest.body.status;
             }

@@ -1,23 +1,23 @@
 export interface PersistedDisputesProps {
-  id: string;
-  disputeType: "reviews" | "messages";
-  contentId: string;
-  reportedBy: string;
-  reportedUser: string;
-  reason: string;
-  status: "pending" | "resolved" | "rejected";
-  resolveAction?: "deleted" | "blocked";
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    disputeType: "reviews" | "messages";
+    contentId: string;
+    reportedBy: string;
+    reportedUser: string;
+    reason: string;
+    status: "pending" | "resolved" | "rejected";
+    resolveAction?: "deleted" | "blocked";
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface CreateDisputesProps {
-  disputeType: "reviews" | "messages";
-  contentId: string;
-  reportedBy: string;
-  reportedUser: string;
-  reason: string;
-  status?: "pending" | "resolved" | "rejected";
+    disputeType: "reviews" | "messages";
+    contentId: string;
+    reportedBy: string;
+    reportedUser: string;
+    reason: string;
+    status?: "pending" | "resolved" | "rejected";
 }
 
 export class Disputes {

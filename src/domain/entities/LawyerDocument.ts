@@ -1,13 +1,13 @@
 import { v4 as uuidv4 } from "uuid";
 
 export interface LawyerDocumentsProps {
-  id: string;
-  userId: string;
-  enrollmentCertificate: string;
-  certificateOfPractice: string;
-  barCouncilCertificate: string;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    userId: string;
+    enrollmentCertificate: string;
+    certificateOfPractice: string;
+    barCouncilCertificate: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export class LawyerDocuments {
@@ -29,9 +29,7 @@ export class LawyerDocuments {
         this._updatedAt = props.updatedAt;
     }
 
-    static create(
-        props: Omit<LawyerDocumentsProps, "id" | "createdAt" | "updatedAt">
-    ): LawyerDocuments {
+    static create(props: Omit<LawyerDocumentsProps, "id" | "createdAt" | "updatedAt">): LawyerDocuments {
         const now = new Date();
         return new LawyerDocuments({
             ...props,
@@ -86,9 +84,7 @@ export class LawyerDocuments {
         return this._updatedAt;
     }
 
-    update(
-        props: Partial<Omit<LawyerDocumentsProps, "id" | "userId" | "createdAt">>
-    ): void {
+    update(props: Partial<Omit<LawyerDocumentsProps, "id" | "userId" | "createdAt">>): void {
         let changed = false;
         if (props.enrollmentCertificate !== undefined) {
             this._enrollmentCertificate = props.enrollmentCertificate;

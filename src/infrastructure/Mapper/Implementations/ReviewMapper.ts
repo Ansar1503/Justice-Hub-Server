@@ -1,6 +1,6 @@
 import { Review } from "@domain/entities/Review";
-import { IMapper } from "../IMapper";
 import { IreviewModel } from "@infrastructure/database/model/ReviewModel";
+import { IMapper } from "../IMapper";
 
 export class ReviewMapper implements IMapper<Review, IreviewModel> {
     toDomain(persistence: IreviewModel): Review {

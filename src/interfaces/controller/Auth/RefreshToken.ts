@@ -1,5 +1,4 @@
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
-import { IController } from "../Interface/IController";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
@@ -7,12 +6,13 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IUserReAuth } from "@src/application/usecases/Auth/IUserReAuthUseCase";
+import { IController } from "../Interface/IController";
 
 export class RefreshToken implements IController {
     constructor(
-    private userReAuth: IUserReAuth,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private userReAuth: IUserReAuth,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const token = (httpRequest as Record<string, any>)?.cookies?.refresh;

@@ -1,20 +1,20 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IcallLogModel extends Document {
-  _id: string;
-  roomId: string;
-  session_id: string;
-  start_time: Date;
-  end_time?: Date;
-  client_joined_at?: Date;
-  client_left_at?: Date;
-  lawyer_joined_at?: Date;
-  lawyer_left_at?: Date;
-  end_reason?: string;
-  callDuration?: number;
-  status: "ongoing" | "completed" | "cancelled" | "missed" | "dropped";
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    roomId: string;
+    session_id: string;
+    start_time: Date;
+    end_time?: Date;
+    client_joined_at?: Date;
+    client_left_at?: Date;
+    lawyer_joined_at?: Date;
+    lawyer_left_at?: Date;
+    end_reason?: string;
+    callDuration?: number;
+    status: "ongoing" | "completed" | "cancelled" | "missed" | "dropped";
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const callLogsSchema = new Schema<IcallLogModel>(
@@ -37,10 +37,7 @@ const callLogsSchema = new Schema<IcallLogModel>(
             default: "ongoing",
         },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
-export const CallLogsModel = mongoose.model<IcallLogModel>(
-    "CallLogs",
-    callLogsSchema
-);
+export const CallLogsModel = mongoose.model<IcallLogModel>("CallLogs", callLogsSchema);

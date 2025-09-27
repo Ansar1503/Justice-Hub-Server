@@ -11,11 +11,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export const sendVerificationEmail = async (
-    email: string,
-    user_id: string,
-    otp: string
-): Promise<void> => {
+export const sendVerificationEmail = async (email: string, user_id: string, otp: string): Promise<void> => {
     const token = jwt.sign({ user_id }, process.env.JWT_EMAIL_SECRET as string, {
         expiresIn: "15min",
     });
@@ -30,7 +26,7 @@ export const sendVerificationEmail = async (
 }/api/user/verify-email?token=${token}&email=${email}">here</a></button> to verify your email.</p><br/>
             ${
     otp &&
-              `<h4>or</h4> <br/>
+                `<h4>or</h4> <br/>
             <p>use this <h3>${otp}</h3> otp to verify your email</p>`
 }`,
     };

@@ -7,12 +7,6 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { FetchLawyerProfessionalDetailsUsecase } from "@src/application/usecases/Lawyer/implementations/FetchLawyerProfessionalDetailsUsecase";
 
 export function FetchLawyersProfessionalDetailscomposer(): IController {
-    const usecase = new FetchLawyerProfessionalDetailsUsecase(
-        new LawyerRepository(new LawyerMapper())
-    );
-    return new FetchLawyerProfessionalDetailsController(
-        usecase,
-        new HttpErrors(),
-        new HttpSuccess()
-    );
+    const usecase = new FetchLawyerProfessionalDetailsUsecase(new LawyerRepository(new LawyerMapper()));
+    return new FetchLawyerProfessionalDetailsController(usecase, new HttpErrors(), new HttpSuccess());
 }

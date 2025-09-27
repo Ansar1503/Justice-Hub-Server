@@ -1,4 +1,3 @@
-import { IController } from "../../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
@@ -7,21 +6,18 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IUpdateAvailableSlotsUseCase } from "@src/application/usecases/Lawyer/IUpdateAvailableSlotsUseCase";
 import { UpdateAvailableSlotsBodyValidateSchema } from "@interfaces/middelwares/validator/zod/lawyer/UpdateAvailableSlotSchema";
+import { IController } from "../../Interface/IController";
 
 export class UpdateAvailableSlotsController implements IController {
     constructor(
-    private updateAvailableSlots: IUpdateAvailableSlotsUseCase,
-    private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    private httpErrors: IHttpErrors = new HttpErrors()
+        private updateAvailableSlots: IUpdateAvailableSlotsUseCase,
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
 
-        if (
-            httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user
-        ) {
+        if (httpRequest.user && typeof httpRequest.user === "object" && "id" in httpRequest.user) {
             user_id = String(httpRequest.user.id);
         }
 
@@ -30,9 +26,7 @@ export class UpdateAvailableSlotsController implements IController {
         }
 
         try {
-            const parsed = UpdateAvailableSlotsBodyValidateSchema.safeParse(
-                httpRequest.body
-            );
+            const parsed = UpdateAvailableSlotsBodyValidateSchema.safeParse(httpRequest.body);
             if (!parsed.success) {
                 const err = parsed.error.errors[0];
                 return this.httpErrors.error_400(err.message);

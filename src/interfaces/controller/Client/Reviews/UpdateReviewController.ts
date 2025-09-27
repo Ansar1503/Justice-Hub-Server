@@ -1,4 +1,3 @@
-import { IController } from "../../Interface/IController";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
@@ -8,38 +7,29 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IUpdateReviewUseCase } from "@src/application/usecases/Client/IUpdateReviewUseCase";
 import { UpdateReviewInputDto } from "@src/application/dtos/client/UpdateReviewDto";
+import { IController } from "../../Interface/IController";
 
 export class UpdateReviewsController implements IController {
     constructor(
-    private updateReview: IUpdateReviewUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private updateReview: IUpdateReviewUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         try {
             const reviewId =
-        httpRequest.params &&
-        typeof httpRequest.params === "object" &&
-        "id" in httpRequest.params
-            ? (httpRequest.params as { id: string }).id
-            : undefined;
+                httpRequest.params && typeof httpRequest.params === "object" && "id" in httpRequest.params
+                    ? (httpRequest.params as { id: string }).id
+                    : undefined;
 
-            const body: any =
-        httpRequest.body && typeof httpRequest.body === "object"
-            ? httpRequest.body
-            : undefined;
+            const body: any = httpRequest.body && typeof httpRequest.body === "object" ? httpRequest.body : undefined;
 
             if (!reviewId) {
                 const error = this.httpErrors.error_400("review id not found");
                 return error;
             }
-            if (
-                !body ||
-        !body.heading ||
-        !body.review ||
-        typeof body.rating !== "number"
-            ) {
+            if (!body || !body.heading || !body.review || typeof body.rating !== "number") {
                 const error = this.httpErrors.error_400("invalid payload");
                 return error;
             }

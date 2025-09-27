@@ -1,5 +1,4 @@
 import { generateTimeSlots } from "@shared/utils/helpers/DateAndTimeHelper";
-import { IFetchLawyerSlotsUseCase } from "../IFetchLawyerSlotsUseCase";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { ERRORS } from "@infrastructure/constant/errors";
 import { IScheduleSettingsRepo } from "@domain/IRepository/IScheduleSettingsRepo";
@@ -8,28 +7,29 @@ import { IOverrideRepo } from "@domain/IRepository/IOverrideRepo";
 import { IAvailableSlots } from "@domain/IRepository/IAvailableSlots";
 import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
 import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
+import { IFetchLawyerSlotsUseCase } from "../IFetchLawyerSlotsUseCase";
 
 export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
     constructor(
-    private userRepository: IUserRepository,
-    private lawyerRepository: ILawyerVerificationRepo,
-    private scheduleSettingsRepo: IScheduleSettingsRepo,
-    private appointmentRepo: IAppointmentsRepository,
-    private ovverrideRepo: IOverrideRepo,
-    private availableSlotsRepo: IAvailableSlots
+        private userRepository: IUserRepository,
+        private lawyerRepository: ILawyerVerificationRepo,
+        private scheduleSettingsRepo: IScheduleSettingsRepo,
+        private appointmentRepo: IAppointmentsRepository,
+        private ovverrideRepo: IOverrideRepo,
+        private availableSlotsRepo: IAvailableSlots,
     ) {}
     async execute(input: {
-    lawyer_id: string;
-    date: Date;
-    client_id: string;
-  }): Promise<{ slots: string[]; isAvailable: boolean }> {
+        lawyer_id: string;
+        date: Date;
+        client_id: string;
+    }): Promise<{ slots: string[]; isAvailable: boolean }> {
         const { client_id, date, lawyer_id } = input;
         const isToday = (someDate: Date) => {
             const today = new Date();
             return (
                 someDate.getDate() === today.getDate() &&
-        someDate.getMonth() === today.getMonth() &&
-        someDate.getFullYear() === today.getFullYear()
+                someDate.getMonth() === today.getMonth() &&
+                someDate.getFullYear() === today.getFullYear()
             );
         };
 
@@ -42,46 +42,34 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
             return slotDate > now;
         };
 
-        const filterBookedSlots = (slots: string[]) =>
-            slots.filter((t) => !booked.has(t));
+        const filterBookedSlots = (slots: string[]) => slots.filter((t) => !booked.has(t));
         const user = await this.userRepository.findByuser_id(lawyer_id);
         if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
         if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
         const lawyer = await this.lawyerRepository.findByUserId(lawyer_id);
         if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
-        if (lawyer.verificationStatus !== "verified")
-            throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
+        if (lawyer.verificationStatus !== "verified") throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
 
-        const slotSettings = await this.scheduleSettingsRepo.fetchScheduleSettings(
-            lawyer_id
-        );
+        const slotSettings = await this.scheduleSettingsRepo.fetchScheduleSettings(lawyer_id);
 
         if (!slotSettings) {
             const error: any = new Error("slot settings not found for the lawyer");
             error.code = 404;
             throw error;
         }
-        const existingAppointment =
-      await this.appointmentRepo.findByDateandLawyer_id({
-          date,
-          lawyer_id,
-      });
+        const existingAppointment = await this.appointmentRepo.findByDateandLawyer_id({
+            date,
+            lawyer_id,
+        });
 
         const booked = new Set<string>();
-        existingAppointment?.forEach(
-            (a) => a.payment_status !== "failed" && booked.add(a.time)
-        );
+        existingAppointment?.forEach((a) => a.payment_status !== "failed" && booked.add(a.time));
 
         const slotDuration = slotSettings.slotDuration;
 
-        const override = await this.ovverrideRepo.fetcghOverrideSlotByDate(
-            lawyer_id,
-            date
-        );
+        const override = await this.ovverrideRepo.fetcghOverrideSlotByDate(lawyer_id, date);
 
-        const availableSlots = await this.availableSlotsRepo.findAvailableSlots(
-            lawyer_id
-        );
+        const availableSlots = await this.availableSlotsRepo.findAvailableSlots(lawyer_id);
 
         if (!availableSlots) {
             const error: any = new Error("No available slots found for the lawyer");
@@ -89,23 +77,13 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
             throw error;
         }
 
-        const days: Daytype[] = [
-            "sunday",
-            "monday",
-            "tuesday",
-            "wednesday",
-            "thursday",
-            "friday",
-            "saturday",
-        ];
+        const days: Daytype[] = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
         const index = date.getDay();
         const day = days[index];
 
         if (!availableSlots.getDayAvailability(day)) {
-            const error: any = new Error(
-                "No available slots found for the selected date"
-            );
+            const error: any = new Error("No available slots found for the selected date");
             error.code = 404;
             throw error;
         }
@@ -122,11 +100,7 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
                 let allSlots = [];
                 for (let i = 0; i < overrideSlot.timeRanges.length; i++) {
                     const timeRange = overrideSlot.timeRanges[i];
-                    const timeSlot = generateTimeSlots(
-                        timeRange.start,
-                        timeRange.end,
-                        slotDuration
-                    );
+                    const timeSlot = generateTimeSlots(timeRange.start, timeRange.end, slotDuration);
                     allSlots.push(...timeSlot);
                 }
                 allSlots = filterBookedSlots(allSlots);

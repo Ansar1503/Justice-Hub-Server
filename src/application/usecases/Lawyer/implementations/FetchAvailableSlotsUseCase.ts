@@ -1,6 +1,6 @@
 import { AvailabilityOutputDto } from "@src/application/dtos/Lawyer/AvailabilityDto";
-import { IFetchAvailableSlotsUseCase } from "../IFetchAvailableSlotsUseCase";
 import { IAvailableSlots } from "@domain/IRepository/IAvailableSlots";
+import { IFetchAvailableSlotsUseCase } from "../IFetchAvailableSlotsUseCase";
 
 export class FetchAvailableSlotsUseCase implements IFetchAvailableSlotsUseCase {
     constructor(private AvailableSlotRepo: IAvailableSlots) {}

@@ -1,24 +1,20 @@
 import { IFetchCasesByQueryUsecase } from "@src/application/usecases/Case/Interfaces/IFetchCasesByQuery";
-import { IController } from "../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { FindCasesQueryInputZodSchema } from "@interfaces/middelwares/validator/zod/Cases/FindCasesQuerySchema";
+import { IController } from "../Interface/IController";
 
 export class FetchAllCasesByQueryController implements IController {
     constructor(
-    private _fetchCasesUsecase: IFetchCasesByQueryUsecase,
-    private _errors: IHttpErrors,
-    private _success: IHttpSuccess
+        private _fetchCasesUsecase: IFetchCasesByQueryUsecase,
+        private _errors: IHttpErrors,
+        private _success: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let userId = "";
-        if (
-            httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user
-        ) {
+        if (httpRequest.user && typeof httpRequest.user === "object" && "id" in httpRequest.user) {
             userId = String(httpRequest.user.id);
         }
         const parsed = FindCasesQueryInputZodSchema.safeParse(httpRequest.query);

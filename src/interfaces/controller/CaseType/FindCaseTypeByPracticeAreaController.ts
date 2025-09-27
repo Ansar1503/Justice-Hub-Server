@@ -1,23 +1,19 @@
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
-import { IController } from "../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IFindCaseTypesByPracticeAreas } from "@src/application/usecases/CaseType/IFetchCasesTypesByPracticeAreaIds";
+import { IController } from "../Interface/IController";
 
 export class FindCaseTypesByPracticeAreasController implements IController {
     constructor(
-    private _findCaseTypes: IFindCaseTypesByPracticeAreas,
-    private _errors: IHttpErrors,
-    private _success: IHttpSuccess
+        private _findCaseTypes: IFindCaseTypesByPracticeAreas,
+        private _errors: IHttpErrors,
+        private _success: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let practiceIds: string[] = [];
-        if (
-            httpRequest.query &&
-      typeof httpRequest.query === "object" &&
-      "pids" in httpRequest.query
-        ) {
+        if (httpRequest.query && typeof httpRequest.query === "object" && "pids" in httpRequest.query) {
             if (Array.isArray(httpRequest.query.pids)) {
                 practiceIds = httpRequest.query.pids;
             } else if (typeof httpRequest.query.pids === "string") {

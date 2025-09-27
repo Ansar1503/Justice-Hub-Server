@@ -1,4 +1,3 @@
-import { IController } from "../../Interface/IController";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
@@ -8,23 +7,24 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IFetchAppointmentsClientUseCase } from "@src/application/usecases/Client/IFetchAppointmentsUseCase";
 import { zodAppointmentQuerySchema } from "@interfaces/middelwares/validator/zod/zod.validate";
+import { IController } from "../../Interface/IController";
 
 export class FetchAppointmentDataController implements IController {
     constructor(
-    private fetchAppointments: IFetchAppointmentsClientUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private fetchAppointments: IFetchAppointmentsClientUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id = "";
         if (
             httpRequest.user &&
-      typeof httpRequest.user == "object" &&
-      "id" in httpRequest.user &&
-      typeof httpRequest.user.id == "string" &&
-      "role" in httpRequest.user &&
-      httpRequest.user.role != "admin"
+            typeof httpRequest.user == "object" &&
+            "id" in httpRequest.user &&
+            typeof httpRequest.user.id == "string" &&
+            "role" in httpRequest.user &&
+            httpRequest.user.role != "admin"
         ) {
             user_id = httpRequest.user.id;
         }

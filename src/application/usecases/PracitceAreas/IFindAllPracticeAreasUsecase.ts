@@ -5,4 +5,4 @@ import {
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IFindAllPracticeAreasUsecase
-  extends IUseCase<FindAllPracticeAreaInputDto, FindAllPracticeAreaOutputDto> {}
+    extends IUseCase<FindAllPracticeAreaInputDto, FindAllPracticeAreaOutputDto> {}

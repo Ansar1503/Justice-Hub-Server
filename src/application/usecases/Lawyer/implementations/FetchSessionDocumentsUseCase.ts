@@ -1,10 +1,8 @@
 import { FindSessionDocumentOutputDto } from "@src/application/dtos/Lawyer/FindSessionDocumentDto";
-import { IFetchSessionDocumentsUseCase } from "../IFetchSessionDocumentsUseCase";
 import { ISessionDocumentRepo } from "@domain/IRepository/ISessionDocumentsRepo";
+import { IFetchSessionDocumentsUseCase } from "../IFetchSessionDocumentsUseCase";
 
-export class FetchSessionsDocumentsUseCase
-implements IFetchSessionDocumentsUseCase
-{
+export class FetchSessionsDocumentsUseCase implements IFetchSessionDocumentsUseCase {
     constructor(private sessionDocumentsRepo: ISessionDocumentRepo) {}
     async execute(input: string): Promise<FindSessionDocumentOutputDto> {
         const result = await this.sessionDocumentsRepo.findBySessionId({

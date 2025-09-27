@@ -1,6 +1,6 @@
 import { Otp } from "@domain/entities/Otp";
-import { IMapper } from "../IMapper";
 import { IotpModel } from "@infrastructure/database/model/OtpModel";
+import { IMapper } from "../IMapper";
 
 export class OtpMapper implements IMapper<Otp, IotpModel> {
     toDomain(persistence: IotpModel): Otp {

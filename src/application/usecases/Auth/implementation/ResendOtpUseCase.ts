@@ -1,18 +1,18 @@
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
-import { IResendOtpUseCase } from "../IResendOtpUseCase";
 import { IOtpRepository } from "@domain/IRepository/IOtpRepo";
 import { generateOtp } from "@infrastructure/services/OtpManager/GenerateOtp";
 import { INodeMailerProvider } from "@src/application/providers/NodeMailerProvider";
 import { Otp } from "@domain/entities/Otp";
 import { token } from "morgan";
 import { IJwtProvider } from "@src/application/providers/JwtProvider";
+import { IResendOtpUseCase } from "../IResendOtpUseCase";
 
 export class ResendOtpUseCase implements IResendOtpUseCase {
     constructor(
-    private userRepo: IUserRepository,
-    private otpRepo: IOtpRepository,
-    private emailProvider: INodeMailerProvider,
-    private tokenProvider: IJwtProvider
+        private userRepo: IUserRepository,
+        private otpRepo: IOtpRepository,
+        private emailProvider: INodeMailerProvider,
+        private tokenProvider: IJwtProvider,
     ) {}
     async execute(input: string): Promise<void> {
         const user = await this.userRepo.findByEmail(input);

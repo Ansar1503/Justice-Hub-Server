@@ -1,17 +1,17 @@
 import { v4 as uuid } from "uuid";
 
 export interface PersistedOtpProps {
-  id: string;
-  email: string;
-  otp: string;
-  expiresAt: Date;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    email: string;
+    otp: string;
+    expiresAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface CreateOtpProps {
-  email: string;
-  otp: string;
+    email: string;
+    otp: string;
 }
 
 export class Otp {

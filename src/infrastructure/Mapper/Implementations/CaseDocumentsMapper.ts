@@ -1,10 +1,8 @@
 import { CaseDocument } from "@domain/entities/SessionDocument";
-import { IMapper } from "../IMapper";
 import { ICaseDocumentModel } from "@infrastructure/database/model/CaseDocumentModel";
+import { IMapper } from "../IMapper";
 
-export class caseDocumentsMapper
-implements IMapper<CaseDocument, ICaseDocumentModel>
-{
+export class caseDocumentsMapper implements IMapper<CaseDocument, ICaseDocumentModel> {
     toDomain(persistence: ICaseDocumentModel): CaseDocument {
         return CaseDocument.fromPersistence({
             caseId: persistence.caseId,

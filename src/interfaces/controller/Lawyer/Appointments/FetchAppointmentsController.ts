@@ -9,9 +9,9 @@ import { IFetchAppointmentDetailsLawyerUseCase } from "@src/application/usecases
 
 export class FetchAppointmentsController implements IController {
     constructor(
-    private FetchAppointmentsLawyer: IFetchAppointmentDetailsLawyerUseCase,
-    private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    private httpErrors: IHttpErrors = new HttpErrors()
+        private FetchAppointmentsLawyer: IFetchAppointmentDetailsLawyerUseCase,
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
@@ -22,11 +22,7 @@ export class FetchAppointmentsController implements IController {
         let appointmentType: "all" | "consultation" | "follow-up" = "all";
         let page: number = 1;
         let limit: number = 10;
-        if (
-            httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user
-        ) {
+        if (httpRequest.user && typeof httpRequest.user === "object" && "id" in httpRequest.user) {
             user_id = String(httpRequest.user.id);
         }
         if (!user_id) {
@@ -39,10 +35,10 @@ export class FetchAppointmentsController implements IController {
             if ("appointmentStatus" in httpRequest.query) {
                 if (
                     httpRequest.query.appointmentStatus === "confirmed" ||
-          httpRequest.query.appointmentStatus === "pending" ||
-          httpRequest.query.appointmentStatus === "completed" ||
-          httpRequest.query.appointmentStatus === "cancelled" ||
-          httpRequest.query.appointmentStatus === "rejected"
+                    httpRequest.query.appointmentStatus === "pending" ||
+                    httpRequest.query.appointmentStatus === "completed" ||
+                    httpRequest.query.appointmentStatus === "cancelled" ||
+                    httpRequest.query.appointmentStatus === "rejected"
                 ) {
                     appointmentStatus = httpRequest.query.appointmentStatus;
                 }
@@ -50,38 +46,31 @@ export class FetchAppointmentsController implements IController {
             if ("sortField" in httpRequest.query) {
                 if (
                     httpRequest.query.sortField === "name" ||
-          httpRequest.query.sortField === "date" ||
-          httpRequest.query.sortField === "consultation_fee" ||
-          httpRequest.query.sortField === "created_at"
+                    httpRequest.query.sortField === "date" ||
+                    httpRequest.query.sortField === "consultation_fee" ||
+                    httpRequest.query.sortField === "created_at"
                 ) {
                     sortField = httpRequest.query.sortField;
                 }
             }
             if ("sortOrder" in httpRequest.query) {
-                if (
-                    httpRequest.query.sortOrder === "asc" ||
-          httpRequest.query.sortOrder === "desc"
-                ) {
+                if (httpRequest.query.sortOrder === "asc" || httpRequest.query.sortOrder === "desc") {
                     sortOrder = httpRequest.query.sortOrder;
                 }
             }
             if ("appointmentType" in httpRequest.query) {
                 if (
                     httpRequest.query.appointmentType === "consultation" ||
-          httpRequest.query.appointmentType === "follow-up"
+                    httpRequest.query.appointmentType === "follow-up"
                 ) {
                     appointmentType = httpRequest.query.appointmentType;
                 }
             }
             if ("page" in httpRequest.query) {
-                page = isNaN(Number(httpRequest.query.page))
-                    ? Number(httpRequest.query.page)
-                    : 1;
+                page = isNaN(Number(httpRequest.query.page)) ? Number(httpRequest.query.page) : 1;
             }
             if ("limit" in httpRequest.query) {
-                limit = isNaN(Number(httpRequest.query.limit))
-                    ? Number(httpRequest.query.limit)
-                    : 10;
+                limit = isNaN(Number(httpRequest.query.limit)) ? Number(httpRequest.query.limit) : 10;
             }
         }
         try {

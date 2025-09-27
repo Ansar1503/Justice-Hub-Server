@@ -1,17 +1,17 @@
 import { FetchClientDto } from "@src/application/dtos/client/FetchClientDto";
-import { IFetchClientDataUseCase } from "../IFetchClientData";
 import { ClientUpdateDto } from "@src/application/dtos/client.dto";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { IClientRepository } from "@domain/IRepository/IClientRepo";
 import { IAddressRepository } from "@domain/IRepository/IAddressRepo";
 import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
+import { IFetchClientDataUseCase } from "../IFetchClientData";
 
 export class FetchClientDataUseCaseDto implements IFetchClientDataUseCase {
     constructor(
-    private userRepository: IUserRepository,
-    private clientRepository: IClientRepository,
-    private addressRepository: IAddressRepository,
-    private lawyerRepository: ILawyerVerificationRepo
+        private userRepository: IUserRepository,
+        private clientRepository: IClientRepository,
+        private addressRepository: IAddressRepository,
+        private lawyerRepository: ILawyerVerificationRepo,
     ) {}
     async execute(input: string): Promise<FetchClientDto> {
         try {

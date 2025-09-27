@@ -1,9 +1,6 @@
 import { ICaseRepo } from "@domain/IRepository/ICaseRepo";
+import { FetchCaseQueryType, FindCasesWithPagination } from "@src/application/dtos/Cases/FindCasesByQueryDto";
 import { IFetchCasesByQueryUsecase } from "../Interfaces/IFetchCasesByQuery";
-import {
-    FetchCaseQueryType,
-    FindCasesWithPagination,
-} from "@src/application/dtos/Cases/FindCasesByQueryDto";
 
 export class FetchAllCasesByQueryUsecase implements IFetchCasesByQueryUsecase {
     constructor(private _casesRepository: ICaseRepo) {}

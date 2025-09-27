@@ -18,9 +18,5 @@ import { BookAppointmentByWalletUsecase } from "@src/application/usecases/Appoin
 
 export function BookAppointmentByWalletComposer(): IController {
     const uscase = new BookAppointmentByWalletUsecase(new MongoUnitofWork());
-    return new BookAppointmentByWalletController(
-        uscase,
-        new HttpErrors(),
-        new HttpSuccess()
-    );
+    return new BookAppointmentByWalletController(uscase, new HttpErrors(), new HttpSuccess());
 }

@@ -1,15 +1,13 @@
 import { ISpecializationRepo } from "@domain/IRepository/ISpecialization";
-import { IDeleteSpecializationUsecase } from "../IDeleteSpecializationUseCase";
 import { SpecializationDto } from "@src/application/dtos/Specializations/SpecializationDto";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { IPracticAreaRepo } from "@domain/IRepository/IPracticeAreas";
+import { IDeleteSpecializationUsecase } from "../IDeleteSpecializationUseCase";
 
-export class DeleteSpecializationUsecase
-implements IDeleteSpecializationUsecase
-{
+export class DeleteSpecializationUsecase implements IDeleteSpecializationUsecase {
     constructor(
-    private specializationRepo: ISpecializationRepo,
-    private practiceAreaRepo: IPracticAreaRepo
+        private specializationRepo: ISpecializationRepo,
+        private practiceAreaRepo: IPracticAreaRepo,
     ) {}
     async execute(input: string): Promise<SpecializationDto> {
         const exists = await this.specializationRepo.findById(input);

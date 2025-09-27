@@ -5,7 +5,4 @@ import {
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IUpdateDisputesStatusUseCase
-  extends IUseCase<
-    UpdateDisputesStatusInputDto,
-    UpdateDisputesStatusOutputDto
-  > {}
+    extends IUseCase<UpdateDisputesStatusInputDto, UpdateDisputesStatusOutputDto> {}

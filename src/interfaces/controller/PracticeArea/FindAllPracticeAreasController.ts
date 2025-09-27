@@ -1,16 +1,16 @@
 import { IFindAllPracticeAreasUsecase } from "@src/application/usecases/PracitceAreas/IFindAllPracticeAreasUsecase";
-import { IController } from "../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { FindAllPracticeAreasQuery } from "@interfaces/middelwares/validator/zod/PracticeAreas/FindAllPracticeAreasQuery";
+import { IController } from "../Interface/IController";
 
 export class FindAllPracticeAreasController implements IController {
     constructor(
-    private _findAllPracticeAreas: IFindAllPracticeAreasUsecase,
-    private _httpSucces: IHttpSuccess,
-    private _httpErrors: IHttpErrors
+        private _findAllPracticeAreas: IFindAllPracticeAreasUsecase,
+        private _httpSucces: IHttpSuccess,
+        private _httpErrors: IHttpErrors,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const parsed = FindAllPracticeAreasQuery.safeParse(httpRequest.query);

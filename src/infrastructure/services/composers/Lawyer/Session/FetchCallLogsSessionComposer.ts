@@ -3,7 +3,7 @@ import { FetchCallLogsController } from "@interfaces/controller/Lawyer/FetchCall
 import { FetchCallLogsUseCase } from "@src/application/usecases/Lawyer/implementations/FetchCallLogsUseCase";
 import { CallLogsRepository } from "@infrastructure/database/repo/CallLogsRepo";
 
-export function FetchCallLogsSessionComposer():IController{
+export function FetchCallLogsSessionComposer(): IController {
     const usecase = new FetchCallLogsUseCase(new CallLogsRepository());
     return new FetchCallLogsController(usecase);
 }

@@ -2,23 +2,21 @@ import {
     UploadSessionDocumentInputDto,
     UploadSessionDocumentOutPutDto,
 } from "@src/application/dtos/client/UploadSessionDocuemtDto";
-import { IUploadSessionDocumentUseCase } from "../IUploadSessionDocumentUseCase";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { timeStringToDate } from "@shared/utils/helpers/DateAndTimeHelper";
 import { ISessionDocumentRepo } from "@domain/IRepository/ISessionDocumentsRepo";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { SessionDocument } from "@domain/entities/SessionDocument";
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
+import { IUploadSessionDocumentUseCase } from "../IUploadSessionDocumentUseCase";
 
 export class UploadSessionDocument implements IUploadSessionDocumentUseCase {
     constructor(
-    private _sessionDocumentRepo: ISessionDocumentRepo,
-    private _sessionRepo: ISessionsRepo,
-    private _appointmentRepo: IAppointmentsRepository
+        private _sessionDocumentRepo: ISessionDocumentRepo,
+        private _sessionRepo: ISessionsRepo,
+        private _appointmentRepo: IAppointmentsRepository,
     ) {}
-    async execute(
-        input: UploadSessionDocumentInputDto
-    ): Promise<UploadSessionDocumentOutPutDto> {
+    async execute(input: UploadSessionDocumentInputDto): Promise<UploadSessionDocumentOutPutDto> {
         const session = await this._sessionRepo.findById({
             session_id: input.sessionId,
         });
@@ -27,18 +25,14 @@ export class UploadSessionDocument implements IUploadSessionDocumentUseCase {
         });
         if (sessionDocument) {
             if (sessionDocument.documents.length > 0) {
-                throw new ValidationError(
-                    "Session is already has document. remove existing document and upload new "
-                );
+                throw new ValidationError("Session is already has document. remove existing document and upload new ");
             }
         }
 
         if (!session) {
             throw new ValidationError("Session not found");
         }
-        const appointmentDetails = await this._appointmentRepo.findByBookingId(
-            session.bookingId
-        );
+        const appointmentDetails = await this._appointmentRepo.findByBookingId(session.bookingId);
         if (!appointmentDetails) throw new Error("Appointment not found");
         switch (session.status) {
         case "cancelled":
@@ -52,10 +46,7 @@ export class UploadSessionDocument implements IUploadSessionDocumentUseCase {
         default:
             break;
         }
-        const slotDateTime = timeStringToDate(
-            appointmentDetails.date,
-            appointmentDetails.time
-        );
+        const slotDateTime = timeStringToDate(appointmentDetails.date, appointmentDetails.time);
         if (slotDateTime <= new Date()) {
             throw new ValidationError("Session is already begun");
         }

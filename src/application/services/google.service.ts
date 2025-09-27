@@ -15,10 +15,10 @@ export async function verifyAuthCode(code: string) {
 
         const ticket = await oauth2Client.verifyIdToken({
             idToken:
-        tokens.id_token ??
-        (() => {
-            throw new Error("TOKEN_MISSING");
-        })(),
+                tokens.id_token ??
+                (() => {
+                    throw new Error("TOKEN_MISSING");
+                })(),
             audience: CLIENT_ID,
         });
 

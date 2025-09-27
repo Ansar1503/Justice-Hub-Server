@@ -1,36 +1,36 @@
 import { IUpdateNotificationStatus } from "@src/application/usecases/Notification/IUpdateNotificationStatus";
-import { IController } from "../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
+import { IController } from "../Interface/IController";
 
 export class UpdateNotificationStatusController implements IController {
     constructor(
-    private updateNotificationUseCase: IUpdateNotificationStatus,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private updateNotificationUseCase: IUpdateNotificationStatus,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let status: boolean = false;
         let id: string = "";
         if (
             httpRequest &&
-      httpRequest.body &&
-      typeof httpRequest.body === "object" &&
-      "status" in httpRequest.body &&
-      typeof httpRequest.body.status === "boolean"
+            httpRequest.body &&
+            typeof httpRequest.body === "object" &&
+            "status" in httpRequest.body &&
+            typeof httpRequest.body.status === "boolean"
         ) {
             status = httpRequest.body.status;
         }
         if (
             httpRequest &&
-      httpRequest.params &&
-      typeof httpRequest.params === "object" &&
-      "id" in httpRequest.params &&
-      typeof httpRequest.params.id === "string"
+            httpRequest.params &&
+            typeof httpRequest.params === "object" &&
+            "id" in httpRequest.params &&
+            typeof httpRequest.params.id === "string"
         ) {
             id = httpRequest.params.id;
         }

@@ -1,14 +1,14 @@
 import { VerifyEmailInput } from "@src/application/dtos/Auth/VerifyEmailDto";
-import { IVerifyEmailUseCase } from "../IVerifyEmailUseCase";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { IJwtProvider } from "@src/application/providers/JwtProvider";
 import { IOtpRepository } from "@domain/IRepository/IOtpRepo";
+import { IVerifyEmailUseCase } from "../IVerifyEmailUseCase";
 
 export class VerifyEmailUseCase implements IVerifyEmailUseCase {
     constructor(
-    private userRepo: IUserRepository,
-    private otpRepo: IOtpRepository,
-    private jwtManager: IJwtProvider
+        private userRepo: IUserRepository,
+        private otpRepo: IOtpRepository,
+        private jwtManager: IJwtProvider,
     ) {}
     async execute(input: VerifyEmailInput): Promise<void> {
         try {

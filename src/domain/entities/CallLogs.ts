@@ -1,32 +1,32 @@
 export interface PersistedCallLogsProps {
-  id: string;
-  roomId: string;
-  session_id: string;
-  start_time: Date;
-  end_time?: Date;
-  client_joined_at?: Date;
-  client_left_at?: Date;
-  lawyer_joined_at?: Date;
-  lawyer_left_at?: Date;
-  end_reason?: string;
-  callDuration?: number;
-  status: "ongoing" | "completed" | "cancelled" | "missed" | "dropped";
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    roomId: string;
+    session_id: string;
+    start_time: Date;
+    end_time?: Date;
+    client_joined_at?: Date;
+    client_left_at?: Date;
+    lawyer_joined_at?: Date;
+    lawyer_left_at?: Date;
+    end_reason?: string;
+    callDuration?: number;
+    status: "ongoing" | "completed" | "cancelled" | "missed" | "dropped";
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface CreateCallLogsProps {
-  roomId: string;
-  session_id: string;
-  start_time?: Date;
-  end_time?: Date;
-  client_joined_at?: Date;
-  client_left_at?: Date;
-  lawyer_joined_at?: Date;
-  lawyer_left_at?: Date;
-  end_reason?: string;
-  callDuration?: number;
-  status: "ongoing" | "completed" | "cancelled" | "missed" | "dropped";
+    roomId: string;
+    session_id: string;
+    start_time?: Date;
+    end_time?: Date;
+    client_joined_at?: Date;
+    client_left_at?: Date;
+    lawyer_joined_at?: Date;
+    lawyer_left_at?: Date;
+    end_reason?: string;
+    callDuration?: number;
+    status: "ongoing" | "completed" | "cancelled" | "missed" | "dropped";
 }
 
 export class CallLogs {
@@ -143,11 +143,7 @@ export class CallLogs {
         this.touch();
     }
 
-    updateCallTimes(
-        props: Partial<
-      Omit<CreateCallLogsProps, "roomId" | "session_id" | "status">
-    >
-    ): void {
+    updateCallTimes(props: Partial<Omit<CreateCallLogsProps, "roomId" | "session_id" | "status">>): void {
         let changed = false;
         if (props.start_time !== undefined) {
             this._start_time = props.start_time;

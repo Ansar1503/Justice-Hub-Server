@@ -1,10 +1,8 @@
 import { ChatSession } from "@domain/entities/ChatSession";
-import { IMapper } from "../IMapper";
 import { IChatSessionModel } from "@infrastructure/database/model/ChatSessionModel";
+import { IMapper } from "../IMapper";
 
-export class ChatSessionMapper
-implements IMapper<ChatSession, IChatSessionModel>
-{
+export class ChatSessionMapper implements IMapper<ChatSession, IChatSessionModel> {
     toDomain(persistence: IChatSessionModel): ChatSession {
         return ChatSession.fromPersistence({
             id: persistence._id,

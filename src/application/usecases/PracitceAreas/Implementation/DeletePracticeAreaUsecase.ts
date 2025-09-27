@@ -1,7 +1,7 @@
 import { IPracticAreaRepo } from "@domain/IRepository/IPracticeAreas";
-import { IDeletePracticeAreaUsecase } from "../IDeletePracticeAreaUsecase";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { PracticeAreaDto } from "@src/application/dtos/PracticeAreas/PracticeAreasDto";
+import { IDeletePracticeAreaUsecase } from "../IDeletePracticeAreaUsecase";
 
 export class DeletePracticeAreaUsecase implements IDeletePracticeAreaUsecase {
     constructor(private practiceAreaRepo: IPracticAreaRepo) {}

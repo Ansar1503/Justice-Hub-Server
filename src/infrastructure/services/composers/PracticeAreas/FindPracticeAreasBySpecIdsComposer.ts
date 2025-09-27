@@ -9,9 +9,5 @@ import { FindPracticeAreasBySpecIdsUsecase } from "@src/application/usecases/Pra
 export function FindPracticeAreasBySpecIdsComposer(): IController {
     const practiceAreaRepo = new PracticeAreaRepo(new PracticeAreaMapper());
     const usecase = new FindPracticeAreasBySpecIdsUsecase(practiceAreaRepo);
-    return new FindPracticeAreasBySpecIds(
-        usecase,
-        new HttpErrors(),
-        new HttpSuccess()
-    );
+    return new FindPracticeAreasBySpecIds(usecase, new HttpErrors(), new HttpSuccess());
 }

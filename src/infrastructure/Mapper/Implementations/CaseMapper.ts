@@ -1,6 +1,6 @@
 import { Case } from "@domain/entities/Case";
-import { IMapper } from "../IMapper";
 import { ICaseModel } from "@infrastructure/database/model/CaseModel";
+import { IMapper } from "../IMapper";
 
 export class CaseMapper implements IMapper<Case, ICaseModel> {
     toDomain(persistence: ICaseModel): Case {

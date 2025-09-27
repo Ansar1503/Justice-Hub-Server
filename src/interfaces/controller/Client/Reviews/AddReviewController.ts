@@ -1,4 +1,3 @@
-import { IController } from "../../Interface/IController";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
@@ -7,12 +6,13 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IAddReviewUseCase } from "@src/application/usecases/Client/IAddReviewUseCase";
+import { IController } from "../../Interface/IController";
 
 export class AddReviewController implements IController {
     constructor(
-    private addReview: IAddReviewUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private addReview: IAddReviewUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
@@ -38,9 +38,7 @@ export class AddReviewController implements IController {
             }
 
             if (!sessionId) {
-                const error = this.httpErrors.error_400(
-                    "You had no session with this lawyer"
-                );
+                const error = this.httpErrors.error_400("You had no session with this lawyer");
                 return new HttpResponse(error.statusCode, error.body);
             }
 

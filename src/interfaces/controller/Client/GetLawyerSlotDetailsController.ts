@@ -10,26 +10,22 @@ import { IFetchLawyerSlotsUseCase } from "@src/application/usecases/Client/IFetc
 
 export class GetLawyerSlotDetailsController implements IController {
     constructor(
-    private readonly fetchLawyerSlots: IFetchLawyerSlotsUseCase,
-    private readonly httpErrors: IHttpErrors = new HttpErrors(),
-    private readonly httpSuccess: IHttpSuccess = new HttpSuccess()
+        private readonly fetchLawyerSlots: IFetchLawyerSlotsUseCase,
+        private readonly httpErrors: IHttpErrors = new HttpErrors(),
+        private readonly httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: IHttpRequest): Promise<IHttpResponse> {
         try {
             const lawyer_id = (httpRequest.params as { id: string })?.id || "";
             const date = (httpRequest.query as { date: string })?.date;
-            const client_id = (
-        httpRequest as IHttpRequest & { user?: { id?: string } }
-            ).user?.id;
+            const client_id = (httpRequest as IHttpRequest & { user?: { id?: string } }).user?.id;
 
             if (!lawyer_id.trim() || !date || !client_id) {
                 return this.httpErrors.error_400("Invalid Credentials");
             }
 
-            const dateObj = new Date(
-                new Date(date).getTime() - new Date(date).getTimezoneOffset() * 60000
-            );
+            const dateObj = new Date(new Date(date).getTime() - new Date(date).getTimezoneOffset() * 60000);
 
             const result = await this.fetchLawyerSlots.execute({
                 lawyer_id,
@@ -51,9 +47,7 @@ export class GetLawyerSlotDetailsController implements IController {
             case ERRORS.LAWYER_NOT_VERIFIED:
                 return this.httpErrors.error_400("Lawyer is not verified");
             default:
-                return this.httpErrors.error_500(
-                    error.message || "Internal Server Error"
-                );
+                return this.httpErrors.error_500(error.message || "Internal Server Error");
             }
         }
     }

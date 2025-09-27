@@ -1,13 +1,13 @@
 import mongoose, { Schema } from "mongoose";
 
 export interface ISessionDocumentModel extends Document {
-  _id: string;
-  session_id: string;
-  client_id: string;
-  caseId: string;
-  document: { name: string; type: string; url: string }[];
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    session_id: string;
+    client_id: string;
+    caseId: string;
+    document: { name: string; type: string; url: string }[];
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const documentSchema = new Schema({
@@ -28,10 +28,7 @@ const sessionDocumentSchema = new Schema<ISessionDocumentModel>(
         client_id: { type: String, required: true, ref: "clients" },
         document: [documentSchema],
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
-export default mongoose.model<ISessionDocumentModel>(
-    "session_documents",
-    sessionDocumentSchema
-);
+export default mongoose.model<ISessionDocumentModel>("session_documents", sessionDocumentSchema);

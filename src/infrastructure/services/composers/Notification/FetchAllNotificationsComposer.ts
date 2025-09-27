@@ -4,8 +4,6 @@ import { FetchAllNotificationsController } from "@interfaces/controller/Notifica
 import { FetchAllNotificationsUseCase } from "@src/application/usecases/Notification/implementation/FetchAllNotificationsUseCase";
 
 export function FetchAllNotificationsComposer(): IController {
-    const usecase = new FetchAllNotificationsUseCase(
-        new NotificationRepository()
-    );
+    const usecase = new FetchAllNotificationsUseCase(new NotificationRepository());
     return new FetchAllNotificationsController(usecase);
 }

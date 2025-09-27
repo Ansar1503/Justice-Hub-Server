@@ -2,21 +2,17 @@ import jwt from "jsonwebtoken";
 import "dotenv/config";
 
 interface TokenPayload {
-  id: string;
-  email: string;
-  role: string;
-  status: boolean;
+    id: string;
+    email: string;
+    role: string;
+    status: boolean;
 }
 
-const REFRESH_SECRET_KEY: jwt.Secret =
-  process.env.JWT_REFRESH_SECRET || "your-refresh-secret-key";
-const ACCESS_SECRET_KEY: jwt.Secret =
-  process.env.JWT_ACCESS_SECRET || "your-access-secret-key";
+const REFRESH_SECRET_KEY: jwt.Secret = process.env.JWT_REFRESH_SECRET || "your-refresh-secret-key";
+const ACCESS_SECRET_KEY: jwt.Secret = process.env.JWT_ACCESS_SECRET || "your-access-secret-key";
 
-const ACCESS_EXPIRATION_TIME = (process.env.JWT_ACCESS_EXPIRY ||
-  "15m") as jwt.SignOptions["expiresIn"];
-const REFRESH_EXPIRATION_TIME = (process.env.JWT_REFRESH_EXPIRY ||
-  "1d") as jwt.SignOptions["expiresIn"];
+const ACCESS_EXPIRATION_TIME = (process.env.JWT_ACCESS_EXPIRY || "15m") as jwt.SignOptions["expiresIn"];
+const REFRESH_EXPIRATION_TIME = (process.env.JWT_REFRESH_EXPIRY || "1d") as jwt.SignOptions["expiresIn"];
 
 if (!ACCESS_SECRET_KEY || !REFRESH_SECRET_KEY) {
     throw new Error("JWT secret keys are missing in environment variables.");

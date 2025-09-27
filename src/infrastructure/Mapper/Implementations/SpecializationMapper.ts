@@ -1,10 +1,8 @@
 import { Specialization } from "@domain/entities/Specialization";
-import { IMapper } from "../IMapper";
 import { ISpecializationModel } from "@infrastructure/database/model/SpecializationModel";
+import { IMapper } from "../IMapper";
 
-export class SpecializationMapper
-implements IMapper<Specialization, ISpecializationModel>
-{
+export class SpecializationMapper implements IMapper<Specialization, ISpecializationModel> {
     toDomain(persistence: ISpecializationModel): Specialization {
         return Specialization.fromPersisted({
             createdAt: persistence.createdAt,

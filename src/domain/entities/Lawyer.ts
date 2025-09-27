@@ -1,15 +1,15 @@
 import { v4 as uuidv4 } from "uuid";
 
 export interface LawyerProps {
-  id: string;
-  userId: string;
-  description: string;
-  practiceAreas: string[];
-  experience: number;
-  specializations: string[];
-  consultationFee: number;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    userId: string;
+    description: string;
+    practiceAreas: string[];
+    experience: number;
+    specializations: string[];
+    consultationFee: number;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export class Lawyer {
@@ -35,9 +35,7 @@ export class Lawyer {
         this._updatedAt = props.updatedAt;
     }
 
-    static create(
-        props: Omit<LawyerProps, "id" | "createdAt" | "updatedAt">
-    ): Lawyer {
+    static create(props: Omit<LawyerProps, "id" | "createdAt" | "updatedAt">): Lawyer {
         const now = new Date();
         return new Lawyer({
             ...props,
@@ -124,9 +122,7 @@ export class Lawyer {
         this.touch();
     }
 
-    update(
-        payload: Partial<Omit<LawyerProps, "id" | "userId" | "createdAt">>
-    ): void {
+    update(payload: Partial<Omit<LawyerProps, "id" | "userId" | "createdAt">>): void {
         let changed = false;
         if (payload.description !== undefined) {
             this._description = payload.description;

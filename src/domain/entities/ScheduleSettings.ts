@@ -1,20 +1,20 @@
 import { v4 as uuidv4 } from "uuid";
 
 export interface PersistedScheduleSettingsProps {
-  id: string;
-  lawyer_id: string;
-  slotDuration: number;
-  maxDaysInAdvance: number;
-  autoConfirm: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    lawyer_id: string;
+    slotDuration: number;
+    maxDaysInAdvance: number;
+    autoConfirm: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface CreateScheduleSettingsProps {
-  lawyer_id: string;
-  slotDuration: number;
-  maxDaysInAdvance: number;
-  autoConfirm: boolean;
+    lawyer_id: string;
+    slotDuration: number;
+    maxDaysInAdvance: number;
+    autoConfirm: boolean;
 }
 
 export class ScheduleSettings {

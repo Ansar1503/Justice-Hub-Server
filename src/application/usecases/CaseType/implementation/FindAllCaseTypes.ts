@@ -1,6 +1,6 @@
 import { CaseTypeDto } from "@src/application/dtos/CaseType/CaseTypeDto";
-import { IFindAllCaseTypes } from "../IFindAllCaseTypes";
 import { ICasetype } from "@domain/IRepository/ICasetype";
+import { IFindAllCaseTypes } from "../IFindAllCaseTypes";
 
 export class FindAllCaseTypesUseCase implements IFindAllCaseTypes {
     constructor(private _caseTypeRepo: ICasetype) {}

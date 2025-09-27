@@ -1,17 +1,17 @@
 import { v4 as uuidv4 } from "uuid";
 
 interface PersistedWalletProps {
-  id: string;
-  user_id: string;
-  balance: number;
-  status: boolean;
-  isAdmin: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    user_id: string;
+    balance: number;
+    status: boolean;
+    isAdmin: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 interface CreateWalletProps {
-  user_id: string;
+    user_id: string;
 }
 
 export class Wallet {

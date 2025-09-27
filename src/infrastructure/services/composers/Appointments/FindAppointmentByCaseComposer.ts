@@ -10,11 +10,7 @@ import { FindAppointmentsByCaseUsecase } from "@src/application/usecases/Appoint
 export function FindAppointmentByCaseComposer(): IController {
     const usecase = new FindAppointmentsByCaseUsecase(
         new AppointmentsRepository(),
-        new CaseRepository(new CaseMapper())
+        new CaseRepository(new CaseMapper()),
     );
-    return new FindAppointmentByCaseController(
-        usecase,
-        new HttpErrors(),
-        new HttpSuccess()
-    );
+    return new FindAppointmentByCaseController(usecase, new HttpErrors(), new HttpSuccess());
 }

@@ -1,24 +1,18 @@
 import { FetchReviewsBySessionOutputDto } from "@src/application/dtos/client/FetchReviewDto";
-import { IFetchReviewsBySessionUseCase } from "../IFetchReviewsBySessionUseCase";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { IReviewRepo } from "@domain/IRepository/IReviewRepo";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
+import { IFetchReviewsBySessionUseCase } from "../IFetchReviewsBySessionUseCase";
 
-export class FetchReviewBySessionUseCase
-implements IFetchReviewsBySessionUseCase
-{
+export class FetchReviewBySessionUseCase implements IFetchReviewsBySessionUseCase {
     constructor(
-    private sessionRepo: ISessionsRepo,
-    private reviewRepository: IReviewRepo
+        private sessionRepo: ISessionsRepo,
+        private reviewRepository: IReviewRepo,
     ) {}
-    async execute(input: {
-    session_id: string;
-  }): Promise<FetchReviewsBySessionOutputDto[]> {
+    async execute(input: { session_id: string }): Promise<FetchReviewsBySessionOutputDto[]> {
         const session = await this.sessionRepo.findById(input);
         if (!session) throw new ValidationError("Session not found");
-        const reviews = await this.reviewRepository.findBySession_id(
-            input.session_id
-        );
+        const reviews = await this.reviewRepository.findBySession_id(input.session_id);
         return reviews;
     }
 }

@@ -1,10 +1,8 @@
 import { LawyerDocuments } from "@domain/entities/LawyerDocument";
-import { IMapper } from "../IMapper";
 import { ILawyerDocumentsModel } from "@infrastructure/database/model/LawyerDocumentsModel";
+import { IMapper } from "../IMapper";
 
-export class lawyerDocumentsMapper
-implements IMapper<LawyerDocuments, ILawyerDocumentsModel>
-{
+export class lawyerDocumentsMapper implements IMapper<LawyerDocuments, ILawyerDocumentsModel> {
     toDomain(persistence: ILawyerDocumentsModel): LawyerDocuments {
         return LawyerDocuments.fromPersistence({
             id: persistence._id,

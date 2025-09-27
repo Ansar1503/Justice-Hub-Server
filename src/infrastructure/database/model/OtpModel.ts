@@ -1,12 +1,12 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IotpModel extends Document {
-  _id: string;
-  email: string;
-  otp: string;
-  expiresAt: Date;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    email: string;
+    otp: string;
+    expiresAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const otpSchema = new Schema<IotpModel>(
@@ -16,7 +16,7 @@ const otpSchema = new Schema<IotpModel>(
         otp: { type: String, required: true },
         expiresAt: { type: Date, required: true },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
 const otpModel = mongoose.model<IotpModel>("otp", otpSchema);

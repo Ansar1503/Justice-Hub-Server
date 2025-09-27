@@ -8,11 +8,7 @@ export class RedisService implements IRedisService {
         this._client = client;
     }
 
-    async setWithNx(
-        key: string,
-        value: string,
-        ttlSeconds?: number
-    ): Promise<boolean> {
+    async setWithNx(key: string, value: string, ttlSeconds?: number): Promise<boolean> {
         const result = await this._client.set(key, value, {
             NX: true,
             EX: ttlSeconds || 60 * 5,

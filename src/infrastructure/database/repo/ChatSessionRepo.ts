@@ -1,34 +1,28 @@
 import { ChatSession } from "@domain/entities/ChatSession";
 import { IChatSessionRepo } from "@domain/IRepository/IChatSessionRepo";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
-import { ChatModel, IChatSessionModel } from "../model/ChatSessionModel";
 import { ChatSessionMapper } from "@infrastructure/Mapper/Implementations/ChatSessionMapper";
+import { ChatModel, IChatSessionModel } from "../model/ChatSessionModel";
 
 export class ChatSessionRepository implements IChatSessionRepo {
-    constructor(
-    private mapper: IMapper<
-      ChatSession,
-      IChatSessionModel
-    > = new ChatSessionMapper()
-    ) {}
+    constructor(private mapper: IMapper<ChatSession, IChatSessionModel> = new ChatSessionMapper()) {}
     async create(payload: ChatSession): Promise<ChatSession> {
         const chat = new ChatModel(this.mapper.toPersistence(payload));
         await chat.save();
         return this.mapper.toDomain(chat);
     }
     async aggregate(payload: {
-    user_id: string;
-    search: string;
-    page: number;
-    role: "lawyer" | "client";
-  }): Promise<{ data: any[]; nextCursor?: number }> {
+        user_id: string;
+        search: string;
+        page: number;
+        role: "lawyer" | "client";
+    }): Promise<{ data: any[]; nextCursor?: number }> {
         const { user_id, page = 1, search = "", role } = payload;
         const limit = 10;
         const skip = page > 0 ? Math.abs(page - 1) * limit : 0;
 
         const matchStage = {
-            [role === "client" ? "participants.client_id" : "participants.lawyer_id"]:
-        user_id,
+            [role === "client" ? "participants.client_id" : "participants.lawyer_id"]: user_id,
         };
         if (search.trim()) {
             matchStage["name"] = search;
@@ -105,11 +99,7 @@ export class ChatSessionRepository implements IChatSessionRepo {
             {
                 $addFields: {
                     lawyerData: {
-                        $mergeObjects: [
-                            "$userDetails",
-                            "$lawyerProfile",
-                            "$lawyerClientProfile",
-                        ],
+                        $mergeObjects: ["$userDetails", "$lawyerProfile", "$lawyerClientProfile"],
                     },
                 },
             },
@@ -187,11 +177,7 @@ export class ChatSessionRepository implements IChatSessionRepo {
             nextCursor: hasNextPage ? page + 1 : undefined,
         };
     }
-    async update(payload: {
-    name?: string;
-    last_message?: string;
-    id: string;
-  }): Promise<ChatSession | null> {
+    async update(payload: { name?: string; last_message?: string; id: string }): Promise<ChatSession | null> {
         const update: any = {};
         if (payload.name) {
             update.name = payload.name;
@@ -200,11 +186,7 @@ export class ChatSessionRepository implements IChatSessionRepo {
             update.last_message = payload.last_message;
         }
 
-        const updatedChatSession = await ChatModel.findOneAndUpdate(
-            { _id: payload.id },
-            update,
-            { new: true }
-        );
+        const updatedChatSession = await ChatModel.findOneAndUpdate({ _id: payload.id }, update, { new: true });
         if (!updatedChatSession) return null;
 
         return this.mapper.toDomain(updatedChatSession);

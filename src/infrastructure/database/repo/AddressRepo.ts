@@ -1,14 +1,12 @@
 import { IMapper } from "@infrastructure/Mapper/IMapper";
+import { AddressMapper } from "@infrastructure/Mapper/Implementations/AddressMapper";
 import { Address } from "../../../domain/entities/Address";
 import { IAddressRepository } from "../../../domain/IRepository/IAddressRepo";
 import AddressModel, { IAddresModel } from "../model/AddressModel";
 import { BaseRepository } from "./base/BaseRepo";
-import { AddressMapper } from "@infrastructure/Mapper/Implementations/AddressMapper";
 
 export class AddressRepository implements IAddressRepository {
-    constructor(
-    private mapper: IMapper<Address, IAddresModel> = new AddressMapper()
-    ) {}
+    constructor(private mapper: IMapper<Address, IAddresModel> = new AddressMapper()) {}
 
     async update(payload: Address): Promise<Address> {
         const data = await AddressModel.findOneAndUpdate(
@@ -21,7 +19,7 @@ export class AddressRepository implements IAddressRepository {
                     state: payload.state,
                 },
             },
-            { upsert: true, new: true }
+            { upsert: true, new: true },
         );
         return this.mapper.toDomain(data);
     }
@@ -31,8 +29,6 @@ export class AddressRepository implements IAddressRepository {
     }
     async findAll(): Promise<Address[]> {
         const data = await AddressModel.find({});
-        return data && this.mapper.toDomainArray
-            ? this.mapper.toDomainArray(data)
-            : [];
+        return data && this.mapper.toDomainArray ? this.mapper.toDomainArray(data) : [];
     }
 }

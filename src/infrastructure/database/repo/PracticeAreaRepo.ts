@@ -1,20 +1,14 @@
 import { PracticeArea } from "@domain/entities/PracticeArea";
-import { BaseRepository } from "./base/BaseRepo";
-import {
-    IPracticeareaModel,
-    practiceareaModel,
-} from "../model/PracticeAreaModel";
 import { IPracticAreaRepo } from "@domain/IRepository/IPracticeAreas";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
 import {
     FindAllPracticeAreaInputDto,
     FindAllPracticeAreaOutputDto,
 } from "@src/application/dtos/PracticeAreas/FindAllPracticeAreaDto";
+import { IPracticeareaModel, practiceareaModel } from "../model/PracticeAreaModel";
+import { BaseRepository } from "./base/BaseRepo";
 
-export class PracticeAreaRepo
-    extends BaseRepository<PracticeArea, IPracticeareaModel>
-    implements IPracticAreaRepo
-{
+export class PracticeAreaRepo extends BaseRepository<PracticeArea, IPracticeareaModel> implements IPracticAreaRepo {
     constructor(mapper: IMapper<PracticeArea, IPracticeareaModel>) {
         super(practiceareaModel, mapper);
     }
@@ -27,9 +21,7 @@ export class PracticeAreaRepo
         const data = await this.model.findOne({ name: name });
         return data ? this.mapper.toDomain(data) : null;
     }
-    async findAll(
-        payload: FindAllPracticeAreaInputDto
-    ): Promise<FindAllPracticeAreaOutputDto> {
+    async findAll(payload: FindAllPracticeAreaInputDto): Promise<FindAllPracticeAreaOutputDto> {
         const skip = (payload.page - 1) * payload.limit;
         const query: Record<string, any> = {};
         if (payload.search.trim()) {
@@ -56,15 +48,11 @@ export class PracticeAreaRepo
             })),
         };
     }
-    async update(
-        id: string,
-        name: string,
-        specId: string
-    ): Promise<PracticeArea | null> {
+    async update(id: string, name: string, specId: string): Promise<PracticeArea | null> {
         const updated = await this.model.findOneAndUpdate(
             { _id: id },
             { name, specializationId: specId },
-            { new: true }
+            { new: true },
         );
         return updated ? this.mapper.toDomain(updated) : null;
     }
@@ -77,8 +65,6 @@ export class PracticeAreaRepo
     }
     async findBySpecIds(specIds: string[]): Promise<PracticeArea[] | []> {
         const data = await this.model.find({ specializationId: { $in: specIds } });
-        return data && this.mapper.toDomainArray
-            ? this.mapper.toDomainArray(data)
-            : [];
+        return data && this.mapper.toDomainArray ? this.mapper.toDomainArray(data) : [];
     }
 }

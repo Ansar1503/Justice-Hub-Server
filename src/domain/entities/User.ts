@@ -3,25 +3,25 @@ import { v4 as uuidv4 } from "uuid";
 type RoleType = "lawyer" | "client" | "admin";
 
 interface PersistedUserProps {
-  id: string;
-  user_id: string;
-  name: string;
-  email: string;
-  mobile: string;
-  password: string;
-  role: RoleType;
-  is_blocked: boolean;
-  is_verified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    user_id: string;
+    name: string;
+    email: string;
+    mobile: string;
+    password: string;
+    role: RoleType;
+    is_blocked: boolean;
+    is_verified: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 interface CreateUserProps {
-  name: string;
-  email: string;
-  mobile: string;
-  password: string;
-  role: RoleType;
+    name: string;
+    email: string;
+    mobile: string;
+    password: string;
+    role: RoleType;
 }
 
 export class User {

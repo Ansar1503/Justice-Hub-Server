@@ -1,37 +1,28 @@
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
-import { IController } from "../Interface/IController";
 import { IChangeLawyerVerificationStatus } from "@src/application/usecases/Admin/IChangeLawyerVerificationStatus";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
+import { IController } from "../Interface/IController";
 
 export class ChangeLawyerVerificationStatusController implements IController {
     constructor(
-    private ChangeLawyerVerificationUseCase: IChangeLawyerVerificationStatus,
-    private httpError: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private ChangeLawyerVerificationUseCase: IChangeLawyerVerificationStatus,
+        private httpError: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-        const { user_id, status, rejectReason } = httpRequest.body as Record<
-      string,
-      any
-    >;
+        const { user_id, status, rejectReason } = httpRequest.body as Record<string, any>;
         if (!user_id) {
             const error = this.httpError.error_400();
             return new HttpResponse(error.statusCode, "UserId not found");
         }
-        if (
-            !status ||
-      !["verified", "rejected", "pending", "requested"].includes(status)
-        ) {
+        if (!status || !["verified", "rejected", "pending", "requested"].includes(status)) {
             const error = this.httpError.error_400();
-            return new HttpResponse(
-                error.statusCode,
-                "Status not found or Invalid status"
-            );
+            return new HttpResponse(error.statusCode, "Status not found or Invalid status");
         }
         try {
             const result = await this.ChangeLawyerVerificationUseCase.execute({

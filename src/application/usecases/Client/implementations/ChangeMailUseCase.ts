@@ -1,24 +1,19 @@
 import { ResposeUserDto } from "@src/application/dtos/user.dto";
-import { IChangeMailUseCase } from "../IChangeMailUseCase";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { INodeMailerProvider } from "@src/application/providers/NodeMailerProvider";
 import { generateOtp } from "@infrastructure/services/OtpManager/GenerateOtp";
 import { IJwtProvider } from "@src/application/providers/JwtProvider";
+import { IChangeMailUseCase } from "../IChangeMailUseCase";
 
 export class ChangeMailUseCase implements IChangeMailUseCase {
     constructor(
-    private userRepository: IUserRepository,
-    private nodemailerProvider: INodeMailerProvider,
-    private tokenProvider: IJwtProvider
+        private userRepository: IUserRepository,
+        private nodemailerProvider: INodeMailerProvider,
+        private tokenProvider: IJwtProvider,
     ) {}
-    async execute(input: {
-    email: string;
-    user_id: string;
-  }): Promise<ResposeUserDto> {
+    async execute(input: { email: string; user_id: string }): Promise<ResposeUserDto> {
         try {
-            const userDetails = await this.userRepository.findByuser_id(
-                input.user_id
-            );
+            const userDetails = await this.userRepository.findByuser_id(input.user_id);
             if (!userDetails) {
                 throw new Error("NO_USER_FOUND");
             }
@@ -38,11 +33,7 @@ export class ChangeMailUseCase implements IChangeMailUseCase {
                 user_id: input.user_id,
             });
             try {
-                await this.nodemailerProvider.sendVerificationMail(
-                    input.email,
-                    token,
-                    otp
-                );
+                await this.nodemailerProvider.sendVerificationMail(input.email, token, otp);
             } catch (error) {
                 throw new Error("MAIL_SEND_ERROR");
             }

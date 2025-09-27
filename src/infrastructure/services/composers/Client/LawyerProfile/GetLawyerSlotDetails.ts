@@ -15,7 +15,7 @@ export const GetLawyerSlotDetailsComposer = () => {
         new ScheduleSettingsRepository(),
         new AppointmentsRepository(),
         new OverrideSlotsRepository(),
-        new AvailableSlotRepository()
+        new AvailableSlotRepository(),
     );
     return new GetLawyerSlotDetailsController(useCase);
 };

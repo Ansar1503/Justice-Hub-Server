@@ -1,10 +1,8 @@
 import { ScheduleSettings } from "@domain/entities/ScheduleSettings";
-import { IMapper } from "../IMapper";
 import { IscheduleSettingsModel } from "@infrastructure/database/model/ScheduleSettingsModel";
+import { IMapper } from "../IMapper";
 
-export class ScheduleSettingsMapper
-implements IMapper<ScheduleSettings, IscheduleSettingsModel>
-{
+export class ScheduleSettingsMapper implements IMapper<ScheduleSettings, IscheduleSettingsModel> {
     toDomain(persistence: IscheduleSettingsModel): ScheduleSettings {
         return ScheduleSettings.fromPersistence({
             id: persistence._id,

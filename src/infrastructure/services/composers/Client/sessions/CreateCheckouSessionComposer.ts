@@ -25,11 +25,7 @@ export const CreateCheckoutSessionComposer = async () => {
         new OverrideSlotsRepository(),
         new WalletRepo(),
         new LawyerRepository(),
-        new RedisService(client)
+        new RedisService(client),
     );
-    return new CreateCheckoutSessionController(
-        useCase,
-        new HttpErrors(),
-        new HttpSuccess()
-    );
+    return new CreateCheckoutSessionController(useCase, new HttpErrors(), new HttpSuccess());
 };

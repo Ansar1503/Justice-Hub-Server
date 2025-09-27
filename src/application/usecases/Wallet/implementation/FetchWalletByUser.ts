@@ -1,6 +1,6 @@
 import { WalletDto } from "@src/application/dtos/wallet/WalletDto";
-import { IFetchWalletByUser } from "../IFetchWalletByUser";
 import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
+import { IFetchWalletByUser } from "../IFetchWalletByUser";
 
 export class FetchWalletByUser implements IFetchWalletByUser {
     constructor(private walletRepo: IWalletRepo) {}

@@ -1,15 +1,15 @@
 import { IUpdatePracticeAreaUsecase } from "@src/application/usecases/PracitceAreas/IUpdatePracticeAreaUsecase";
-import { IController } from "../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
+import { IController } from "../Interface/IController";
 
 export class UpdatePracticeAreaController implements IController {
     constructor(
-    private _updatePracticeAreasUsecase: IUpdatePracticeAreaUsecase,
-    private _httpSuccess: IHttpSuccess,
-    private _httpErrors: IHttpErrors
+        private _updatePracticeAreasUsecase: IUpdatePracticeAreaUsecase,
+        private _httpSuccess: IHttpSuccess,
+        private _httpErrors: IHttpErrors,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let specId = "";

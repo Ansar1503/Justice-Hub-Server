@@ -15,9 +15,7 @@ export async function connectRedis(): Promise<RedisClientType> {
             redisClient.on("error", (err) => {
                 console.error("Redis error:", err);
             });
-            redisClient.on("connect", () =>
-                console.log("Redis client connecting...")
-            );
+            redisClient.on("connect", () => console.log("Redis client connecting..."));
             redisClient.on("ready", () => console.log("Redis ready"));
             redisClient.on("end", () => console.log("Redis connection closed"));
         }
@@ -35,9 +33,7 @@ export async function connectRedis(): Promise<RedisClientType> {
 
 export function getRedisClient(): RedisClientType {
     if (!redisClient || !redisClient.isOpen) {
-        throw new Error(
-            "Redis client not initialized. Call connectRedis in composer."
-        );
+        throw new Error("Redis client not initialized. Call connectRedis in composer.");
     }
     return redisClient;
 }

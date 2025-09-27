@@ -1,9 +1,6 @@
-import {
-    FetchReviewInputDto,
-    FetchReviewsOutputDto,
-} from "@src/application/dtos/client/FetchReviewDto";
-import { IFetchReviewsUseCase } from "../IFetchReviewsUseCase";
+import { FetchReviewInputDto, FetchReviewsOutputDto } from "@src/application/dtos/client/FetchReviewDto";
 import { IReviewRepo } from "@domain/IRepository/IReviewRepo";
+import { IFetchReviewsUseCase } from "../IFetchReviewsUseCase";
 
 export class FetchReviewUseCase implements IFetchReviewsUseCase {
     constructor(private reviewRepository: IReviewRepo) {}

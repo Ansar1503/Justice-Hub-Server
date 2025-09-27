@@ -5,9 +5,6 @@ import { NodeMailerProvider } from "@infrastructure/Providers/NodeMailerProvider
 import { JwtProvider } from "@infrastructure/Providers/JwtProvider";
 
 export function SendVerificationMailComposer(): IController {
-    const usecase = new VerifyMailUseCase(
-        new NodeMailerProvider(),
-        new JwtProvider()
-    );
+    const usecase = new VerifyMailUseCase(new NodeMailerProvider(), new JwtProvider());
     return new SendVerificationMailController(usecase);
 }

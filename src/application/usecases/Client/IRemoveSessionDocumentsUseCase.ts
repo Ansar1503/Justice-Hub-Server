@@ -2,10 +2,10 @@ import { UploadSessionDocumentOutPutDto } from "@src/application/dtos/client/Upl
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IRemoveSessionDocumentsUseCase
-  extends IUseCase<
-    {
-      documentId: string;
-      sessionId: string;
-    },
-    UploadSessionDocumentOutPutDto | null
-  > {}
+    extends IUseCase<
+        {
+            documentId: string;
+            sessionId: string;
+        },
+        UploadSessionDocumentOutPutDto | null
+    > {}

@@ -1,24 +1,18 @@
 import { ClientUpdateDto } from "@src/application/dtos/client.dto";
-import { IUpdatePasswordUseCase } from "../IUpdatePasswordUseCase";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { IClientRepository } from "@domain/IRepository/IClientRepo";
 import { IPasswordManager } from "@src/application/providers/PasswordHasher";
+import { IUpdatePasswordUseCase } from "../IUpdatePasswordUseCase";
 
 export class UpdatePasswordUseCase implements IUpdatePasswordUseCase {
     constructor(
-    private userRepository: IUserRepository,
-    private clientRepository: IClientRepository,
-    private passwordManager: IPasswordManager
+        private userRepository: IUserRepository,
+        private clientRepository: IClientRepository,
+        private passwordManager: IPasswordManager,
     ) {}
-    async execute(input: {
-    currentPassword: string;
-    user_id: string;
-    password: string;
-  }): Promise<ClientUpdateDto> {
+    async execute(input: { currentPassword: string; user_id: string; password: string }): Promise<ClientUpdateDto> {
         const userDetails = await this.userRepository.findByuser_id(input.user_id);
-        const clientDetails = await this.clientRepository.findByUserId(
-            input.user_id
-        );
+        const clientDetails = await this.clientRepository.findByUserId(input.user_id);
 
         if (!userDetails) {
             throw new Error("USER_NOT_FOUND");
@@ -27,19 +21,13 @@ export class UpdatePasswordUseCase implements IUpdatePasswordUseCase {
             throw new Error("USER_BLOCKED");
         }
 
-        const currpassmatch = await this.passwordManager.comparePasswords(
-            input.currentPassword,
-            userDetails.password
-        );
+        const currpassmatch = await this.passwordManager.comparePasswords(input.currentPassword, userDetails.password);
 
         if (!currpassmatch) {
             throw new Error("PASS_NOT_MATCH");
         }
 
-        const passmatch = await this.passwordManager.comparePasswords(
-            input.password,
-            userDetails.password
-        );
+        const passmatch = await this.passwordManager.comparePasswords(input.password, userDetails.password);
 
         if (passmatch) {
             throw new Error("PASS_EXIST");

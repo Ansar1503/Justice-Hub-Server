@@ -4,8 +4,8 @@
     "build": "tsc",
     "start": "node dist/infrastructure/express/server.js",
     "dev": "npx nodemon --exec tsx src/infrastructure/express/server.ts",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint": "eslint src/**/*.{ts,tsx}",
+    "lint:fix": "eslint src/**/*.{ts,tsx} --fix"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
@@ -16,10 +16,14 @@
     "@typescript-eslint/eslint-plugin": "^8.44.1",
     "@typescript-eslint/parser": "^8.44.1",
     "eslint": "^9.36.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.4.0",
     "jiti": "^2.6.0",
     "nodemon": "^3.1.9",
     "plop": "^4.0.2",
+    "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.44.1"

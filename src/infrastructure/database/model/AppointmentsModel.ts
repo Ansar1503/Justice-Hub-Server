@@ -1,21 +1,21 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IAppointmentModel extends Document {
-  _id: string;
-  lawyer_id: string;
-  client_id: string;
-  caseId: string;
-  bookingId: string;
-  date: Date;
-  time: string;
-  duration: number;
-  reason: string;
-  amount: number;
-  type: "consultation" | "follow-up";
-  payment_status: "pending" | "success" | "failed";
-  status: "pending" | "confirmed" | "completed" | "cancelled" | "rejected";
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    lawyer_id: string;
+    client_id: string;
+    caseId: string;
+    bookingId: string;
+    date: Date;
+    time: string;
+    duration: number;
+    reason: string;
+    amount: number;
+    type: "consultation" | "follow-up";
+    payment_status: "pending" | "success" | "failed";
+    status: "pending" | "confirmed" | "completed" | "cancelled" | "rejected";
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const appointmentSchema = new Schema<IAppointmentModel>(
@@ -48,12 +48,9 @@ const appointmentSchema = new Schema<IAppointmentModel>(
             default: "pending",
         },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
 appointmentSchema.index({ lawyer_id: 1, date: 1, time: 1 }, { unique: true });
 
-export const AppointmentModel = mongoose.model<IAppointmentModel>(
-    "appointments",
-    appointmentSchema
-);
+export const AppointmentModel = mongoose.model<IAppointmentModel>("appointments", appointmentSchema);

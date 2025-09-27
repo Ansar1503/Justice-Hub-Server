@@ -1,16 +1,12 @@
 import { Request, Response, NextFunction } from "express";
+import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
 import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
 import { UserRepository } from "../../../infrastructure/database/repo/UserRepo";
 import { IUserRepository } from "../../../domain/IRepository/IUserRepo";
-import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
 
 const userRepo: IUserRepository = new UserRepository(new UserMapper());
 
-export async function authenticateClient(
-    req: Request & { user?: any },
-    res: Response,
-    next: NextFunction
-) {
+export async function authenticateClient(req: Request & { user?: any }, res: Response, next: NextFunction) {
     const client_id = req.user.id;
     if (!client_id) {
         res.status(STATUS_CODES.FORBIDDEN).json({

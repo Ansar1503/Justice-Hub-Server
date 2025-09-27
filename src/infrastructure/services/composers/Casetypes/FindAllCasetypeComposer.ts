@@ -9,9 +9,5 @@ import { FetchCasetypeUsecase } from "@src/application/usecases/CaseType/impleme
 export function FindAllCasetypeComposer(): IController {
     const casetypeRepo = new CaseTypeRepo(new CaseTypeMapper());
     const usecase = new FetchCasetypeUsecase(casetypeRepo);
-    return new FetchAllCasetypeController(
-        usecase,
-        new HttpErrors(),
-        new HttpSuccess()
-    );
+    return new FetchAllCasetypeController(usecase, new HttpErrors(), new HttpSuccess());
 }

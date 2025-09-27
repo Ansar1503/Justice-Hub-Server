@@ -1,19 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import {
-    ForbiddenError,
-    UnauthorizedError,
-    InternalError,
-} from "../Error/CustomError";
 import { TokenManagerProvider } from "@infrastructure/Providers/TokenManager";
+import { ForbiddenError, UnauthorizedError, InternalError } from "../Error/CustomError";
 
-export const authenticateUser = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-): void => {
-    const token = req.headers.authorization
-        ? req.headers.authorization.split(" ")[1]
-        : null;
+export const authenticateUser = (req: Request, res: Response, next: NextFunction): void => {
+    const token = req.headers.authorization ? req.headers.authorization.split(" ")[1] : null;
 
     if (!token || token === "undefined" || token === "null") {
         res.status(401).json({

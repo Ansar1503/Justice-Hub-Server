@@ -1,6 +1,4 @@
 import express, { Request, Response } from "express";
-import { validateUser } from "../middelwares/validator/user.validator";
-import { handleValidationErrors } from "../middelwares/validator/validation.middleware";
 import { expressAdapter } from "@interfaces/adapters/express";
 import { RegisterUserComponser } from "@infrastructure/services/composers/Auth/RegisterUser";
 import { LoginUserComposer } from "@infrastructure/services/composers/Auth/LoginUserComposer";
@@ -9,18 +7,15 @@ import { VerifyEmailComposer } from "@infrastructure/services/composers/Auth/Ver
 import { VerifyEmailOtpComposer } from "@infrastructure/services/composers/Auth/VerifyEmailOtpComposer";
 import { ResendOtpComposer } from "@infrastructure/services/composers/Auth/ResendOtpComposer";
 import { AuthRoute } from "@shared/constant/RouteConstant";
+import { handleValidationErrors } from "../middelwares/validator/validation.middleware";
+import { validateUser } from "../middelwares/validator/user.validator";
 
 const router = express.Router();
-router.post(
-    AuthRoute.signup,
-    validateUser,
-    handleValidationErrors,
-    async (req: Request, res: Response) => {
-        const adaper = await expressAdapter(req, RegisterUserComponser());
-        res.status(adaper.statusCode).json(adaper.body);
-        return;
-    }
-);
+router.post(AuthRoute.signup, validateUser, handleValidationErrors, async (req: Request, res: Response) => {
+    const adaper = await expressAdapter(req, RegisterUserComponser());
+    res.status(adaper.statusCode).json(adaper.body);
+    return;
+});
 router.post(AuthRoute.login, async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, LoginUserComposer());
     res.cookie("refresh", adaper.body?.refreshtoken, {

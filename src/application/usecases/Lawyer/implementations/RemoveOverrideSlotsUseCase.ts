@@ -1,21 +1,14 @@
-import { IOverrideRepo } from "@domain/IRepository/IOverrideRepo";
-import { IRemoveOverrideSlotUseCase } from "../IRemoveOverrideSlotsUseCase";
-import { OverrideSlotsDto } from "@src/application/dtos/Lawyer/OverrideSlotsDto";
 import { STATUS_CODES } from "http";
+import { IOverrideRepo } from "@domain/IRepository/IOverrideRepo";
+import { OverrideSlotsDto } from "@src/application/dtos/Lawyer/OverrideSlotsDto";
+import { IRemoveOverrideSlotUseCase } from "../IRemoveOverrideSlotsUseCase";
 
 export class RemoveOverrideSlots implements IRemoveOverrideSlotUseCase {
     constructor(private overrideRepo: IOverrideRepo) {}
-    async execute(input: {
-    lawyer_id: string;
-    date: string;
-  }): Promise<OverrideSlotsDto> {
+    async execute(input: { lawyer_id: string; date: string }): Promise<OverrideSlotsDto> {
         const inputDate = new Date(input.date);
-        const overrideDate = new Date(
-            inputDate.getTime() - inputDate.getTimezoneOffset() * 60000
-        );
-        const existingOverrideSlots = await this.overrideRepo.fetchOverrideSlots(
-            input.lawyer_id
-        );
+        const overrideDate = new Date(inputDate.getTime() - inputDate.getTimezoneOffset() * 60000);
+        const existingOverrideSlots = await this.overrideRepo.fetchOverrideSlots(input.lawyer_id);
         // console.log("override slots", existingOverrideSlots);
         if (!existingOverrideSlots) {
             const error: any = new Error("Override slots not found");
@@ -38,10 +31,7 @@ export class RemoveOverrideSlots implements IRemoveOverrideSlotUseCase {
         //   throw error;
         // }
 
-        const updatedOverrideSlots = await this.overrideRepo.removeOverrideSlots(
-            input.lawyer_id,
-            overrideDate
-        );
+        const updatedOverrideSlots = await this.overrideRepo.removeOverrideSlots(input.lawyer_id, overrideDate);
         if (!updatedOverrideSlots) throw new Error("Remvoe override slots failed");
         return {
             lawyer_id: updatedOverrideSlots.lawyerId,

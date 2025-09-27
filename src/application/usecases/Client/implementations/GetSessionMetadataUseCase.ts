@@ -1,6 +1,6 @@
 import { getSessionMetaData } from "@src/application/services/stripe.service";
-import { IGetSessionMetadataUseCase } from "../IGetSessionMetadataUseCase";
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
+import { IGetSessionMetadataUseCase } from "../IGetSessionMetadataUseCase";
 
 export class GetSessionMetadataUseCase implements IGetSessionMetadataUseCase {
     constructor(private appointmentRepo: IAppointmentsRepository) {}

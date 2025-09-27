@@ -1,5 +1,4 @@
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
-import { IController } from "../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
@@ -7,12 +6,13 @@ import { IBlockUserUseCase } from "@src/application/usecases/Admin/IBlockUserUse
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
+import { IController } from "../Interface/IController";
 
 export class BlockUser implements IController {
     constructor(
-    private BlockUserUseCase: IBlockUserUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private BlockUserUseCase: IBlockUserUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const { user_id, status } = httpRequest.body as Record<string, string>;
@@ -36,10 +36,7 @@ export class BlockUser implements IController {
             const success = this.httpSuccess.success_200(body);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error: any) {
-            return new HttpResponse(
-                error?.statusCode || 500,
-                error?.message || "Internal Server Error"
-            );
+            return new HttpResponse(error?.statusCode || 500, error?.message || "Internal Server Error");
         }
     }
 }

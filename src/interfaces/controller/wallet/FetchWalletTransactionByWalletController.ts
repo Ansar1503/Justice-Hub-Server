@@ -1,26 +1,26 @@
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
-import { IController } from "../Interface/IController";
 import { IFetchWalletTransactionsByWallet } from "@src/application/usecases/Wallet/IFetchWalletTransactionsByWallet";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { FetchWalletTransactionsQuerySchema } from "@interfaces/middelwares/validator/zod/wallet/fetchWalletTransactionsQuerySchema";
+import { IController } from "../Interface/IController";
 
 export class FetchWalletTransactionByWalletController implements IController {
     constructor(
-    private fetchTransactionByWallet: IFetchWalletTransactionsByWallet,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private fetchTransactionByWallet: IFetchWalletTransactionsByWallet,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let userId = "";
         if (
             httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user &&
-      typeof httpRequest.user.id === "string"
+            typeof httpRequest.user === "object" &&
+            "id" in httpRequest.user &&
+            typeof httpRequest.user.id === "string"
         ) {
             userId = httpRequest.user.id;
         }
@@ -28,9 +28,7 @@ export class FetchWalletTransactionByWalletController implements IController {
             return this.httpErrors.error_400("user id not found");
         }
 
-        const parsed = FetchWalletTransactionsQuerySchema.safeParse(
-            httpRequest.query
-        );
+        const parsed = FetchWalletTransactionsQuerySchema.safeParse(httpRequest.query);
         if (!parsed.success) {
             const err = parsed.error.errors[0];
             console.log("error", err);

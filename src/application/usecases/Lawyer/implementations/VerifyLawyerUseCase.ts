@@ -1,12 +1,9 @@
-import { IVerifyLawyerUseCase } from "../IVerifyLawyerUseCase";
 import { LawyerDocuments } from "@domain/entities/LawyerDocument";
-import {
-    LawyerVerificationInputDto,
-    LawyerOutputDto,
-} from "@src/application/dtos/Lawyer/VerifyLawyerDto";
+import { LawyerVerificationInputDto, LawyerOutputDto } from "@src/application/dtos/Lawyer/VerifyLawyerDto";
 import { Lawyer } from "@domain/entities/Lawyer";
 import { LawyerVerification } from "@domain/entities/LawyerVerification";
 import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
+import { IVerifyLawyerUseCase } from "../IVerifyLawyerUseCase";
 
 export class VerifyLawyerUseCase implements IVerifyLawyerUseCase {
     constructor(private _unitOfWork: IUnitofWork) {}
@@ -19,11 +16,8 @@ export class VerifyLawyerUseCase implements IVerifyLawyerUseCase {
             if (userDetails.is_blocked) throw new Error("USER_BLOCKED");
 
             const document = await uow.lawyerDocumentsRepo.find(userDetails.user_id);
-            const lawyerDetails = await uow.lawyerRepo.findUserId(
-                userDetails.user_id
-            );
-            const lawyerVerificationDetails =
-        await uow.lawyerVerificationRepo.findByUserId(userDetails.user_id);
+            const lawyerDetails = await uow.lawyerRepo.findUserId(userDetails.user_id);
+            const lawyerVerificationDetails = await uow.lawyerVerificationRepo.findByUserId(userDetails.user_id);
 
             if (lawyerVerificationDetails?.verificationStatus === "verified") {
                 throw new Error("LAWYER_ALREADY_VERIFIED");
@@ -85,9 +79,7 @@ export class VerifyLawyerUseCase implements IVerifyLawyerUseCase {
                     userId: input.user_id,
                     verificationStatus: "requested",
                 });
-                lawyerData = await uow.lawyerVerificationRepo.create(
-                    lawyerVerificationPayload
-                );
+                lawyerData = await uow.lawyerVerificationRepo.create(lawyerVerificationPayload);
             } else {
                 lawyerData = await uow.lawyerVerificationRepo.update({
                     rejectReason: "",

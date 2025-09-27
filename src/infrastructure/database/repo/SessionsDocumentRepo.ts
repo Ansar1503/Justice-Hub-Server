@@ -1,18 +1,11 @@
 import { SessionDocument } from "@domain/entities/SessionDocument";
 import { ISessionDocumentRepo } from "@domain/IRepository/ISessionDocumentsRepo";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
-import SessionDocumentsModel, {
-    ISessionDocumentModel,
-} from "../model/SessionDocumentsModel";
 import { SessionDocumentMapper } from "@infrastructure/Mapper/Implementations/SessionDocumentMapper";
+import SessionDocumentsModel, { ISessionDocumentModel } from "../model/SessionDocumentsModel";
 
 export class SessionDocumentsRepository implements ISessionDocumentRepo {
-    constructor(
-    private mapper: IMapper<
-      SessionDocument,
-      ISessionDocumentModel
-    > = new SessionDocumentMapper()
-    ) {}
+    constructor(private mapper: IMapper<SessionDocument, ISessionDocumentModel> = new SessionDocumentMapper()) {}
     async create(payload: SessionDocument): Promise<SessionDocument> {
         const newpayload = this.mapper.toPersistence(payload);
         const newSession = new SessionDocumentsModel(newpayload);
@@ -20,9 +13,7 @@ export class SessionDocumentsRepository implements ISessionDocumentRepo {
         return this.mapper.toDomain(newSession);
     }
 
-    async findBySessionId(payload: {
-    session_id: string;
-  }): Promise<SessionDocument | null> {
+    async findBySessionId(payload: { session_id: string }): Promise<SessionDocument | null> {
         const document = await SessionDocumentsModel.findOne({
             session_id: payload.session_id,
         });
@@ -42,7 +33,7 @@ export class SessionDocumentsRepository implements ISessionDocumentRepo {
                     },
                 },
             },
-            { new: true }
+            { new: true },
         );
         return data ? this.mapper.toDomain(data) : null;
     }

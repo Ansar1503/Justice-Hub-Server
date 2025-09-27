@@ -1,15 +1,15 @@
 import { IPracticAreaRepo } from "@domain/IRepository/IPracticeAreas";
-import { IAddPracticeAreasUsecase } from "../IAddPracticeAreasUseCase";
 import { AddPracticeAreaInputDto } from "@src/application/dtos/PracticeAreas/AddPracticeAreaDto";
 import { PracticeAreaDto } from "@src/application/dtos/PracticeAreas/PracticeAreasDto";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { PracticeArea } from "@domain/entities/PracticeArea";
 import { ISpecializationRepo } from "@domain/IRepository/ISpecialization";
+import { IAddPracticeAreasUsecase } from "../IAddPracticeAreasUseCase";
 
 export class AddPracticeAreaUsecase implements IAddPracticeAreasUsecase {
     constructor(
-    private practiceAreaRepo: IPracticAreaRepo,
-    private specRepo: ISpecializationRepo
+        private practiceAreaRepo: IPracticAreaRepo,
+        private specRepo: ISpecializationRepo,
     ) {}
     async execute(input: AddPracticeAreaInputDto): Promise<PracticeAreaDto> {
         const exsits = await this.practiceAreaRepo.findByName(input.name);

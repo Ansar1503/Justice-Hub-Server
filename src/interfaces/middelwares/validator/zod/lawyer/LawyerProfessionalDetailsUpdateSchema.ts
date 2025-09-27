@@ -12,19 +12,10 @@ export const SpecializationSchema = z.object({
 
 export const ProfessionalDetailsSchema = z.object({
     description: z.string().min(1, "Description is required"),
-    practiceAreas: z
-        .array(PracticeAreaSchema)
-        .min(1, "At least one practice area is required"),
-    specialisations: z
-        .array(SpecializationSchema)
-        .min(1, "At least one specialization is required"),
+    practiceAreas: z.array(PracticeAreaSchema).min(1, "At least one practice area is required"),
+    specialisations: z.array(SpecializationSchema).min(1, "At least one specialization is required"),
     experience: z.number().int().min(1, "Minimum 1 year experience required"),
-    consultationFee: z
-        .number()
-        .int()
-        .min(100, "Consultation fee should be at least ₹100"),
+    consultationFee: z.number().int().min(100, "Consultation fee should be at least ₹100"),
 });
 
-export type ProfessionalDetailsFormData = z.infer<
-  typeof ProfessionalDetailsSchema
->;
+export type ProfessionalDetailsFormData = z.infer<typeof ProfessionalDetailsSchema>;

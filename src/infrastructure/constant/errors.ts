@@ -4,5 +4,3 @@ export const ERRORS = {
     LAWYER_NOT_VERIFIED: "LAWYERUNVERIFIED",
     MAIL_NOT_VERIFIED: "MAILUNVERIFIED",
 } as const;
-
-

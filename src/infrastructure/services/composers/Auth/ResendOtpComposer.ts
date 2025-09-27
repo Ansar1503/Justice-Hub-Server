@@ -11,12 +11,7 @@ export function ResendOtpComposer(): IController {
     const otprepo = new OtpRepository();
     const emailProvider = new NodeMailerProvider();
     const tokentProvider = new JwtProvider();
-    const usecase = new ResendOtpUseCase(
-        userrepo,
-        otprepo,
-        emailProvider,
-        tokentProvider
-    );
+    const usecase = new ResendOtpUseCase(userrepo, otprepo, emailProvider, tokentProvider);
     const controller = new ResendOtpController(usecase);
     return controller;
 }

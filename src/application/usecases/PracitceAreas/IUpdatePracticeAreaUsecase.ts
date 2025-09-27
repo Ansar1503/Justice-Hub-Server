@@ -2,7 +2,4 @@ import { PracticeAreaDto } from "@src/application/dtos/PracticeAreas/PracticeAre
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IUpdatePracticeAreaUsecase
-  extends IUseCase<
-    { id: string; name: string; specId: string },
-    PracticeAreaDto
-  > {}
+    extends IUseCase<{ id: string; name: string; specId: string }, PracticeAreaDto> {}

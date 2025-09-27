@@ -2,27 +2,27 @@ import e from "express";
 import mongoose, { Schema, Document } from "mongoose";
 
 interface TimeSlot {
-  start: string;
-  end: string;
+    start: string;
+    end: string;
 }
 
 interface DayAvailability {
-  enabled: boolean;
-  timeSlots: TimeSlot[];
+    enabled: boolean;
+    timeSlots: TimeSlot[];
 }
 
 export interface IAvailabilityModel extends Document {
-  _id: string;
-  lawyer_id: string;
-  monday: DayAvailability;
-  tuesday: DayAvailability;
-  wednesday: DayAvailability;
-  thursday: DayAvailability;
-  friday: DayAvailability;
-  saturday: DayAvailability;
-  sunday: DayAvailability;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    lawyer_id: string;
+    monday: DayAvailability;
+    tuesday: DayAvailability;
+    wednesday: DayAvailability;
+    thursday: DayAvailability;
+    friday: DayAvailability;
+    saturday: DayAvailability;
+    sunday: DayAvailability;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const timeSlotSchema = new Schema<TimeSlot>(
@@ -30,7 +30,7 @@ const timeSlotSchema = new Schema<TimeSlot>(
         start: { type: String, required: true, default: "09:00" },
         end: { type: String, required: true, default: "17:00" },
     },
-    { _id: false }
+    { _id: false },
 );
 
 const dayScheduleSchema = new Schema<DayAvailability>(
@@ -38,7 +38,7 @@ const dayScheduleSchema = new Schema<DayAvailability>(
         enabled: { type: Boolean, required: true, default: false },
         timeSlots: { type: [timeSlotSchema], default: [] },
     },
-    { _id: false }
+    { _id: false },
 );
 
 const AvailabilitySchema = new Schema<IAvailabilityModel>(
@@ -53,10 +53,7 @@ const AvailabilitySchema = new Schema<IAvailabilityModel>(
         saturday: { type: dayScheduleSchema, required: true },
         sunday: { type: dayScheduleSchema, required: true },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
-export default mongoose.model<IAvailabilityModel>(
-    "available_schedule",
-    AvailabilitySchema
-);
+export default mongoose.model<IAvailabilityModel>("available_schedule", AvailabilitySchema);

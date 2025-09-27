@@ -1,22 +1,20 @@
 import { AddressInputDto } from "@src/application/dtos/AdressDto";
-import { IUpdateAddressUseCase } from "../IUpdateAddressUseCase";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { IClientRepository } from "@domain/IRepository/IClientRepo";
 import { IAddressRepository } from "@domain/IRepository/IAddressRepo";
 import { Address } from "@domain/entities/Address";
 import { ClientUpdateDto } from "@src/application/dtos/client.dto";
+import { IUpdateAddressUseCase } from "../IUpdateAddressUseCase";
 
 export class UpdateAddressUseCase implements IUpdateAddressUseCase {
     constructor(
-    private userRepository: IUserRepository,
-    private clientRepository: IClientRepository,
-    private addressRepository: IAddressRepository
+        private userRepository: IUserRepository,
+        private clientRepository: IClientRepository,
+        private addressRepository: IAddressRepository,
     ) {}
     async execute(input: AddressInputDto): Promise<void> {
         const userDetails = await this.userRepository.findByuser_id(input.user_id);
-        const clientDetails = await this.clientRepository.findByUserId(
-            input.user_id
-        );
+        const clientDetails = await this.clientRepository.findByUserId(input.user_id);
         if (!userDetails) {
             throw new Error("USER_NOT_FOUND");
         }

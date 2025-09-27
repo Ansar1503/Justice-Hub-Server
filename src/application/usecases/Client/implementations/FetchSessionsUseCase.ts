@@ -1,9 +1,6 @@
-import {
-    FetchSessionsInputDto,
-    FetchSessionOutputDto,
-} from "@src/application/dtos/client/FetchSessionsDto";
-import { IFetchSessionsUseCase } from "../IFetchSessionsUseCase";
+import { FetchSessionsInputDto, FetchSessionOutputDto } from "@src/application/dtos/client/FetchSessionsDto";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
+import { IFetchSessionsUseCase } from "../IFetchSessionsUseCase";
 
 export class FetchSessionsUseCase implements IFetchSessionsUseCase {
     constructor(private _sessionRepo: ISessionsRepo) {}

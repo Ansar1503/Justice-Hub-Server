@@ -5,4 +5,4 @@ import {
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IFetchAllSpecializationsUsecase
-  extends IUseCase<FetchSpecializationInputDto, FetchSpecializationOutputDto> {}
+    extends IUseCase<FetchSpecializationInputDto, FetchSpecializationOutputDto> {}

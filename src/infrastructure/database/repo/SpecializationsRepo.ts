@@ -1,11 +1,8 @@
 import { Specialization } from "@domain/entities/Specialization";
-import { BaseRepository } from "./base/BaseRepo";
-import {
-    ISpecializationModel,
-    SpecializationModel,
-} from "../model/SpecializationModel";
 import { ISpecializationRepo } from "@domain/IRepository/ISpecialization";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
+import { BaseRepository } from "./base/BaseRepo";
+import { ISpecializationModel, SpecializationModel } from "../model/SpecializationModel";
 
 export class SpecializationRepo
     extends BaseRepository<Specialization, ISpecializationModel>
@@ -15,16 +12,12 @@ export class SpecializationRepo
         super(SpecializationModel, mapper);
     }
 
-    async findAll(payload: {
-    page: number;
-    limit: number;
-    search: string;
-  }): Promise<{
-    data: Specialization[] | [];
-    totalCount: number;
-    currentPage: number;
-    totalPage: number;
-  }> {
+    async findAll(payload: { page: number; limit: number; search: string }): Promise<{
+        data: Specialization[] | [];
+        totalCount: number;
+        currentPage: number;
+        totalPage: number;
+    }> {
         const { limit, page, search } = payload;
         const skip = (page - 1) * limit;
 
@@ -39,10 +32,7 @@ export class SpecializationRepo
 
         const totalPage = Math.ceil(count / limit);
         return {
-            data:
-        this.mapper.toDomainArray && specializations
-            ? this.mapper.toDomainArray(specializations)
-            : [],
+            data: this.mapper.toDomainArray && specializations ? this.mapper.toDomainArray(specializations) : [],
             currentPage: page,
             totalCount: count,
             totalPage,
@@ -58,7 +48,7 @@ export class SpecializationRepo
                 _id: id,
             },
             { name },
-            { new: true }
+            { new: true },
         );
 
         if (!updated) {

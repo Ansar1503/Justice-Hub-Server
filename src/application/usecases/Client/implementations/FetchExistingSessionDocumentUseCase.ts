@@ -1,10 +1,8 @@
 import { UploadSessionDocumentOutPutDto } from "@src/application/dtos/client/UploadSessionDocuemtDto";
-import { IFetchExistingSessionDocumentsUseCase } from "../IFetchExistingSessionDocumentUseCase";
 import { ISessionDocumentRepo } from "@domain/IRepository/ISessionDocumentsRepo";
+import { IFetchExistingSessionDocumentsUseCase } from "../IFetchExistingSessionDocumentUseCase";
 
-export class FetchExistingSessionDocumentUseCase
-implements IFetchExistingSessionDocumentsUseCase
-{
+export class FetchExistingSessionDocumentUseCase implements IFetchExistingSessionDocumentsUseCase {
     constructor(private sessionDocumentRepo: ISessionDocumentRepo) {}
     async execute(input: string): Promise<UploadSessionDocumentOutPutDto | null> {
         const documents = await this.sessionDocumentRepo.findBySessionId({

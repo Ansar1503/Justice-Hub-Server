@@ -1,22 +1,18 @@
 import { v4 as uuidv4 } from "uuid";
 
-export type VerificationStatus =
-  | "verified"
-  | "rejected"
-  | "pending"
-  | "requested";
+export type VerificationStatus = "verified" | "rejected" | "pending" | "requested";
 
 export interface LawyerVerificationProps {
-  id: string;
-  userId: string;
-  barCouncilNumber: string;
-  enrollmentCertificateNumber: string;
-  certificateOfPracticeNumber: string;
-  verificationStatus: VerificationStatus;
-  rejectReason?: string;
-  documents: string;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    userId: string;
+    barCouncilNumber: string;
+    enrollmentCertificateNumber: string;
+    certificateOfPracticeNumber: string;
+    verificationStatus: VerificationStatus;
+    rejectReason?: string;
+    documents: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export class LawyerVerification {
@@ -48,9 +44,7 @@ export class LawyerVerification {
         return new LawyerVerification(props);
     }
 
-    static create(
-        props: Omit<LawyerVerificationProps, "id" | "createdAt" | "updatedAt">
-    ): LawyerVerification {
+    static create(props: Omit<LawyerVerificationProps, "id" | "createdAt" | "updatedAt">): LawyerVerification {
         const now = new Date();
         return new LawyerVerification({
             ...props,
@@ -102,9 +96,7 @@ export class LawyerVerification {
         this._rejectReason = reason;
     }
 
-    update(
-        props: Partial<Omit<LawyerVerificationProps, "id" | "userId" | "createdAt">>
-    ): void {
+    update(props: Partial<Omit<LawyerVerificationProps, "id" | "userId" | "createdAt">>): void {
         let changed = false;
 
         if (props.barCouncilNumber !== undefined) {

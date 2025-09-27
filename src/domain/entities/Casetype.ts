@@ -1,16 +1,16 @@
 import { v4 as uuidv4 } from "uuid";
 
 interface persistedCasetypes {
-  id: string;
-  name: string;
-  practiceareaId: string;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    name: string;
+    practiceareaId: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 interface createCasetypeProps {
-  name: string;
-  practiceareaId: string;
+    name: string;
+    practiceareaId: string;
 }
 
 export class CaseType {

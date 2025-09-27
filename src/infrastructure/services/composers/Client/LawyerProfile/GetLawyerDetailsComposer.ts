@@ -14,7 +14,7 @@ export function GetLawyerDetailComposer(): IController {
         new ClientRepository(),
         new AddressRepository(),
         new LawyerRepository(),
-        new LawyerVerificationRepo(new LawyerVerificationMapper())
+        new LawyerVerificationRepo(new LawyerVerificationMapper()),
     );
     return new GetLawyerDetailController(usecase);
 }

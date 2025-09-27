@@ -1,9 +1,9 @@
 export interface VerifyEmailInput {
-  email: string;
-  token: string;
+    email: string;
+    token: string;
 }
 
 export interface VerifyEmailByOtpInput {
-  email: string;
-  otp: string;
+    email: string;
+    otp: string;
 }

@@ -1,25 +1,25 @@
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
-import { IController } from "../Interface/IController";
 import { IFetchWalletByUser } from "@src/application/usecases/Wallet/IFetchWalletByUser";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
+import { IController } from "../Interface/IController";
 
 export class FetchWalletByUserController implements IController {
     constructor(
-    private fetchWallet: IFetchWalletByUser,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private fetchWallet: IFetchWalletByUser,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let userId = "";
         if (
             httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user &&
-      typeof httpRequest.user.id === "string"
+            typeof httpRequest.user === "object" &&
+            "id" in httpRequest.user &&
+            typeof httpRequest.user.id === "string"
         ) {
             userId = httpRequest.user.id;
         }

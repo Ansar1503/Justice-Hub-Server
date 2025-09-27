@@ -9,17 +9,13 @@ import { IFetchSessionDocumentsUseCase } from "@src/application/usecases/Lawyer/
 
 export class FetchSessionsDocumentsController implements IController {
     constructor(
-    private fetchSessionDocuments: IFetchSessionDocumentsUseCase,
-    private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    private httpErrors: IHttpErrors = new HttpErrors()
+        private fetchSessionDocuments: IFetchSessionDocumentsUseCase,
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let session_id: string = "";
-        if (
-            httpRequest.params &&
-      typeof httpRequest.params === "object" &&
-      "id" in httpRequest.params
-        ) {
+        if (httpRequest.params && typeof httpRequest.params === "object" && "id" in httpRequest.params) {
             session_id = String(httpRequest.params.id);
         }
         if (!session_id) {

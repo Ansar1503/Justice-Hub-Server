@@ -1,15 +1,15 @@
 import { IUpdateCaseTypeUsecase } from "@src/application/usecases/CaseType/IUpdatedCaseTypeUsecase";
-import { IController } from "../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
+import { IController } from "../Interface/IController";
 
 export class UpdateCasetypeController implements IController {
     constructor(
-    private updateCasetypeUsecase: IUpdateCaseTypeUsecase,
-    private httpErrors: IHttpErrors,
-    private httpSuccess: IHttpSuccess
+        private updateCasetypeUsecase: IUpdateCaseTypeUsecase,
+        private httpErrors: IHttpErrors,
+        private httpSuccess: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let id = "";

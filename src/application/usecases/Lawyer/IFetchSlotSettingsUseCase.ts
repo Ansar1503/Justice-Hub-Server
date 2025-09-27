@@ -1,5 +1,4 @@
-import { IUseCase } from "../IUseCases/IUseCase";
 import { ScheduleSettingsOutputDto } from "@src/application/dtos/Lawyer/ScheduleSettingsDto";
+import { IUseCase } from "../IUseCases/IUseCase";
 
-export interface IFetchSlotSettingsUseCase
-  extends IUseCase<string, ScheduleSettingsOutputDto | null> {}
+export interface IFetchSlotSettingsUseCase extends IUseCase<string, ScheduleSettingsOutputDto | null> {}

@@ -34,11 +34,11 @@ export class ResposeUserDto {
 }
 
 export interface UserProfile {
-  name: string;
-  email: string;
-  mobile: string;
-  user_id: string;
-  profile_image: string;
-  dob: string;
-  gender: string;
+    name: string;
+    email: string;
+    mobile: string;
+    user_id: string;
+    profile_image: string;
+    dob: string;
+    gender: string;
 }

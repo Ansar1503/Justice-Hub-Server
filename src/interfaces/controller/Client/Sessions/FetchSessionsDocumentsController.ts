@@ -1,4 +1,3 @@
-import { IController } from "../../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
@@ -7,12 +6,13 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IFetchExistingSessionDocumentsUseCase } from "@src/application/usecases/Client/IFetchExistingSessionDocumentUseCase";
+import { IController } from "../../Interface/IController";
 
 export class FetchSessionsDocumentsController implements IController {
     constructor(
-    private fetchSessionDocuments: IFetchExistingSessionDocumentsUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private fetchSessionDocuments: IFetchExistingSessionDocumentsUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {

@@ -1,13 +1,10 @@
 import { IWalletTransactionsRepo } from "@domain/IRepository/IWalletTransactionsRepo";
-import { BaseRepository } from "./base/BaseRepo";
 import { WalletTransaction } from "@domain/entities/WalletTransactions";
-import {
-    IWalletTransactionModel,
-    walletTransactionModel,
-} from "../model/WalletTransactionModelt";
 import { WalletTransactionMapper } from "@infrastructure/Mapper/Implementations/WalletTransactionMapper";
 import { ClientSession } from "mongoose";
 import { getWalletTransactionsRepoInputDto } from "@src/application/dtos/wallet/WalletTransactionDto";
+import { IWalletTransactionModel, walletTransactionModel } from "../model/WalletTransactionModelt";
+import { BaseRepository } from "./base/BaseRepo";
 
 export class WalletTransactionsRepo
     extends BaseRepository<WalletTransaction, IWalletTransactionModel>
@@ -16,13 +13,11 @@ export class WalletTransactionsRepo
     constructor(session?: ClientSession) {
         super(walletTransactionModel, new WalletTransactionMapper(), session);
     }
-    async findTransactionsByWalletId(
-        payload: getWalletTransactionsRepoInputDto
-    ): Promise<{
-    data: WalletTransaction[] | [];
-    page: number;
-    totalPages: number;
-  }> {
+    async findTransactionsByWalletId(payload: getWalletTransactionsRepoInputDto): Promise<{
+        data: WalletTransaction[] | [];
+        page: number;
+        totalPages: number;
+    }> {
         const { limit, page, walletId, endDate, search, startDate, type } = payload;
         const skip = (page - 1) * limit;
         const query: Record<string, any> = {};
@@ -59,10 +54,7 @@ export class WalletTransactionsRepo
             this.model.countDocuments(query),
         ]);
         return {
-            data:
-        transactions && this.mapper.toDomainArray
-            ? this.mapper.toDomainArray(transactions)
-            : [],
+            data: transactions && this.mapper.toDomainArray ? this.mapper.toDomainArray(transactions) : [],
             page,
             totalPages: Math.ceil(total / limit),
         };

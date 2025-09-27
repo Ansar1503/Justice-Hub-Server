@@ -2,4 +2,4 @@ import { UploadSessionDocumentOutPutDto } from "@src/application/dtos/client/Upl
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IFetchExistingSessionDocumentsUseCase
-  extends IUseCase<string, UploadSessionDocumentOutPutDto | null> {}
+    extends IUseCase<string, UploadSessionDocumentOutPutDto | null> {}

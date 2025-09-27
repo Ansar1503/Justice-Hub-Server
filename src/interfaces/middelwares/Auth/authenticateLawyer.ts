@@ -1,21 +1,16 @@
 import { Request, Response, NextFunction } from "express";
-import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
-import { UserRepository } from "../../../infrastructure/database/repo/UserRepo";
-import { IUserRepository } from "../../../domain/IRepository/IUserRepo";
 import { UserMapper } from "@infrastructure/Mapper/Implementations/UserMapper";
 import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
 import { LawyerVerificationRepo } from "@infrastructure/database/repo/LawyerVerificationRepo";
 import { LawyerVerificationMapper } from "@infrastructure/Mapper/Implementations/LawyerVerificaitionMapper";
+import { IUserRepository } from "../../../domain/IRepository/IUserRepo";
+import { UserRepository } from "../../../infrastructure/database/repo/UserRepo";
+import { STATUS_CODES } from "../../../infrastructure/constant/status.codes";
 
 const userRepo: IUserRepository = new UserRepository(new UserMapper());
-const lawyerverificationsRepo: ILawyerVerificationRepo =
-  new LawyerVerificationRepo(new LawyerVerificationMapper());
+const lawyerverificationsRepo: ILawyerVerificationRepo = new LawyerVerificationRepo(new LawyerVerificationMapper());
 
-export async function authenticateLawyer(
-    req: Request & { user?: any },
-    res: Response,
-    next: NextFunction
-) {
+export async function authenticateLawyer(req: Request & { user?: any }, res: Response, next: NextFunction) {
     // console.log("lawyer getting authenticated")
     const lawyer_id = req.user.id;
     if (!lawyer_id) {

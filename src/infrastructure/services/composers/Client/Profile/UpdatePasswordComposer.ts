@@ -6,10 +6,6 @@ import { ClientRepository } from "@infrastructure/database/repo/ClientRepo";
 import { PasswordManager } from "@infrastructure/Providers/PasswordHasher";
 
 export function UpdatePasswordComposer(): IController {
-    const usecase = new UpdatePasswordUseCase(
-        new UserRepository(),
-        new ClientRepository(),
-        new PasswordManager()
-    );
+    const usecase = new UpdatePasswordUseCase(new UserRepository(), new ClientRepository(), new PasswordManager());
     return new UpdatePasswordController(usecase);
 }

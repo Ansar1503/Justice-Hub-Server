@@ -1,22 +1,17 @@
 import { UploadSessionDocumentOutPutDto } from "@src/application/dtos/client/UploadSessionDocuemtDto";
-import { IRemoveSessionDocumentsUseCase } from "../IRemoveSessionDocumentsUseCase";
 import { ISessionDocumentRepo } from "@domain/IRepository/ISessionDocumentsRepo";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 
 import e from "express";
 import { ICloudinaryService } from "@src/application/services/Interfaces/ICloudinaryService";
+import { IRemoveSessionDocumentsUseCase } from "../IRemoveSessionDocumentsUseCase";
 
-export class RemoveSessionDocumentsUseCase
-implements IRemoveSessionDocumentsUseCase
-{
+export class RemoveSessionDocumentsUseCase implements IRemoveSessionDocumentsUseCase {
     constructor(
-    private sessionDocumentsRepo: ISessionDocumentRepo,
-    private cloudinaryService: ICloudinaryService
+        private sessionDocumentsRepo: ISessionDocumentRepo,
+        private cloudinaryService: ICloudinaryService,
     ) {}
-    async execute(input: {
-    documentId: string;
-    sessionId: string;
-  }): Promise<UploadSessionDocumentOutPutDto | null> {
+    async execute(input: { documentId: string; sessionId: string }): Promise<UploadSessionDocumentOutPutDto | null> {
         const existingDoc = await this.sessionDocumentsRepo.findBySessionId({
             session_id: input.sessionId,
         });
@@ -24,9 +19,7 @@ implements IRemoveSessionDocumentsUseCase
             throw new ValidationError("Session not found");
         }
 
-        const urltoDelete = existingDoc?.documents?.filter(
-            (doc) => doc?._id == input.documentId
-        )[0].url;
+        const urltoDelete = existingDoc?.documents?.filter((doc) => doc?._id == input.documentId)[0].url;
 
         this.cloudinaryService.deleteFile(urltoDelete);
 

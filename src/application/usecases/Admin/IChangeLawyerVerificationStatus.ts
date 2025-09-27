@@ -2,7 +2,4 @@ import { ChangeLawyerVerificationInnOutDto } from "@src/application/dtos/Admin/C
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IChangeLawyerVerificationStatus
-  extends IUseCase<
-    ChangeLawyerVerificationInnOutDto,
-    ChangeLawyerVerificationInnOutDto
-  > {}
+    extends IUseCase<ChangeLawyerVerificationInnOutDto, ChangeLawyerVerificationInnOutDto> {}

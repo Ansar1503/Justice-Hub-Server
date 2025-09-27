@@ -1,15 +1,15 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ILawyerModel extends Document {
-  _id: string;
-  userId: string;
-  description: string;
-  practiceAreas: string[];
-  experience: number;
-  specialisations: string[];
-  consultationFee: number;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    userId: string;
+    description: string;
+    practiceAreas: string[];
+    experience: number;
+    specialisations: string[];
+    consultationFee: number;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const LawyerSchema = new Schema<ILawyerModel>(
@@ -28,7 +28,7 @@ const LawyerSchema = new Schema<ILawyerModel>(
         },
         consultationFee: { type: Number, default: 0 },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
 export default mongoose.model<ILawyerModel>("Lawyer", LawyerSchema);

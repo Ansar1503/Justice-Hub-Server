@@ -9,7 +9,7 @@ export function CancelSessionComposer(): IController {
     const usecase = new CancelSessionUseCase(
         new SessionsRepository(),
         new AppointmentsRepository(),
-        new MongoUnitofWork()
+        new MongoUnitofWork(),
     );
     return new CancelSessionController(usecase);
 }

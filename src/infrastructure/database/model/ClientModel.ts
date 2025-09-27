@@ -1,14 +1,14 @@
 import mongoose, { Schema, Document, Types } from "mongoose";
 
 export interface IClientModel extends Document {
-  _id: string;
-  user_id: string;
-  profile_image: string;
-  dob: string;
-  gender: string;
-  address: string;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    user_id: string;
+    profile_image: string;
+    dob: string;
+    gender: string;
+    address: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const ClientSchema = new Schema<IClientModel>(
@@ -29,7 +29,7 @@ const ClientSchema = new Schema<IClientModel>(
             required: false,
         },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
 const ClientModel = mongoose.model<IClientModel>("Client", ClientSchema);

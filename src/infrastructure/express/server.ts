@@ -1,21 +1,18 @@
+import { createServer } from "http";
 import express, { Application, NextFunction, Request, Response } from "express";
+import cookieParser from "cookie-parser";
+import morgan from "morgan";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
 import connectDB from "../../infrastructure/database/config";
 import authRoute from "../../interfaces/routes/auth.route";
 import clientRoute from "../../interfaces/routes/client.route";
 import adminRoute from "../../interfaces/routes/admin.routes";
 import lawyerRoute from "../../interfaces/routes/lawyer.route";
-import cookieParser from "cookie-parser";
-import { createServer } from "http";
-import morgan from "morgan";
-import cors from "cors";
 import "dotenv/config";
-import {
-    errorMiddleware,
-    NotFoundErrorHandler,
-} from "../../interfaces/middelwares/Error/ErrorHandler";
+import { errorMiddleware, NotFoundErrorHandler } from "../../interfaces/middelwares/Error/ErrorHandler";
 import { InitialiseSocketServer } from "../socket/config";
 import { setUpChatSocket } from "../../interfaces/socket/chatSocket";
-import rateLimit from "express-rate-limit";
 
 const PORT = process.env.PORT || 4000;
 const app: Application = express();
@@ -31,20 +28,13 @@ const rateLimiter = rateLimit({
 connectDB();
 app.use(
     cors({
-        origin: [
-            `${process.env.FRONTEND_URL}`,
-            "https://c6cfac23a22c.ngrok-free.app",
-        ],
+        origin: [`${process.env.FRONTEND_URL}`, "https://c6cfac23a22c.ngrok-free.app"],
         methods: ["PUT", "POST", "GET", "PATCH", "DELETE"],
         credentials: true,
-    })
+    }),
 );
 app.use(rateLimiter);
-app.use(
-    "/api/client/stripe/webhooks",
-    express.raw({ type: "application/json" }),
-    clientRoute
-);
+app.use("/api/client/stripe/webhooks", express.raw({ type: "application/json" }), clientRoute);
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
@@ -61,6 +51,4 @@ app.use(errorMiddleware);
 
 setUpChatSocket(io);
 
-server.listen(PORT, () =>
-    console.log(`🚀 Server running on port http://localhost:${PORT}`)
-);
+server.listen(PORT, () => console.log(`🚀 Server running on port http://localhost:${PORT}`));

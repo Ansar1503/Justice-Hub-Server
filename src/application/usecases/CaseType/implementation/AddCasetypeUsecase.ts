@@ -1,21 +1,16 @@
 import { ICasetype } from "@domain/IRepository/ICasetype";
-import { IAddCasetypeUsecase } from "../IAddCasetypeUsecase";
-import {
-    AddCasetypeInputDto,
-    CaseTypeDto,
-} from "@src/application/dtos/CaseType/CaseTypeDto";
+import { AddCasetypeInputDto, CaseTypeDto } from "@src/application/dtos/CaseType/CaseTypeDto";
 import { IPracticAreaRepo } from "@domain/IRepository/IPracticeAreas";
 import { CaseType } from "@domain/entities/CaseType";
+import { IAddCasetypeUsecase } from "../IAddCasetypeUsecase";
 
 export class AddCasetypeUsecase implements IAddCasetypeUsecase {
     constructor(
-    private caseTypeRepo: ICasetype,
-    private practiceAreaRepo: IPracticAreaRepo
+        private caseTypeRepo: ICasetype,
+        private practiceAreaRepo: IPracticAreaRepo,
     ) {}
     async execute(input: AddCasetypeInputDto): Promise<CaseTypeDto> {
-        const practiceExists = await this.practiceAreaRepo.findById(
-            input.practiceareaId
-        );
+        const practiceExists = await this.practiceAreaRepo.findById(input.practiceareaId);
         if (!practiceExists) throw new Error("practice area doesnt exist");
         const nameExists = await this.caseTypeRepo.findByName(input.name);
         if (nameExists?.name === input.name) {

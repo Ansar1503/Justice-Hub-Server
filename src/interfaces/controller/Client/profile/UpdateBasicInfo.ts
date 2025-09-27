@@ -1,4 +1,3 @@
-import { IController } from "../../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
@@ -7,18 +6,16 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IUpdateClientDataUseCase } from "@src/application/usecases/Client/IUpdateClientDataUseCase";
+import { IController } from "../../Interface/IController";
 
 export class UpdateBasicInfoController implements IController {
     constructor(
-    private _udpateClientData: IUpdateClientDataUseCase,
-    private _errors: IHttpErrors = new HttpErrors(),
-    private _success: IHttpSuccess = new HttpSuccess()
+        private _udpateClientData: IUpdateClientDataUseCase,
+        private _errors: IHttpErrors = new HttpErrors(),
+        private _success: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-        const { name, mobile, dob, gender } = httpRequest.body as Record<
-      string,
-      any
-    >;
+        const { name, mobile, dob, gender } = httpRequest.body as Record<string, any>;
         if (!name || !mobile) {
             const err = this._errors.error_400();
             return new HttpResponse(err.statusCode, err.body);
@@ -41,7 +38,7 @@ export class UpdateBasicInfoController implements IController {
             const success = this._success.success_200(updateData);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            console.log("error",error);
+            console.log("error", error);
             if (error instanceof Error) {
                 return this._errors.error_400(error.message);
             }

@@ -1,22 +1,22 @@
 import mongoose, { Schema } from "mongoose";
 
 interface Attachment {
-  name: string;
-  url: string;
-  type: string;
+    name: string;
+    url: string;
+    type: string;
 }
 
 export interface IChatMessageModel extends Document {
-  _id: string;
-  session_id: string;
-  senderId: string;
-  receiverId: string;
-  content?: string;
-  read: boolean;
-  active: boolean;
-  attachments?: Attachment[];
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    session_id: string;
+    senderId: string;
+    receiverId: string;
+    content?: string;
+    read: boolean;
+    active: boolean;
+    attachments?: Attachment[];
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const chatMessageSchema = new Schema<IChatMessageModel>(
@@ -36,10 +36,7 @@ const chatMessageSchema = new Schema<IChatMessageModel>(
             },
         ],
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
-export const MessageModel = mongoose.model<IChatMessageModel>(
-    "Message",
-    chatMessageSchema
-);
+export const MessageModel = mongoose.model<IChatMessageModel>("Message", chatMessageSchema);

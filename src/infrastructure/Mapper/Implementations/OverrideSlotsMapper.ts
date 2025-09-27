@@ -1,10 +1,8 @@
 import { Override } from "@domain/entities/Override";
-import { IMapper } from "../IMapper";
 import { IOverrideSlotsModel } from "@infrastructure/database/model/OverrideSlotModel";
+import { IMapper } from "../IMapper";
 
-export class OverrideSlotsMapper
-implements IMapper<Override, IOverrideSlotsModel>
-{
+export class OverrideSlotsMapper implements IMapper<Override, IOverrideSlotsModel> {
     toDomain(persistence: IOverrideSlotsModel): Override {
         return Override.fromPersistence({
             id: persistence._id,

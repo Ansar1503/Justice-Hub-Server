@@ -1,7 +1,5 @@
 import { ICaseRepo } from "@domain/IRepository/ICaseRepo";
-import { BaseRepository } from "./base/BaseRepo";
 import { Case } from "@domain/entities/Case";
-import { CaseModel, ICaseModel } from "../model/CaseModel";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
 import { ClientSession } from "mongoose";
 import {
@@ -9,27 +7,15 @@ import {
     FetchCaseQueryType,
     FindCasesWithPagination,
 } from "@src/application/dtos/Cases/FindCasesByQueryDto";
+import { CaseModel, ICaseModel } from "../model/CaseModel";
+import { BaseRepository } from "./base/BaseRepo";
 
-export class CaseRepository
-    extends BaseRepository<Case, ICaseModel>
-    implements ICaseRepo
-{
+export class CaseRepository extends BaseRepository<Case, ICaseModel> implements ICaseRepo {
     constructor(mapper: IMapper<Case, ICaseModel>, session?: ClientSession) {
         super(CaseModel, mapper, session);
     }
-    async findByQuery(
-        payload: FetchCaseQueryType
-    ): Promise<FindCasesWithPagination> {
-        const {
-            limit,
-            page,
-            search,
-            sortBy,
-            sortOrder,
-            userId,
-            caseTypeFilter,
-            status,
-        } = payload;
+    async findByQuery(payload: FetchCaseQueryType): Promise<FindCasesWithPagination> {
+        const { limit, page, search, sortBy, sortOrder, userId, caseTypeFilter, status } = payload;
         const skip = (page - 1) * limit;
         const order = sortOrder === "asc" ? 1 : -1;
 
@@ -41,10 +27,7 @@ export class CaseRepository
 
         if (search?.trim()) {
             matchStage1.$and.push({
-                $or: [
-                    { title: { $regex: search, $options: "i" } },
-                    { summary: { $regex: search, $options: "i" } },
-                ],
+                $or: [{ title: { $regex: search, $options: "i" } }, { summary: { $regex: search, $options: "i" } }],
             });
             matchStage2["$or"] = [
                 { "clientDetails.name": { $regex: search, $options: "i" } },

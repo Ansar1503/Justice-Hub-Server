@@ -2,16 +2,12 @@ import {
     UpdateDisputesStatusInputDto,
     UpdateDisputesStatusOutputDto,
 } from "@src/application/dtos/Admin/UpdateDisputesStatusDto";
-import { IUpdateDisputesStatusUseCase } from "../IUpdateDisputesStatusUseCase";
 import { IDisputes } from "@domain/IRepository/IDisputesRepo";
+import { IUpdateDisputesStatusUseCase } from "../IUpdateDisputesStatusUseCase";
 
-export class UpdateDisputesStatusUseCase
-implements IUpdateDisputesStatusUseCase
-{
+export class UpdateDisputesStatusUseCase implements IUpdateDisputesStatusUseCase {
     constructor(private _disputesRepo: IDisputes) {}
-    async execute(
-        input: UpdateDisputesStatusInputDto
-    ): Promise<UpdateDisputesStatusOutputDto> {
+    async execute(input: UpdateDisputesStatusInputDto): Promise<UpdateDisputesStatusOutputDto> {
         const existingDispute = await this._disputesRepo.findById(input.disputesId);
         if (!existingDispute) throw new Error("Dispute not found");
         switch (existingDispute.status) {

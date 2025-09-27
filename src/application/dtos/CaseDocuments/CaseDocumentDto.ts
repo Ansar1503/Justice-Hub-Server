@@ -1,20 +1,20 @@
 interface DocumentItem {
-  name: string;
-  type: string;
-  url: string;
+    name: string;
+    type: string;
+    url: string;
 }
 
 export interface CaseDocumentDto {
-  id: string;
-  caseId: string;
-  uploadedBy: string;
-  document: DocumentItem;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    caseId: string;
+    uploadedBy: string;
+    document: DocumentItem;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface UploadDocumentInputDto {
-  caseId: string;
-  uploadedBy: string;
-  document: DocumentItem;
+    caseId: string;
+    uploadedBy: string;
+    document: DocumentItem;
 }

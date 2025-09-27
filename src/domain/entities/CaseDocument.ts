@@ -1,24 +1,24 @@
 import { v4 as uuidv4 } from "uuid";
 
 export interface DocumentItem {
-  name: string;
-  type: string;
-  url: string;
+    name: string;
+    type: string;
+    url: string;
 }
 
 export interface PersistedCaseDocumentProps {
-  id: string;
-  caseId: string;
-  uploadedBy: string;
-  document: DocumentItem;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    caseId: string;
+    uploadedBy: string;
+    document: DocumentItem;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface CreateCaseDocumentProps {
-  caseId: string;
-  uploadedBy: string;
-  document: DocumentItem;
+    caseId: string;
+    uploadedBy: string;
+    document: DocumentItem;
 }
 
 export class CaseDocument {

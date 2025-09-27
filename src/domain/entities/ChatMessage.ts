@@ -1,30 +1,30 @@
 import { v4 as uuidv4 } from "uuid";
 
 export interface Attachment {
-  name: string;
-  url: string;
-  type: string;
+    name: string;
+    url: string;
+    type: string;
 }
 
 export interface PersistedChatMessageProps {
-  id: string;
-  session_id: string;
-  senderId: string;
-  receiverId: string;
-  content?: string;
-  read: boolean;
-  active: boolean;
-  attachments?: Attachment[];
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    session_id: string;
+    senderId: string;
+    receiverId: string;
+    content?: string;
+    read: boolean;
+    active: boolean;
+    attachments?: Attachment[];
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface CreateChatMessageProps {
-  session_id: string;
-  senderId: string;
-  receiverId: string;
-  content?: string;
-  attachments?: Attachment[];
+    session_id: string;
+    senderId: string;
+    receiverId: string;
+    content?: string;
+    attachments?: Attachment[];
 }
 
 export class ChatMessage {

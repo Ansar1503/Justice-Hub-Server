@@ -9,19 +9,19 @@ import { IReportReviewUseCase } from "@src/application/usecases/Client/IReportRe
 
 export class ReportReviewController implements IController {
     constructor(
-    private readonly reportReviewUseCase: IReportReviewUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private readonly reportReviewUseCase: IReportReviewUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: IHttpRequest): Promise<IHttpResponse> {
         try {
             const { id: review_id } = httpRequest.params as { id: string };
             const { reason, reportedBy, reportedUser } = httpRequest.body as {
-        reason: string;
-        reportedBy: string;
-        reportedUser: string;
-      };
+                reason: string;
+                reportedBy: string;
+                reportedUser: string;
+            };
 
             if (!review_id || review_id.trim() === "") {
                 return this.httpErrors.error_400("reviewId required");

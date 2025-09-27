@@ -1,4 +1,3 @@
-import { IController } from "../Interface/IController";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
@@ -7,20 +6,17 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IGetLawyerDetailUseCase } from "@src/application/usecases/Client/IGetLawyerDetailUseCase";
+import { IController } from "../Interface/IController";
 
 export class GetLawyerDetailController implements IController {
     constructor(
-    private getLawyerDetails: IGetLawyerDetailUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private getLawyerDetails: IGetLawyerDetailUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-        if (
-            httpRequest.params &&
-      typeof httpRequest.params === "object" &&
-      "id" in httpRequest.params
-        ) {
+        if (httpRequest.params && typeof httpRequest.params === "object" && "id" in httpRequest.params) {
             const { id } = httpRequest.params as { id: string };
 
             try {

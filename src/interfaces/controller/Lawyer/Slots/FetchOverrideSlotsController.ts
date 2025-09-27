@@ -9,17 +9,13 @@ import { IFetchOverrideSlotsUseCase } from "@src/application/usecases/Lawyer/IFe
 
 export class FetchOverrideSlots implements IController {
     constructor(
-    private fetchOverrideSlots: IFetchOverrideSlotsUseCase,
-    private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    private httpErrors: IHttpErrors = new HttpErrors()
+        private fetchOverrideSlots: IFetchOverrideSlotsUseCase,
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
-        if (
-            httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user
-        ) {
+        if (httpRequest.user && typeof httpRequest.user === "object" && "id" in httpRequest.user) {
             user_id = String(httpRequest.user.id);
         }
         if (!user_id) {

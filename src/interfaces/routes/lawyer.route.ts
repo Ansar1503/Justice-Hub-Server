@@ -1,13 +1,5 @@
 import express, { Request, Response } from "express";
-import {
-    chatDocumentstorage,
-    documentstorage,
-    handleMulterErrors,
-} from "../middelwares/multer";
 import multer from "multer";
-import { authenticateUser } from "../middelwares/Auth/auth.middleware";
-import { authenticateLawyer } from "../middelwares/Auth/authenticateLawyer";
-import { authenticateClient } from "../middelwares/Auth/authenticateClient";
 import { expressAdapter } from "@interfaces/adapters/express";
 import { VerifyLawyerComposer } from "@infrastructure/services/composers/Lawyer/VerifyLawyerComposer";
 import { FetchLawyerComposer } from "@infrastructure/services/composers/Lawyer/FetchLawyersComposer";
@@ -56,6 +48,10 @@ import { FindCaseDetailsComposer } from "@infrastructure/services/composers/Case
 import { FindAppointmentByCaseComposer } from "@infrastructure/services/composers/Appointments/FindAppointmentByCaseComposer";
 import { FindSessionsByCaseComposer } from "@infrastructure/services/composers/Sessions/FindSessionsByCase";
 import { FetchProfileImageComposer } from "@infrastructure/services/composers/Client/Profile/FetchProfileImageComposer";
+import { authenticateClient } from "../middelwares/Auth/authenticateClient";
+import { authenticateLawyer } from "../middelwares/Auth/authenticateLawyer";
+import { authenticateUser } from "../middelwares/Auth/auth.middleware";
+import { chatDocumentstorage, documentstorage, handleMulterErrors } from "../middelwares/multer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -76,27 +72,19 @@ router.post(
     async (req: Request, res: Response) => {
         const adapter = await expressAdapter(req, VerifyLawyerComposer());
         res.status(adapter.statusCode).json(adapter.body);
-    }
+    },
 );
-router.get(
-    LawyerRoutes.root,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, FetchLawyerComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    }
-);
+router.get(LawyerRoutes.root, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchLawyerComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+});
 
 router
     .route(LawyerRoutes.schedule.settings)
     .all(authenticateUser, authenticateClient, authenticateLawyer)
     .patch(async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(
-            req,
-            UpdateLawyerSlotSettingsComposer()
-        );
+        const adapter = await expressAdapter(req, UpdateLawyerSlotSettingsComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
     })
@@ -141,50 +129,35 @@ router
 
 // profiles
 router.get(
-    LawyerRoutes.profile.base +
-    LawyerRoutes.base +
-    LawyerRoutes.professional +
-    CommonParamsRoute.params,
+    LawyerRoutes.profile.base + LawyerRoutes.base + LawyerRoutes.professional + CommonParamsRoute.params,
     authenticateUser,
     authenticateClient,
     async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(
-            req,
-            FetchLawyersProfessionalDetailscomposer()
-        );
+        const adapter = await expressAdapter(req, FetchLawyersProfessionalDetailscomposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 
 router.get(
-    LawyerRoutes.profile.base +
-    LawyerRoutes.base +
-    LawyerRoutes.verification +
-    CommonParamsRoute.params,
+    LawyerRoutes.profile.base + LawyerRoutes.base + LawyerRoutes.verification + CommonParamsRoute.params,
     authenticateUser,
     authenticateClient,
     async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(
-            req,
-            FetchLawyerVerificationDetailsComposer()
-        );
+        const adapter = await expressAdapter(req, FetchLawyerVerificationDetailsComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 router.post(
     LawyerRoutes.profile.base + LawyerRoutes.base + LawyerRoutes.professional,
     authenticateUser,
     authenticateClient,
     async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(
-            req,
-            UpdateLawyersProfessionalDetailsComposer()
-        );
+        const adapter = await expressAdapter(req, UpdateLawyersProfessionalDetailsComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 router.get(
     LawyerRoutes.profile.appointments.base,
@@ -195,7 +168,7 @@ router.get(
         const adapter = await expressAdapter(req, FetchAppointmentDataComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 router.patch(
     LawyerRoutes.profile.appointments.reject,
@@ -206,7 +179,7 @@ router.patch(
         const adpter = await expressAdapter(req, RejectClientAppointmentComposer());
         res.status(adpter.statusCode).json(adpter.body);
         return;
-    }
+    },
 );
 router.patch(
     LawyerRoutes.profile.appointments.approve,
@@ -214,13 +187,10 @@ router.patch(
     authenticateClient,
     authenticateLawyer,
     async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(
-            req,
-            ConfirmClientAppointmentComposer()
-        );
+        const adapter = await expressAdapter(req, ConfirmClientAppointmentComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 // profile sesisons
 router.get(
@@ -232,7 +202,7 @@ router.get(
         const adapter = await expressAdapter(req, fetchSessionsComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 router.get(
     LawyerRoutes.profile.sessions.document,
@@ -243,7 +213,7 @@ router.get(
         const adapter = await expressAdapter(req, FetchSessionDocumentsComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 router.patch(
     LawyerRoutes.profile.sessions.start,
@@ -254,7 +224,7 @@ router.patch(
         const adapter = await expressAdapter(req, StartSessionComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 router.patch(
     LawyerRoutes.profile.sessions.join,
@@ -265,7 +235,7 @@ router.patch(
         const adapter = await expressAdapter(req, JoinVideoSessionComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 router.patch(
     LawyerRoutes.profile.sessions.end,
@@ -275,7 +245,7 @@ router.patch(
         const adapter = await expressAdapter(req, EndSessionComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 router.patch(
     LawyerRoutes.profile.sessions.cancel,
@@ -286,7 +256,7 @@ router.patch(
         const adapter = await expressAdapter(req, CancelSessionComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 
 router.post(
@@ -301,7 +271,7 @@ router.post(
         } catch (error) {
             next(error);
         }
-    }
+    },
 );
 
 router.get(
@@ -313,21 +283,16 @@ router.get(
         const adapter = await expressAdapter(req, FetchCallLogsSessionComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 
 //reviews
 
-router.get(
-    LawyerRoutes.profile.reviews,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, FetchReviewsByUserIdComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    }
-);
+router.get(LawyerRoutes.profile.reviews, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchReviewsByUserIdComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+});
 router.get(
     LawyerRoutes.profile.sessions.reviewsBySession,
     authenticateUser,
@@ -336,7 +301,7 @@ router.get(
         const adapter = await expressAdapter(req, FetchReviewsBySessionComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 
 router.get(
@@ -347,7 +312,7 @@ router.get(
         const adapter = await expressAdapter(req, FetchAllNotificationsComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 
 router.patch(
@@ -355,13 +320,10 @@ router.patch(
     authenticateUser,
     authenticateClient,
     async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(
-            req,
-            UpdateNotificationStatusComposer()
-        );
+        const adapter = await expressAdapter(req, UpdateNotificationStatusComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 
 router.put(
@@ -369,13 +331,10 @@ router.put(
     authenticateUser,
     authenticateClient,
     async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(
-            req,
-            MarkAllNotificationAsReadComposer()
-        );
+        const adapter = await expressAdapter(req, MarkAllNotificationAsReadComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 
 router.get(
@@ -387,7 +346,7 @@ router.get(
         const adapter = await expressAdapter(req, FetchWalletByUserComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 router.get(
     WalletRoutes.base + WalletRoutes.transactions,
@@ -395,42 +354,23 @@ router.get(
     authenticateClient,
     authenticateLawyer,
     async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(
-            req,
-            FetchTransactionsByWalletComposer()
-        );
+        const adapter = await expressAdapter(req, FetchTransactionsByWalletComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 
-router.get(
-    SpecializationRoute.base,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(
-            req,
-            FetchAllSpecializationsComposer()
-        );
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    }
-);
+router.get(SpecializationRoute.base, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchAllSpecializationsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+});
 
-router.get(
-    PracticeAreaRoutes.base,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(
-            req,
-            FindPracticeAreasBySpecIdsComposer()
-        );
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    }
-);
+router.get(PracticeAreaRoutes.base, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindPracticeAreasBySpecIdsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+});
 
 router.get(
     CasesRoutes.base,
@@ -441,7 +381,7 @@ router.get(
         const adapter = await expressAdapter(req, FindAllCasesByQueryComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 router.get(
     CasesRoutes.base + CommonParamsRoute.params,
@@ -450,7 +390,7 @@ router.get(
     async (req: Request, res: Response) => {
         const adapter = await expressAdapter(req, FindCaseDetailsComposer());
         res.status(adapter.statusCode).json(adapter.body);
-    }
+    },
 );
 
 router.get(
@@ -461,7 +401,7 @@ router.get(
         const adapter = await expressAdapter(req, FindAppointmentByCaseComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 
 router.get(
@@ -473,7 +413,7 @@ router.get(
         const adapter = await expressAdapter(req, FindSessionsByCaseComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 router.get(
     ClientRoutes.profile.base + ClientRoutes.profile.image,
@@ -483,7 +423,7 @@ router.get(
         const adapter = await expressAdapter(req, FetchProfileImageComposer());
         res.status(adapter.statusCode).json(adapter.body);
         return;
-    }
+    },
 );
 
 export default router;

@@ -2,9 +2,9 @@ import { FetchReviewsBySessionOutputDto } from "@src/application/dtos/client/Fet
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IFetchReviewsBySessionUseCase
-  extends IUseCase<
-    {
-      session_id: string;
-    },
-    FetchReviewsBySessionOutputDto[]
-  > {}
+    extends IUseCase<
+        {
+            session_id: string;
+        },
+        FetchReviewsBySessionOutputDto[]
+    > {}

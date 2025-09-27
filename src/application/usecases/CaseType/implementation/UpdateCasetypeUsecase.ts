@@ -1,22 +1,17 @@
-import {
-    UpdateCasetypeInputDto,
-    CaseTypeDto,
-} from "@src/application/dtos/CaseType/CaseTypeDto";
-import { IUpdateCaseTypeUsecase } from "../IUpdatedCaseTypeUsecase";
+import { UpdateCasetypeInputDto, CaseTypeDto } from "@src/application/dtos/CaseType/CaseTypeDto";
 import { ICasetype } from "@domain/IRepository/ICasetype";
 import { IPracticAreaRepo } from "@domain/IRepository/IPracticeAreas";
+import { IUpdateCaseTypeUsecase } from "../IUpdatedCaseTypeUsecase";
 
 export class UpdateCasetypeUsecase implements IUpdateCaseTypeUsecase {
     constructor(
-    private caseTypeRepo: ICasetype,
-    private practiceAreaRepo: IPracticAreaRepo
+        private caseTypeRepo: ICasetype,
+        private practiceAreaRepo: IPracticAreaRepo,
     ) {}
     async execute(input: UpdateCasetypeInputDto): Promise<CaseTypeDto> {
         const existsCasetype = await this.caseTypeRepo.findById(input.id);
         if (!existsCasetype) throw new Error("no case type exists");
-        const existsPracticeArea = await this.practiceAreaRepo.findById(
-            input.practiceareaId
-        );
+        const existsPracticeArea = await this.practiceAreaRepo.findById(input.practiceareaId);
         if (!existsPracticeArea) throw new Error("practice area not found");
         existsCasetype.updateName(input.name);
         existsCasetype.updatePracticeareaId(input.practiceareaId);

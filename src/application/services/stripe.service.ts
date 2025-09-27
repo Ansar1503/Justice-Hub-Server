@@ -4,31 +4,31 @@ import { format } from "date-fns";
 import { session } from "passport";
 
 type WebhookResult = {
-  amount?: number;
-  lawyer_id?: string;
-  client_id?: string;
-  date?: string;
-  time?: string;
-  duration?: string;
-  reason?: string;
-  title?: string;
-  caseTypeId?: string;
-  payment_status?: "pending" | "success" | "failed";
-  eventHandled: boolean;
+    amount?: number;
+    lawyer_id?: string;
+    client_id?: string;
+    date?: string;
+    time?: string;
+    duration?: string;
+    reason?: string;
+    title?: string;
+    caseTypeId?: string;
+    payment_status?: "pending" | "success" | "failed";
+    eventHandled: boolean;
 };
 
 type payloadType = {
-  userEmail: string;
-  lawyer_name: string;
-  date: string;
-  slot: string;
-  amount: number;
-  lawyer_id: string;
-  duration: number;
-  client_id: string;
-  reason?: string;
-  title: string;
-  caseTypeId: string;
+    userEmail: string;
+    lawyer_name: string;
+    date: string;
+    slot: string;
+    amount: number;
+    lawyer_id: string;
+    duration: number;
+    client_id: string;
+    reason?: string;
+    title: string;
+    caseTypeId: string;
 };
 
 export async function getStripeSession(payload: payloadType) {
@@ -71,19 +71,11 @@ export async function getStripeSession(payload: payloadType) {
     return session;
 }
 
-export async function handleStripeWebHook(
-    body: any,
-    signature: string | string[]
-): Promise<WebhookResult> {
+export async function handleStripeWebHook(body: any, signature: string | string[]): Promise<WebhookResult> {
     if (!process.env.STRIPE_SECRET_KEY) throw new Error("SECRETKEYNOTFOUND");
-    if (!process.env.STRIPE_WEBHOOK_SECRET)
-        throw new Error("WEBHOOKSECRETNOTFOUND");
+    if (!process.env.STRIPE_WEBHOOK_SECRET) throw new Error("WEBHOOKSECRETNOTFOUND");
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-    const event = await stripe.webhooks.constructEvent(
-        body,
-        signature,
-        process.env.STRIPE_WEBHOOK_SECRET
-    );
+    const event = await stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET);
     switch (event.type) {
     case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;

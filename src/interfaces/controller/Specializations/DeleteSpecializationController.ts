@@ -1,23 +1,19 @@
 import { IDeleteSpecializationUsecase } from "@src/application/usecases/Specializations/IDeleteSpecializationUseCase";
-import { IController } from "../Interface/IController";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
+import { IController } from "../Interface/IController";
 
 export class DeleteSpecializationController implements IController {
     constructor(
-    private deleteSpecialization: IDeleteSpecializationUsecase,
-    private httpErrors: IHttpErrors,
-    private httpSuccess: IHttpSuccess
+        private deleteSpecialization: IDeleteSpecializationUsecase,
+        private httpErrors: IHttpErrors,
+        private httpSuccess: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let id = "";
-        if (
-            httpRequest.params &&
-      typeof httpRequest.params === "object" &&
-      "id" in httpRequest.params
-        ) {
+        if (httpRequest.params && typeof httpRequest.params === "object" && "id" in httpRequest.params) {
             id = String(httpRequest.params.id);
         }
         if (!id) {

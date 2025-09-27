@@ -1,15 +1,15 @@
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
-import { IController } from "../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IAddSpecializationUsecase } from "@src/application/usecases/Specializations/IAddSpecializationUsecase";
+import { IController } from "../Interface/IController";
 
 export class AddSpecializationController implements IController {
     constructor(
-    private AddSpecialization: IAddSpecializationUsecase,
-    private httpErrors: IHttpErrors,
-    private httpSuccess: IHttpSuccess
+        private AddSpecialization: IAddSpecializationUsecase,
+        private httpErrors: IHttpErrors,
+        private httpSuccess: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let id = "";

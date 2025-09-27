@@ -1,10 +1,8 @@
 import { Notification } from "@domain/entities/Notification";
-import { IMapper } from "../IMapper";
 import { INotificationModel } from "@infrastructure/database/model/NotificationModel";
+import { IMapper } from "../IMapper";
 
-export class NotificationMapper
-implements IMapper<Notification, INotificationModel>
-{
+export class NotificationMapper implements IMapper<Notification, INotificationModel> {
     toDomain(persistence: INotificationModel): Notification {
         return Notification.fromPersistence({
             id: persistence._id.toString(),

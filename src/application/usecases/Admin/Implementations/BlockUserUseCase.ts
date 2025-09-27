@@ -1,16 +1,13 @@
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
+import { InternalError, ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { IBlockUserUseCase } from "../IBlockUserUseCase";
-import {
-    InternalError,
-    ValidationError,
-} from "@interfaces/middelwares/Error/CustomError";
 
 export class BlockUserUseCase implements IBlockUserUseCase {
     constructor(private userRepo: IUserRepository) {}
     async execute(input: {
-    user_id: string;
-    status: boolean;
-  }): Promise<{ status: boolean; role: "lawyer" | "client" }> {
+        user_id: string;
+        status: boolean;
+    }): Promise<{ status: boolean; role: "lawyer" | "client" }> {
         const userDetails = await this.userRepo.findByuser_id(input.user_id);
 
         if (!userDetails) {

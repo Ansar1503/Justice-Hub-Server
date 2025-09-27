@@ -1,9 +1,8 @@
+import { STATUS_CODES } from "http";
 import {
     ChangeAppointmentStatusInputDto,
     ChangeAppointmentStatusOutputDto,
 } from "@src/application/dtos/Lawyer/ChangeAppointmentStatusDto";
-import { IConfirmAppointmentUseCase } from "../IConfirmAppointmentUseCase";
-import { STATUS_CODES } from "http";
 import { timeStringToDate } from "@shared/utils/helpers/DateAndTimeHelper";
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
@@ -11,17 +10,16 @@ import { Session } from "@domain/entities/Session";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { ChatSession } from "@domain/entities/ChatSession";
 import { IChatSessionRepo } from "@domain/IRepository/IChatSessionRepo";
+import { IConfirmAppointmentUseCase } from "../IConfirmAppointmentUseCase";
 
 export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
     constructor(
-    private appointmentRepo: IAppointmentsRepository,
-    private sessionRepo: ISessionsRepo,
-    private userRepo: IUserRepository,
-    private chatRepo: IChatSessionRepo
+        private appointmentRepo: IAppointmentsRepository,
+        private sessionRepo: ISessionsRepo,
+        private userRepo: IUserRepository,
+        private chatRepo: IChatSessionRepo,
     ) {}
-    async execute(
-        input: ChangeAppointmentStatusInputDto
-    ): Promise<ChangeAppointmentStatusOutputDto> {
+    async execute(input: ChangeAppointmentStatusInputDto): Promise<ChangeAppointmentStatusOutputDto> {
         const appointment = await this.appointmentRepo.findById(input.id);
         if (!appointment) {
             const error: any = new Error("appointment not found");

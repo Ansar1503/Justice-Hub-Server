@@ -14,36 +14,26 @@ export class JwtProvider implements IJwtProvider {
         this.accessSecret = process.env.JWT_ACCESS_SECRET || "access_secret";
         this.refreshSecret = process.env.JWT_REFRESH_SECRET || "refresh_secret";
         this.emailSecret = process.env.JWT_EMAIL_SECRET || "email_secret";
-        this.accessExpiry =
-      (process.env.JWT_ACCESS_EXPIRY as jwt.SignOptions["expiresIn"]) || "15m";
-        this.refreshExpiry =
-      (process.env.JWT_REFRESH_EXPIRY as jwt.SignOptions["expiresIn"]) || "1d";
+        this.accessExpiry = (process.env.JWT_ACCESS_EXPIRY as jwt.SignOptions["expiresIn"]) || "15m";
+        this.refreshExpiry = (process.env.JWT_REFRESH_EXPIRY as jwt.SignOptions["expiresIn"]) || "1d";
     }
 
     private signToken<T extends object>(
         payload: T,
         secret: jwt.Secret,
-        expiresIn: jwt.SignOptions["expiresIn"]
+        expiresIn: jwt.SignOptions["expiresIn"],
     ): string {
         return jwt.sign(payload, secret, { expiresIn });
     }
 
     GenerateAccessToken(payload: JwtPayloadDto): string {
         const { exp, iat, ...safePayload } = payload as any;
-        return this.signToken<JwtPayloadDto>(
-            safePayload,
-            this.accessSecret,
-            this.accessExpiry
-        );
+        return this.signToken<JwtPayloadDto>(safePayload, this.accessSecret, this.accessExpiry);
     }
 
     GenerateRefreshToken(payload: JwtPayloadDto): string {
         const { exp, iat, ...safePayload } = payload as any;
-        return this.signToken<JwtPayloadDto>(
-            safePayload,
-            this.refreshSecret,
-            this.refreshExpiry
-        );
+        return this.signToken<JwtPayloadDto>(safePayload, this.refreshSecret, this.refreshExpiry);
     }
 
     GenerateEmailToken(payload: { user_id: string }): string {

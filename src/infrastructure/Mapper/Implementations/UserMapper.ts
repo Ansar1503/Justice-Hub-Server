@@ -1,6 +1,6 @@
 import { User } from "@domain/entities/User";
-import { IMapper } from "../IMapper";
 import { IUserModel } from "@infrastructure/database/model/UserModel";
+import { IMapper } from "../IMapper";
 
 export class UserMapper implements IMapper<User, IUserModel> {
     toDomain(raw: IUserModel): User {

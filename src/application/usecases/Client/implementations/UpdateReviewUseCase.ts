@@ -1,16 +1,11 @@
-import {
-    UpdateReviewInputDto,
-    UpdateReviewOutputDto,
-} from "@src/application/dtos/client/UpdateReviewDto";
-import { IUpdateReviewUseCase } from "../IUpdateReviewUseCase";
+import { UpdateReviewInputDto, UpdateReviewOutputDto } from "@src/application/dtos/client/UpdateReviewDto";
 import { IReviewRepo } from "@domain/IRepository/IReviewRepo";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
+import { IUpdateReviewUseCase } from "../IUpdateReviewUseCase";
 
 export class UpdateReviewUseCase implements IUpdateReviewUseCase {
     constructor(private reviewRepository: IReviewRepo) {}
-    async execute(
-        input: UpdateReviewInputDto
-    ): Promise<UpdateReviewOutputDto | null> {
+    async execute(input: UpdateReviewInputDto): Promise<UpdateReviewOutputDto | null> {
         const review = await this.reviewRepository.findByReview_id(input.review_id);
         if (!review) throw new ValidationError("review not found");
         const updated = await this.reviewRepository.update(input);

@@ -1,6 +1,4 @@
 import { CaseType } from "@domain/entities/CaseType";
-import { BaseRepository } from "./base/BaseRepo";
-import { CasetypeModel, ICasetypeModel } from "../model/CaseTypeModel";
 import { ICasetype } from "@domain/IRepository/ICasetype";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
 import {
@@ -8,11 +6,10 @@ import {
     CaseTypeFetchResultDto,
     UpdateCasetypeInputDto,
 } from "@src/application/dtos/CaseType/CaseTypeDto";
+import { CasetypeModel, ICasetypeModel } from "../model/CaseTypeModel";
+import { BaseRepository } from "./base/BaseRepo";
 
-export class CaseTypeRepo
-    extends BaseRepository<CaseType, ICasetypeModel>
-    implements ICasetype
-{
+export class CaseTypeRepo extends BaseRepository<CaseType, ICasetypeModel> implements ICasetype {
     constructor(mapper: IMapper<CaseType, ICasetypeModel>) {
         super(CasetypeModel, mapper);
     }
@@ -24,9 +21,7 @@ export class CaseTypeRepo
         const data = await this.model.findOne({ name });
         return data ? this.mapper.toDomain(data) : null;
     }
-    async findAllByQuery(
-        query: CasetypeFetchQueryDto
-    ): Promise<CaseTypeFetchResultDto> {
+    async findAllByQuery(query: CasetypeFetchQueryDto): Promise<CaseTypeFetchResultDto> {
         const { limit, page, practiceAreaId, search } = query;
         const skip = (page - 1) * limit;
         const queries: Record<string, any> = {};
@@ -59,16 +54,14 @@ export class CaseTypeRepo
 
     async findAll(): Promise<CaseType[] | []> {
         const data = await this.model.find();
-        return this.mapper.toDomainArray && data
-            ? this.mapper.toDomainArray(data)
-            : [];
+        return this.mapper.toDomainArray && data ? this.mapper.toDomainArray(data) : [];
     }
 
     async update(payload: UpdateCasetypeInputDto): Promise<CaseType | null> {
         const data = await this.model.findOneAndUpdate(
             { _id: payload.id },
             { name: payload.name, practiceareaId: payload.practiceareaId },
-            { new: true }
+            { new: true },
         );
         return data ? this.mapper.toDomain(data) : null;
     }
@@ -78,8 +71,6 @@ export class CaseTypeRepo
     }
     async findByPracticeAreas(query: string[]): Promise<CaseType[] | []> {
         const data = await this.model.find({ practiceareaId: { $in: query } });
-        return this.mapper.toDomainArray && data
-            ? this.mapper.toDomainArray(data)
-            : [];
+        return this.mapper.toDomainArray && data ? this.mapper.toDomainArray(data) : [];
     }
 }

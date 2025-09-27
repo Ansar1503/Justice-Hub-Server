@@ -1,4 +1,3 @@
-import { IController } from "../../Interface/IController";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
@@ -7,12 +6,13 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IUploadSessionDocumentUseCase } from "@src/application/usecases/Client/IUploadSessionDocumentUseCase";
+import { IController } from "../../Interface/IController";
 
 export class UploadSessionDocumentsController implements IController {
     constructor(
-    private uploadSessionDocument: IUploadSessionDocumentUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private uploadSessionDocument: IUploadSessionDocumentUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const req = httpRequest as Record<string, any>;
@@ -35,10 +35,7 @@ export class UploadSessionDocumentsController implements IController {
                 fileType = "image";
             } else if (subtype === "pdf") {
                 fileType = "pdf";
-            } else if (
-                subtype ===
-        "vnd.openxmlformats-officedocument.wordprocessingml.document"
-            ) {
+            } else if (subtype === "vnd.openxmlformats-officedocument.wordprocessingml.document") {
                 fileType = "docx";
             } else {
                 fileType = "unknown";

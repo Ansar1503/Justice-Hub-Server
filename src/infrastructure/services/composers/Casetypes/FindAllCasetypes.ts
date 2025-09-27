@@ -7,8 +7,6 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { FindAllCaseTypesUseCase } from "@src/application/usecases/CaseType/implementation/FindAllCaseTypes";
 
 export function FindAllCaseTypesComposer(): IController {
-    const usecase = new FindAllCaseTypesUseCase(
-        new CaseTypeRepo(new CaseTypeMapper())
-    );
+    const usecase = new FindAllCaseTypesUseCase(new CaseTypeRepo(new CaseTypeMapper()));
     return new FindAllCaseTypes(usecase, new HttpErrors(), new HttpSuccess());
 }

@@ -2,15 +2,15 @@ import mongoose, { Document, Schema } from "mongoose";
 
 type StatusType = "open" | "closed" | "onhold";
 export interface ICaseModel extends Document {
-  _id: string;
-  title: string;
-  clientId: string;
-  lawyerId: string;
-  caseType: string;
-  summary?: string;
-  status: StatusType;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    title: string;
+    clientId: string;
+    lawyerId: string;
+    caseType: string;
+    summary?: string;
+    status: StatusType;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const CaseSchema = new Schema<ICaseModel>(
@@ -29,7 +29,7 @@ const CaseSchema = new Schema<ICaseModel>(
         createdAt: { type: Date },
         updatedAt: { type: Date },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
 export const CaseModel = mongoose.model("case", CaseSchema);

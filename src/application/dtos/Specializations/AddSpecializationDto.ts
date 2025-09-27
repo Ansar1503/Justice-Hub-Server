@@ -1,4 +1,4 @@
 export interface AddSpecializationInputDto {
-  name: string;
-  id?: string;
+    name: string;
+    id?: string;
 }

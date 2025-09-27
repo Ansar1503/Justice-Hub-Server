@@ -5,7 +5,4 @@ import {
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IUploadSessionDocumentUseCase
-  extends IUseCase<
-    UploadSessionDocumentInputDto,
-    UploadSessionDocumentOutPutDto
-  > {}
+    extends IUseCase<UploadSessionDocumentInputDto, UploadSessionDocumentOutPutDto> {}

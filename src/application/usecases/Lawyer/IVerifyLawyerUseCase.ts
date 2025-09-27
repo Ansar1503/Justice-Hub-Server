@@ -2,5 +2,4 @@ import { LawyerVerificationInputDto, LawyerOutputDto } from "@src/application/dt
 import { IUseCase } from "../IUseCases/IUseCase";
 // import { LawyerVerificationDto } from "@src/application/dtos/Lawyer/VerifyLawyerDto";
 
-export interface IVerifyLawyerUseCase
-  extends IUseCase<LawyerVerificationInputDto, LawyerOutputDto> {}
+export interface IVerifyLawyerUseCase extends IUseCase<LawyerVerificationInputDto, LawyerOutputDto> {}

@@ -1,25 +1,25 @@
 import { v4 as uuidv4 } from "uuid";
 
 export interface PersistedReviewProps {
-  id: string;
-  session_id: string;
-  heading: string;
-  review: string;
-  rating: number;
-  client_id: string;
-  lawyer_id: string;
-  active: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    session_id: string;
+    heading: string;
+    review: string;
+    rating: number;
+    client_id: string;
+    lawyer_id: string;
+    active: boolean;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface CreateReviewProps {
-  session_id: string;
-  heading: string;
-  review: string;
-  rating: number;
-  client_id: string;
-  lawyer_id: string;
+    session_id: string;
+    heading: string;
+    review: string;
+    rating: number;
+    client_id: string;
+    lawyer_id: string;
 }
 
 export class Review {

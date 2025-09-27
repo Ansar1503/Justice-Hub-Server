@@ -1,22 +1,18 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export type VerificationStatus =
-  | "verified"
-  | "rejected"
-  | "pending"
-  | "requested";
+export type VerificationStatus = "verified" | "rejected" | "pending" | "requested";
 
 export interface ILawyerVerificationModel extends Document {
-  _id: string;
-  userId: string;
-  barCouncilNumber: string;
-  enrollmentCertificateNumber: string;
-  certificateOfPracticeNumber: string;
-  verificationStatus: VerificationStatus;
-  rejectReason?: string;
-  documents: string;
-  createdAt: Date;
-  updatedAt: Date;
+    _id: string;
+    userId: string;
+    barCouncilNumber: string;
+    enrollmentCertificateNumber: string;
+    certificateOfPracticeNumber: string;
+    verificationStatus: VerificationStatus;
+    rejectReason?: string;
+    documents: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const LawyerVerificationSchema = new Schema<ILawyerVerificationModel>(
@@ -35,10 +31,7 @@ const LawyerVerificationSchema = new Schema<ILawyerVerificationModel>(
         rejectReason: { type: String },
         documents: { type: String, ref: "lawyerdocuments" },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
-export default mongoose.model<ILawyerVerificationModel>(
-    "LawyerVerification",
-    LawyerVerificationSchema
-);
+export default mongoose.model<ILawyerVerificationModel>("LawyerVerification", LawyerVerificationSchema);

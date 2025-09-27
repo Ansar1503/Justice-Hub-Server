@@ -1,16 +1,11 @@
 import { ChatMessage } from "@domain/entities/ChatMessage";
 import { IChatMessagesRepo } from "@domain/IRepository/IChatMessagesRepo";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
-import { IChatMessageModel, MessageModel } from "../model/ChatMessageModel";
 import { ChatMessageMapper } from "@infrastructure/Mapper/Implementations/ChatMessageMapper";
+import { IChatMessageModel, MessageModel } from "../model/ChatMessageModel";
 
 export class ChatMessageRepository implements IChatMessagesRepo {
-    constructor(
-    private mapper: IMapper<
-      ChatMessage,
-      IChatMessageModel
-    > = new ChatMessageMapper()
-    ) {}
+    constructor(private mapper: IMapper<ChatMessage, IChatMessageModel> = new ChatMessageMapper()) {}
     async create(payload: ChatMessage): Promise<ChatMessage> {
         const newmessage = new MessageModel(this.mapper.toPersistence(payload));
         await newmessage.save();
@@ -18,7 +13,7 @@ export class ChatMessageRepository implements IChatMessagesRepo {
     }
     async findMessagesBySessionId(
         id: string,
-        page: number
+        page: number,
     ): Promise<{ data: ChatMessage[] | []; nextCursor?: number }> {
         const limit = 10;
         const skip = page > 0 ? (page - 1) * limit : 0;
@@ -30,27 +25,24 @@ export class ChatMessageRepository implements IChatMessagesRepo {
         const data = hasNextPage ? messages.slice(0, limit) : messages;
 
         return {
-            data:
-        this.mapper.toDomainArray && data
-            ? this.mapper.toDomainArray(data).reverse()
-            : [],
+            data: this.mapper.toDomainArray && data ? this.mapper.toDomainArray(data).reverse() : [],
             nextCursor: hasNextPage ? page + 1 : undefined,
         };
     }
     async update(payload: {
-    messageId: string;
-    reason?: string;
-    reportedAt?: Date;
-    read?: boolean;
-    active?: boolean;
-  }): Promise<ChatMessage | null> {
+        messageId: string;
+        reason?: string;
+        reportedAt?: Date;
+        read?: boolean;
+        active?: boolean;
+    }): Promise<ChatMessage | null> {
         const { messageId, reason, reportedAt, read, active } = payload;
 
         const update: {
-      read?: boolean;
-      report?: { reason?: string; reportedAt?: Date };
-      active?: boolean;
-    } = {};
+            read?: boolean;
+            report?: { reason?: string; reportedAt?: Date };
+            active?: boolean;
+        } = {};
 
         if (reason || reportedAt) {
             update.report = {};
@@ -66,11 +58,7 @@ export class ChatMessageRepository implements IChatMessagesRepo {
             update.read = read;
         }
 
-        const data = await MessageModel.findOneAndUpdate(
-            { _id: messageId },
-            { $set: update },
-            { new: true }
-        );
+        const data = await MessageModel.findOneAndUpdate({ _id: messageId }, { $set: update }, { new: true });
 
         return data ? this.mapper.toDomain(data) : null;
     }
@@ -79,20 +67,17 @@ export class ChatMessageRepository implements IChatMessagesRepo {
         return data ? this.mapper.toDomain(data) : null;
     }
     async fetchDisputesAggregation(payload: {
-    search: string;
-    sortBy: "All" | "session_date" | "reported_date";
-    sortOrder: "asc" | "desc";
-    limit: number;
-    page: number;
-  }): Promise<{
-    data:
-      | (ChatMessage &
-          { chatSession: any & { clientData: any; lawyerData: any } }[])
-      | [];
-    totalCount: number;
-    currentPage: number;
-    totalPage: number;
-  }> {
+        search: string;
+        sortBy: "All" | "session_date" | "reported_date";
+        sortOrder: "asc" | "desc";
+        limit: number;
+        page: number;
+    }): Promise<{
+        data: (ChatMessage & { chatSession: any & { clientData: any; lawyerData: any } }[]) | [];
+        totalCount: number;
+        currentPage: number;
+        totalPage: number;
+    }> {
         const { search, sortBy, sortOrder, limit, page } = payload;
         const skip = (page - 1) * limit;
         const order = sortOrder === "asc" ? 1 : -1;
@@ -229,11 +214,7 @@ export class ChatMessageRepository implements IChatMessagesRepo {
             {
                 $facet: {
                     data: pipline,
-                    count: [
-                        { $match: matchStageFilter1 },
-                        { $match: matchStageFilter2 },
-                        { $count: "count" },
-                    ],
+                    count: [{ $match: matchStageFilter1 }, { $match: matchStageFilter2 }, { $count: "count" }],
                 },
             },
         ]);

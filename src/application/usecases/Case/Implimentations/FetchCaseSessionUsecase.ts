@@ -1,6 +1,6 @@
 import { SessionData } from "@src/application/dtos/sessions/FetchSessionsDto";
-import { IFetchCaseSessionsUsecase } from "../Interfaces/IFetchCaseSessionsUsecase";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
+import { IFetchCaseSessionsUsecase } from "../Interfaces/IFetchCaseSessionsUsecase";
 
 export class FetchCaseSessionUsecase implements IFetchCaseSessionsUsecase {
     constructor(private _sessionRepo: ISessionsRepo) {}

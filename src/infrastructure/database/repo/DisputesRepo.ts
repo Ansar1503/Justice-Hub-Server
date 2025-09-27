@@ -1,30 +1,23 @@
 import { IMapper } from "@infrastructure/Mapper/IMapper";
-import { Disputes } from "../../../domain/entities/Disputes";
-import { IDisputes } from "../../../domain/IRepository/IDisputesRepo";
-import { DisputesModel, IDisputesModel } from "../model/DisputesModel";
 import {
     FetchReviewDisputesInputDto,
     FetchReviewDisputesOutputDto,
 } from "@src/application/dtos/Admin/FetchReviewDisputesDto";
 import { DisputesMapper } from "@infrastructure/Mapper/Implementations/DisputesMapper";
-import { BaseRepository } from "./base/BaseRepo";
 import {
     FetchChatDisputesInputDto,
     FetchChatDisputesOutputDto,
 } from "@src/application/dtos/Admin/FetchChatDisputesDto";
+import { Disputes } from "../../../domain/entities/Disputes";
+import { IDisputes } from "../../../domain/IRepository/IDisputesRepo";
+import { DisputesModel, IDisputesModel } from "../model/DisputesModel";
+import { BaseRepository } from "./base/BaseRepo";
 
-export class DisputesRepo
-    extends BaseRepository<Disputes, IDisputesModel>
-    implements IDisputes
-{
-    constructor(
-        mapper: IMapper<Disputes, IDisputesModel> = new DisputesMapper()
-    ) {
+export class DisputesRepo extends BaseRepository<Disputes, IDisputesModel> implements IDisputes {
+    constructor(mapper: IMapper<Disputes, IDisputesModel> = new DisputesMapper()) {
         super(DisputesModel, mapper);
     }
-    async findByContentId(payload: {
-    contentId: string;
-  }): Promise<Disputes | null> {
+    async findByContentId(payload: { contentId: string }): Promise<Disputes | null> {
         const disputes = await DisputesModel.findOne({
             contentId: payload.contentId,
         });
@@ -36,24 +29,22 @@ export class DisputesRepo
         return this.mapper.toDomain(disputes);
     }
     async update(payload: {
-    disputesId: string;
-    action?: "blocked" | "deleted";
-    status: "pending" | "resolved" | "rejected";
-  }): Promise<Disputes | null> {
+        disputesId: string;
+        action?: "blocked" | "deleted";
+        status: "pending" | "resolved" | "rejected";
+    }): Promise<Disputes | null> {
         const update = { status: payload.status, resolveAction: payload.action };
         const updated = await DisputesModel.findOneAndUpdate(
             {
                 _id: payload.disputesId,
             },
             update,
-            { new: true }
+            { new: true },
         );
         if (!updated) return null;
         return this.mapper.toDomain(updated);
     }
-    async findReviewDisputes(
-        payload: FetchReviewDisputesInputDto
-    ): Promise<FetchReviewDisputesOutputDto> {
+    async findReviewDisputes(payload: FetchReviewDisputesInputDto): Promise<FetchReviewDisputesOutputDto> {
         const { limit, page, search, sortBy, sortOrder } = payload;
         const skip = (page - 1) * limit;
         const order = sortOrder === "asc" ? 1 : -1;
@@ -62,10 +53,7 @@ export class DisputesRepo
         };
         const matchFilter2: Record<string, any> = {};
         if (search.trim()) {
-            matchFilter2["$or"] = [
-                { "reportedByuserData.name": search },
-                { "reportedUserData.name": search },
-            ];
+            matchFilter2["$or"] = [{ "reportedByuserData.name": search }, { "reportedUserData.name": search }];
         }
         const sortFilter: Record<string, any> = { createdAt: order };
         if (sortBy !== "All" && sortBy === "reported_date") {
@@ -144,20 +132,14 @@ export class DisputesRepo
             {
                 $addFields: {
                     reportedByuserData: {
-                        $mergeObjects: [
-                            "$reportedByusersUserData",
-                            "$reportedByUserClientData",
-                        ],
+                        $mergeObjects: ["$reportedByusersUserData", "$reportedByUserClientData"],
                     },
                 },
             },
             {
                 $addFields: {
                     reportedUserData: {
-                        $mergeObjects: [
-                            "$reportedUsersUserData",
-                            "$reportedUserClientData",
-                        ],
+                        $mergeObjects: ["$reportedUsersUserData", "$reportedUserClientData"],
                     },
                 },
             },
@@ -213,11 +195,7 @@ export class DisputesRepo
             {
                 $facet: {
                     data: pipeline,
-                    count: [
-                        { $match: matchFilter1 },
-                        { $match: matchFilter2 },
-                        { $count: "count" },
-                    ],
+                    count: [{ $match: matchFilter1 }, { $match: matchFilter2 }, { $count: "count" }],
                 },
             },
         ]);
@@ -272,19 +250,14 @@ export class DisputesRepo
         };
     }
 
-    async findAllChatDisputes(
-        payload: FetchChatDisputesInputDto
-    ): Promise<FetchChatDisputesOutputDto> {
+    async findAllChatDisputes(payload: FetchChatDisputesInputDto): Promise<FetchChatDisputesOutputDto> {
         const { limit, page, search, sortBy, sortOrder } = payload;
         const skip = (page - 1) * limit;
         const order = sortOrder === "asc" ? 1 : -1;
         const matchFilter1: Record<string, any> = { disputeType: "messages" };
         const matchFilter2: Record<string, any> = {};
         if (search.trim()) {
-            matchFilter2["$or"] = [
-                { "reportedBy.name": search },
-                { "reportedUser.name": search },
-            ];
+            matchFilter2["$or"] = [{ "reportedBy.name": search }, { "reportedUser.name": search }];
         }
         const sortFilter: Record<string, any> = { createdAt: order };
         if (sortBy === "message_date") {
@@ -367,10 +340,7 @@ export class DisputesRepo
             {
                 $addFields: {
                     reportedUser: {
-                        $mergeObjects: [
-                            "$reportedUsersUserData",
-                            "$reportedUserClientData",
-                        ],
+                        $mergeObjects: ["$reportedUsersUserData", "$reportedUserClientData"],
                     },
                 },
             },
@@ -411,11 +381,7 @@ export class DisputesRepo
             {
                 $facet: {
                     data: pipeline,
-                    count: [
-                        { $match: matchFilter1 },
-                        { $match: matchFilter2 },
-                        { $count: "count" },
-                    ],
+                    count: [{ $match: matchFilter1 }, { $match: matchFilter2 }, { $count: "count" }],
                 },
             },
         ]);

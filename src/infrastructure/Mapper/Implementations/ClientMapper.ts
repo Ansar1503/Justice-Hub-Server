@@ -1,6 +1,6 @@
 import { Client } from "@domain/entities/Client";
-import { IMapper } from "../IMapper";
 import { IClientModel } from "@infrastructure/database/model/ClientModel";
+import { IMapper } from "../IMapper";
 
 export class ClientMapper implements IMapper<Client, IClientModel> {
     toDomain(persistence: IClientModel): Client {

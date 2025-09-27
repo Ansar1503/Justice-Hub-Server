@@ -1,10 +1,8 @@
 import { Appointment } from "@domain/entities/Appointment";
-import { IMapper } from "../IMapper";
 import { IAppointmentModel } from "@infrastructure/database/model/AppointmentsModel";
+import { IMapper } from "../IMapper";
 
-export class AppointmentMapper
-implements IMapper<Appointment, IAppointmentModel>
-{
+export class AppointmentMapper implements IMapper<Appointment, IAppointmentModel> {
     toDomain(persistence: IAppointmentModel): Appointment {
         return Appointment.fromPersistence({
             amount: persistence.amount,

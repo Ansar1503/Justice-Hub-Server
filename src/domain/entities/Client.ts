@@ -1,14 +1,14 @@
 import { v4 as uuidv4 } from "uuid";
 
 interface ClientProps {
-  id: string;
-  user_id: string;
-  profile_image: string;
-  dob: string;
-  gender: string;
-  address: string;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    user_id: string;
+    profile_image: string;
+    dob: string;
+    gender: string;
+    address: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export class Client {
@@ -75,33 +75,21 @@ export class Client {
         let changed = false;
         if (
             props.profile_image !== undefined &&
-      props.profile_image !== null &&
-      props.profile_image !== this._profile_image
+            props.profile_image !== null &&
+            props.profile_image !== this._profile_image
         ) {
             this._profile_image = props.profile_image;
             changed = true;
         }
-        if (
-            props.dob !== undefined &&
-      props.dob !== null &&
-      props.dob !== props.dob
-        ) {
+        if (props.dob !== undefined && props.dob !== null && props.dob !== props.dob) {
             this._dob = props.dob;
             changed = true;
         }
-        if (
-            props.gender !== undefined &&
-      props.gender !== null &&
-      props.gender !== this._gender
-        ) {
+        if (props.gender !== undefined && props.gender !== null && props.gender !== this._gender) {
             this._gender = props.gender;
             changed = true;
         }
-        if (
-            props.address !== undefined &&
-      props.address !== null &&
-      props.address !== this._address
-        ) {
+        if (props.address !== undefined && props.address !== null && props.address !== this._address) {
             this._address = props.address;
             changed = true;
         }

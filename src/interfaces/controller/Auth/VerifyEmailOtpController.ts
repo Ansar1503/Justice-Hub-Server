@@ -1,5 +1,4 @@
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { IController } from "../Interface/IController";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
@@ -7,12 +6,13 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IVerifyEmailByOtp } from "@src/application/usecases/Auth/IVerifyEmailByOtp";
+import { IController } from "../Interface/IController";
 
 export class VerifyEmailOtpController implements IController {
     constructor(
-    private verifyEmailByOtpUseCase: IVerifyEmailByOtp,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private verifyEmailByOtpUseCase: IVerifyEmailByOtp,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const { otpValue: otp, email } = httpRequest.body as Record<string, any>;

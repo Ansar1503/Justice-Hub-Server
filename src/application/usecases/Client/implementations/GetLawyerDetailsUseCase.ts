@@ -1,18 +1,18 @@
 import { LawyerResponseDto } from "@src/application/dtos/lawyer.dto";
-import { IGetLawyerDetailUseCase } from "../IGetLawyerDetailUseCase";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { IClientRepository } from "@domain/IRepository/IClientRepo";
 import { IAddressRepository } from "@domain/IRepository/IAddressRepo";
 import { ILawyerRepository } from "@domain/IRepository/ILawyerRepo";
 import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
+import { IGetLawyerDetailUseCase } from "../IGetLawyerDetailUseCase";
 
 export class GetLawyerDetailsUseCase implements IGetLawyerDetailUseCase {
     constructor(
-    private userRepository: IUserRepository,
-    private clientRepository: IClientRepository,
-    private addressRepository: IAddressRepository,
-    private lawyerRepository: ILawyerRepository,
-    private lawyerVerification: ILawyerVerificationRepo
+        private userRepository: IUserRepository,
+        private clientRepository: IClientRepository,
+        private addressRepository: IAddressRepository,
+        private lawyerRepository: ILawyerRepository,
+        private lawyerVerification: ILawyerVerificationRepo,
     ) {}
     async execute(input: string): Promise<LawyerResponseDto | null> {
         const user = await this.userRepository.findByuser_id(input);
@@ -21,13 +21,10 @@ export class GetLawyerDetailsUseCase implements IGetLawyerDetailUseCase {
         const client = await this.clientRepository.findByUserId(input);
         const address = await this.addressRepository.find(input);
         const lawyer = await this.lawyerRepository.findUserId(input);
-        const lawyerVerification = await this.lawyerVerification.findByUserId(
-            input
-        );
+        const lawyerVerification = await this.lawyerVerification.findByUserId(input);
         if (!lawyerVerification) throw new Error("LAWYER_UNVERIFIED");
         if (!lawyer) throw new Error("LAWYER_UNAVAILABLE");
-        if (lawyerVerification.verificationStatus !== "verified")
-            throw new Error("LAWYER_UNVERIFIED");
+        if (lawyerVerification.verificationStatus !== "verified") throw new Error("LAWYER_UNVERIFIED");
         const responseData: LawyerResponseDto = {
             createdAt: user.createdAt,
             email: user.email,
@@ -52,10 +49,8 @@ export class GetLawyerDetailsUseCase implements IGetLawyerDetailUseCase {
             specialisation: lawyer?.specializations,
             verification_status: lawyerVerification.verificationStatus,
             description: lawyer.description || "",
-            certificate_of_practice_number:
-        lawyerVerification.certificateOfPracticeNumber || "",
-            enrollment_certificate_number:
-        lawyerVerification.enrollmentCertificateNumber || "",
+            certificate_of_practice_number: lawyerVerification.certificateOfPracticeNumber || "",
+            enrollment_certificate_number: lawyerVerification.enrollmentCertificateNumber || "",
         };
         return responseData;
     }

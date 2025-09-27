@@ -7,17 +7,13 @@ import { IFetchProfileImageUsecase } from "@src/application/usecases/Client/IFet
 
 export class FetchProfileImageController implements IController {
     constructor(
-    private _fetchProfile: IFetchProfileImageUsecase,
-    private _errors: IHttpErrors,
-    private _success: IHttpSuccess
+        private _fetchProfile: IFetchProfileImageUsecase,
+        private _errors: IHttpErrors,
+        private _success: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let userId = "";
-        if (
-            httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user
-        ) {
+        if (httpRequest.user && typeof httpRequest.user === "object" && "id" in httpRequest.user) {
             userId = String(httpRequest.user.id);
         }
         if (!userId) {

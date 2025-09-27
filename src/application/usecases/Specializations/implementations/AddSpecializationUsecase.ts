@@ -1,9 +1,9 @@
 import { ISpecializationRepo } from "@domain/IRepository/ISpecialization";
-import { IAddSpecializationUsecase } from "../IAddSpecializationUsecase";
 import { AddSpecializationInputDto } from "@src/application/dtos/Specializations/AddSpecializationDto";
 import { SpecializationDto } from "@src/application/dtos/Specializations/SpecializationDto";
 import { Specialization } from "@domain/entities/Specialization";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
+import { IAddSpecializationUsecase } from "../IAddSpecializationUsecase";
 
 export class AddSpecializationUsecase implements IAddSpecializationUsecase {
     constructor(private specializationRepo: ISpecializationRepo) {}
@@ -25,10 +25,7 @@ export class AddSpecializationUsecase implements IAddSpecializationUsecase {
         const exist = await this.specializationRepo.findById(input.id);
         if (!exist) throw new ValidationError("No spc found with the id");
         exist.updateName(input.name);
-        const updated = await this.specializationRepo.updateName(
-            exist.id,
-            exist.name
-        );
+        const updated = await this.specializationRepo.updateName(exist.id, exist.name);
         return {
             createdAt: updated.createdAt,
             id: updated.id,

@@ -1,22 +1,17 @@
 import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
-import { BaseRepository } from "./base/BaseRepo";
 import { LawyerVerification } from "@domain/entities/LawyerVerification";
-import LawyerVerificaitionModel, {
-    ILawyerVerificationModel,
-} from "../model/LawyerVerificaitionModel";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
 import { ClientSession } from "mongoose";
 import { lawyerVerificationDetails } from "@src/application/dtos/Lawyer/LawyerVerificationDetailsDto";
+import LawyerVerificaitionModel, { ILawyerVerificationModel } from "../model/LawyerVerificaitionModel";
+import { BaseRepository } from "./base/BaseRepo";
 import { ILawyerDocumentsModel } from "../model/LawyerDocumentsModel";
 
 export class LawyerVerificationRepo
     extends BaseRepository<LawyerVerification, ILawyerVerificationModel>
     implements ILawyerVerificationRepo
 {
-    constructor(
-        mapper: IMapper<LawyerVerification, ILawyerVerificationModel>,
-        session?: ClientSession
-    ) {
+    constructor(mapper: IMapper<LawyerVerification, ILawyerVerificationModel>, session?: ClientSession) {
         super(LawyerVerificaitionModel, mapper, session);
     }
     async findByUserId(id: string): Promise<lawyerVerificationDetails | null> {
@@ -43,21 +38,17 @@ export class LawyerVerificationRepo
             rejectReason: data.rejectReason,
         };
     }
-    async update(
-        payload: Partial<LawyerVerification>
-    ): Promise<LawyerVerification | null> {
+    async update(payload: Partial<LawyerVerification>): Promise<LawyerVerification | null> {
         const update: Record<string, any> = {};
 
         if (payload.barCouncilNumber?.trim()) {
             update["barCouncilNumber"] = payload.barCouncilNumber;
         }
         if (payload.certificateOfPracticeNumber?.trim()) {
-            update["certificateOfPracticeNumber"] =
-        payload.certificateOfPracticeNumber;
+            update["certificateOfPracticeNumber"] = payload.certificateOfPracticeNumber;
         }
         if (payload.enrollmentCertificateNumber?.trim()) {
-            update["enrollmentCertificateNumber"] =
-        payload.enrollmentCertificateNumber;
+            update["enrollmentCertificateNumber"] = payload.enrollmentCertificateNumber;
         }
         if (payload.documents?.trim()) {
             update["documents"] = payload.documents;

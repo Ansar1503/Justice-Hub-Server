@@ -1,25 +1,23 @@
 import { CancelSessionOutputDto } from "@src/application/dtos/Lawyer/CancelSessionDto";
-import { IEndSessionUseCase } from "../IEndSessionUseCase";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { timeStringToDate } from "@shared/utils/helpers/DateAndTimeHelper";
 import { ICallLogs } from "@domain/IRepository/ICallLogs";
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
+import { IEndSessionUseCase } from "../IEndSessionUseCase";
 
 export class EndSessionUseCase implements IEndSessionUseCase {
     constructor(
-    private _sessionsRepo: ISessionsRepo,
-    private _callLogsRepo: ICallLogs,
-    private _appointmentRepo: IAppointmentsRepository
+        private _sessionsRepo: ISessionsRepo,
+        private _callLogsRepo: ICallLogs,
+        private _appointmentRepo: IAppointmentsRepository,
     ) {}
     async execute(input: { sessionId: string }): Promise<CancelSessionOutputDto> {
         const session = await this._sessionsRepo.findById({
             session_id: input.sessionId,
         });
         if (!session) throw new ValidationError("Session not found");
-        const appointmentDetails = await this._appointmentRepo.findByBookingId(
-            session.bookingId
-        );
+        const appointmentDetails = await this._appointmentRepo.findByBookingId(session.bookingId);
         if (!appointmentDetails) throw new Error("appointment not found");
         switch (session.status) {
         case "cancelled":
@@ -31,18 +29,13 @@ export class EndSessionUseCase implements IEndSessionUseCase {
         case "upcoming":
             throw new ValidationError("session has not started yet");
         }
-        const sessionStartAt = timeStringToDate(
-            appointmentDetails?.date,
-            appointmentDetails.time
-        );
+        const sessionStartAt = timeStringToDate(appointmentDetails?.date, appointmentDetails.time);
         const currentDate = new Date();
         // if (currentDate < sessionStartAt) {
         //   throw new ValidationError("Session has not started yet");
         // }
         const durationInMinutes = session.start_time
-            ? Math.floor(
-                (currentDate.getTime() - session.start_time.getTime()) / (1000 * 60)
-            )
+            ? Math.floor((currentDate.getTime() - session.start_time.getTime()) / (1000 * 60))
             : 0;
 
         const updatedSession = await this._sessionsRepo.update({

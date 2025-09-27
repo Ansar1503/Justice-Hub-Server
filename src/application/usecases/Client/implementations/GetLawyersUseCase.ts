@@ -1,10 +1,7 @@
-import {
-    GetLawyersInputDto,
-    GetLawyersOutputDto,
-} from "@src/application/dtos/client/GetLawyersDto";
-import { IGetLawyersUseCase } from "../IGetLawyerUseCase";
+import { GetLawyersInputDto, GetLawyersOutputDto } from "@src/application/dtos/client/GetLawyersDto";
 import { ILawyerRepository } from "@domain/IRepository/ILawyerRepo";
 import { LawyerResponseDto } from "@src/application/dtos/lawyer.dto";
+import { IGetLawyersUseCase } from "../IGetLawyerUseCase";
 
 export class GetLawyersUseCase implements IGetLawyersUseCase {
     constructor(private lawyerRepository: ILawyerRepository) {}
@@ -91,8 +88,8 @@ export class GetLawyersUseCase implements IGetLawyersUseCase {
                     lawyer?.practiceAreasDetails?.map((p: any) => p?.name),
                     lawyer?.experience,
                     lawyer?.specialisationsDetails?.map((s: any) => s?.name),
-                    lawyer?.consultationFee
-                )
+                    lawyer?.consultationFee,
+                ),
         );
         return {
             ...response,

@@ -1,4 +1,3 @@
-import { IController } from "../../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
@@ -7,12 +6,13 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IRemoveSessionDocumentsUseCase } from "@src/application/usecases/Client/IRemoveSessionDocumentsUseCase";
+import { IController } from "../../Interface/IController";
 
 export class RemoveSessionDocumentController implements IController {
     constructor(
-    private removeSessionDocument: IRemoveSessionDocumentsUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+        private removeSessionDocument: IRemoveSessionDocumentsUseCase,
+        private httpErrors: IHttpErrors = new HttpErrors(),
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const req = httpRequest as Record<string, any>;

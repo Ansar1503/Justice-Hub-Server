@@ -1,4 +1,3 @@
-import { IController } from "../../Interface/IController";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
@@ -6,26 +5,19 @@ import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IFetchSlotSettingsUseCase } from "@src/application/usecases/Lawyer/IFetchSlotSettingsUseCase";
+import { IController } from "../../Interface/IController";
 
 export class FetchSlotSettingsController implements IController {
     constructor(
-    private slotSettings: IFetchSlotSettingsUseCase,
-    private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    private httpErrors: IHttpErrors = new HttpErrors()
+        private slotSettings: IFetchSlotSettingsUseCase,
+        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
-        if (
-            httpRequest.params &&
-      typeof httpRequest.params === "object" &&
-      "id" in httpRequest.params
-        ) {
+        if (httpRequest.params && typeof httpRequest.params === "object" && "id" in httpRequest.params) {
             user_id = String(httpRequest.params.id);
-        } else if (
-            httpRequest.user &&
-      typeof httpRequest.user === "object" &&
-      "id" in httpRequest.user
-        ) {
+        } else if (httpRequest.user && typeof httpRequest.user === "object" && "id" in httpRequest.user) {
             user_id = String(httpRequest.user.id);
         }
         if (!user_id) {

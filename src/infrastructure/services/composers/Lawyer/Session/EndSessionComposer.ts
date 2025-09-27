@@ -9,7 +9,7 @@ export function EndSessionComposer(): IController {
     const usecase = new EndSessionUseCase(
         new SessionsRepository(),
         new CallLogsRepository(),
-        new AppointmentsRepository()
+        new AppointmentsRepository(),
     );
     return new EndSessionController(usecase);
 }

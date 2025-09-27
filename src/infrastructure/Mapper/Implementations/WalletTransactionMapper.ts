@@ -1,10 +1,8 @@
 import { WalletTransaction } from "@domain/entities/WalletTransactions";
-import { IMapper } from "../IMapper";
 import { IWalletTransactionModel } from "@infrastructure/database/model/WalletTransactionModelt";
+import { IMapper } from "../IMapper";
 
-export class WalletTransactionMapper
-implements IMapper<WalletTransaction, IWalletTransactionModel>
-{
+export class WalletTransactionMapper implements IMapper<WalletTransaction, IWalletTransactionModel> {
     toDomain(persistence: IWalletTransactionModel): WalletTransaction {
         return new WalletTransaction({
             amount: persistence.amount,

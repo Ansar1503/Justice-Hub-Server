@@ -12,7 +12,7 @@ export function FetchClientDataComposer(): IController {
         new UserRepository(),
         new ClientRepository(),
         new AddressRepository(),
-        new LawyerVerificationRepo(new LawyerVerificationMapper())
+        new LawyerVerificationRepo(new LawyerVerificationMapper()),
     );
     const controller = new FetchClientDataController(usecase);
     return controller;

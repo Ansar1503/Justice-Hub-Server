@@ -1,20 +1,20 @@
 export interface PersistedAddressProps {
-  id: string;
-  user_id: string;
-  state?: string;
-  city?: string;
-  locality?: string;
-  pincode?: string;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    user_id: string;
+    state?: string;
+    city?: string;
+    locality?: string;
+    pincode?: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface CreateAddressProps {
-  user_id: string;
-  state?: string;
-  city?: string;
-  locality?: string;
-  pincode?: string;
+    user_id: string;
+    state?: string;
+    city?: string;
+    locality?: string;
+    pincode?: string;
 }
 
 export class Address {

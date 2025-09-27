@@ -2,21 +2,19 @@ import {
     ChangeAppointmentStatusInputDto,
     ChangeAppointmentStatusOutputDto,
 } from "@src/application/dtos/Lawyer/ChangeAppointmentStatusDto";
-import { ICancelAppointmentUseCase } from "../ICancelAppointmentUseCase";
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 import { WalletTransaction } from "@domain/entities/WalletTransactions";
 import { generateDescription } from "@shared/utils/helpers/WalletDescriptionsHelper";
 import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
 import { STATUS_CODES } from "@infrastructure/constant/status.codes";
+import { ICancelAppointmentUseCase } from "../ICancelAppointmentUseCase";
 
 export class CancelAppointmentUseCase implements ICancelAppointmentUseCase {
     constructor(
-    private appointmentRepo: IAppointmentsRepository,
-    private unitofWork: IUnitofWork
+        private appointmentRepo: IAppointmentsRepository,
+        private unitofWork: IUnitofWork,
     ) {}
-    async execute(
-        input: ChangeAppointmentStatusInputDto
-    ): Promise<ChangeAppointmentStatusOutputDto> {
+    async execute(input: ChangeAppointmentStatusInputDto): Promise<ChangeAppointmentStatusOutputDto> {
         return await this.unitofWork.startTransaction(async (uow) => {
             const appointment = await this.appointmentRepo.findById(input.id);
             if (!appointment) {
@@ -45,9 +43,7 @@ export class CancelAppointmentUseCase implements ICancelAppointmentUseCase {
                 throw error;
             }
 
-            const clientWallet = await uow.walletRepo.getWalletByUserId(
-                appointment.client_id
-            );
+            const clientWallet = await uow.walletRepo.getWalletByUserId(appointment.client_id);
             const adminWallet = await uow.walletRepo.getAdminWallet();
 
             if (!clientWallet) throw new Error("client wallet not found");
@@ -60,14 +56,8 @@ export class CancelAppointmentUseCase implements ICancelAppointmentUseCase {
             adminWallet.updateBalance(adminWallet.balance - appointment.amount);
             clientWallet.updateBalance(clientWallet.balance + appointment.amount);
 
-            await uow.walletRepo.updateBalance(
-                adminWallet.user_id,
-                adminWallet.balance
-            );
-            await uow.walletRepo.updateBalance(
-                clientWallet.user_id,
-                clientWallet.balance
-            );
+            await uow.walletRepo.updateBalance(adminWallet.user_id, adminWallet.balance);
+            await uow.walletRepo.updateBalance(clientWallet.user_id, clientWallet.balance);
 
             const adminTransaction = WalletTransaction.create({
                 amount: appointment.amount,

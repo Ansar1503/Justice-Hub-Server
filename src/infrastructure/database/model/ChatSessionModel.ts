@@ -1,20 +1,20 @@
 import mongoose, { Schema } from "mongoose";
 
 interface ChatParticipants {
-  lawyer_id: string;
-  client_id: string;
+    lawyer_id: string;
+    client_id: string;
 }
 
-export interface  IChatSessionModel extends Document {
-  _id: string;
-  name: string;
-  participants: ChatParticipants;
-  last_message: string;
-  session_id: string;
-  createdAt: Date;
-  updatedAt: Date;
+export interface IChatSessionModel extends Document {
+    _id: string;
+    name: string;
+    participants: ChatParticipants;
+    last_message: string;
+    session_id: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
- 
+
 const chatSessionSchema = new Schema<IChatSessionModel>(
     {
         _id: { type: String },
@@ -29,10 +29,7 @@ const chatSessionSchema = new Schema<IChatSessionModel>(
             required: false,
         },
     },
-    { timestamps: true }
+    { timestamps: true },
 );
 
-export const ChatModel = mongoose.model<IChatSessionModel>(
-    "ChatSession",
-    chatSessionSchema
-);
+export const ChatModel = mongoose.model<IChatSessionModel>("ChatSession", chatSessionSchema);

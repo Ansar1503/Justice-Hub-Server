@@ -2,42 +2,37 @@ import { v4 as uuidv4 } from "uuid";
 
 type PaymentStatus = "pending" | "success" | "failed";
 type AppointmentType = "consultation" | "follow-up";
-type AppointmentStatus =
-  | "pending"
-  | "confirmed"
-  | "completed"
-  | "cancelled"
-  | "rejected";
+type AppointmentStatus = "pending" | "confirmed" | "completed" | "cancelled" | "rejected";
 
 interface PersistedAppointmentProps {
-  id: string;
-  bookingId: string;
-  lawyer_id: string;
-  client_id: string;
-  caseId: string;
-  date: Date;
-  time: string;
-  duration: number;
-  reason: string;
-  amount: number;
-  payment_status: PaymentStatus;
-  type: AppointmentType;
-  status: AppointmentStatus;
-  createdAt: Date;
-  updatedAt: Date;
+    id: string;
+    bookingId: string;
+    lawyer_id: string;
+    client_id: string;
+    caseId: string;
+    date: Date;
+    time: string;
+    duration: number;
+    reason: string;
+    amount: number;
+    payment_status: PaymentStatus;
+    type: AppointmentType;
+    status: AppointmentStatus;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 interface CreateAppointmentProps {
-  lawyer_id: string;
-  client_id: string;
-  caseId: string;
-  date: Date;
-  payment_status: PaymentStatus;
-  time: string;
-  duration: number;
-  reason: string;
-  amount: number;
-  type: AppointmentType;
+    lawyer_id: string;
+    client_id: string;
+    caseId: string;
+    date: Date;
+    payment_status: PaymentStatus;
+    time: string;
+    duration: number;
+    reason: string;
+    amount: number;
+    type: AppointmentType;
 }
 
 export class Appointment {

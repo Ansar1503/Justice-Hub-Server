@@ -11,11 +11,7 @@ import { AddPracticeAreaUsecase } from "@src/application/usecases/PracitceAreas/
 export function AddPracticeAreasComposer(): IController {
     const usecase = new AddPracticeAreaUsecase(
         new PracticeAreaRepo(new PracticeAreaMapper()),
-        new SpecializationRepo(new SpecializationMapper())
+        new SpecializationRepo(new SpecializationMapper()),
     );
-    return new AddPracticeAreaController(
-        usecase,
-        new HttpSuccess(),
-        new HttpErrors()
-    );
+    return new AddPracticeAreaController(usecase, new HttpSuccess(), new HttpErrors());
 }

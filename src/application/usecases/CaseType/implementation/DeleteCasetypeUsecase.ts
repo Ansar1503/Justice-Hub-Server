@@ -1,6 +1,6 @@
 import { ICasetype } from "@domain/IRepository/ICasetype";
-import { IDeleteCasetypeUsecase } from "../IDeleteCasetypeUsecase";
 import { CaseTypeDto } from "@src/application/dtos/CaseType/CaseTypeDto";
+import { IDeleteCasetypeUsecase } from "../IDeleteCasetypeUsecase";
 
 export class DeleteCasetypeUsecase implements IDeleteCasetypeUsecase {
     constructor(private casetypeRepo: ICasetype) {}

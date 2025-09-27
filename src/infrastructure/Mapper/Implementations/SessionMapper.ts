@@ -1,6 +1,6 @@
 import { Session } from "@domain/entities/Session";
-import { IMapper } from "../IMapper";
 import { ISessionModel } from "@infrastructure/database/model/SessionModel";
+import { IMapper } from "../IMapper";
 
 export class SessionMapper implements IMapper<Session, ISessionModel> {
     toDomain(persistence: ISessionModel): Session {

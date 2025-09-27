@@ -1,7 +1,6 @@
 import { Session } from "@domain/entities/Session";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
-import SessionModel, { ISessionModel } from "../model/SessionModel";
 import {
     FetchSessionsInputDto,
     FetchSessionsOutputtDto,
@@ -9,28 +8,29 @@ import {
 } from "@src/application/dtos/sessions/FetchSessionsDto";
 import { SessionMapper } from "@infrastructure/Mapper/Implementations/SessionMapper";
 import { ClientSession } from "mongoose";
+import SessionModel, { ISessionModel } from "../model/SessionModel";
 
 export class SessionsRepository implements ISessionsRepo {
     constructor(
-    private mapper: IMapper<Session, ISessionModel> = new SessionMapper(),
-    private clientSession?: ClientSession
+        private mapper: IMapper<Session, ISessionModel> = new SessionMapper(),
+        private clientSession?: ClientSession,
     ) {}
     async aggregate(payload: {
-    user_id: string;
-    role: "lawyer" | "client";
-    search: string;
-    sort: "name" | "date" | "amount" | "created_at";
-    order: "asc" | "desc";
-    status?: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
-    consultation_type?: "consultation" | "follow-up";
-    page: number;
-    limit: number;
-  }): Promise<{
-    data: any;
-    totalCount: number;
-    currentPage: number;
-    totalPage: number;
-  }> {
+        user_id: string;
+        role: "lawyer" | "client";
+        search: string;
+        sort: "name" | "date" | "amount" | "created_at";
+        order: "asc" | "desc";
+        status?: "upcoming" | "ongoing" | "completed" | "cancelled" | "missed";
+        consultation_type?: "consultation" | "follow-up";
+        page: number;
+        limit: number;
+    }): Promise<{
+        data: any;
+        totalCount: number;
+        currentPage: number;
+        totalPage: number;
+    }> {
         const {
             page = 1,
             limit = 10,
@@ -58,18 +58,10 @@ export class SessionsRepository implements ISessionsRepo {
         } else {
             sortStage["created_at"] = order === "asc" ? 1 : -1;
         }
-        if (
-            status &&
-      ["upcoming", "ongoing", "completed", "cancelled", "missed"].includes(
-          status
-      )
-        ) {
+        if (status && ["upcoming", "ongoing", "completed", "cancelled", "missed"].includes(status)) {
             matchStage["status"] = status;
         }
-        if (
-            consultation_type &&
-      ["consultation", "follow-up"].includes(consultation_type)
-        ) {
+        if (consultation_type && ["consultation", "follow-up"].includes(consultation_type)) {
             matchStage["type"] = consultation_type;
         }
         const countPipeline: any[] = [{ $match: matchStage }];
@@ -154,7 +146,7 @@ export class SessionsRepository implements ISessionsRepo {
             { $project: { "userData.password": 0 } },
             { $sort: sortStage },
             { $skip: (page - 1) * limit },
-            { $limit: limit }
+            { $limit: limit },
         );
 
         countPipeline.push({ $count: "total" });
@@ -182,22 +174,22 @@ export class SessionsRepository implements ISessionsRepo {
         return this.mapper.toDomain(savedSession);
     }
     async update(payload: {
-    end_time?: Date;
-    client_joined_at?: Date;
-    client_left_at?: Date;
-    lawyer_left_at?: Date;
-    end_reason?: string;
-    callDuration?: number;
-    lawyer_joined_at?: Date;
-    start_time?: Date;
-    room_id?: string;
-    session_id: string;
-    status?: Session["status"];
-    notes?: string;
-    summary?: string;
-    follow_up_suggested?: boolean;
-    follow_up_session_id?: string;
-  }): Promise<Session | null> {
+        end_time?: Date;
+        client_joined_at?: Date;
+        client_left_at?: Date;
+        lawyer_left_at?: Date;
+        end_reason?: string;
+        callDuration?: number;
+        lawyer_joined_at?: Date;
+        start_time?: Date;
+        room_id?: string;
+        session_id: string;
+        status?: Session["status"];
+        notes?: string;
+        summary?: string;
+        follow_up_suggested?: boolean;
+        follow_up_session_id?: string;
+    }): Promise<Session | null> {
         const update: any = {};
         if (payload.status) {
             update.status = payload.status;
@@ -249,7 +241,7 @@ export class SessionsRepository implements ISessionsRepo {
                 _id: payload.session_id,
             },
             { $set: update },
-            { new: true, session: this.clientSession }
+            { new: true, session: this.clientSession },
         );
 
         return sessions ? this.mapper.toDomain(sessions) : null;
@@ -258,19 +250,8 @@ export class SessionsRepository implements ISessionsRepo {
         const sessions = await SessionModel.findById(payload.session_id);
         return sessions ? this.mapper.toDomain(sessions) : null;
     }
-    async findSessionsAggregate(
-        payload: FetchSessionsInputDto
-    ): Promise<FetchSessionsOutputtDto> {
-        const {
-            search,
-            limit,
-            page,
-            sortBy,
-            sortOrder,
-            status,
-            consultation_type,
-            user_id,
-        } = payload;
+    async findSessionsAggregate(payload: FetchSessionsInputDto): Promise<FetchSessionsOutputtDto> {
+        const { search, limit, page, sortBy, sortOrder, status, consultation_type, user_id } = payload;
         const skip = (page - 1) * limit;
         const order = sortOrder === "asc" ? 1 : -1;
 
@@ -469,11 +450,7 @@ export class SessionsRepository implements ISessionsRepo {
                 { $skip: skip },
                 { $limit: limit },
             ]),
-            SessionModel.aggregate([
-                ...pipeline,
-                { $match: matchStage2 },
-                { $count: "total" },
-            ]),
+            SessionModel.aggregate([...pipeline, { $match: matchStage2 }, { $count: "total" }]),
         ]);
 
         const totalCount = countResult[0]?.total || 0;

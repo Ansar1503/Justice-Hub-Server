@@ -18,11 +18,7 @@ export function minutesToTimeString(minutes: number): string {
     return `${hoursStr}:${minsStr}`;
 }
 
-export function generateTimeSlots(
-    start: string,
-    end: string,
-    duration: number
-): string[] {
+export function generateTimeSlots(start: string, end: string, duration: number): string[] {
     const slots: string[] = [];
 
     const [startHour, startMinute] = start.split(":").map(Number);

@@ -11,11 +11,7 @@ import { DeleteSpecializationUsecase } from "@src/application/usecases/Specializ
 export function DeleteSpecializationComposer(): IController {
     const usecase = new DeleteSpecializationUsecase(
         new SpecializationRepo(new SpecializationMapper()),
-        new PracticeAreaRepo(new PracticeAreaMapper())
+        new PracticeAreaRepo(new PracticeAreaMapper()),
     );
-    return new DeleteSpecializationController(
-        usecase,
-        new HttpErrors(),
-        new HttpSuccess()
-    );
+    return new DeleteSpecializationController(usecase, new HttpErrors(), new HttpSuccess());
 }

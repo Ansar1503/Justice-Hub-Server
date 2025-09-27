@@ -1,6 +1,6 @@
 import { CallLogs } from "@domain/entities/CallLogs";
-import { IMapper } from "../IMapper";
 import { IcallLogModel } from "@infrastructure/database/model/CallLogsModel";
+import { IMapper } from "../IMapper";
 
 export class CallLogsMapper implements IMapper<CallLogs, IcallLogModel> {
     toDomain(persistence: IcallLogModel): CallLogs {

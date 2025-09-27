@@ -1,6 +1,6 @@
 import { Disputes } from "@domain/entities/Disputes";
-import { IMapper } from "../IMapper";
 import { IDisputesModel } from "@infrastructure/database/model/DisputesModel";
+import { IMapper } from "../IMapper";
 
 export class DisputesMapper implements IMapper<Disputes, IDisputesModel> {
     toDomain(persistence: IDisputesModel): Disputes {

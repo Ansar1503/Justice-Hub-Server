@@ -1,6 +1,6 @@
 import { Wallet } from "@domain/entities/Wallet";
-import { IMapper } from "../IMapper";
 import { IWalletModel } from "@infrastructure/database/model/WalletModel";
+import { IMapper } from "../IMapper";
 
 export class WalletMapper implements IMapper<Wallet, IWalletModel> {
     toDomain(persistence: IWalletModel): Wallet {

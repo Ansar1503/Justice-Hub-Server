@@ -1,10 +1,8 @@
 import { PracticeArea } from "@domain/entities/PracticeArea";
-import { IMapper } from "../IMapper";
 import { IPracticeareaModel } from "@infrastructure/database/model/PracticeAreaModel";
+import { IMapper } from "../IMapper";
 
-export class PracticeAreaMapper
-implements IMapper<PracticeArea, IPracticeareaModel>
-{
+export class PracticeAreaMapper implements IMapper<PracticeArea, IPracticeareaModel> {
     toDomain(persistence: IPracticeareaModel): PracticeArea {
         return PracticeArea.fromPersisted({
             createdAt: persistence.createdAt,

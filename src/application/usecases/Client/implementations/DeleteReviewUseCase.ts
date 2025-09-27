@@ -1,14 +1,12 @@
 import { UpdateReviewOutputDto } from "@src/application/dtos/client/UpdateReviewDto";
-import { IDeleteReviewUseCase } from "../IDeleteReviewUseCase";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { IReviewRepo } from "@domain/IRepository/IReviewRepo";
+import { IDeleteReviewUseCase } from "../IDeleteReviewUseCase";
 
 export class DelereReviewUseCase implements IDeleteReviewUseCase {
     constructor(private reviewRepository: IReviewRepo) {}
     async execute(input: { review_id: string }): Promise<UpdateReviewOutputDto> {
-        const deletingReview = await this.reviewRepository.findByReview_id(
-            input.review_id
-        );
+        const deletingReview = await this.reviewRepository.findByReview_id(input.review_id);
         if (!deletingReview) throw new ValidationError("review not found");
         deletingReview.deleteReview();
         await this.reviewRepository.update({

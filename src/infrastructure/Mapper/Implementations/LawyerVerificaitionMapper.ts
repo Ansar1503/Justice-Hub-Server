@@ -1,10 +1,8 @@
 import { LawyerVerification } from "@domain/entities/LawyerVerification";
-import { IMapper } from "../IMapper";
 import { ILawyerVerificationModel } from "@infrastructure/database/model/LawyerVerificaitionModel";
+import { IMapper } from "../IMapper";
 
-export class LawyerVerificationMapper
-implements IMapper<LawyerVerification, ILawyerVerificationModel>
-{
+export class LawyerVerificationMapper implements IMapper<LawyerVerification, ILawyerVerificationModel> {
     toDomain(persistence: ILawyerVerificationModel): LawyerVerification {
         return LawyerVerification.fromPersistence({
             id: persistence._id,

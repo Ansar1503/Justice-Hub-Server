@@ -5,4 +5,4 @@ import {
 import { IUseCase } from "../IUseCases/IUseCase";
 
 export interface IFetchAppointmentsClientUseCase
-  extends IUseCase<FetchAppointmentsInputDto, FetchAppointmentsOutputDto> {}
+    extends IUseCase<FetchAppointmentsInputDto, FetchAppointmentsOutputDto> {}
