@@ -7,9 +7,14 @@ interface DocumentItem {
 export interface CaseDocumentDto {
   id: string;
   caseId: string;
-  clientId?: string;
-  lawyerId?: string;
+  uploadedBy: string;
   document: DocumentItem;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface UploadDocumentInputDto {
+  caseId: string;
+  uploadedBy: string;
+  document: DocumentItem;
 }

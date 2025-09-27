@@ -9,8 +9,7 @@ export interface DocumentItem {
 export interface PersistedCaseDocumentProps {
   id: string;
   caseId: string;
-  clientId?: string;
-  lawyerId?: string;
+  uploadedBy: string;
   document: DocumentItem;
   createdAt: Date;
   updatedAt: Date;
@@ -18,16 +17,14 @@ export interface PersistedCaseDocumentProps {
 
 export interface CreateCaseDocumentProps {
   caseId: string;
-  clientId?: string;
-  lawyerId?: string;
+  uploadedBy: string;
   document: DocumentItem;
 }
 
 export class CaseDocument {
   private _id: string;
   private _caseId: string;
-  private _clientId?: string;
-  private _lawyerId?: string;
+  private _uploadedBy: string;
   private _document: DocumentItem;
   private _createdAt: Date;
   private _updatedAt: Date;
@@ -35,8 +32,7 @@ export class CaseDocument {
   private constructor(props: PersistedCaseDocumentProps) {
     this._id = props.id;
     this._caseId = props.caseId;
-    this._clientId = props.clientId;
-    this._lawyerId = props.lawyerId;
+    this._uploadedBy = props.uploadedBy;
     this._document = props.document;
     this._createdAt = props.createdAt;
     this._updatedAt = props.updatedAt;
@@ -47,8 +43,7 @@ export class CaseDocument {
     return new CaseDocument({
       id: uuidv4(),
       caseId: props.caseId,
-      clientId: props.clientId,
-      lawyerId: props.lawyerId,
+      uploadedBy: props.uploadedBy,
       document: props.document,
       createdAt: now,
       updatedAt: now,
@@ -68,12 +63,8 @@ export class CaseDocument {
     return this._caseId;
   }
 
-  get clientId(): string | undefined {
-    return this._clientId;
-  }
-
-  get lawyerId(): string | undefined {
-    return this._lawyerId;
+  get uploadedBy() {
+    return this._uploadedBy;
   }
 
   get document(): DocumentItem {
@@ -88,7 +79,6 @@ export class CaseDocument {
     return this._updatedAt;
   }
 
-  // Business methods
   updateDocument(newDoc: DocumentItem): void {
     this._document = newDoc;
     this.touch();

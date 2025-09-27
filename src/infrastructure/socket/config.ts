@@ -1,5 +1,5 @@
 import { Server as HTTPServer } from "http";
-import { Server as SocketIOServer, Socket, ExtendedError } from "socket.io";
+import { Server as SocketIOServer } from "socket.io";
 import "dotenv/config";
 import { authenticateClientSocket } from "../../interfaces/middelwares/socket/client.socket.auth";
 
@@ -10,7 +10,7 @@ export function InitialiseSocketServer(server: HTTPServer): SocketIOServer {
       origin: [
         `${FRONTEND_URL}`,
         "http://localhost:4000",
-        "https://myapp.loca.lt/",
+        "https://c6cfac23a22c.ngrok-free.app",
       ],
       credentials: true,
       methods: ["GET", "POST"],

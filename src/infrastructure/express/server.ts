@@ -31,7 +31,10 @@ const rateLimiter = rateLimit({
 connectDB();
 app.use(
   cors({
-    origin: [`${process.env.FRONTEND_URL}`],
+    origin: [
+      `${process.env.FRONTEND_URL}`,
+      "https://c6cfac23a22c.ngrok-free.app",
+    ],
     methods: ["PUT", "POST", "GET", "PATCH", "DELETE"],
     credentials: true,
   })

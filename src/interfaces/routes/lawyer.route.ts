@@ -34,6 +34,7 @@ import { SendMessageFileComposer } from "@infrastructure/services/composers/Clie
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 import {
   CasesRoutes,
+  ClientRoutes,
   CommonParamsRoute,
   LawyerRoutes,
   PracticeAreaRoutes,
@@ -54,6 +55,7 @@ import { FindAllCasesByQueryComposer } from "@infrastructure/services/composers/
 import { FindCaseDetailsComposer } from "@infrastructure/services/composers/Cases/FindCaseDetailsComposer";
 import { FindAppointmentByCaseComposer } from "@infrastructure/services/composers/Appointments/FindAppointmentByCaseComposer";
 import { FindSessionsByCaseComposer } from "@infrastructure/services/composers/Sessions/FindSessionsByCase";
+import { FetchProfileImageComposer } from "@infrastructure/services/composers/Client/Profile/FetchProfileImageComposer";
 
 const upload = multer({ storage: documentstorage });
 const chatFile = multer({
@@ -469,6 +471,16 @@ router.get(
   authenticateLawyer,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FindSessionsByCaseComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+router.get(
+  ClientRoutes.profile.base + ClientRoutes.profile.image,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchProfileImageComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }
