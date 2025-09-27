@@ -7,9 +7,9 @@ import { IController } from "@interfaces/controller/Interface/IController";
 import { CancelAppointmentUseCase } from "@src/application/usecases/Client/implementations/CancelAppointmentUseCase";
 
 export function CancelAppointmentComposer(): IController {
-  const useCase = new CancelAppointmentUseCase(
-    new AppointmentsRepository(),
-    new MongoUnitofWork()
-  );
-  return new CancelAppointmentController(useCase);
+    const useCase = new CancelAppointmentUseCase(
+        new AppointmentsRepository(),
+        new MongoUnitofWork()
+    );
+    return new CancelAppointmentController(useCase);
 }

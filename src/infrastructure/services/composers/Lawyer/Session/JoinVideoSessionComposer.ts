@@ -5,9 +5,9 @@ import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
 import { AppointmentsRepository } from "@infrastructure/database/repo/AppointmentsRepo";
 
 export function JoinVideoSessionComposer(): IController {
-  const usecase = new JoinSessionUseCase(
-    new SessionsRepository(),
-    new AppointmentsRepository()
-  );
-  return new JoinVideoSessionController(usecase);
+    const usecase = new JoinSessionUseCase(
+        new SessionsRepository(),
+        new AppointmentsRepository()
+    );
+    return new JoinVideoSessionController(usecase);
 }

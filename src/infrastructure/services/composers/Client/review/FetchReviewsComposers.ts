@@ -4,6 +4,6 @@ import { FetchReviewUseCase } from "@src/application/usecases/Client/implementat
 import { ReviewRepo } from "@infrastructure/database/repo/ReviewRepo";
 
 export function FetchReviewsComposer(): IController {
-  const usecase = new FetchReviewUseCase(new ReviewRepo());
-  return new FetchReviewsController(usecase);
+    const usecase = new FetchReviewUseCase(new ReviewRepo());
+    return new FetchReviewsController(usecase);
 }

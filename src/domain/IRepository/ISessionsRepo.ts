@@ -1,7 +1,7 @@
 import {
-  FetchSessionsInputDto,
-  FetchSessionsOutputtDto,
-  SessionData,
+    FetchSessionsInputDto,
+    FetchSessionsOutputtDto,
+    SessionData,
 } from "@src/application/dtos/sessions/FetchSessionsDto";
 import { Session } from "../entities/Session";
 

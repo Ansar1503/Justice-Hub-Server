@@ -1,11 +1,11 @@
 import {
-  FetchReviewInputDto,
-  FetchReviewOutputDto,
+    FetchReviewInputDto,
+    FetchReviewOutputDto,
 } from "@src/application/dtos/Reviews/review.dto";
 import { Review } from "../entities/Review";
 import {
-  FetchReviewsBySessionOutputDto,
-  FetchReviewsOutputDto,
+    FetchReviewsBySessionOutputDto,
+    FetchReviewsOutputDto,
 } from "@src/application/dtos/client/FetchReviewDto";
 export interface IReviewRepo {
   create(payload: Review): Promise<Review>;

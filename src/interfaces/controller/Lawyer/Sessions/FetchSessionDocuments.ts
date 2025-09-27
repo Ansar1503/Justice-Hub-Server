@@ -8,35 +8,35 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IFetchSessionDocumentsUseCase } from "@src/application/usecases/Lawyer/IFetchSessionDocumentsUseCase";
 
 export class FetchSessionsDocumentsController implements IController {
-  constructor(
+    constructor(
     private fetchSessionDocuments: IFetchSessionDocumentsUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
-  ) {}
-  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    let session_id: string = "";
-    if (
-      httpRequest.params &&
+    ) {}
+    async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+        let session_id: string = "";
+        if (
+            httpRequest.params &&
       typeof httpRequest.params === "object" &&
       "id" in httpRequest.params
-    ) {
-      session_id = String(httpRequest.params.id);
+        ) {
+            session_id = String(httpRequest.params.id);
+        }
+        if (!session_id) {
+            return this.httpErrors.error_400("session id is required");
+        }
+        try {
+            const result = await this.fetchSessionDocuments.execute(session_id);
+            return this.httpSuccess.success_200({
+                success: true,
+                message: "document fetched successfully",
+                data: result,
+            });
+        } catch (error) {
+            if (error instanceof Error) {
+                return this.httpErrors.error_500(error.message);
+            }
+            return this.httpErrors.error_500();
+        }
     }
-    if (!session_id) {
-      return this.httpErrors.error_400("session id is required");
-    }
-    try {
-      const result = await this.fetchSessionDocuments.execute(session_id);
-      return this.httpSuccess.success_200({
-        success: true,
-        message: "document fetched successfully",
-        data: result,
-      });
-    } catch (error) {
-      if (error instanceof Error) {
-        return this.httpErrors.error_500(error.message);
-      }
-      return this.httpErrors.error_500();
-    }
-  }
 }

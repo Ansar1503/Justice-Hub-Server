@@ -4,8 +4,8 @@ import { Session } from "../../../domain/entities/Session";
 import { ChatMessage } from "@domain/entities/ChatMessage";
 import { FetchChatSessionOutPutDto } from "@src/application/dtos/chats/fetchChatsDto";
 import {
-  ChatMessageInputDto,
-  ChatMessageOutputDto,
+    ChatMessageInputDto,
+    ChatMessageOutputDto,
 } from "@src/application/dtos/chats/ChatMessageDto";
 
 export interface IChatusecase {

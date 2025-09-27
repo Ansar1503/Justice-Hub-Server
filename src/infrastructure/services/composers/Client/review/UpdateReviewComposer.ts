@@ -4,6 +4,6 @@ import { UpdateReviewUseCase } from "@src/application/usecases/Client/implementa
 import { ReviewRepo } from "@infrastructure/database/repo/ReviewRepo";
 
 export function UpdateReviewsComposer(): IController {
-  const usecase = new UpdateReviewUseCase(new ReviewRepo());
-  return new UpdateReviewsController(usecase);
+    const usecase = new UpdateReviewUseCase(new ReviewRepo());
+    return new UpdateReviewsController(usecase);
 }

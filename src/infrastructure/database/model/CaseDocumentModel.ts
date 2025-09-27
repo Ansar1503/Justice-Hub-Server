@@ -17,29 +17,29 @@ export interface ICaseDocumentModel extends Document {
 }
 
 const DocumentItemSchema = new Schema<DocumentItem>(
-  {
-    name: { type: String, required: true },
-    type: { type: String, required: true },
-    url: { type: String, required: true },
-  },
-  { _id: false }
+    {
+        name: { type: String, required: true },
+        type: { type: String, required: true },
+        url: { type: String, required: true },
+    },
+    { _id: false }
 );
 
 const caseDocumentSchema = new Schema<ICaseDocumentModel>(
-  {
-    _id: {
-      type: String,
-      default: () => new mongoose.Types.ObjectId().toString(),
+    {
+        _id: {
+            type: String,
+            default: () => new mongoose.Types.ObjectId().toString(),
+        },
+        caseId: { type: String, required: true, ref: "cases" },
+        clientId: { type: String, ref: "clients" },
+        lawyerId: { type: String, ref: "lawyers" },
+        document: { type: DocumentItemSchema, required: true },
     },
-    caseId: { type: String, required: true, ref: "cases" },
-    clientId: { type: String, ref: "clients" },
-    lawyerId: { type: String, ref: "lawyers" },
-    document: { type: DocumentItemSchema, required: true },
-  },
-  { timestamps: true }
+    { timestamps: true }
 );
 
 export default mongoose.model<ICaseDocumentModel>(
-  "caseDocuments",
-  caseDocumentSchema
+    "caseDocuments",
+    caseDocumentSchema
 );

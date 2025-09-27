@@ -1,11 +1,11 @@
 import {
-  FetchReviewDisputesInputDto,
-  FetchReviewDisputesOutputDto,
+    FetchReviewDisputesInputDto,
+    FetchReviewDisputesOutputDto,
 } from "@src/application/dtos/Admin/FetchReviewDisputesDto";
 import { Disputes } from "../entities/Disputes";
 import {
-  FetchChatDisputesInputDto,
-  FetchChatDisputesOutputDto,
+    FetchChatDisputesInputDto,
+    FetchChatDisputesOutputDto,
 } from "@src/application/dtos/Admin/FetchChatDisputesDto";
 
 export interface IDisputes {

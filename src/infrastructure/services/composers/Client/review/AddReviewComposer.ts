@@ -7,10 +7,10 @@ import { LawyerVerificationRepo } from "@infrastructure/database/repo/LawyerVeri
 import { LawyerVerificationMapper } from "@infrastructure/Mapper/Implementations/LawyerVerificaitionMapper";
 
 export function AddReviewComposer(): IController {
-  const usecase = new AddReviewUseCase(
-    new UserRepository(),
-    new LawyerVerificationRepo(new LawyerVerificationMapper()),
-    new ReviewRepo()
-  );
-  return new AddReviewController(usecase);
+    const usecase = new AddReviewUseCase(
+        new UserRepository(),
+        new LawyerVerificationRepo(new LawyerVerificationMapper()),
+        new ReviewRepo()
+    );
+    return new AddReviewController(usecase);
 }

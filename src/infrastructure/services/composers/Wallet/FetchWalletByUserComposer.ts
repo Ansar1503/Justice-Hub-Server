@@ -4,6 +4,6 @@ import { FetchWalletByUserController } from "@interfaces/controller/wallet/Fetch
 import { FetchWalletByUser } from "@src/application/usecases/Wallet/implementation/FetchWalletByUser";
 
 export function FetchWalletByUserComposer(): IController {
-  const usecase = new FetchWalletByUser(new WalletRepo());
-  return new FetchWalletByUserController(usecase);
+    const usecase = new FetchWalletByUser(new WalletRepo());
+    return new FetchWalletByUserController(usecase);
 }

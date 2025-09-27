@@ -7,12 +7,12 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { DeletePracticeAreaUsecase } from "@src/application/usecases/PracitceAreas/Implementation/DeletePracticeAreaUsecase";
 
 export function DeletePracticeAreaComposer(): IController {
-  const usecase = new DeletePracticeAreaUsecase(
-    new PracticeAreaRepo(new PracticeAreaMapper())
-  );
-  return new DeletePracticeAreaController(
-    usecase,
-    new HttpSuccess(),
-    new HttpErrors()
-  );
+    const usecase = new DeletePracticeAreaUsecase(
+        new PracticeAreaRepo(new PracticeAreaMapper())
+    );
+    return new DeletePracticeAreaController(
+        usecase,
+        new HttpSuccess(),
+        new HttpErrors()
+    );
 }

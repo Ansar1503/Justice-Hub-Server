@@ -7,12 +7,12 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { FindAllpracticeAreasUsecase } from "@src/application/usecases/PracitceAreas/Implementation/FindAllPracticeAreasUsecase";
 
 export function FindAllPracticeAreaComposer(): IController {
-  const usecase = new FindAllpracticeAreasUsecase(
-    new PracticeAreaRepo(new PracticeAreaMapper())
-  );
-  return new FindAllPracticeAreasController(
-    usecase,
-    new HttpSuccess(),
-    new HttpErrors()
-  );
+    const usecase = new FindAllpracticeAreasUsecase(
+        new PracticeAreaRepo(new PracticeAreaMapper())
+    );
+    return new FindAllPracticeAreasController(
+        usecase,
+        new HttpSuccess(),
+        new HttpErrors()
+    );
 }

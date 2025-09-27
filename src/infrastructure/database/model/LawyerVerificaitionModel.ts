@@ -20,25 +20,25 @@ export interface ILawyerVerificationModel extends Document {
 }
 
 const LawyerVerificationSchema = new Schema<ILawyerVerificationModel>(
-  {
-    _id: { type: String },
-    userId: { type: String, required: true, unique: true },
-    barCouncilNumber: { type: String },
-    enrollmentCertificateNumber: { type: String },
-    certificateOfPracticeNumber: { type: String },
-    verificationStatus: {
-      type: String,
-      enum: ["verified", "rejected", "pending", "requested"],
-      default: "pending",
-      required: true,
+    {
+        _id: { type: String },
+        userId: { type: String, required: true, unique: true },
+        barCouncilNumber: { type: String },
+        enrollmentCertificateNumber: { type: String },
+        certificateOfPracticeNumber: { type: String },
+        verificationStatus: {
+            type: String,
+            enum: ["verified", "rejected", "pending", "requested"],
+            default: "pending",
+            required: true,
+        },
+        rejectReason: { type: String },
+        documents: { type: String, ref: "lawyerdocuments" },
     },
-    rejectReason: { type: String },
-    documents: { type: String, ref: "lawyerdocuments" },
-  },
-  { timestamps: true }
+    { timestamps: true }
 );
 
 export default mongoose.model<ILawyerVerificationModel>(
-  "LawyerVerification",
-  LawyerVerificationSchema
+    "LawyerVerification",
+    LawyerVerificationSchema
 );

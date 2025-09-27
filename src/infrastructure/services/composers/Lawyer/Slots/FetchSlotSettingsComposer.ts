@@ -4,7 +4,7 @@ import { FetchSlotSettingsUseCase } from "@src/application/usecases/Lawyer/imple
 import { ScheduleSettingsRepository } from "@infrastructure/database/repo/ScheduleSettingsRepo";
 
 export function FetchSlotSettingsComposer(): IController {
-  const slotSettingsRepo = new ScheduleSettingsRepository();
-  const usecase = new FetchSlotSettingsUseCase(slotSettingsRepo);
-  return new FetchSlotSettingsController(usecase);
+    const slotSettingsRepo = new ScheduleSettingsRepository();
+    const usecase = new FetchSlotSettingsUseCase(slotSettingsRepo);
+    return new FetchSlotSettingsController(usecase);
 }

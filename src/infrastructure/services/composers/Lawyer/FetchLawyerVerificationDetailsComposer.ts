@@ -7,12 +7,12 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { FetchLawyerVerificationDetailsUsecase } from "@src/application/usecases/Lawyer/implementations/FetchLawyerVerificationDetailsUsecase";
 
 export function FetchLawyerVerificationDetailsComposer(): IController {
-  const usecase = new FetchLawyerVerificationDetailsUsecase(
-    new LawyerVerificationRepo(new LawyerVerificationMapper())
-  );
-  return new FetchLawyersVerificationDataController(
-    usecase,
-    new HttpErrors(),
-    new HttpSuccess()
-  );
+    const usecase = new FetchLawyerVerificationDetailsUsecase(
+        new LawyerVerificationRepo(new LawyerVerificationMapper())
+    );
+    return new FetchLawyersVerificationDataController(
+        usecase,
+        new HttpErrors(),
+        new HttpSuccess()
+    );
 }

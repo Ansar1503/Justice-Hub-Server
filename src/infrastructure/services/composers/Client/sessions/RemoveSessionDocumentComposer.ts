@@ -5,9 +5,9 @@ import { SessionDocumentsRepository } from "@infrastructure/database/repo/Sessio
 import { CloudinaryService } from "@src/application/services/cloudinary.service";
 
 export function RemoveSessionDocumentComposer(): IController {
-  const usecase = new RemoveSessionDocumentsUseCase(
-    new SessionDocumentsRepository(),
-    new CloudinaryService()
-  );
-  return new RemoveSessionDocumentController(usecase);
+    const usecase = new RemoveSessionDocumentsUseCase(
+        new SessionDocumentsRepository(),
+        new CloudinaryService()
+    );
+    return new RemoveSessionDocumentController(usecase);
 }

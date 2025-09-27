@@ -8,42 +8,42 @@ import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IFetchSlotSettingsUseCase } from "@src/application/usecases/Lawyer/IFetchSlotSettingsUseCase";
 
 export class FetchSlotSettingsController implements IController {
-  constructor(
+    constructor(
     private slotSettings: IFetchSlotSettingsUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
-  ) {}
-  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    let user_id: string = "";
-    if (
-      httpRequest.params &&
+    ) {}
+    async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+        let user_id: string = "";
+        if (
+            httpRequest.params &&
       typeof httpRequest.params === "object" &&
       "id" in httpRequest.params
-    ) {
-      user_id = String(httpRequest.params.id);
-    } else if (
-      httpRequest.user &&
+        ) {
+            user_id = String(httpRequest.params.id);
+        } else if (
+            httpRequest.user &&
       typeof httpRequest.user === "object" &&
       "id" in httpRequest.user
-    ) {
-      user_id = String(httpRequest.user.id);
+        ) {
+            user_id = String(httpRequest.user.id);
+        }
+        if (!user_id) {
+            return this.httpErrors.error_400("User_id Not found");
+        }
+        try {
+            const response = await this.slotSettings.execute(user_id);
+            return this.httpSuccess.success_200({
+                success: true,
+                message: "data fetched",
+                data: response || {},
+            });
+        } catch (error) {
+            console.log("error in fetching slot Settings: ", error);
+            if (error instanceof Error) {
+                return this.httpErrors.error_500(error.message);
+            }
+            return this.httpErrors.error_500();
+        }
     }
-    if (!user_id) {
-      return this.httpErrors.error_400("User_id Not found");
-    }
-    try {
-      const response = await this.slotSettings.execute(user_id);
-      return this.httpSuccess.success_200({
-        success: true,
-        message: "data fetched",
-        data: response || {},
-      });
-    } catch (error) {
-      console.log("error in fetching slot Settings: ", error);
-      if (error instanceof Error) {
-        return this.httpErrors.error_500(error.message);
-      }
-      return this.httpErrors.error_500();
-    }
-  }
 }

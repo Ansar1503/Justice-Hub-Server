@@ -1,6 +1,6 @@
 import {
-  FetchSpecializationInputDto,
-  FetchSpecializationOutputDto,
+    FetchSpecializationInputDto,
+    FetchSpecializationOutputDto,
 } from "@src/application/dtos/Specializations/FetchSpecializationDto";
 import { IUseCase } from "../IUseCases/IUseCase";
 

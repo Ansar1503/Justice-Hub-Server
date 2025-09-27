@@ -7,11 +7,11 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { FindPracticeAreasBySpecIdsUsecase } from "@src/application/usecases/PracitceAreas/Implementation/FindPacticeAreasBySpecIdsUsecase";
 
 export function FindPracticeAreasBySpecIdsComposer(): IController {
-  const practiceAreaRepo = new PracticeAreaRepo(new PracticeAreaMapper());
-  const usecase = new FindPracticeAreasBySpecIdsUsecase(practiceAreaRepo);
-  return new FindPracticeAreasBySpecIds(
-    usecase,
-    new HttpErrors(),
-    new HttpSuccess()
-  );
+    const practiceAreaRepo = new PracticeAreaRepo(new PracticeAreaMapper());
+    const usecase = new FindPracticeAreasBySpecIdsUsecase(practiceAreaRepo);
+    return new FindPracticeAreasBySpecIds(
+        usecase,
+        new HttpErrors(),
+        new HttpSuccess()
+    );
 }

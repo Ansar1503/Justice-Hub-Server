@@ -7,11 +7,11 @@ import { IController } from "@interfaces/controller/Interface/IController";
 import { ChatUseCase } from "@src/application/usecases/chat.usecase";
 
 export function GetMessagesComposer(): IController {
-  const usecase = new ChatUseCase(
-    new ChatSessionRepository(),
-    new ChatMessageRepository(),
-    new SessionsRepository(),
-    new DisputesRepo()
-  );
-  return new GetMessages(usecase);
+    const usecase = new ChatUseCase(
+        new ChatSessionRepository(),
+        new ChatMessageRepository(),
+        new SessionsRepository(),
+        new DisputesRepo()
+    );
+    return new GetMessages(usecase);
 }

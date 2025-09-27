@@ -1,7 +1,7 @@
 import {
-  appointmentOutputDto,
-  FetchAppointmentsInputDto,
-  FetchAppointmentsOutputDto,
+    appointmentOutputDto,
+    FetchAppointmentsInputDto,
+    FetchAppointmentsOutputDto,
 } from "@src/application/dtos/Appointments/FetchAppointmentsDto";
 import { Appointment } from "../entities/Appointment";
 import { Client } from "../entities/Client";

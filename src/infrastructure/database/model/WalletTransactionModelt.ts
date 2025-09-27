@@ -21,27 +21,27 @@ export interface IWalletTransactionModel extends Document {
 }
 
 const walletTransactionSchema = new Schema<IWalletTransactionModel>(
-  {
-    _id: { type: String },
-    walletId: { type: String, required: true, ref: "wallets" },
-    amount: { type: Number, required: true },
-    type: { type: String, required: true, enum: ["debit", "credit"] },
-    description: { type: String, required: true },
-    category: {
-      type: String,
-      required: true,
-      enum: ["deposit", "withdrawal", "payment", "refund", "transfer"],
+    {
+        _id: { type: String },
+        walletId: { type: String, required: true, ref: "wallets" },
+        amount: { type: Number, required: true },
+        type: { type: String, required: true, enum: ["debit", "credit"] },
+        description: { type: String, required: true },
+        category: {
+            type: String,
+            required: true,
+            enum: ["deposit", "withdrawal", "payment", "refund", "transfer"],
+        },
+        status: {
+            type: String,
+            required: true,
+            enum: ["pending", "completed", "failed", "cancelled"],
+        },
     },
-    status: {
-      type: String,
-      required: true,
-      enum: ["pending", "completed", "failed", "cancelled"],
-    },
-  },
-  { timestamps: true }
+    { timestamps: true }
 );
 
 export const walletTransactionModel = mongoose.model<IWalletTransactionModel>(
-  "transactions",
-  walletTransactionSchema
+    "transactions",
+    walletTransactionSchema
 );

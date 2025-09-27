@@ -4,6 +4,6 @@ import { UpdateNotificationStatusController } from "@interfaces/controller/Notif
 import { UpdateNotificationStatus } from "@src/application/usecases/Notification/implementation/UpdateNotificationStatus";
 
 export function UpdateNotificationStatusComposer(): IController {
-  const usecase = new UpdateNotificationStatus(new NotificationRepository());
-  return new UpdateNotificationStatusController(usecase);
+    const usecase = new UpdateNotificationStatus(new NotificationRepository());
+    return new UpdateNotificationStatusController(usecase);
 }

@@ -4,6 +4,6 @@ import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
 import { FetchSessionsUseCase } from "@src/application/usecases/Client/implementations/FetchSessionsUseCase";
 
 export function FetchSessionsComposer(): IController {
-  const usecase = new FetchSessionsUseCase(new SessionsRepository());
-  return new FetchSessionController(usecase);
+    const usecase = new FetchSessionsUseCase(new SessionsRepository());
+    return new FetchSessionController(usecase);
 }

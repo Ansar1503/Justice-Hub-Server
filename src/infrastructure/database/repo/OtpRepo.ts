@@ -6,23 +6,23 @@ import { OtpMapper } from "@infrastructure/Mapper/Implementations/OtpMapper";
 import { ClientSession } from "mongoose";
 
 export class OtpRepository implements IOtpRepository {
-  constructor(
+    constructor(
     private mapper: IMapper<Otp, IotpModel> = new OtpMapper(),
     private readonly _session?: ClientSession
-  ) {}
+    ) {}
 
-  async storeOtp(otp: Otp): Promise<void> {
-    await otpModel.findOneAndUpdate(
-      { email: otp.email },
-      { otp: otp.otp, expiresAt: otp.expiresAt },
-      { upsert: true, new: true, session: this._session }
-    );
-  }
-  async findOtp(email: string): Promise<Otp | null> {
-    const data = await otpModel.findOne({ email });
-    return data ? this.mapper.toDomain(data) : null;
-  }
-  async delete(email: string): Promise<void> {
-    await otpModel.deleteOne({ email });
-  }
+    async storeOtp(otp: Otp): Promise<void> {
+        await otpModel.findOneAndUpdate(
+            { email: otp.email },
+            { otp: otp.otp, expiresAt: otp.expiresAt },
+            { upsert: true, new: true, session: this._session }
+        );
+    }
+    async findOtp(email: string): Promise<Otp | null> {
+        const data = await otpModel.findOne({ email });
+        return data ? this.mapper.toDomain(data) : null;
+    }
+    async delete(email: string): Promise<void> {
+        await otpModel.deleteOne({ email });
+    }
 }

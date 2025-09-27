@@ -6,10 +6,10 @@ import { CallLogsRepository } from "@infrastructure/database/repo/CallLogsRepo";
 import { AppointmentsRepository } from "@infrastructure/database/repo/AppointmentsRepo";
 
 export function StartSessionComposer(): IController {
-  const usecase = new StartSessionUseCase(
-    new SessionsRepository(),
-    new CallLogsRepository(),
-    new AppointmentsRepository()
-  );
-  return new StartSessionController(usecase);
+    const usecase = new StartSessionUseCase(
+        new SessionsRepository(),
+        new CallLogsRepository(),
+        new AppointmentsRepository()
+    );
+    return new StartSessionController(usecase);
 }

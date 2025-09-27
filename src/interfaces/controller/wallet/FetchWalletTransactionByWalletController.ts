@@ -9,44 +9,44 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { FetchWalletTransactionsQuerySchema } from "@interfaces/middelwares/validator/zod/wallet/fetchWalletTransactionsQuerySchema";
 
 export class FetchWalletTransactionByWalletController implements IController {
-  constructor(
+    constructor(
     private fetchTransactionByWallet: IFetchWalletTransactionsByWallet,
     private httpErrors: IHttpErrors = new HttpErrors(),
     private httpSuccess: IHttpSuccess = new HttpSuccess()
-  ) {}
-  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    let userId = "";
-    if (
-      httpRequest.user &&
+    ) {}
+    async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+        let userId = "";
+        if (
+            httpRequest.user &&
       typeof httpRequest.user === "object" &&
       "id" in httpRequest.user &&
       typeof httpRequest.user.id === "string"
-    ) {
-      userId = httpRequest.user.id;
-    }
-    if (!userId) {
-      return this.httpErrors.error_400("user id not found");
-    }
+        ) {
+            userId = httpRequest.user.id;
+        }
+        if (!userId) {
+            return this.httpErrors.error_400("user id not found");
+        }
 
-    const parsed = FetchWalletTransactionsQuerySchema.safeParse(
-      httpRequest.query
-    );
-    if (!parsed.success) {
-      const err = parsed.error.errors[0];
-      console.log("error", err);
-      return this.httpErrors.error_400(err.message);
+        const parsed = FetchWalletTransactionsQuerySchema.safeParse(
+            httpRequest.query
+        );
+        if (!parsed.success) {
+            const err = parsed.error.errors[0];
+            console.log("error", err);
+            return this.httpErrors.error_400(err.message);
+        }
+        try {
+            const result = await this.fetchTransactionByWallet.execute({
+                ...parsed.data,
+                userId,
+            });
+            return this.httpSuccess.success_200(result);
+        } catch (error) {
+            if (error instanceof Error) {
+                return this.httpErrors.error_400(error.message);
+            }
+            return this.httpErrors.error_500("internal server error");
+        }
     }
-    try {
-      const result = await this.fetchTransactionByWallet.execute({
-        ...parsed.data,
-        userId,
-      });
-      return this.httpSuccess.success_200(result);
-    } catch (error) {
-      if (error instanceof Error) {
-        return this.httpErrors.error_400(error.message);
-      }
-      return this.httpErrors.error_500("internal server error");
-    }
-  }
 }

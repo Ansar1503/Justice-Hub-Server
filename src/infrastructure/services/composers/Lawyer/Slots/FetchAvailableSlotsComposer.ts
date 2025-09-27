@@ -4,6 +4,6 @@ import { FetchAvailableSlotsUseCase } from "@src/application/usecases/Lawyer/imp
 import { AvailableSlotRepository } from "@infrastructure/database/repo/AvailableSlotsRepo";
 
 export function FetchAvailableSlotsComposer(): IController {
-  const usecase = new FetchAvailableSlotsUseCase(new AvailableSlotRepository())
-  return new FetchAvailableSlotsController(usecase);
+    const usecase = new FetchAvailableSlotsUseCase(new AvailableSlotRepository());
+    return new FetchAvailableSlotsController(usecase);
 }

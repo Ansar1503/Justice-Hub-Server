@@ -1,9 +1,9 @@
 import { CaseType } from "@domain/entities/CaseType";
 import { IBaseRepository } from "./IBaseRepo";
 import {
-  CasetypeFetchQueryDto,
-  CaseTypeFetchResultDto,
-  UpdateCasetypeInputDto,
+    CasetypeFetchQueryDto,
+    CaseTypeFetchResultDto,
+    UpdateCasetypeInputDto,
 } from "@src/application/dtos/CaseType/CaseTypeDto";
 
 export interface ICasetype extends IBaseRepository<CaseType> {

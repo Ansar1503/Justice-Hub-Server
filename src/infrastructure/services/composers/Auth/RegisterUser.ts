@@ -7,15 +7,15 @@ import { IController } from "@interfaces/controller/Interface/IController";
 import { RegisterUserUseCase } from "@src/application/usecases/Auth/implementation/RegisterUserUseCase";
 
 export function RegisterUserComponser(): IController {
-  const passwordHasher = new PasswordManager();
-  const nodeMailerProvider = new NodeMailerProvider();
-  const jwtProvider = new JwtProvider();
-  const usecase = new RegisterUserUseCase(
-    passwordHasher,
-    nodeMailerProvider,
-    jwtProvider,
-    new MongoUnitofWork()
-  );
-  const controller = new RegisterUser(usecase);
-  return controller;
+    const passwordHasher = new PasswordManager();
+    const nodeMailerProvider = new NodeMailerProvider();
+    const jwtProvider = new JwtProvider();
+    const usecase = new RegisterUserUseCase(
+        passwordHasher,
+        nodeMailerProvider,
+        jwtProvider,
+        new MongoUnitofWork()
+    );
+    const controller = new RegisterUser(usecase);
+    return controller;
 }

@@ -2,5 +2,5 @@ import { SendMessageFileController } from "@interfaces/controller/Client/SendMes
 import { IController } from "@interfaces/controller/Interface/IController";
 
 export function SendMessageFileComposer(): IController {
-  return new SendMessageFileController();
+    return new SendMessageFileController();
 }

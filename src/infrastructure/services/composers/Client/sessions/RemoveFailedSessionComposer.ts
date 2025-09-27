@@ -5,6 +5,6 @@ import { AppointmentsRepository } from "@infrastructure/database/repo/Appointmen
 
 
 export function RemoveFailedSessionComposer(): IController {
-  const usecase = new GetSessionMetadataUseCase(new AppointmentsRepository())
-  return new RemoveFailedSessionController(usecase);
+    const usecase = new GetSessionMetadataUseCase(new AppointmentsRepository());
+    return new RemoveFailedSessionController(usecase);
 }

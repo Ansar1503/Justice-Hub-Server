@@ -7,11 +7,11 @@ import { UserRepository } from "@infrastructure/database/repo/UserRepo";
 import { ChatSessionRepository } from "@infrastructure/database/repo/ChatSessionRepo";
 
 export function ConfirmClientAppointmentComposer(): IController {
-  const usecase = new ConfirmAppointmentUseCase(
-    new AppointmentsRepository(),
-    new SessionsRepository(),
-    new UserRepository(),
-    new ChatSessionRepository()
-  );
-  return new ConfirmClientAppointment(usecase);
+    const usecase = new ConfirmAppointmentUseCase(
+        new AppointmentsRepository(),
+        new SessionsRepository(),
+        new UserRepository(),
+        new ChatSessionRepository()
+    );
+    return new ConfirmClientAppointment(usecase);
 }

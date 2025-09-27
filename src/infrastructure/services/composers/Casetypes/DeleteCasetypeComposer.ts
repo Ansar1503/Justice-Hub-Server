@@ -7,11 +7,11 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { DeleteCasetypeUsecase } from "@src/application/usecases/CaseType/implementation/DeleteCasetypeUsecase";
 
 export function DeleteCasetypeComposer(): IController {
-  const casetypeRepo = new CaseTypeRepo(new CaseTypeMapper());
-  const usecase = new DeleteCasetypeUsecase(casetypeRepo);
-  return new DeleteCaseTypeController(
-    usecase,
-    new HttpErrors(),
-    new HttpSuccess()
-  );
+    const casetypeRepo = new CaseTypeRepo(new CaseTypeMapper());
+    const usecase = new DeleteCasetypeUsecase(casetypeRepo);
+    return new DeleteCaseTypeController(
+        usecase,
+        new HttpErrors(),
+        new HttpSuccess()
+    );
 }

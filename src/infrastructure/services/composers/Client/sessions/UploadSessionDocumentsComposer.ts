@@ -6,10 +6,10 @@ import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
 import { AppointmentsRepository } from "@infrastructure/database/repo/AppointmentsRepo";
 
 export function UploadSessionDocumentsComposer(): IController {
-  const usecase = new UploadSessionDocument(
-    new SessionDocumentsRepository(),
-    new SessionsRepository(),
-    new AppointmentsRepository()
-  );
-  return new UploadSessionDocumentsController(usecase);
+    const usecase = new UploadSessionDocument(
+        new SessionDocumentsRepository(),
+        new SessionsRepository(),
+        new AppointmentsRepository()
+    );
+    return new UploadSessionDocumentsController(usecase);
 }

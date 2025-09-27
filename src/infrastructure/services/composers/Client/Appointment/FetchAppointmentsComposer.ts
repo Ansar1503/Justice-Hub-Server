@@ -4,8 +4,8 @@ import { FetchAppointmentsClientUseCase } from "@src/application/usecases/Client
 import { AppointmentsRepository } from "@infrastructure/database/repo/AppointmentsRepo";
 
 export function FetchAppointmentDataComposer(): IController {
-  const useCase = new FetchAppointmentsClientUseCase(
-    new AppointmentsRepository()
-  );
-  return new FetchAppointmentDataController(useCase);
+    const useCase = new FetchAppointmentsClientUseCase(
+        new AppointmentsRepository()
+    );
+    return new FetchAppointmentDataController(useCase);
 }

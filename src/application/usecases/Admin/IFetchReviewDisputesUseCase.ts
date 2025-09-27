@@ -1,6 +1,6 @@
 import {
-  FetchReviewDisputesInputDto,
-  FetchReviewDisputesOutputDto,
+    FetchReviewDisputesInputDto,
+    FetchReviewDisputesOutputDto,
 } from "@src/application/dtos/Admin/FetchReviewDisputesDto";
 import { IUseCase } from "../IUseCases/IUseCase";
 

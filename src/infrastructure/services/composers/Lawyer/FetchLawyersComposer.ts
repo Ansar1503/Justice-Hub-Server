@@ -8,17 +8,17 @@ import { LawyerVerificationRepo } from "@infrastructure/database/repo/LawyerVeri
 import { LawyerVerificationMapper } from "@infrastructure/Mapper/Implementations/LawyerVerificaitionMapper";
 
 export function FetchLawyerComposer(): IController {
-  const userRepo = new UserRepository();
-  const lawyerRepo = new LawyerRepository();
-  const lawyerDocsRepo = new LawyerDocumentsRepository();
-  const lawyerVerificationRepo = new LawyerVerificationRepo(
-    new LawyerVerificationMapper()
-  );
-  const usecase = new FetchLawyerDataUseCase(
-    userRepo,
-    lawyerRepo,
-    lawyerDocsRepo,
-    lawyerVerificationRepo
-  );
-  return new FetchLawyerController(usecase);
+    const userRepo = new UserRepository();
+    const lawyerRepo = new LawyerRepository();
+    const lawyerDocsRepo = new LawyerDocumentsRepository();
+    const lawyerVerificationRepo = new LawyerVerificationRepo(
+        new LawyerVerificationMapper()
+    );
+    const usecase = new FetchLawyerDataUseCase(
+        userRepo,
+        lawyerRepo,
+        lawyerDocsRepo,
+        lawyerVerificationRepo
+    );
+    return new FetchLawyerController(usecase);
 }

@@ -4,6 +4,6 @@ import { FetchOverrideSlotsUseCase } from "@src/application/usecases/Lawyer/impl
 import { OverrideSlotsRepository } from "@infrastructure/database/repo/OverrideSlotsRepo";
 
 export function FetchOverrideSlotsComposer(): IController {
-  const usecase = new FetchOverrideSlotsUseCase(new OverrideSlotsRepository());
-  return new FetchOverrideSlots(usecase);
+    const usecase = new FetchOverrideSlotsUseCase(new OverrideSlotsRepository());
+    return new FetchOverrideSlots(usecase);
 }

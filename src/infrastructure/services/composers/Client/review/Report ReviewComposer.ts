@@ -4,6 +4,6 @@ import { ReviewRepo } from "@infrastructure/database/repo/ReviewRepo";
 import { DisputesRepo } from "@infrastructure/database/repo/DisputesRepo";
 
 export const ReportReviewComposer = () => {
-  const useCase = new ReportReviewUseCase(new ReviewRepo(), new DisputesRepo());
-  return new ReportReviewController(useCase);
+    const useCase = new ReportReviewUseCase(new ReviewRepo(), new DisputesRepo());
+    return new ReportReviewController(useCase);
 };

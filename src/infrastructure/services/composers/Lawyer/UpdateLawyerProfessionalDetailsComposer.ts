@@ -7,12 +7,12 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { UpdateProfessionalDetailsUsecase } from "@src/application/usecases/Lawyer/implementations/UpdateProfessionalDetailsUsecase";
 
 export function UpdateLawyersProfessionalDetailsComposer(): IController {
-  const usecase = new UpdateProfessionalDetailsUsecase(
-    new LawyerRepository(new LawyerMapper())
-  );
-  return new UpdateLawyersProfessionalDetails(
-    usecase,
-    new HttpErrors(),
-    new HttpSuccess()
-  );
+    const usecase = new UpdateProfessionalDetailsUsecase(
+        new LawyerRepository(new LawyerMapper())
+    );
+    return new UpdateLawyersProfessionalDetails(
+        usecase,
+        new HttpErrors(),
+        new HttpSuccess()
+    );
 }

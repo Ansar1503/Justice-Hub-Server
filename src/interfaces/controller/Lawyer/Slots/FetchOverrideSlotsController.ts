@@ -8,32 +8,32 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IFetchOverrideSlotsUseCase } from "@src/application/usecases/Lawyer/IFetchOverrideSlotsUseCase";
 
 export class FetchOverrideSlots implements IController {
-  constructor(
+    constructor(
     private fetchOverrideSlots: IFetchOverrideSlotsUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
-  ) {}
-  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    let user_id: string = "";
-    if (
-      httpRequest.user &&
+    ) {}
+    async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+        let user_id: string = "";
+        if (
+            httpRequest.user &&
       typeof httpRequest.user === "object" &&
       "id" in httpRequest.user
-    ) {
-      user_id = String(httpRequest.user.id);
+        ) {
+            user_id = String(httpRequest.user.id);
+        }
+        if (!user_id) {
+            return this.httpErrors.error_400("User_id Not found");
+        }
+        try {
+            const response = await this.fetchOverrideSlots.execute(user_id);
+            return this.httpSuccess.success_200(response);
+        } catch (error) {
+            console.log("error in fetging override slots", error);
+            if (error instanceof Error) {
+                return this.httpErrors.error_400(error.message);
+            }
+            return this.httpErrors.error_500();
+        }
     }
-    if (!user_id) {
-      return this.httpErrors.error_400("User_id Not found");
-    }
-    try {
-      const response = await this.fetchOverrideSlots.execute(user_id);
-      return this.httpSuccess.success_200(response);
-    } catch (error) {
-      console.log("error in fetging override slots", error);
-      if (error instanceof Error) {
-        return this.httpErrors.error_400(error.message);
-      }
-      return this.httpErrors.error_500();
-    }
-  }
 }

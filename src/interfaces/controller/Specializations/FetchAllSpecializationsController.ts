@@ -9,27 +9,27 @@ import { FetchAllSpecializationsQueryValidatorSchema } from "@interfaces/middelw
 import { IFetchAllSpecializationsUsecase } from "@src/application/usecases/Specializations/IFetchAllSpecializationsUsecase";
 
 export class FetchAllSpecializationsController implements IController {
-  constructor(
+    constructor(
     private FetchAllSpecializations: IFetchAllSpecializationsUsecase,
     private httpErrors: IHttpErrors = new HttpErrors(),
     private httpSuccess: IHttpSuccess = new HttpSuccess()
-  ) {}
-  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    const parsed = FetchAllSpecializationsQueryValidatorSchema.safeParse(
-      httpRequest.query
-    );
-    if (!parsed.success) {
-      const error = parsed.error.errors[0];
-      return this.httpErrors.error_400(error.message);
+    ) {}
+    async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+        const parsed = FetchAllSpecializationsQueryValidatorSchema.safeParse(
+            httpRequest.query
+        );
+        if (!parsed.success) {
+            const error = parsed.error.errors[0];
+            return this.httpErrors.error_400(error.message);
+        }
+        try {
+            const result = await this.FetchAllSpecializations.execute(parsed.data);
+            return this.httpSuccess.success_200(result);
+        } catch (error) {
+            if (error instanceof Error) {
+                return this.httpErrors.error_400(error.message);
+            }
+            return this.httpErrors.error_500();
+        }
     }
-    try {
-      const result = await this.FetchAllSpecializations.execute(parsed.data);
-      return this.httpSuccess.success_200(result);
-    } catch (error) {
-      if (error instanceof Error) {
-        return this.httpErrors.error_400(error.message);
-      }
-      return this.httpErrors.error_500();
-    }
-  }
 }

@@ -1,6 +1,6 @@
 import {
-  FetchCaseQueryType,
-  FindCasesWithPagination,
+    FetchCaseQueryType,
+    FindCasesWithPagination,
 } from "@src/application/dtos/Cases/FindCasesByQueryDto";
 import { IUseCase } from "../../IUseCases/IUseCase";
 

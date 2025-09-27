@@ -15,21 +15,21 @@ import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 
 export const CreateCheckoutSessionComposer = async () => {
-  const client = await connectRedis();
-  const useCase = new CreateCheckoutSessionUseCase(
-    new UserRepository(),
-    new LawyerVerificationRepo(new LawyerVerificationMapper()),
-    new AppointmentsRepository(),
-    new ScheduleSettingsRepository(),
-    new AvailableSlotRepository(),
-    new OverrideSlotsRepository(),
-    new WalletRepo(),
-    new LawyerRepository(),
-    new RedisService(client)
-  );
-  return new CreateCheckoutSessionController(
-    useCase,
-    new HttpErrors(),
-    new HttpSuccess()
-  );
+    const client = await connectRedis();
+    const useCase = new CreateCheckoutSessionUseCase(
+        new UserRepository(),
+        new LawyerVerificationRepo(new LawyerVerificationMapper()),
+        new AppointmentsRepository(),
+        new ScheduleSettingsRepository(),
+        new AvailableSlotRepository(),
+        new OverrideSlotsRepository(),
+        new WalletRepo(),
+        new LawyerRepository(),
+        new RedisService(client)
+    );
+    return new CreateCheckoutSessionController(
+        useCase,
+        new HttpErrors(),
+        new HttpSuccess()
+    );
 };

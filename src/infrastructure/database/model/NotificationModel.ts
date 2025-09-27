@@ -17,21 +17,21 @@ export interface INotificationModel extends Document {
 }
 
 const NotificationSchema = new Schema<INotificationModel>(
-  {
-    _id: { type: String },
-    isRead: { type: Boolean, default: false },
-    message: { type: String, required: true },
-    recipientId: { type: String, required: true },
-    senderId: { type: String, required: true },
-    title: { type: String, required: true },
-    type: { type: String, enum: ["message", "session"], required: true },
-    roomId: { type: String, required: false },
-    sessionId: { type: String, required: false },
-  },
-  { timestamps: true }
+    {
+        _id: { type: String },
+        isRead: { type: Boolean, default: false },
+        message: { type: String, required: true },
+        recipientId: { type: String, required: true },
+        senderId: { type: String, required: true },
+        title: { type: String, required: true },
+        type: { type: String, enum: ["message", "session"], required: true },
+        roomId: { type: String, required: false },
+        sessionId: { type: String, required: false },
+    },
+    { timestamps: true }
 );
 
 export const NotificationModel = mongoose.model<INotificationModel>(
-  "Notification",
-  NotificationSchema
+    "Notification",
+    NotificationSchema
 );

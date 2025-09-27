@@ -9,12 +9,12 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { AddCasetypeUsecase } from "@src/application/usecases/CaseType/implementation/AddCasetypeUsecase";
 
 export function AddCaseTypeComposer(): IController {
-  const caseTypeRepo = new CaseTypeRepo(new CaseTypeMapper());
-  const practiceAreaRepo = new PracticeAreaRepo(new PracticeAreaMapper());
-  const usecase = new AddCasetypeUsecase(caseTypeRepo, practiceAreaRepo);
-  return new AddCasetypeController(
-    usecase,
-    new HttpErrors(),
-    new HttpSuccess()
-  );
+    const caseTypeRepo = new CaseTypeRepo(new CaseTypeMapper());
+    const practiceAreaRepo = new PracticeAreaRepo(new PracticeAreaMapper());
+    const usecase = new AddCasetypeUsecase(caseTypeRepo, practiceAreaRepo);
+    return new AddCasetypeController(
+        usecase,
+        new HttpErrors(),
+        new HttpSuccess()
+    );
 }

@@ -1,6 +1,6 @@
 import {
-  CancelSessionInputDto,
-  CancelSessionOutputDto,
+    CancelSessionInputDto,
+    CancelSessionOutputDto,
 } from "@src/application/dtos/Lawyer/CancelSessionDto";
 import { IUseCase } from "../IUseCases/IUseCase";
 

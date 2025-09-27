@@ -11,17 +11,17 @@ export interface ILawyerDocumentsModel extends Document {
 }
 
 const LawyerDocumentsSchema = new Schema<ILawyerDocumentsModel>(
-  {
-    _id: { type: String },
-    userId: { type: String, required: true, unique: true },
-    enrollmentCertificate: { type: String },
-    certificateOfPractice: { type: String },
-    barCouncilCertificate: { type: String },
-  },
-  { timestamps: true }
+    {
+        _id: { type: String },
+        userId: { type: String, required: true, unique: true },
+        enrollmentCertificate: { type: String },
+        certificateOfPractice: { type: String },
+        barCouncilCertificate: { type: String },
+    },
+    { timestamps: true }
 );
 
 export default mongoose.model<ILawyerDocumentsModel>(
-  "lawyerdocuments",
-  LawyerDocumentsSchema
+    "lawyerdocuments",
+    LawyerDocumentsSchema
 );

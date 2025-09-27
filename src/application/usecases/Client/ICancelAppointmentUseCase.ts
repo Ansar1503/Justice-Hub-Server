@@ -1,6 +1,6 @@
 import {
-  ChangeAppointmentStatusInputDto,
-  ChangeAppointmentStatusOutputDto,
+    ChangeAppointmentStatusInputDto,
+    ChangeAppointmentStatusOutputDto,
 } from "@src/application/dtos/Lawyer/ChangeAppointmentStatusDto";
 import { IUseCase } from "../IUseCases/IUseCase";
 

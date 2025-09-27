@@ -33,101 +33,101 @@ interface AvailabilityProps {
 }
 
 export class Availability {
-  private _id: string;
-  private _lawyer_id: string;
-  private _monday: DayAvailability;
-  private _tuesday: DayAvailability;
-  private _wednesday: DayAvailability;
-  private _thursday: DayAvailability;
-  private _friday: DayAvailability;
-  private _saturday: DayAvailability;
-  private _sunday: DayAvailability;
-  private _createdAt: Date;
-  private _updatedAt: Date;
+    private _id: string;
+    private _lawyer_id: string;
+    private _monday: DayAvailability;
+    private _tuesday: DayAvailability;
+    private _wednesday: DayAvailability;
+    private _thursday: DayAvailability;
+    private _friday: DayAvailability;
+    private _saturday: DayAvailability;
+    private _sunday: DayAvailability;
+    private _createdAt: Date;
+    private _updatedAt: Date;
 
-  private constructor(props: AvailabilityProps) {
-    this._id = props.id;
-    this._lawyer_id = props.lawyer_id;
-    this._monday = props.monday;
-    this._tuesday = props.tuesday;
-    this._wednesday = props.wednesday;
-    this._thursday = props.thursday;
-    this._friday = props.friday;
-    this._saturday = props.saturday;
-    this._sunday = props.sunday;
-    this._createdAt = props.createdAt;
-    this._updatedAt = props.updatedAt;
-  }
-
-  static create(defaultSlots?: Partial<AvailabilityProps>): Availability {
-    function setDefaultDay(day: Daytype): DayAvailability {
-      return {
-        enabled: day !== "saturday" && day !== "sunday",
-        timeSlots: [{ start: "09:00", end: "17:00" }],
-      };
+    private constructor(props: AvailabilityProps) {
+        this._id = props.id;
+        this._lawyer_id = props.lawyer_id;
+        this._monday = props.monday;
+        this._tuesday = props.tuesday;
+        this._wednesday = props.wednesday;
+        this._thursday = props.thursday;
+        this._friday = props.friday;
+        this._saturday = props.saturday;
+        this._sunday = props.sunday;
+        this._createdAt = props.createdAt;
+        this._updatedAt = props.updatedAt;
     }
-    const now = new Date();
 
-    const defaultAvailability: AvailabilityProps = {
-      id: `avb-${uuid()}`,
-      lawyer_id: defaultSlots?.lawyer_id || "",
-      monday: defaultSlots?.monday || setDefaultDay("monday"),
-      tuesday: defaultSlots?.tuesday || setDefaultDay("tuesday"),
-      wednesday: defaultSlots?.wednesday || setDefaultDay("wednesday"),
-      thursday: defaultSlots?.thursday || setDefaultDay("thursday"),
-      friday: defaultSlots?.friday || setDefaultDay("friday"),
-      saturday: defaultSlots?.saturday || setDefaultDay("saturday"),
-      sunday: defaultSlots?.sunday || setDefaultDay("sunday"),
-      createdAt: defaultSlots?.createdAt || now,
-      updatedAt: defaultSlots?.updatedAt || now,
-    };
+    static create(defaultSlots?: Partial<AvailabilityProps>): Availability {
+        function setDefaultDay(day: Daytype): DayAvailability {
+            return {
+                enabled: day !== "saturday" && day !== "sunday",
+                timeSlots: [{ start: "09:00", end: "17:00" }],
+            };
+        }
+        const now = new Date();
 
-    return new Availability(defaultAvailability);
-  }
+        const defaultAvailability: AvailabilityProps = {
+            id: `avb-${uuid()}`,
+            lawyer_id: defaultSlots?.lawyer_id || "",
+            monday: defaultSlots?.monday || setDefaultDay("monday"),
+            tuesday: defaultSlots?.tuesday || setDefaultDay("tuesday"),
+            wednesday: defaultSlots?.wednesday || setDefaultDay("wednesday"),
+            thursday: defaultSlots?.thursday || setDefaultDay("thursday"),
+            friday: defaultSlots?.friday || setDefaultDay("friday"),
+            saturday: defaultSlots?.saturday || setDefaultDay("saturday"),
+            sunday: defaultSlots?.sunday || setDefaultDay("sunday"),
+            createdAt: defaultSlots?.createdAt || now,
+            updatedAt: defaultSlots?.updatedAt || now,
+        };
 
-  static fromPersistence(availability: AvailabilityProps): Availability {
-    return new Availability(availability);
-  }
+        return new Availability(defaultAvailability);
+    }
 
-  get id() {
-    return this._id;
-  }
-  get lawyer_id() {
-    return this._lawyer_id;
-  }
-  get createdAt() {
-    return this._createdAt;
-  }
-  get updatedAt() {
-    return this._updatedAt;
-  }
+    static fromPersistence(availability: AvailabilityProps): Availability {
+        return new Availability(availability);
+    }
 
-  getDayAvailability(day: Daytype): DayAvailability {
-    return this[`_${day}`];
-  }
+    get id() {
+        return this._id;
+    }
+    get lawyer_id() {
+        return this._lawyer_id;
+    }
+    get createdAt() {
+        return this._createdAt;
+    }
+    get updatedAt() {
+        return this._updatedAt;
+    }
 
-  enableDay(day: Daytype): void {
-    this[`_${day}`].enabled = true;
-  }
+    getDayAvailability(day: Daytype): DayAvailability {
+        return this[`_${day}`];
+    }
 
-  disableDay(day: Daytype): void {
-    this[`_${day}`].enabled = false;
-    this[`_${day}`].timeSlots = [];
-  }
+    enableDay(day: Daytype): void {
+        this[`_${day}`].enabled = true;
+    }
 
-  addTimeSlot(day: Daytype, slot: TimeSlot): void {
-    this[`_${day}`].timeSlots.push(slot);
-  }
+    disableDay(day: Daytype): void {
+        this[`_${day}`].enabled = false;
+        this[`_${day}`].timeSlots = [];
+    }
 
-  removeTimeSlot(day: Daytype, index: number): void {
-    this[`_${day}`].timeSlots.splice(index, 1);
-  }
+    addTimeSlot(day: Daytype, slot: TimeSlot): void {
+        this[`_${day}`].timeSlots.push(slot);
+    }
 
-  clearTimeSlots(day: Daytype): void {
-    this[`_${day}`].timeSlots = [];
-  }
+    removeTimeSlot(day: Daytype, index: number): void {
+        this[`_${day}`].timeSlots.splice(index, 1);
+    }
 
-  updateTimeSlots(day: Daytype, slots: TimeSlot[]): void {
-    this[`_${day}`].timeSlots = slots;
-  }
+    clearTimeSlots(day: Daytype): void {
+        this[`_${day}`].timeSlots = [];
+    }
+
+    updateTimeSlots(day: Daytype, slots: TimeSlot[]): void {
+        this[`_${day}`].timeSlots = slots;
+    }
 }

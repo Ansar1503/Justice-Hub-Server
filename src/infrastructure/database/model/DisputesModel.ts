@@ -14,37 +14,37 @@ export interface IDisputesModel extends Document {
 }
 
 const diputesSchema = new Schema<IDisputesModel>(
-  {
-    _id: { type: String },
-    disputeType: {
-      type: String,
-      required: true,
-      enum: ["reviews", "messages"],
+    {
+        _id: { type: String },
+        disputeType: {
+            type: String,
+            required: true,
+            enum: ["reviews", "messages"],
+        },
+        contentId: {
+            type: String,
+            required: true,
+            refPath: "disputeType",
+        },
+        reason: { type: String, required: true },
+        reportedBy: { type: String, required: true },
+        reportedUser: { type: String, required: true },
+        status: {
+            type: String,
+            required: true,
+            enum: ["pending", "resolved", "rejected"],
+            default: "pending",
+        },
+        resolveAction: {
+            type: String,
+            required: false,
+            enum: ["deleted", "blocked"],
+        },
     },
-    contentId: {
-      type: String,
-      required: true,
-      refPath: "disputeType",
-    },
-    reason: { type: String, required: true },
-    reportedBy: { type: String, required: true },
-    reportedUser: { type: String, required: true },
-    status: {
-      type: String,
-      required: true,
-      enum: ["pending", "resolved", "rejected"],
-      default: "pending",
-    },
-    resolveAction: {
-      type: String,
-      required: false,
-      enum: ["deleted", "blocked"],
-    },
-  },
-  { timestamps: true }
+    { timestamps: true }
 );
 
 export const DisputesModel = mongoose.model<IDisputesModel>(
-  "Disputes",
-  diputesSchema
+    "Disputes",
+    diputesSchema
 );

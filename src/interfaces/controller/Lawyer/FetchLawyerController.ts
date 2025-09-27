@@ -8,31 +8,31 @@ import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IFetchLawyerDataUseCase } from "@src/application/usecases/Lawyer/IFetchLawyerDataUseCase";
 
 export class FetchLawyerController implements IController {
-  constructor(
+    constructor(
     private FetchLawyer: IFetchLawyerDataUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
-  ) {}
-  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    let user_id: string = "";
-    if (
-      httpRequest.user &&
+    ) {}
+    async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+        let user_id: string = "";
+        if (
+            httpRequest.user &&
       typeof httpRequest.user === "object" &&
       "id" in httpRequest.user
-    ) {
-      user_id = String(httpRequest.user.id);
+        ) {
+            user_id = String(httpRequest.user.id);
+        }
+        if (!user_id) {
+            return this.httpErrors.error_400("User_id Not found");
+        }
+        try {
+            const lawyers = await this.FetchLawyer.execute(user_id);
+            return this.httpSuccess.success_200(lawyers);
+        } catch (error) {
+            if (error instanceof Error) {
+                return this.httpErrors.error_400(error.message);
+            }
+            return this.httpErrors.error_500("Something went wrong");
+        }
     }
-    if (!user_id) {
-      return this.httpErrors.error_400("User_id Not found");
-    }
-    try {
-      const lawyers = await this.FetchLawyer.execute(user_id);
-      return this.httpSuccess.success_200(lawyers);
-    } catch (error) {
-      if (error instanceof Error) {
-        return this.httpErrors.error_400(error.message);
-      }
-      return this.httpErrors.error_500("Something went wrong");
-    }
-  }
 }

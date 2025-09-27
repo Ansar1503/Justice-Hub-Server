@@ -1,6 +1,6 @@
 import {
-  FetchCallLogsInputDto,
-  FetchCallLogsOutputDto,
+    FetchCallLogsInputDto,
+    FetchCallLogsOutputDto,
 } from "@src/application/dtos/Lawyer/FetchCallLogsDto";
 import { IUseCase } from "../IUseCases/IUseCase";
 

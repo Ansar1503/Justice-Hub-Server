@@ -9,43 +9,43 @@ import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IUpdateClientDataUseCase } from "@src/application/usecases/Client/IUpdateClientDataUseCase";
 
 export class UpdateBasicInfoController implements IController {
-  constructor(
+    constructor(
     private _udpateClientData: IUpdateClientDataUseCase,
     private _errors: IHttpErrors = new HttpErrors(),
     private _success: IHttpSuccess = new HttpSuccess()
-  ) {}
-  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    const { name, mobile, dob, gender } = httpRequest.body as Record<
+    ) {}
+    async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+        const { name, mobile, dob, gender } = httpRequest.body as Record<
       string,
       any
     >;
-    if (!name || !mobile) {
-      const err = this._errors.error_400();
-      return new HttpResponse(err.statusCode, err.body);
+        if (!name || !mobile) {
+            const err = this._errors.error_400();
+            return new HttpResponse(err.statusCode, err.body);
+        }
+        const profile_image = (httpRequest as Record<string, any>)?.file?.filename;
+        const user_id = (httpRequest as Record<string, any>)?.user?.id;
+        try {
+            const updateData = await this._udpateClientData.execute({
+                profile_image,
+                user_id,
+                name,
+                mobile,
+                dob,
+                gender,
+            });
+            if (!updateData) {
+                const err = this._errors.error_500();
+                return new HttpResponse(err.statusCode, err.body);
+            }
+            const success = this._success.success_200(updateData);
+            return new HttpResponse(success.statusCode, success.body);
+        } catch (error) {
+            console.log("error",error);
+            if (error instanceof Error) {
+                return this._errors.error_400(error.message);
+            }
+            return this._errors.error_500();
+        }
     }
-    const profile_image = (httpRequest as Record<string, any>)?.file?.filename;
-    const user_id = (httpRequest as Record<string, any>)?.user?.id;
-    try {
-      const updateData = await this._udpateClientData.execute({
-        profile_image,
-        user_id,
-        name,
-        mobile,
-        dob,
-        gender,
-      });
-      if (!updateData) {
-        const err = this._errors.error_500();
-        return new HttpResponse(err.statusCode, err.body);
-      }
-      const success = this._success.success_200(updateData);
-      return new HttpResponse(success.statusCode, success.body);
-    } catch (error) {
-      console.log("error",error)
-      if (error instanceof Error) {
-        return this._errors.error_400(error.message);
-      }
-      return this._errors.error_500();
-    }
-  }
 }

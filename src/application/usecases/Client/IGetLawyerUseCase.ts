@@ -1,6 +1,6 @@
 import {
-  GetLawyersInputDto,
-  GetLawyersOutputDto,
+    GetLawyersInputDto,
+    GetLawyersOutputDto,
 } from "@src/application/dtos/client/GetLawyersDto";
 import { IUseCase } from "../IUseCases/IUseCase";
 

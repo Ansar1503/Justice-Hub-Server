@@ -1,6 +1,6 @@
 import {
-  getWalletTransactionsInputDto,
-  getWalletTransactionsOutputDto,
+    getWalletTransactionsInputDto,
+    getWalletTransactionsOutputDto,
 } from "@src/application/dtos/wallet/WalletTransactionDto";
 import { IUseCase } from "../IUseCases/IUseCase";
 

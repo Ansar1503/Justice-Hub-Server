@@ -9,13 +9,13 @@ import { LawyerVerificationRepo } from "@infrastructure/database/repo/LawyerVeri
 import { LawyerVerificationMapper } from "@infrastructure/Mapper/Implementations/LawyerVerificaitionMapper";
 
 export const GetLawyerSlotDetailsComposer = () => {
-  const useCase = new FetchLawyerSlotsUseCase(
-    new UserRepository(),
-    new LawyerVerificationRepo(new LawyerVerificationMapper()),
-    new ScheduleSettingsRepository(),
-    new AppointmentsRepository(),
-    new OverrideSlotsRepository(),
-    new AvailableSlotRepository()
-  );
-  return new GetLawyerSlotDetailsController(useCase);
+    const useCase = new FetchLawyerSlotsUseCase(
+        new UserRepository(),
+        new LawyerVerificationRepo(new LawyerVerificationMapper()),
+        new ScheduleSettingsRepository(),
+        new AppointmentsRepository(),
+        new OverrideSlotsRepository(),
+        new AvailableSlotRepository()
+    );
+    return new GetLawyerSlotDetailsController(useCase);
 };

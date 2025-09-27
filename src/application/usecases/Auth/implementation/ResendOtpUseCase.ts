@@ -8,39 +8,39 @@ import { token } from "morgan";
 import { IJwtProvider } from "@src/application/providers/JwtProvider";
 
 export class ResendOtpUseCase implements IResendOtpUseCase {
-  constructor(
+    constructor(
     private userRepo: IUserRepository,
     private otpRepo: IOtpRepository,
     private emailProvider: INodeMailerProvider,
     private tokenProvider: IJwtProvider
-  ) {}
-  async execute(input: string): Promise<void> {
-    const user = await this.userRepo.findByEmail(input);
-    if (!user) {
-      throw new Error("INVALID_EMAIL");
+    ) {}
+    async execute(input: string): Promise<void> {
+        const user = await this.userRepo.findByEmail(input);
+        if (!user) {
+            throw new Error("INVALID_EMAIL");
+        }
+        if (user.is_verified) {
+            throw new Error("USER_VERIFIED");
+        }
+        if (user.is_blocked) {
+            throw new Error("USER_BLOCKED");
+        }
+        const otp = generateOtp();
+        const token = this.tokenProvider.GenerateEmailToken({
+            user_id: user.user_id,
+        });
+        try {
+            await this.emailProvider.sendVerificationMail(user.email, token, otp);
+            console.log("email send successfully");
+        } catch (error: any) {
+            console.log(error.message);
+            throw new Error("MAIL_SEND_ERROR");
+        }
+        try {
+            const newotp = Otp.create({ email: input, otp: otp });
+            await this.otpRepo.storeOtp(newotp);
+        } catch (error: any) {
+            throw new Error("DB_ERROR");
+        }
     }
-    if (user.is_verified) {
-      throw new Error("USER_VERIFIED");
-    }
-    if (user.is_blocked) {
-      throw new Error("USER_BLOCKED");
-    }
-    const otp = generateOtp();
-    const token = this.tokenProvider.GenerateEmailToken({
-      user_id: user.user_id,
-    });
-    try {
-      await this.emailProvider.sendVerificationMail(user.email, token, otp);
-      console.log("email send successfully");
-    } catch (error: any) {
-      console.log(error.message);
-      throw new Error("MAIL_SEND_ERROR");
-    }
-    try {
-      const newotp = Otp.create({ email: input, otp: otp });
-      await this.otpRepo.storeOtp(newotp);
-    } catch (error: any) {
-      throw new Error("DB_ERROR");
-    }
-  }
 }

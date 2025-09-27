@@ -4,7 +4,7 @@ import { PracticeAreaDto } from "./PracticeAreas/PracticeAreasDto";
 import { SpecializationDto } from "./Specializations/SpecializationDto";
 
 export class LawyerResponseDto implements Partial<Client>, Partial<User> {
-  constructor(
+    constructor(
     public user_id: string,
     public name: string,
     public email: string,
@@ -34,5 +34,5 @@ export class LawyerResponseDto implements Partial<Client>, Partial<User> {
     public description?: string,
     public certificate_of_practice_number?: string,
     public enrollment_certificate_number?: string
-  ) {}
+    ) {}
 }

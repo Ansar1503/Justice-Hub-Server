@@ -4,21 +4,21 @@ import "dotenv/config";
 import { authenticateClientSocket } from "../../interfaces/middelwares/socket/client.socket.auth";
 
 export function InitialiseSocketServer(server: HTTPServer): SocketIOServer {
-  const FRONTEND_URL = process.env.FRONTEND_URL;
-  const io = new SocketIOServer(server, {
-    cors: {
-      origin: [
-        `${FRONTEND_URL}`,
-        "http://localhost:4000",
-        "https://c6cfac23a22c.ngrok-free.app",
-      ],
-      credentials: true,
-      methods: ["GET", "POST"],
-    },
-    pingInterval: 25000,
-    pingTimeout: 20000,
-  });
-  io.use(authenticateClientSocket);
+    const FRONTEND_URL = process.env.FRONTEND_URL;
+    const io = new SocketIOServer(server, {
+        cors: {
+            origin: [
+                `${FRONTEND_URL}`,
+                "http://localhost:4000",
+                "https://c6cfac23a22c.ngrok-free.app",
+            ],
+            credentials: true,
+            methods: ["GET", "POST"],
+        },
+        pingInterval: 25000,
+        pingTimeout: 20000,
+    });
+    io.use(authenticateClientSocket);
 
-  return io;
+    return io;
 }

@@ -4,6 +4,6 @@ import { GetLawyersUseCase } from "@src/application/usecases/Client/implementati
 import { LawyerRepository } from "@infrastructure/database/repo/LawyerRepo";
 
 export function GetLawyersComposer(): IController {
-  const usecase = new GetLawyersUseCase(new LawyerRepository())
-  return new GetLawyersController(usecase);
+    const usecase = new GetLawyersUseCase(new LawyerRepository());
+    return new GetLawyersController(usecase);
 }

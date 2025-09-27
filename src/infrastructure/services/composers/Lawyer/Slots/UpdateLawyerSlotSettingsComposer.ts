@@ -4,7 +4,7 @@ import { UpdateSlotSettingsUseCase } from "@src/application/usecases/Lawyer/impl
 import { ScheduleSettingsRepository } from "@infrastructure/database/repo/ScheduleSettingsRepo";
 
 export function UpdateLawyerSlotSettingsComposer(): IController {
-  const scheduleSettingsRepo = new ScheduleSettingsRepository()
-  const usecase = new UpdateSlotSettingsUseCase(scheduleSettingsRepo)
-  return new UpdateLawyerSlotSettingsController(usecase);
+    const scheduleSettingsRepo = new ScheduleSettingsRepository();
+    const usecase = new UpdateSlotSettingsUseCase(scheduleSettingsRepo);
+    return new UpdateLawyerSlotSettingsController(usecase);
 }

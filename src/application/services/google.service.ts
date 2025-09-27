@@ -8,26 +8,26 @@ const REDIRECT_URI = process.env.FRONTEND_URL;
 const oauth2Client = new OAuth2Client(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 
 export async function verifyAuthCode(code: string) {
-  try {
-    const { tokens } = await oauth2Client.getToken(code);
+    try {
+        const { tokens } = await oauth2Client.getToken(code);
 
-    oauth2Client.setCredentials(tokens);
+        oauth2Client.setCredentials(tokens);
 
-    const ticket = await oauth2Client.verifyIdToken({
-      idToken:
+        const ticket = await oauth2Client.verifyIdToken({
+            idToken:
         tokens.id_token ??
         (() => {
-          throw new Error("TOKEN_MISSING");
+            throw new Error("TOKEN_MISSING");
         })(),
-      audience: CLIENT_ID,
-    });
+            audience: CLIENT_ID,
+        });
 
-    const payload = ticket.getPayload();
-    console.log("payload", payload);
+        const payload = ticket.getPayload();
+        console.log("payload", payload);
 
-    return payload;
-  } catch (err) {
-    console.error("Error verifying auth code:", err);
-    throw err;
-  }
+        return payload;
+    } catch (err) {
+        console.error("Error verifying auth code:", err);
+        throw err;
+    }
 }

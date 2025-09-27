@@ -7,11 +7,11 @@ import { IController } from "@interfaces/controller/Interface/IController";
 import { ChangeLawyerVerificationStatus } from "@src/application/usecases/Admin/Implementations/ChangeLawyerVerificationUseCase";
 
 export function ChangeLawyerVerificationComposer(): IController {
-  const lawyerMapper = new LawyerVerificationMapper();
-  const userMapper = new UserMapper();
-  const lawyerRepo = new LawyerVerificationRepo(lawyerMapper);
-  const userRepo = new UserRepository(userMapper);
-  const useCase = new ChangeLawyerVerificationStatus(userRepo, lawyerRepo);
-  const controller = new ChangeLawyerVerificationStatusController(useCase);
-  return controller;
+    const lawyerMapper = new LawyerVerificationMapper();
+    const userMapper = new UserMapper();
+    const lawyerRepo = new LawyerVerificationRepo(lawyerMapper);
+    const userRepo = new UserRepository(userMapper);
+    const useCase = new ChangeLawyerVerificationStatus(userRepo, lawyerRepo);
+    const controller = new ChangeLawyerVerificationStatusController(useCase);
+    return controller;
 }

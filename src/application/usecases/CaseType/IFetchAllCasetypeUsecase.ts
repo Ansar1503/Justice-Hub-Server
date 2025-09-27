@@ -1,6 +1,6 @@
 import {
-  CasetypeFetchQueryDto,
-  CaseTypeFetchResultDto,
+    CasetypeFetchQueryDto,
+    CaseTypeFetchResultDto,
 } from "@src/application/dtos/CaseType/CaseTypeDto";
 import { IUseCase } from "../IUseCases/IUseCase";
 

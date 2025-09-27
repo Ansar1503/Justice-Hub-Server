@@ -5,20 +5,20 @@ import { IReviewRepo } from "@domain/IRepository/IReviewRepo";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 
 export class FetchReviewBySessionUseCase
-  implements IFetchReviewsBySessionUseCase
+implements IFetchReviewsBySessionUseCase
 {
-  constructor(
+    constructor(
     private sessionRepo: ISessionsRepo,
     private reviewRepository: IReviewRepo
-  ) {}
-  async execute(input: {
+    ) {}
+    async execute(input: {
     session_id: string;
   }): Promise<FetchReviewsBySessionOutputDto[]> {
-    const session = await this.sessionRepo.findById(input);
-    if (!session) throw new ValidationError("Session not found");
-    const reviews = await this.reviewRepository.findBySession_id(
-      input.session_id
-    );
-    return reviews;
-  }
+        const session = await this.sessionRepo.findById(input);
+        if (!session) throw new ValidationError("Session not found");
+        const reviews = await this.reviewRepository.findBySession_id(
+            input.session_id
+        );
+        return reviews;
+    }
 }

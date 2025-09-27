@@ -1,6 +1,6 @@
 import {
-  FetchSessionOutputDto,
-  FetchSessionsInputDto,
+    FetchSessionOutputDto,
+    FetchSessionsInputDto,
 } from "@src/application/dtos/client/FetchSessionsDto";
 import { IUseCase } from "../IUseCases/IUseCase";
 

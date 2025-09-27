@@ -15,65 +15,65 @@ export interface CreateOtpProps {
 }
 
 export class Otp {
-  private _id: string;
-  private _email: string;
-  private _otp: string;
-  private _expiresAt: Date;
-  private _createdAt: Date;
-  private _updatedAt: Date;
+    private _id: string;
+    private _email: string;
+    private _otp: string;
+    private _expiresAt: Date;
+    private _createdAt: Date;
+    private _updatedAt: Date;
 
-  private constructor(props: PersistedOtpProps) {
-    this._id = props.id;
-    this._email = props.email;
-    this._otp = props.otp;
-    this._expiresAt = props.expiresAt;
-    this._createdAt = props.createdAt;
-    this._updatedAt = props.updatedAt;
-  }
+    private constructor(props: PersistedOtpProps) {
+        this._id = props.id;
+        this._email = props.email;
+        this._otp = props.otp;
+        this._expiresAt = props.expiresAt;
+        this._createdAt = props.createdAt;
+        this._updatedAt = props.updatedAt;
+    }
 
-  static create(props: CreateOtpProps): Otp {
-    const expiresAt = new Date(Date.now() + 60 * 1000);
-    const now = new Date();
-    return new Otp({
-      id: `otp-${uuid()}`,
-      email: props.email,
-      otp: props.otp,
-      expiresAt,
-      createdAt: now,
-      updatedAt: now,
-    });
-  }
+    static create(props: CreateOtpProps): Otp {
+        const expiresAt = new Date(Date.now() + 60 * 1000);
+        const now = new Date();
+        return new Otp({
+            id: `otp-${uuid()}`,
+            email: props.email,
+            otp: props.otp,
+            expiresAt,
+            createdAt: now,
+            updatedAt: now,
+        });
+    }
 
-  static fromPersistence(props: PersistedOtpProps): Otp {
-    return new Otp(props);
-  }
+    static fromPersistence(props: PersistedOtpProps): Otp {
+        return new Otp(props);
+    }
 
-  // Getters
-  get id() {
-    return this._id;
-  }
+    // Getters
+    get id() {
+        return this._id;
+    }
 
-  get createdAt() {
-    return this._createdAt;
-  }
+    get createdAt() {
+        return this._createdAt;
+    }
 
-  get updatedAt() {
-    return this._updatedAt;
-  }
+    get updatedAt() {
+        return this._updatedAt;
+    }
 
-  get email(): string {
-    return this._email;
-  }
+    get email(): string {
+        return this._email;
+    }
 
-  get otp(): string {
-    return this._otp;
-  }
+    get otp(): string {
+        return this._otp;
+    }
 
-  get expiresAt(): Date {
-    return this._expiresAt;
-  }
+    get expiresAt(): Date {
+        return this._expiresAt;
+    }
 
-  isExpired(): boolean {
-    return new Date() > this._expiresAt;
-  }
+    isExpired(): boolean {
+        return new Date() > this._expiresAt;
+    }
 }

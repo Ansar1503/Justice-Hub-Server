@@ -1,6 +1,6 @@
 import {
-  FindAllPracticeAreaInputDto,
-  FindAllPracticeAreaOutputDto,
+    FindAllPracticeAreaInputDto,
+    FindAllPracticeAreaOutputDto,
 } from "@src/application/dtos/PracticeAreas/FindAllPracticeAreaDto";
 import { IUseCase } from "../IUseCases/IUseCase";
 

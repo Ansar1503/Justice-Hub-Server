@@ -1,8 +1,8 @@
 import { PracticeArea } from "@domain/entities/PracticeArea";
 import { IBaseRepository } from "./IBaseRepo";
 import {
-  FindAllPracticeAreaInputDto,
-  FindAllPracticeAreaOutputDto,
+    FindAllPracticeAreaInputDto,
+    FindAllPracticeAreaOutputDto,
 } from "@src/application/dtos/PracticeAreas/FindAllPracticeAreaDto";
 
 export interface IPracticAreaRepo extends IBaseRepository<PracticeArea> {

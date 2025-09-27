@@ -7,13 +7,13 @@ import { CloudinaryService } from "@src/application/services/cloudinary.service"
 import { FetchProfileImageUsecase } from "@src/application/usecases/Client/implementations/FetchProfileImageUsecase";
 
 export function FetchProfileImageComposer(): IController {
-  const usecase = new FetchProfileImageUsecase(
-    new ClientRepository(),
-    new CloudinaryService()
-  );
-  return new FetchProfileImageController(
-    usecase,
-    new HttpErrors(),
-    new HttpSuccess()
-  );
+    const usecase = new FetchProfileImageUsecase(
+        new ClientRepository(),
+        new CloudinaryService()
+    );
+    return new FetchProfileImageController(
+        usecase,
+        new HttpErrors(),
+        new HttpSuccess()
+    );
 }

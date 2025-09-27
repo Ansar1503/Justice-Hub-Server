@@ -4,6 +4,6 @@ import { DelereReviewUseCase } from "@src/application/usecases/Client/implementa
 import { ReviewRepo } from "@infrastructure/database/repo/ReviewRepo";
 
 export function DeleteReviewComposer(): IController {
-  const usecase = new DelereReviewUseCase(new ReviewRepo());
-  return new DeleteReviewController(usecase);
+    const usecase = new DelereReviewUseCase(new ReviewRepo());
+    return new DeleteReviewController(usecase);
 }

@@ -9,49 +9,49 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 
 export class ChangeLawyerVerificationStatusController implements IController {
-  constructor(
+    constructor(
     private ChangeLawyerVerificationUseCase: IChangeLawyerVerificationStatus,
     private httpError: IHttpErrors = new HttpErrors(),
     private httpSuccess: IHttpSuccess = new HttpSuccess()
-  ) {}
-  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    const { user_id, status, rejectReason } = httpRequest.body as Record<
+    ) {}
+    async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+        const { user_id, status, rejectReason } = httpRequest.body as Record<
       string,
       any
     >;
-    if (!user_id) {
-      const error = this.httpError.error_400();
-      return new HttpResponse(error.statusCode, "UserId not found");
-    }
-    if (
-      !status ||
+        if (!user_id) {
+            const error = this.httpError.error_400();
+            return new HttpResponse(error.statusCode, "UserId not found");
+        }
+        if (
+            !status ||
       !["verified", "rejected", "pending", "requested"].includes(status)
-    ) {
-      const error = this.httpError.error_400();
-      return new HttpResponse(
-        error.statusCode,
-        "Status not found or Invalid status"
-      );
+        ) {
+            const error = this.httpError.error_400();
+            return new HttpResponse(
+                error.statusCode,
+                "Status not found or Invalid status"
+            );
+        }
+        try {
+            const result = await this.ChangeLawyerVerificationUseCase.execute({
+                user_id,
+                status,
+                rejectReason,
+            });
+            if (!result) {
+                const error = this.httpError.error_400();
+                return new HttpResponse(error.statusCode, error.body);
+            } else {
+                const success = this.httpSuccess.success_200(result);
+                return new HttpResponse(success.statusCode, success.body);
+            }
+        } catch (error) {
+            console.log(error);
+            if (error instanceof Error) {
+                return this.httpError.error_400(error.message);
+            }
+            return this.httpError.error_500();
+        }
     }
-    try {
-      const result = await this.ChangeLawyerVerificationUseCase.execute({
-        user_id,
-        status,
-        rejectReason,
-      });
-      if (!result) {
-        const error = this.httpError.error_400();
-        return new HttpResponse(error.statusCode, error.body);
-      } else {
-        const success = this.httpSuccess.success_200(result);
-        return new HttpResponse(success.statusCode, success.body);
-      }
-    } catch (error) {
-      console.log(error);
-      if (error instanceof Error) {
-        return this.httpError.error_400(error.message);
-      }
-      return this.httpError.error_500();
-    }
-  }
 }

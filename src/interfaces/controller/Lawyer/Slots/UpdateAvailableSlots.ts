@@ -9,43 +9,43 @@ import { IUpdateAvailableSlotsUseCase } from "@src/application/usecases/Lawyer/I
 import { UpdateAvailableSlotsBodyValidateSchema } from "@interfaces/middelwares/validator/zod/lawyer/UpdateAvailableSlotSchema";
 
 export class UpdateAvailableSlotsController implements IController {
-  constructor(
+    constructor(
     private updateAvailableSlots: IUpdateAvailableSlotsUseCase,
     private httpSuccess: IHttpSuccess = new HttpSuccess(),
     private httpErrors: IHttpErrors = new HttpErrors()
-  ) {}
-  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    let user_id: string = "";
+    ) {}
+    async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+        let user_id: string = "";
 
-    if (
-      httpRequest.user &&
+        if (
+            httpRequest.user &&
       typeof httpRequest.user === "object" &&
       "id" in httpRequest.user
-    ) {
-      user_id = String(httpRequest.user.id);
-    }
+        ) {
+            user_id = String(httpRequest.user.id);
+        }
 
-    if (!user_id) {
-      return this.httpErrors.error_400("User_id Not found");
-    }
+        if (!user_id) {
+            return this.httpErrors.error_400("User_id Not found");
+        }
 
-    try {
-      const parsed = UpdateAvailableSlotsBodyValidateSchema.safeParse(
-        httpRequest.body
-      );
-      if (!parsed.success) {
-        const err = parsed.error.errors[0];
-        return this.httpErrors.error_400(err.message);
-      }
-      const payload = { ...parsed.data, lawyer_id: user_id };
-      const result = await this.updateAvailableSlots.execute(payload);
-      return this.httpSuccess.success_200(result);
-    } catch (error) {
-      if (error instanceof Error) {
-        console.log("error in updating avaliable slots:", error);
-        return this.httpErrors.error_500(error.message);
-      }
-      return this.httpErrors.error_500();
+        try {
+            const parsed = UpdateAvailableSlotsBodyValidateSchema.safeParse(
+                httpRequest.body
+            );
+            if (!parsed.success) {
+                const err = parsed.error.errors[0];
+                return this.httpErrors.error_400(err.message);
+            }
+            const payload = { ...parsed.data, lawyer_id: user_id };
+            const result = await this.updateAvailableSlots.execute(payload);
+            return this.httpSuccess.success_200(result);
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log("error in updating avaliable slots:", error);
+                return this.httpErrors.error_500(error.message);
+            }
+            return this.httpErrors.error_500();
+        }
     }
-  }
 }

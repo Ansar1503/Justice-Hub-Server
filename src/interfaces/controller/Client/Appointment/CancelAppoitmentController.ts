@@ -9,34 +9,34 @@ import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { ICancelAppointmentUseCase } from "@src/application/usecases/Client/ICancelAppointmentUseCase";
 
 export class CancelAppointmentController implements IController {
-  constructor(
+    constructor(
     private cancelAppointment: ICancelAppointmentUseCase,
     private httpErrors: IHttpErrors = new HttpErrors(),
     private httpSuccess: IHttpSuccess = new HttpSuccess()
-  ) {}
-  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    const req = httpRequest as Record<string, any>;
-    const client_id = req.user?.id;
-    if (!client_id) {
-      return new HttpResponse(400, { message: "Client Id not found" });
+    ) {}
+    async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+        const req = httpRequest as Record<string, any>;
+        const client_id = req.user?.id;
+        if (!client_id) {
+            return new HttpResponse(400, { message: "Client Id not found" });
+        }
+        const { id, status } = req.body;
+        if (!id || !status) {
+            return new HttpResponse(400, { message: "Credentials not found" });
+        }
+        try {
+            const result = await this.cancelAppointment.execute({
+                id,
+                status,
+            });
+            const success = this.httpSuccess.success_200(result);
+            return new HttpResponse(success.statusCode, success.body);
+        } catch (error) {
+            console.log("error in ", error);
+            if (error instanceof Error) {
+                return this.httpErrors.error_400(error.message);
+            }
+            return this.httpErrors.error_500();
+        }
     }
-    const { id, status } = req.body;
-    if (!id || !status) {
-      return new HttpResponse(400, { message: "Credentials not found" });
-    }
-    try {
-      const result = await this.cancelAppointment.execute({
-        id,
-        status,
-      });
-      const success = this.httpSuccess.success_200(result);
-      return new HttpResponse(success.statusCode, success.body);
-    } catch (error) {
-      console.log("error in ", error);
-      if (error instanceof Error) {
-        return this.httpErrors.error_400(error.message);
-      }
-      return this.httpErrors.error_500();
-    }
-  }
 }

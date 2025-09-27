@@ -6,10 +6,10 @@ import { ClientRepository } from "@infrastructure/database/repo/ClientRepo";
 import { CloudinaryService } from "@src/application/services/cloudinary.service";
 
 export function updateClientDataComposer(): IController {
-  const usecase = new UpdateClientDataUseCase(
-    new UserRepository(),
-    new ClientRepository(),
-    new CloudinaryService()
-  );
-  return new UpdateBasicInfoController(usecase);
+    const usecase = new UpdateClientDataUseCase(
+        new UserRepository(),
+        new ClientRepository(),
+        new CloudinaryService()
+    );
+    return new UpdateBasicInfoController(usecase);
 }

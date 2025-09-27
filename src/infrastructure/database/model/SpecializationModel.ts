@@ -8,14 +8,14 @@ export interface ISpecializationModel extends Document {
 }
 
 const specializationSchema = new Schema<ISpecializationModel>(
-  {
-    _id: { type: String },
-    name: { type: String, required: true },
-  },
-  { timestamps: true }
+    {
+        _id: { type: String },
+        name: { type: String, required: true },
+    },
+    { timestamps: true }
 );
 
 export const SpecializationModel = mongoose.model<ISpecializationModel>(
-  "specializations",
-  specializationSchema
+    "specializations",
+    specializationSchema
 );

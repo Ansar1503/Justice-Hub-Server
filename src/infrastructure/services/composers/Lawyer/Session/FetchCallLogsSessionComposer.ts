@@ -4,6 +4,6 @@ import { FetchCallLogsUseCase } from "@src/application/usecases/Lawyer/implement
 import { CallLogsRepository } from "@infrastructure/database/repo/CallLogsRepo";
 
 export function FetchCallLogsSessionComposer():IController{
-    const usecase = new FetchCallLogsUseCase(new CallLogsRepository())
-    return new FetchCallLogsController(usecase)
+    const usecase = new FetchCallLogsUseCase(new CallLogsRepository());
+    return new FetchCallLogsController(usecase);
 }

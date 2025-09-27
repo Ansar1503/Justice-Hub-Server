@@ -7,11 +7,11 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { FetchCasetypeUsecase } from "@src/application/usecases/CaseType/implementation/FetchCasetypeUsecase";
 
 export function FindAllCasetypeComposer(): IController {
-  const casetypeRepo = new CaseTypeRepo(new CaseTypeMapper());
-  const usecase = new FetchCasetypeUsecase(casetypeRepo);
-  return new FetchAllCasetypeController(
-    usecase,
-    new HttpErrors(),
-    new HttpSuccess()
-  );
+    const casetypeRepo = new CaseTypeRepo(new CaseTypeMapper());
+    const usecase = new FetchCasetypeUsecase(casetypeRepo);
+    return new FetchAllCasetypeController(
+        usecase,
+        new HttpErrors(),
+        new HttpSuccess()
+    );
 }

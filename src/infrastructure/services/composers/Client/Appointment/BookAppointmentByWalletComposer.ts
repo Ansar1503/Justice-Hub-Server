@@ -17,10 +17,10 @@ import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { BookAppointmentByWalletUsecase } from "@src/application/usecases/Appointments/implementations/BookAppointmentsByWalletUsecase";
 
 export function BookAppointmentByWalletComposer(): IController {
-  const uscase = new BookAppointmentByWalletUsecase(new MongoUnitofWork());
-  return new BookAppointmentByWalletController(
-    uscase,
-    new HttpErrors(),
-    new HttpSuccess()
-  );
+    const uscase = new BookAppointmentByWalletUsecase(new MongoUnitofWork());
+    return new BookAppointmentByWalletController(
+        uscase,
+        new HttpErrors(),
+        new HttpSuccess()
+    );
 }

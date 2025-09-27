@@ -10,8 +10,8 @@ import morgan from "morgan";
 import cors from "cors";
 import "dotenv/config";
 import {
-  errorMiddleware,
-  NotFoundErrorHandler,
+    errorMiddleware,
+    NotFoundErrorHandler,
 } from "../../interfaces/middelwares/Error/ErrorHandler";
 import { InitialiseSocketServer } from "../socket/config";
 import { setUpChatSocket } from "../../interfaces/socket/chatSocket";
@@ -22,28 +22,28 @@ const app: Application = express();
 const server = createServer(app);
 const io = InitialiseSocketServer(server);
 const rateLimiter = rateLimit({
-  windowMs: 60000,
-  max: 100,
-  message: "Too many requests from this IP, please try again later.",
-  standardHeaders: true,
-  legacyHeaders: false,
+    windowMs: 60000,
+    max: 100,
+    message: "Too many requests from this IP, please try again later.",
+    standardHeaders: true,
+    legacyHeaders: false,
 });
 connectDB();
 app.use(
-  cors({
-    origin: [
-      `${process.env.FRONTEND_URL}`,
-      "https://c6cfac23a22c.ngrok-free.app",
-    ],
-    methods: ["PUT", "POST", "GET", "PATCH", "DELETE"],
-    credentials: true,
-  })
+    cors({
+        origin: [
+            `${process.env.FRONTEND_URL}`,
+            "https://c6cfac23a22c.ngrok-free.app",
+        ],
+        methods: ["PUT", "POST", "GET", "PATCH", "DELETE"],
+        credentials: true,
+    })
 );
 app.use(rateLimiter);
 app.use(
-  "/api/client/stripe/webhooks",
-  express.raw({ type: "application/json" }),
-  clientRoute
+    "/api/client/stripe/webhooks",
+    express.raw({ type: "application/json" }),
+    clientRoute
 );
 app.use(morgan("dev"));
 app.use(express.json());
@@ -62,5 +62,5 @@ app.use(errorMiddleware);
 setUpChatSocket(io);
 
 server.listen(PORT, () =>
-  console.log(`🚀 Server running on port http://localhost:${PORT}`)
+    console.log(`🚀 Server running on port http://localhost:${PORT}`)
 );

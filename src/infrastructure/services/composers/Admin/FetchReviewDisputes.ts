@@ -4,8 +4,8 @@ import { IController } from "@interfaces/controller/Interface/IController";
 import { FetchReviewDisputesUseCase } from "@src/application/usecases/Admin/Implementations/FetchReviewDisputesUseCase";
 
 export function FetchReviewDipsutesComposer(): IController {
-  const repo = new DisputesRepo();
-  const usecase = new FetchReviewDisputesUseCase(repo);
-  const controller = new FetchReviewDisputes(usecase);
-  return controller;
+    const repo = new DisputesRepo();
+    const usecase = new FetchReviewDisputesUseCase(repo);
+    const controller = new FetchReviewDisputes(usecase);
+    return controller;
 }

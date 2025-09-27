@@ -4,6 +4,6 @@ import { IController } from "@interfaces/controller/Interface/IController";
 import { UpdateDisputesStatusUseCase } from "@src/application/usecases/Admin/Implementations/UpdateDisputesStatusUseCase";
 
 export function UpdateDisputesStatusComposer(): IController {
-  const usecase = new UpdateDisputesStatusUseCase(new DisputesRepo());
-  return new ChangeDisputesStatusController(usecase);
+    const usecase = new UpdateDisputesStatusUseCase(new DisputesRepo());
+    return new ChangeDisputesStatusController(usecase);
 }

@@ -14,56 +14,56 @@ interface createCasetypeProps {
 }
 
 export class CaseType {
-  private _id: string;
-  private _name: string;
-  private _practiceareaId: string;
-  private _createdAt: Date;
-  private _updatedAt: Date;
-  constructor(props: persistedCasetypes) {
-    this._id = props.id;
-    this._name = props.name;
-    this._practiceareaId = props.practiceareaId;
-    this._createdAt = props.createdAt;
-    this._updatedAt = props.updatedAt;
-  }
+    private _id: string;
+    private _name: string;
+    private _practiceareaId: string;
+    private _createdAt: Date;
+    private _updatedAt: Date;
+    constructor(props: persistedCasetypes) {
+        this._id = props.id;
+        this._name = props.name;
+        this._practiceareaId = props.practiceareaId;
+        this._createdAt = props.createdAt;
+        this._updatedAt = props.updatedAt;
+    }
 
-  get id() {
-    return this._id;
-  }
-  get name() {
-    return this._name;
-  }
-  get practiceareaId() {
-    return this._practiceareaId;
-  }
-  get createdAt() {
-    return this._createdAt;
-  }
-  get updatedAt() {
-    return this._updatedAt;
-  }
+    get id() {
+        return this._id;
+    }
+    get name() {
+        return this._name;
+    }
+    get practiceareaId() {
+        return this._practiceareaId;
+    }
+    get createdAt() {
+        return this._createdAt;
+    }
+    get updatedAt() {
+        return this._updatedAt;
+    }
 
-  static create(props: createCasetypeProps) {
-    const now = new Date();
-    return new CaseType({
-      id: `ct-${uuidv4()}`,
-      name: props.name,
-      practiceareaId: props.practiceareaId,
-      createdAt: now,
-      updatedAt: now,
-    });
-  }
+    static create(props: createCasetypeProps) {
+        const now = new Date();
+        return new CaseType({
+            id: `ct-${uuidv4()}`,
+            name: props.name,
+            practiceareaId: props.practiceareaId,
+            createdAt: now,
+            updatedAt: now,
+        });
+    }
 
-  static fromPersistance(props: persistedCasetypes) {
-    return new CaseType(props);
-  }
+    static fromPersistance(props: persistedCasetypes) {
+        return new CaseType(props);
+    }
 
-  updateName(name: string) {
-    this._name = name;
-    this._updatedAt = new Date();
-  }
-  updatePracticeareaId(id: string) {
-    this._practiceareaId = id;
-    this._updatedAt = new Date();
-  }
+    updateName(name: string) {
+        this._name = name;
+        this._updatedAt = new Date();
+    }
+    updatePracticeareaId(id: string) {
+        this._practiceareaId = id;
+        this._updatedAt = new Date();
+    }
 }

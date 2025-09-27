@@ -9,37 +9,37 @@ import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 
 export class BlockUser implements IController {
-  constructor(
+    constructor(
     private BlockUserUseCase: IBlockUserUseCase,
     private httpErrors: IHttpErrors = new HttpErrors(),
     private httpSuccess: IHttpSuccess = new HttpSuccess()
-  ) {}
-  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    const { user_id, status } = httpRequest.body as Record<string, string>;
-    if (!user_id) {
-      const error = this.httpErrors.error_400();
-      return new HttpResponse(error.statusCode, "user Id not found");
+    ) {}
+    async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+        const { user_id, status } = httpRequest.body as Record<string, string>;
+        if (!user_id) {
+            const error = this.httpErrors.error_400();
+            return new HttpResponse(error.statusCode, "user Id not found");
+        }
+        if (status === undefined || status === null || status === "") {
+            return this.httpErrors.error_400("status not found");
+        }
+        try {
+            const result = await this.BlockUserUseCase.execute({
+                status: typeof status === "boolean" ? status : Boolean(status),
+                user_id,
+            });
+            const body = {
+                success: true,
+                message: `user ${result?.status ? "blocked" : "unblocked"}`,
+                data: result,
+            };
+            const success = this.httpSuccess.success_200(body);
+            return new HttpResponse(success.statusCode, success.body);
+        } catch (error: any) {
+            return new HttpResponse(
+                error?.statusCode || 500,
+                error?.message || "Internal Server Error"
+            );
+        }
     }
-    if (status === undefined || status === null || status === "") {
-      return this.httpErrors.error_400("status not found");
-    }
-    try {
-      const result = await this.BlockUserUseCase.execute({
-        status: typeof status === "boolean" ? status : Boolean(status),
-        user_id,
-      });
-      const body = {
-        success: true,
-        message: `user ${result?.status ? "blocked" : "unblocked"}`,
-        data: result,
-      };
-      const success = this.httpSuccess.success_200(body);
-      return new HttpResponse(success.statusCode, success.body);
-    } catch (error: any) {
-      return new HttpResponse(
-        error?.statusCode || 500,
-        error?.message || "Internal Server Error"
-      );
-    }
-  }
 }

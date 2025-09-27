@@ -4,6 +4,6 @@ import { RemoveOverrideSlots } from "@src/application/usecases/Lawyer/implementa
 import { OverrideSlotsRepository } from "@infrastructure/database/repo/OverrideSlotsRepo";
 
 export function RemoveOverriedSlotsComposer(): IController {
-  const usecase = new RemoveOverrideSlots(new OverrideSlotsRepository());
-  return new RemoveOverrideSlotsController(usecase);
+    const usecase = new RemoveOverrideSlots(new OverrideSlotsRepository());
+    return new RemoveOverrideSlotsController(usecase);
 }

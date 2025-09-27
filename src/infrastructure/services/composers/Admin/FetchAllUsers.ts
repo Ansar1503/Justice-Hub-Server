@@ -5,8 +5,8 @@ import { IController } from "@interfaces/controller/Interface/IController";
 import { FetchUsersUseCase } from "@src/application/usecases/Admin/Implementations/FetchUsersUseCase";
 
 export function FetchAllUserComposer(): IController {
-  const mapper = new UserMapper();
-  const repo = new UserRepository(mapper);
-  const usecase = new FetchUsersUseCase(repo);
-  return new FetchALLUsers(usecase);
+    const mapper = new UserMapper();
+    const repo = new UserRepository(mapper);
+    const usecase = new FetchUsersUseCase(repo);
+    return new FetchALLUsers(usecase);
 }

@@ -1,6 +1,6 @@
 import {
-  UseCaseInputDto,
-  UseCaseOutputDto,
+    UseCaseInputDto,
+    UseCaseOutputDto,
 } from "@src/application/dtos/Admin/FetchAllUsersDto";
 import { IUseCase } from "../IUseCases/IUseCase";
 

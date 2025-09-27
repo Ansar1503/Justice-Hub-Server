@@ -5,9 +5,9 @@ import { ScheduleSettingsRepository } from "@infrastructure/database/repo/Schedu
 import { OverrideSlotsRepository } from "@infrastructure/database/repo/OverrideSlotsRepo";
 
 export function AddOverrideSlotsComposer(): IController {
-  const usecase = new AddOverrideSlotsUseCase(
-    new ScheduleSettingsRepository(),
-    new OverrideSlotsRepository()
-  );
-  return new AddOverrideSlotsController(usecase);
+    const usecase = new AddOverrideSlotsUseCase(
+        new ScheduleSettingsRepository(),
+        new OverrideSlotsRepository()
+    );
+    return new AddOverrideSlotsController(usecase);
 }

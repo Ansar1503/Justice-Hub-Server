@@ -11,11 +11,11 @@ import { FetchChatDisputesComposer } from "@infrastructure/services/composers/Ad
 import { UpdateDisputesStatusComposer } from "@infrastructure/services/composers/Admin/UpdateDisputesStatusComposer";
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 import {
-  AdminRoutes,
-  CasetypeRoutes,
-  PracticeAreaRoutes,
-  SpecializationRoute,
-  WalletRoutes,
+    AdminRoutes,
+    CasetypeRoutes,
+    PracticeAreaRoutes,
+    SpecializationRoute,
+    WalletRoutes,
 } from "@shared/constant/RouteConstant";
 import { FetchTransactionsByWalletComposer } from "@infrastructure/services/composers/Wallet/FetchTransactionsByWalletComposer";
 import { FetchWalletByUserComposer } from "@infrastructure/services/composers/Wallet/FetchWalletByUserComposer";
@@ -34,200 +34,200 @@ import { DeleteCasetypeComposer } from "@infrastructure/services/composers/Caset
 const router = Router();
 
 router.get(
-  AdminRoutes.users,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FetchAllUserComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
+    AdminRoutes.users,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, FetchAllUserComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    }
 );
 router.get(
-  AdminRoutes.lawyers,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FetchAllLawyersComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
+    AdminRoutes.lawyers,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, FetchAllLawyersComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    }
 );
 router.patch(
-  AdminRoutes.blockUser,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, BlockUserComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
+    AdminRoutes.blockUser,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, BlockUserComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    }
 );
 router.patch(
-  AdminRoutes.changeLawyerVerification,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(
-      req,
-      ChangeLawyerVerificationComposer()
-    );
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
+    AdminRoutes.changeLawyerVerification,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(
+            req,
+            ChangeLawyerVerificationComposer()
+        );
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    }
 );
 
 router.get(
-  AdminRoutes.profileAppointments,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FetchAppointmentDataComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
+    AdminRoutes.profileAppointments,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, FetchAppointmentDataComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    }
 );
 router.get(
-  AdminRoutes.profileSessions,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adaper = await expressAdapter(req, fetchSessionsComposer());
-    res.status(adaper.statusCode).json(adaper.body);
-    return;
-  }
+    AdminRoutes.profileSessions,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adaper = await expressAdapter(req, fetchSessionsComposer());
+        res.status(adaper.statusCode).json(adaper.body);
+        return;
+    }
 );
 
 // disputes
 router.get(
-  AdminRoutes.reviewDisputes,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adaper = await expressAdapter(req, FetchReviewDipsutesComposer());
-    res.status(adaper.statusCode).json(adaper.body);
-    return;
-  }
+    AdminRoutes.reviewDisputes,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adaper = await expressAdapter(req, FetchReviewDipsutesComposer());
+        res.status(adaper.statusCode).json(adaper.body);
+        return;
+    }
 );
 
 router.get(
-  AdminRoutes.chatDisputes,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FetchChatDisputesComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
+    AdminRoutes.chatDisputes,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, FetchChatDisputesComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    }
 );
 
 router.put(
-  AdminRoutes.updateDisputeStatus,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, UpdateDisputesStatusComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
+    AdminRoutes.updateDisputeStatus,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, UpdateDisputesStatusComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    }
 );
 
 router.get(
-  WalletRoutes.base + WalletRoutes.transactions,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(
-      req,
-      FetchTransactionsByWalletComposer()
-    );
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
+    WalletRoutes.base + WalletRoutes.transactions,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(
+            req,
+            FetchTransactionsByWalletComposer()
+        );
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    }
 );
 router.get(
-  WalletRoutes.base,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FetchWalletByUserComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
+    WalletRoutes.base,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, FetchWalletByUserComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    }
 );
 
 router
-  .route(SpecializationRoute.base)
-  .all(authenticateUser)
-  .get(async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(
-      req,
-      FetchAllSpecializationsComposer()
-    );
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  })
-  .patch(async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, AddSpecializationComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  });
+    .route(SpecializationRoute.base)
+    .all(authenticateUser)
+    .get(async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(
+            req,
+            FetchAllSpecializationsComposer()
+        );
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    })
+    .patch(async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, AddSpecializationComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    });
 
 router.delete(
-  SpecializationRoute.base + SpecializationRoute.params,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, DeleteSpecializationComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
+    SpecializationRoute.base + SpecializationRoute.params,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, DeleteSpecializationComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    }
 );
 
 router
-  .route(PracticeAreaRoutes.base)
-  .all(authenticateUser)
-  .post(async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, AddPracticeAreasComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  })
-  .get(async (req: Request, res: Response) => {
-    const adaper = await expressAdapter(req, FindAllPracticeAreaComposer());
-    res.status(adaper.statusCode).json(adaper.body);
-    return;
-  })
-  .put(async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, UpdatePracticeAreaComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  });
+    .route(PracticeAreaRoutes.base)
+    .all(authenticateUser)
+    .post(async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, AddPracticeAreasComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    })
+    .get(async (req: Request, res: Response) => {
+        const adaper = await expressAdapter(req, FindAllPracticeAreaComposer());
+        res.status(adaper.statusCode).json(adaper.body);
+        return;
+    })
+    .put(async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, UpdatePracticeAreaComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    });
 
 router.delete(
-  PracticeAreaRoutes.base + PracticeAreaRoutes.params,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, DeletePracticeAreaComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
+    PracticeAreaRoutes.base + PracticeAreaRoutes.params,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, DeletePracticeAreaComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    }
 );
 
 router
-  .route(CasetypeRoutes.base)
-  .all(authenticateUser)
-  .get(async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FindAllCasetypeComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  })
-  .post(async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, AddCaseTypeComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  })
-  .put(async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, UpdateCasetypeComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  });
+    .route(CasetypeRoutes.base)
+    .all(authenticateUser)
+    .get(async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, FindAllCasetypeComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    })
+    .post(async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, AddCaseTypeComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    })
+    .put(async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, UpdateCasetypeComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    });
 
 router.delete(
-  CasetypeRoutes.base + CasetypeRoutes.params,
-  authenticateUser,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, DeleteCasetypeComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
+    CasetypeRoutes.base + CasetypeRoutes.params,
+    authenticateUser,
+    async (req: Request, res: Response) => {
+        const adapter = await expressAdapter(req, DeleteCasetypeComposer());
+        res.status(adapter.statusCode).json(adapter.body);
+        return;
+    }
 );
 
 export default router;

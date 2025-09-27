@@ -4,8 +4,8 @@ import { FetchSessionsDocumentsUseCase } from "@src/application/usecases/Lawyer/
 import { SessionDocumentsRepository } from "@infrastructure/database/repo/SessionsDocumentRepo";
 
 export function FetchSessionDocumentsComposer(): IController {
-  const usecase = new FetchSessionsDocumentsUseCase(
-    new SessionDocumentsRepository()
-  );
-  return new FetchSessionsDocumentsController(usecase);
+    const usecase = new FetchSessionsDocumentsUseCase(
+        new SessionDocumentsRepository()
+    );
+    return new FetchSessionsDocumentsController(usecase);
 }

@@ -3,6 +3,6 @@ import { FetchStripeSessionDetailsController } from "@interfaces/controller/Clie
 import { FetchStripeSessionDetailsUseCase } from "@src/application/usecases/Client/implementations/FethStripeSessionDetailsUseCase";
 
 export function FetchStripeSessionDetailsComposer(): IController {
-  const usecase = new FetchStripeSessionDetailsUseCase();
-  return new FetchStripeSessionDetailsController(usecase);
+    const usecase = new FetchStripeSessionDetailsUseCase();
+    return new FetchStripeSessionDetailsController(usecase);
 }

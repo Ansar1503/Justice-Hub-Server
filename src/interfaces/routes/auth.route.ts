@@ -12,47 +12,47 @@ import { AuthRoute } from "@shared/constant/RouteConstant";
 
 const router = express.Router();
 router.post(
-  AuthRoute.signup,
-  validateUser,
-  handleValidationErrors,
-  async (req: Request, res: Response) => {
-    const adaper = await expressAdapter(req, RegisterUserComponser());
-    res.status(adaper.statusCode).json(adaper.body);
-    return;
-  }
+    AuthRoute.signup,
+    validateUser,
+    handleValidationErrors,
+    async (req: Request, res: Response) => {
+        const adaper = await expressAdapter(req, RegisterUserComponser());
+        res.status(adaper.statusCode).json(adaper.body);
+        return;
+    }
 );
 router.post(AuthRoute.login, async (req: Request, res: Response) => {
-  const adaper = await expressAdapter(req, LoginUserComposer());
-  res.cookie("refresh", adaper.body?.refreshtoken, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-    maxAge: 24 * 60 * 60 * 1000,
-  });
-  res.status(adaper.statusCode).json(adaper.body);
-  return;
+    const adaper = await expressAdapter(req, LoginUserComposer());
+    res.cookie("refresh", adaper.body?.refreshtoken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.status(adaper.statusCode).json(adaper.body);
+    return;
 });
 router.get(AuthRoute.refresh, async (req: Request, res: Response) => {
-  const adaper = await expressAdapter(req, RefreshTokenComposer());
-  // console.log("adapter : ", adaper);
-  res.status(adaper.statusCode).json(adaper.body);
+    const adaper = await expressAdapter(req, RefreshTokenComposer());
+    // console.log("adapter : ", adaper);
+    res.status(adaper.statusCode).json(adaper.body);
 });
 router.get(AuthRoute.verifyMail, async (req: Request, res: Response) => {
-  const adaper = await expressAdapter(req, VerifyEmailComposer());
-  if (adaper.body?.redirectUrl) {
-    res.redirect(adaper.body?.redirectUrl);
-    return;
-  }
+    const adaper = await expressAdapter(req, VerifyEmailComposer());
+    if (adaper.body?.redirectUrl) {
+        res.redirect(adaper.body?.redirectUrl);
+        return;
+    }
 });
 router.post(AuthRoute.verifyOtp, async (req: Request, res: Response) => {
-  const adaper = await expressAdapter(req, VerifyEmailOtpComposer());
-  res.status(adaper.statusCode).json(adaper.body);
-  return;
+    const adaper = await expressAdapter(req, VerifyEmailOtpComposer());
+    res.status(adaper.statusCode).json(adaper.body);
+    return;
 });
 router.post(AuthRoute.resendOtp, async (req: Request, res: Response) => {
-  const adapter = await expressAdapter(req, ResendOtpComposer());
-  res.status(adapter.statusCode).json(adapter.body);
-  return;
+    const adapter = await expressAdapter(req, ResendOtpComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
 });
 // router.post("/google/signup", GoogleRegistration);
 

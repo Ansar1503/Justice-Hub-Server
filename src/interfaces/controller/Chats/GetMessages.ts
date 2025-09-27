@@ -8,24 +8,24 @@ import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 
 export class GetMessages implements IController {
-  constructor(
+    constructor(
     private readonly chatUseCase: IChatusecase,
     private httpErrors: IHttpErrors = new HttpErrors(),
     private httpSuccess: IHttpSuccess = new HttpSuccess()
-  ) {}
-  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-    try {
-      const { cursor, sId } = httpRequest.query as {
+    ) {}
+    async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+        try {
+            const { cursor, sId } = httpRequest.query as {
         cursor?: string | number;
         sId?: string | number;
       };
-      const result = await this.chatUseCase.fetchChatMessages({
-        page: Number(cursor),
-        session_id: String(sId),
-      });
-      return this.httpSuccess.success_200(result);
-    } catch (error) {
-      return this.httpErrors.error_500();
+            const result = await this.chatUseCase.fetchChatMessages({
+                page: Number(cursor),
+                session_id: String(sId),
+            });
+            return this.httpSuccess.success_200(result);
+        } catch (error) {
+            return this.httpErrors.error_500();
+        }
     }
-  }
 }

@@ -5,9 +5,9 @@ import { FetchWalletTransactionByWalletController } from "@interfaces/controller
 import { FetchWalletTransactionsByWallet } from "@src/application/usecases/Wallet/implementation/FetchWalletTransactionsByWallet";
 
 export function FetchTransactionsByWalletComposer(): IController {
-  const usecase = new FetchWalletTransactionsByWallet(
-    new WalletRepo(),
-    new WalletTransactionsRepo()
-  );
-  return new FetchWalletTransactionByWalletController(usecase);
+    const usecase = new FetchWalletTransactionsByWallet(
+        new WalletRepo(),
+        new WalletTransactionsRepo()
+    );
+    return new FetchWalletTransactionByWalletController(usecase);
 }

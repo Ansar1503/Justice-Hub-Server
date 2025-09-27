@@ -5,9 +5,9 @@ import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
 import { ReviewRepo } from "@infrastructure/database/repo/ReviewRepo";
 
 export function FetchReviewsBySessionComposer(): IController {
-  const usecase = new FetchReviewBySessionUseCase(
-    new SessionsRepository(),
-    new ReviewRepo()
-  );
-  return new FetchReviewsBySessionController(usecase);
+    const usecase = new FetchReviewBySessionUseCase(
+        new SessionsRepository(),
+        new ReviewRepo()
+    );
+    return new FetchReviewsBySessionController(usecase);
 }

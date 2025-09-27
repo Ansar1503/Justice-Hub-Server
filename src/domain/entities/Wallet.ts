@@ -15,67 +15,67 @@ interface CreateWalletProps {
 }
 
 export class Wallet {
-  private _id: string;
-  private _user_id: string;
-  private _balance: number;
-  private _status: boolean;
-  private _isAdmin: boolean;
-  private _createdAt: Date;
-  private _updatedAt: Date;
-  constructor(props: PersistedWalletProps) {
-    this._id = props.id;
-    this._user_id = props.user_id;
-    this._balance = props.balance;
-    this._status = props.status;
-    this._isAdmin = props.isAdmin;
-    this._createdAt = props.createdAt;
-    this._updatedAt = props.updatedAt;
-  }
-  static create(props: CreateWalletProps) {
-    const now = new Date();
-    return new Wallet({
-      balance: 0,
-      status: true,
-      createdAt: now,
-      updatedAt: now,
-      isAdmin: false,
-      user_id: props.user_id,
-      id: `w-${uuidv4()}`,
-    });
-  }
+    private _id: string;
+    private _user_id: string;
+    private _balance: number;
+    private _status: boolean;
+    private _isAdmin: boolean;
+    private _createdAt: Date;
+    private _updatedAt: Date;
+    constructor(props: PersistedWalletProps) {
+        this._id = props.id;
+        this._user_id = props.user_id;
+        this._balance = props.balance;
+        this._status = props.status;
+        this._isAdmin = props.isAdmin;
+        this._createdAt = props.createdAt;
+        this._updatedAt = props.updatedAt;
+    }
+    static create(props: CreateWalletProps) {
+        const now = new Date();
+        return new Wallet({
+            balance: 0,
+            status: true,
+            createdAt: now,
+            updatedAt: now,
+            isAdmin: false,
+            user_id: props.user_id,
+            id: `w-${uuidv4()}`,
+        });
+    }
 
-  static fromPersisted(props: PersistedWalletProps) {
-    return new Wallet(props);
-  }
+    static fromPersisted(props: PersistedWalletProps) {
+        return new Wallet(props);
+    }
 
-  get id() {
-    return this._id;
-  }
-  get user_id() {
-    return this._user_id;
-  }
-  get balance() {
-    return this._balance;
-  }
-  get status() {
-    return this._status;
-  }
-  get isAdmin() {
-    return this._isAdmin;
-  }
-  get createdAt() {
-    return this._createdAt;
-  }
-  get updatedAt() {
-    return this._updatedAt;
-  }
+    get id() {
+        return this._id;
+    }
+    get user_id() {
+        return this._user_id;
+    }
+    get balance() {
+        return this._balance;
+    }
+    get status() {
+        return this._status;
+    }
+    get isAdmin() {
+        return this._isAdmin;
+    }
+    get createdAt() {
+        return this._createdAt;
+    }
+    get updatedAt() {
+        return this._updatedAt;
+    }
 
-  updateStatus(status: boolean) {
-    this._status = status;
-    this._updatedAt = new Date();
-  }
-  updateBalance(balance: number) {
-    this._balance = balance;
-    this._updatedAt = new Date();
-  }
+    updateStatus(status: boolean) {
+        this._status = status;
+        this._updatedAt = new Date();
+    }
+    updateBalance(balance: number) {
+        this._balance = balance;
+        this._updatedAt = new Date();
+    }
 }

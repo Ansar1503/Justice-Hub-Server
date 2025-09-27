@@ -1,6 +1,6 @@
 import {
-  FetchAppointmentsInputDto,
-  FetchAppointmentsOutputDto,
+    FetchAppointmentsInputDto,
+    FetchAppointmentsOutputDto,
 } from "@src/application/dtos/Appointments/FetchAppointmentsDto";
 import { IUseCase } from "../IUseCases/IUseCase";
 

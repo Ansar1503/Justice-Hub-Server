@@ -9,15 +9,15 @@ export interface IPracticeareaModel extends Document {
 }
 
 const practiceareaSchema = new Schema<IPracticeareaModel>(
-  {
-    _id: { type: String },
-    name: { type: String, required: true },
-    specializationId: { type: String, required: true, ref: "specializations" },
-  },
-  { timestamps: true }
+    {
+        _id: { type: String },
+        name: { type: String, required: true },
+        specializationId: { type: String, required: true, ref: "specializations" },
+    },
+    { timestamps: true }
 );
 
 export const practiceareaModel = mongoose.model<IPracticeareaModel>(
-  "practiceareas",
-  practiceareaSchema
+    "practiceareas",
+    practiceareaSchema
 );

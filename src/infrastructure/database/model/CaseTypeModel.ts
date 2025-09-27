@@ -9,15 +9,15 @@ export interface ICasetypeModel {
 }
 
 const casettypeSchema = new Schema<ICasetypeModel>(
-  {
-    _id: { type: String },
-    name: { type: String, required: true },
-    practiceareaId: { type: String, required: true, ref: "practiceareas" },
-  },
-  { timestamps: true }
+    {
+        _id: { type: String },
+        name: { type: String, required: true },
+        practiceareaId: { type: String, required: true, ref: "practiceareas" },
+    },
+    { timestamps: true }
 );
 
 export const CasetypeModel = mongoose.model<ICasetypeModel>(
-  "casetypes",
-  casettypeSchema
+    "casetypes",
+    casettypeSchema
 );

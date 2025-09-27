@@ -3,20 +3,20 @@ export function generateDescription(transactionData: {
   category: "deposit" | "withdrawal" | "payment" | "refund" | "transfer";
   amount: number;
 }) {
-  const { type, category, amount } = transactionData;
+    const { type, category, amount } = transactionData;
 
-  switch (category) {
+    switch (category) {
     case "deposit":
-      return `Added ₹${amount} ${type}ed via Stripe`;
+        return `Added ₹${amount} ${type}ed via Stripe`;
     case "withdrawal":
-      return `Withdrew ₹${amount} ${type}d to your bank account`;
+        return `Withdrew ₹${amount} ${type}d to your bank account`;
     case "payment":
-      return `Payment of ₹${amount} ${type}d from wallet`;
+        return `Payment of ₹${amount} ${type}d from wallet`;
     case "refund":
-      return `Refund of ₹${amount} ${type}d to wallet`;
+        return `Refund of ₹${amount} ${type}d to wallet`;
     case "transfer":
-      return `Transferred ₹${amount} ${type}ed to wallet`;
+        return `Transferred ₹${amount} ${type}ed to wallet`;
     default:
-      return `Transaction of ₹${amount}`;
-  }
+        return `Transaction of ₹${amount}`;
+    }
 }

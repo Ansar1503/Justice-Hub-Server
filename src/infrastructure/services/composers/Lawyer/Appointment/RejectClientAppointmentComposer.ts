@@ -5,9 +5,9 @@ import { AppointmentsRepository } from "@infrastructure/database/repo/Appointmen
 import { MongoUnitofWork } from "@infrastructure/database/UnitofWork/implementations/UnitofWork";
 
 export function RejectClientAppointmentComposer(): IController {
-  const usecase = new RejectAppointmentUseCase(
-    new AppointmentsRepository(),
-    new MongoUnitofWork()
-  );
-  return new RejectClientAppointmentController(usecase);
+    const usecase = new RejectAppointmentUseCase(
+        new AppointmentsRepository(),
+        new MongoUnitofWork()
+    );
+    return new RejectClientAppointmentController(usecase);
 }

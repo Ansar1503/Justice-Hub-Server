@@ -1,3 +1,3 @@
 export const socketStore = {
-  onlineUsers: new Set<string>(),
+    onlineUsers: new Set<string>(),
 };

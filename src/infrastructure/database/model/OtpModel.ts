@@ -10,13 +10,13 @@ export interface IotpModel extends Document {
 }
 
 const otpSchema = new Schema<IotpModel>(
-  {
-    _id: { type: String },
-    email: { type: String, required: true, unique: true },
-    otp: { type: String, required: true },
-    expiresAt: { type: Date, required: true },
-  },
-  { timestamps: true }
+    {
+        _id: { type: String },
+        email: { type: String, required: true, unique: true },
+        otp: { type: String, required: true },
+        expiresAt: { type: Date, required: true },
+    },
+    { timestamps: true }
 );
 
 const otpModel = mongoose.model<IotpModel>("otp", otpSchema);

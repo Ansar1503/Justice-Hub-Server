@@ -1,7 +1,7 @@
 import { IUseCase } from "../IUseCases/IUseCase";
 import {
-  FetchReviewInputDto,
-  FetchReviewOutputDto,
+    FetchReviewInputDto,
+    FetchReviewOutputDto,
 } from "@src/application/dtos/Reviews/review.dto";
 
 export interface IFetchReviewUseCase

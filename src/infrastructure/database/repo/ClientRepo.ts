@@ -7,36 +7,36 @@ import { ClientMapper } from "@infrastructure/Mapper/Implementations/ClientMappe
 import { ClientSession } from "mongoose";
 
 export class ClientRepository implements IClientRepository {
-  constructor(
+    constructor(
     private mapper: IMapper<Client, IClientModel> = new ClientMapper(),
     private readonly _session?: ClientSession
-  ) {}
+    ) {}
 
-  async create(client: Client): Promise<Client> {
-    const mapped = this.mapper.toPersistence(client);
-    const data = await new ClientModel(mapped).save({ session: this._session });
-    return this.mapper.toDomain(data);
-  }
-  async findByUserId(user_id: string): Promise<Client | null> {
-    return await ClientModel.findOne({ user_id });
-  }
-  async update(clientData: ClientUpdateDto): Promise<Client | null> {
-    return await ClientModel.findOneAndUpdate(
-      { user_id: clientData.user_id },
-      {
-        $set: {
-          dob: clientData.dob,
-          gender: clientData.gender,
-          profile_image: clientData.profile_image,
-          address: clientData.address,
-        },
-      }
-    );
-  }
-  async findAll(): Promise<Client[] | []> {
-    const data = await ClientModel.find({}).populate("address");
-    return data && this.mapper.toDomainArray
-      ? this.mapper.toDomainArray(data)
-      : [];
-  }
+    async create(client: Client): Promise<Client> {
+        const mapped = this.mapper.toPersistence(client);
+        const data = await new ClientModel(mapped).save({ session: this._session });
+        return this.mapper.toDomain(data);
+    }
+    async findByUserId(user_id: string): Promise<Client | null> {
+        return await ClientModel.findOne({ user_id });
+    }
+    async update(clientData: ClientUpdateDto): Promise<Client | null> {
+        return await ClientModel.findOneAndUpdate(
+            { user_id: clientData.user_id },
+            {
+                $set: {
+                    dob: clientData.dob,
+                    gender: clientData.gender,
+                    profile_image: clientData.profile_image,
+                    address: clientData.address,
+                },
+            }
+        );
+    }
+    async findAll(): Promise<Client[] | []> {
+        const data = await ClientModel.find({}).populate("address");
+        return data && this.mapper.toDomainArray
+            ? this.mapper.toDomainArray(data)
+            : [];
+    }
 }

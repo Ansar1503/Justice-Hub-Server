@@ -6,10 +6,10 @@ import { AppointmentsRepository } from "@infrastructure/database/repo/Appointmen
 import { MongoUnitofWork } from "@infrastructure/database/UnitofWork/implementations/UnitofWork";
 
 export function CancelSessionComposer(): IController {
-  const usecase = new CancelSessionUseCase(
-    new SessionsRepository(),
-    new AppointmentsRepository(),
-    new MongoUnitofWork()
-  );
-  return new CancelSessionController(usecase);
+    const usecase = new CancelSessionUseCase(
+        new SessionsRepository(),
+        new AppointmentsRepository(),
+        new MongoUnitofWork()
+    );
+    return new CancelSessionController(usecase);
 }

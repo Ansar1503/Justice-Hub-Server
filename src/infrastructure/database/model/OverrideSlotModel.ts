@@ -22,32 +22,32 @@ interface TimeSlot {
   end: string;
 }
 const timeSlotSchema = new Schema<TimeSlot>(
-  {
-    start: { type: String, required: true, default: "09:00" },
-    end: { type: String, required: true, default: "17:00" },
-  },
-  { _id: false }
+    {
+        start: { type: String, required: true, default: "09:00" },
+        end: { type: String, required: true, default: "17:00" },
+    },
+    { _id: false }
 );
 
 const overrideDateSchema = new Schema<OverrideDates>(
-  {
-    date: { type: Date, required: true },
-    isUnavailable: { type: Boolean, required: true },
-    timeRanges: [timeSlotSchema],
-  },
-  { _id: false }
+    {
+        date: { type: Date, required: true },
+        isUnavailable: { type: Boolean, required: true },
+        timeRanges: [timeSlotSchema],
+    },
+    { _id: false }
 );
 
 const overrideSlotSchema = new Schema<IOverrideSlotsModel>(
-  {
-    _id: { type: String },
-    lawyer_id: { type: String, required: true, unique: true },
-    overrideDates: [overrideDateSchema],
-  },
-  { timestamps: true }
+    {
+        _id: { type: String },
+        lawyer_id: { type: String, required: true, unique: true },
+        overrideDates: [overrideDateSchema],
+    },
+    { timestamps: true }
 );
 
 export default mongoose.model<IOverrideSlotsModel>(
-  "override_slots",
-  overrideSlotSchema
+    "override_slots",
+    overrideSlotSchema
 );

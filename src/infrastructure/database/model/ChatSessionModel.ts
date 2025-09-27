@@ -16,23 +16,23 @@ export interface  IChatSessionModel extends Document {
 }
  
 const chatSessionSchema = new Schema<IChatSessionModel>(
-  {
-    _id: { type: String },
-    participants: {
-      lawyer_id: { type: String, required: true },
-      client_id: { type: String, required: true },
+    {
+        _id: { type: String },
+        participants: {
+            lawyer_id: { type: String, required: true },
+            client_id: { type: String, required: true },
+        },
+        name: { type: String, required: true },
+        session_id: { type: String, unique: true, required: true },
+        last_message: {
+            type: String,
+            required: false,
+        },
     },
-    name: { type: String, required: true },
-    session_id: { type: String, unique: true, required: true },
-    last_message: {
-      type: String,
-      required: false,
-    },
-  },
-  { timestamps: true }
+    { timestamps: true }
 );
 
 export const ChatModel = mongoose.model<IChatSessionModel>(
-  "ChatSession",
-  chatSessionSchema
+    "ChatSession",
+    chatSessionSchema
 );
