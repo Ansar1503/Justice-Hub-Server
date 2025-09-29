@@ -7,7 +7,7 @@ import unusedImports from "eslint-plugin-unused-imports";
 const compat = new FlatCompat({ baseDirectory: __dirname });
 
 export default defineConfig([
-  // ...compat.extends("plugin:@typescript-eslint/recommended"),
+  ...compat.extends("plugin:@typescript-eslint/recommended"),
   // ...compat.extends("plugin:import/recommended"),
 
   {

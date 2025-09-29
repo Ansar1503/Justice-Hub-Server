@@ -11,9 +11,9 @@ import { WLogger } from "@shared/utils/Winston/WinstonLoggerConfig";
 
 export class BlockUser implements IController {
   constructor(
-    private BlockUserUseCase: IBlockUserUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+    private _blockUserUseCase: IBlockUserUseCase,
+    private _errors: IHttpErrors = new HttpErrors(),
+    private _success: IHttpSuccess = new HttpSuccess()
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
     const { user_id, status } = httpRequest.body as Record<string, string>;
@@ -22,7 +22,7 @@ export class BlockUser implements IController {
         controller: "BlockUser",
         role: "admin",
       });
-      const error = this.httpErrors.error_400();
+      const error = this._errors.error_400();
       return new HttpResponse(error.statusCode, "user Id not found");
     }
     if (status === undefined || status === null || status === "") {
@@ -30,10 +30,10 @@ export class BlockUser implements IController {
         controller: "blockUser",
         role: "admin",
       });
-      return this.httpErrors.error_400("status not found");
+      return this._errors.error_400("status not found");
     }
     try {
-      const result = await this.BlockUserUseCase.execute({
+      const result = await this._blockUserUseCase.execute({
         status: typeof status === "boolean" ? status : Boolean(status),
         user_id,
       });
@@ -47,13 +47,13 @@ export class BlockUser implements IController {
         message: `user ${result?.status ? "blocked" : "unblocked"}`,
         data: result,
       };
-      const success = this.httpSuccess.success_200(body);
+      const success = this._success.success_200(body);
       return new HttpResponse(success.statusCode, success.body);
-    } catch (error: any) {
-      return new HttpResponse(
-        error?.statusCode || 500,
-        error?.message || "Internal Server Error"
-      );
+    } catch (error) {
+      if (error instanceof Error) {
+        return this._errors.error_400(error.message);
+      }
+      return this._errors.error_500();
     }
   }
 }
