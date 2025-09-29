@@ -4,8 +4,8 @@
     "build": "tsc",
     "start": "node dist/infrastructure/express/server.js",
     "dev": "npx nodemon --exec tsx src/infrastructure/express/server.ts",
-    "lint": "eslint src/**/*.{ts,tsx}",
-    "lint:fix": "eslint src/**/*.{ts,tsx} --fix"
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
