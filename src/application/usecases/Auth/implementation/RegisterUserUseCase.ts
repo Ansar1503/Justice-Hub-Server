@@ -1,4 +1,3 @@
-import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { User } from "@domain/entities/User";
 import {
     RegisterUserDto,
@@ -7,15 +6,10 @@ import {
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { IPasswordManager } from "@src/application/providers/PasswordHasher";
 import { Client } from "@domain/entities/Client";
-import { Lawyer } from "@domain/entities/Lawyer";
-import { IClientRepository } from "@domain/IRepository/IClientRepo";
-import { ILawyerRepository } from "@domain/IRepository/ILawyerRepo";
 import { generateOtp } from "@infrastructure/services/OtpManager/GenerateOtp";
 import { INodeMailerProvider } from "@src/application/providers/NodeMailerProvider";
 import { IJwtProvider } from "@src/application/providers/JwtProvider";
-import { IOtpRepository } from "@domain/IRepository/IOtpRepo";
 import { Otp } from "@domain/entities/Otp";
-import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
 import { Wallet } from "@domain/entities/Wallet";
 import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
 import { IRegiserUserUseCase } from "../IRegisterUserUseCase";

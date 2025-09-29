@@ -4,7 +4,6 @@ import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IFetchAppointmentsClientUseCase } from "@src/application/usecases/Client/IFetchAppointmentsUseCase";
 import { zodAppointmentQuerySchema } from "@interfaces/middelwares/validator/zod/zod.validate";
 import { IController } from "../../Interface/IController";

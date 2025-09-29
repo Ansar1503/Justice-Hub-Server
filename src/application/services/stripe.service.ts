@@ -1,7 +1,6 @@
 import Stripe from "stripe";
 import "dotenv/config";
 import { format } from "date-fns";
-import { session } from "passport";
 
 type WebhookResult = {
     amount?: number;

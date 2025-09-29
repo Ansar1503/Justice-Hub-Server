@@ -1,4 +1,3 @@
-import { Appointment } from "@src/application/dtos/Appointments/BaseAppointmentDto";
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 import { ICaseRepo } from "@domain/IRepository/ICaseRepo";
 import { appointmentOutputDto } from "@src/application/dtos/Appointments/FetchAppointmentsDto";

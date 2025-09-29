@@ -4,7 +4,6 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
-import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { IRejectAppointmentUseCase } from "@src/application/usecases/Lawyer/IRejectAppointmentUseCase";
 

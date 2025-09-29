@@ -1,6 +1,4 @@
 import { AppointmentsRepository } from "@infrastructure/database/repo/AppointmentsRepo";
-import { WalletRepo } from "@infrastructure/database/repo/WalletRepo";
-import { WalletTransactionsRepo } from "@infrastructure/database/repo/WalletTransactionsRepo";
 import { MongoUnitofWork } from "@infrastructure/database/UnitofWork/implementations/UnitofWork";
 import { CancelAppointmentController } from "@interfaces/controller/Client/Appointment/CancelAppoitmentController";
 import { IController } from "@interfaces/controller/Interface/IController";

@@ -1,4 +1,3 @@
-import { Address } from "../../domain/entities/Address";
 import { UserDto } from "./user.dto";
 
 export class ClientDto {

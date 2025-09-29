@@ -2,7 +2,6 @@ import { UploadSessionDocumentOutPutDto } from "@src/application/dtos/client/Upl
 import { ISessionDocumentRepo } from "@domain/IRepository/ISessionDocumentsRepo";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 
-import e from "express";
 import { ICloudinaryService } from "@src/application/services/Interfaces/ICloudinaryService";
 import { IRemoveSessionDocumentsUseCase } from "../IRemoveSessionDocumentsUseCase";
 

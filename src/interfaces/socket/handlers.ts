@@ -10,7 +10,6 @@ import {
 import { DisputesRepo } from "@infrastructure/database/repo/DisputesRepo";
 import { NotificationDto } from "@src/application/dtos/Notification/BaseNotification";
 import { AppointmentsRepository } from "@infrastructure/database/repo/AppointmentsRepo";
-import { Notification } from "../../domain/entities/Notification";
 import { NotificationUsecase } from "../../application/usecases/Notification/implementation/CreateNotification";
 import { SocketEventEnum } from "../../infrastructure/constant/SocketEventEnum";
 import { ChatUseCase } from "../../application/usecases/chat.usecase";

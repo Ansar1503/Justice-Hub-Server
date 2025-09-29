@@ -6,7 +6,6 @@ import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { zodSessionQuerySchema } from "@interfaces/middelwares/validator/zod/zod.validate";
-import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IController } from "../Interface/IController";
 
 export class FetchSessions implements IController {

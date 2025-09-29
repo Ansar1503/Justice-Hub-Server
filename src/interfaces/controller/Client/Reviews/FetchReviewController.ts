@@ -2,7 +2,6 @@ import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { IFetchReviewsUseCase } from "@src/application/usecases/Client/IFetchReviewsUseCase";

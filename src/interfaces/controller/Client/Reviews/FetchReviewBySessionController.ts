@@ -4,7 +4,6 @@ import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { HttpResponse } from "@interfaces/helpers/implementation/HttpResponse";
 import { IFetchReviewsBySessionUseCase } from "@src/application/usecases/Client/IFetchReviewsBySessionUseCase";
 import { IController } from "../../Interface/IController";
 

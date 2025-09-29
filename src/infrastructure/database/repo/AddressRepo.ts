@@ -3,7 +3,6 @@ import { AddressMapper } from "@infrastructure/Mapper/Implementations/AddressMap
 import { Address } from "../../../domain/entities/Address";
 import { IAddressRepository } from "../../../domain/IRepository/IAddressRepo";
 import AddressModel, { IAddresModel } from "../model/AddressModel";
-import { BaseRepository } from "./base/BaseRepo";
 
 export class AddressRepository implements IAddressRepository {
     constructor(private mapper: IMapper<Address, IAddresModel> = new AddressMapper()) {}

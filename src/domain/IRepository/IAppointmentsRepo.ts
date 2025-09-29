@@ -4,7 +4,6 @@ import {
     FetchAppointmentsOutputDto,
 } from "@src/application/dtos/Appointments/FetchAppointmentsDto";
 import { Appointment } from "../entities/Appointment";
-import { Client } from "../entities/Client";
 
 export interface IAppointmentsRepository {
     create(payload: Appointment): Promise<Appointment>;

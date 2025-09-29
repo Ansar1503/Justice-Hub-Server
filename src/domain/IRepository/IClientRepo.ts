@@ -1,4 +1,4 @@
-import { ClientDto, ClientUpdateDto } from "../../application/dtos/client.dto";
+import { ClientUpdateDto } from "../../application/dtos/client.dto";
 import { Client } from "../entities/Client";
 
 export interface IClientRepository {

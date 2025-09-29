@@ -1,4 +1,3 @@
-import e from "express";
 import mongoose, { Schema, Document } from "mongoose";
 
 interface TimeSlot {

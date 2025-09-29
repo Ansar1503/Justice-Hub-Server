@@ -3,7 +3,6 @@ import { IOtpRepository } from "@domain/IRepository/IOtpRepo";
 import { generateOtp } from "@infrastructure/services/OtpManager/GenerateOtp";
 import { INodeMailerProvider } from "@src/application/providers/NodeMailerProvider";
 import { Otp } from "@domain/entities/Otp";
-import { token } from "morgan";
 import { IJwtProvider } from "@src/application/providers/JwtProvider";
 import { IResendOtpUseCase } from "../IResendOtpUseCase";
 

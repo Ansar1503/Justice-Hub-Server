@@ -1,5 +1,4 @@
 import mongoose, { ClientSession } from "mongoose";
-import { IMapper } from "@infrastructure/Mapper/IMapper";
 import { AppointmentMapper } from "@infrastructure/Mapper/Implementations/AppointmentMapper";
 import {
     appointmentOutputDto,

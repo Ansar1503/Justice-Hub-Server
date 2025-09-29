@@ -1,5 +1,3 @@
-import { BaseRepository } from "@infrastructure/database/repo/base/BaseRepo";
-import { IUserModel } from "@infrastructure/database/model/UserModel";
 import { AggregatedLawyerProfile } from "@src/application/dtos/Lawyer/FindLawyersByQueryDto";
 import { User } from "../entities/User";
 
