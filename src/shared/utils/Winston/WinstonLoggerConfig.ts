@@ -1,9 +1,9 @@
 import winston from "winston";
-const { combine, timestamp, json, errors } = winston.format;
+const { combine, timestamp, errors, prettyPrint } = winston.format;
 
 export const WLogger = winston.createLogger({
   level: "info",
-  format: combine(timestamp(), errors({ stack: true }), json()),
+  format: combine(timestamp(), errors({ stack: true }), prettyPrint()),
   transports: [
     new winston.transports.Console(),
     new winston.transports.File({ filename: "errors.log", level: "error" }),
