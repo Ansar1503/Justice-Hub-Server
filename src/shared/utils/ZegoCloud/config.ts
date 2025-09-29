@@ -44,7 +44,7 @@ if (!process.env.ZC_SERVERSECRET) {
     );
 }
 
-const RndNum = (a: any, b: any) => {
+const RndNum = (a: number, b: number) => {
     return Math.ceil((a + (b - a)) * Math.random());
 };
 

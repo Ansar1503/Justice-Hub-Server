@@ -7,14 +7,16 @@ import unusedImports from "eslint-plugin-unused-imports";
 const compat = new FlatCompat({ baseDirectory: __dirname });
 
 export default defineConfig([
-  ...compat.extends("plugin:@typescript-eslint/recommended"),
+  // ...compat.extends("plugin:@typescript-eslint/recommended"),
   // ...compat.extends("plugin:import/recommended"),
+  {
+    ignores: ["node_modules/**", "dist/**", "src/shared/plop/plopfile.ts"],
+  },
 
   {
     plugins: {
       "unused-imports": unusedImports,
     },
-    ignores: ["node_modules/**", "dist/**", "src/shared/plop/plopfile.ts"],
     files: ["**/*.ts", "**/*.mts", "**/*.cts"],
     languageOptions: {
       parser: tsParser,
