@@ -40,13 +40,13 @@ import { JoinVideoSessionComposer } from "@infrastructure/services/composers/Law
 import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
 import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsByUserIdComposer";
 import {
-    CasesRoutes,
-    CasetypeRoutes,
-    ClientRoutes,
-    CommonParamsRoute,
-    PracticeAreaRoutes,
-    SpecializationRoute,
-    WalletRoutes,
+  CasesRoutes,
+  CasetypeRoutes,
+  ClientRoutes,
+  CommonParamsRoute,
+  PracticeAreaRoutes,
+  SpecializationRoute,
+  WalletRoutes,
 } from "@shared/constant/RouteConstant";
 import { FetchAllNotificationsComposer } from "@infrastructure/services/composers/Notification/FetchAllNotificationsComposer";
 import { UpdateNotificationStatusComposer } from "@infrastructure/services/composers/Notification/UpdateNotificationStatusComposer";
@@ -65,435 +65,602 @@ import { BookAppointmentByWalletComposer } from "@infrastructure/services/compos
 import { FindSessionsByCaseComposer } from "@infrastructure/services/composers/Sessions/FindSessionsByCase";
 import { authenticateClient } from "../middelwares/Auth/authenticateClient";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
-import { chatDocumentstorage, documentstorage, handleMulterErrors, profilestorage } from "../middelwares/multer";
+import {
+  caseDocumentStorage,
+  chatDocumentstorage,
+  documentstorage,
+  handleMulterErrors,
+  profilestorage,
+} from "../middelwares/multer";
+import { UploadCaseDocumentsComposer } from "@infrastructure/services/composers/Cases/UploadCaseDocumentComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
-    storage: documentstorage,
-    limits: { fileSize: 10 * 1024 * 1024, files: 3 },
-    fileFilter: (req, file, cb) => {
-        const allowedTypes = [
-            "application/pdf",
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "image/jpeg",
-            "image/png",
-            "image/jpg",
-            "image/webp",
-        ];
+  storage: documentstorage,
+  limits: { fileSize: 10 * 1024 * 1024, files: 3 },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+      "image/webp",
+    ];
 
-        if (allowedTypes.includes(file.mimetype)) {
-            cb(null, true);
-        } else {
-            cb(new Error("Invalid file type. Only PDF, DOCX, and images are allowed."));
-        }
-    },
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(
+        new Error("Invalid file type. Only PDF, DOCX, and images are allowed.")
+      );
+    }
+  },
 });
 const chatFile = multer({
-    storage: chatDocumentstorage,
-    limits: { fileSize: 10 * 1024 * 1024, files: 3 },
+  storage: chatDocumentstorage,
+  limits: { fileSize: 10 * 1024 * 1024, files: 3 },
+});
+
+const caseDocumentUpload = multer({
+  storage: caseDocumentStorage,
+  limits: { fileSize: 20 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/jpg",
+    ];
+
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type. Only PDF and images are allowed."));
+    }
+  },
 });
 
 const router = express.Router();
 
 // profile area
 router.get(
-    ClientRoutes.profile.base + ClientRoutes.profile.image,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, FetchProfileImageComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  ClientRoutes.profile.base + ClientRoutes.profile.image,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchProfileImageComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
 );
 
-router.get(ClientRoutes.profile.base, authenticateUser, async (req: Request, res: Response) => {
+router.get(
+  ClientRoutes.profile.base,
+  authenticateUser,
+  async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, FetchClientDataComposer());
     res.status(adaper.statusCode).json(adaper.body);
     return;
-});
-router.put(
-    ClientRoutes.profile.basic,
-    authenticateUser,
-    upload.single("image"),
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, updateClientDataComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  }
 );
-router.put(ClientRoutes.profile.personal, authenticateUser, async (req: Request, res: Response) => {
+router.put(
+  ClientRoutes.profile.basic,
+  authenticateUser,
+  upload.single("image"),
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, updateClientDataComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+router.put(
+  ClientRoutes.profile.personal,
+  authenticateUser,
+  async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, UpdateEmailComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
-router.post(ClientRoutes.profile.verifyMail, authenticateUser, async (req: Request, res: Response) => {
+  }
+);
+router.post(
+  ClientRoutes.profile.verifyMail,
+  authenticateUser,
+  async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, SendVerificationMailComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
-router.put(ClientRoutes.profile.updatePassword, authenticateUser, async (req: Request, res: Response) => {
+  }
+);
+router.put(
+  ClientRoutes.profile.updatePassword,
+  authenticateUser,
+  async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, UpdatePasswordComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
+  }
+);
 
-router.post(ClientRoutes.profile.address, authenticateUser, async (req: Request, res: Response) => {
+router.post(
+  ClientRoutes.profile.address,
+  authenticateUser,
+  async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, UpdateAddressComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
+  }
+);
 router
-    .route(ClientRoutes.profile.appointments)
-    .all(authenticateUser, authenticateClient)
-    .patch(async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, CancelAppointmentComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    })
-    .get(async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, FetchAppointmentDataComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    });
+  .route(ClientRoutes.profile.appointments)
+  .all(authenticateUser, authenticateClient)
+  .patch(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, CancelAppointmentComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  })
+  .get(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchAppointmentDataComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  });
 
 // profile sessions
-router.get(ClientRoutes.profile.sessions, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
+router.get(
+  ClientRoutes.profile.sessions,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, fetchSessionsComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
+  }
+);
 
 router
-    .route(ClientRoutes.profile.sessionDocs.byId)
-    .all(authenticateUser, authenticateClient)
-    .get(async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, FetchSessionDocumentsComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-    })
-    .delete(async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, RemoveSessionDocumentComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-    });
+  .route(ClientRoutes.profile.sessionDocs.byId)
+  .all(authenticateUser, authenticateClient)
+  .get(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchSessionDocumentsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+  })
+  .delete(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, RemoveSessionDocumentComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+  });
 
 router.post(
-    ClientRoutes.profile.sessionDocs.base,
-    authenticateUser,
-    authenticateClient,
-    handleMulterErrors(documentUpload.array("documents", 3)),
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, UploadSessionDocumentsComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  ClientRoutes.profile.sessionDocs.base,
+  authenticateUser,
+  authenticateClient,
+  handleMulterErrors(documentUpload.array("documents", 3)),
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, UploadSessionDocumentsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
 );
 
 router.patch(
-    ClientRoutes.profile.cancelSession,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const adapter = await expressAdapter(req, CancelSessionComposer());
-            res.status(adapter.statusCode).json(adapter.body);
-        } catch (error) {
-            next(error);
-        }
-    },
+  ClientRoutes.profile.cancelSession,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const adapter = await expressAdapter(req, CancelSessionComposer());
+      res.status(adapter.statusCode).json(adapter.body);
+    } catch (error) {
+      next(error);
+    }
+  }
 );
 router.patch(
-    ClientRoutes.profile.endSession,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const adapter = await expressAdapter(req, EndSessionComposer());
-            res.status(adapter.statusCode).json(adapter.body);
-        } catch (error) {
-            next(error);
-        }
-    },
+  ClientRoutes.profile.endSession,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const adapter = await expressAdapter(req, EndSessionComposer());
+      res.status(adapter.statusCode).json(adapter.body);
+    } catch (error) {
+      next(error);
+    }
+  }
 );
 
 // chats
-router.get(ClientRoutes.profile.chats, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
+router.get(
+  ClientRoutes.profile.chats,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, GetChatsComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
+  }
+);
 
 router.get(
-    ClientRoutes.profile.chatMessages,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, GetMessagesComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  ClientRoutes.profile.chatMessages,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, GetMessagesComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
 );
 
 // lawyers finding and booking areas
-router.get(ClientRoutes.lawyers.base, authenticateUser, async (req: Request, res: Response) => {
+router.get(
+  ClientRoutes.lawyers.base,
+  authenticateUser,
+  async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, GetLawyersComposer());
     res.status(adaper.statusCode).json(adaper.body);
     return;
-});
-router.get(ClientRoutes.lawyers.byId, authenticateUser, async (req: Request, res: Response) => {
+  }
+);
+router.get(
+  ClientRoutes.lawyers.byId,
+  authenticateUser,
+  async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, GetLawyerDetailComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
+  }
+);
 
 // reviews
-router.post(ClientRoutes.lawyers.review, authenticateUser, async (req: Request, res: Response) => {
+router.post(
+  ClientRoutes.lawyers.review,
+  authenticateUser,
+  async (req: Request, res: Response) => {
     req.body.user = req.user;
     const adapter = await expressAdapter(req, AddReviewComposer());
     res.status(adapter.statusCode).json(adapter.body);
-});
-router.get(
-    ClientRoutes.lawyers.reviewsByLawyer,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, FetchReviewsComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  }
 );
-router.get(ClientRoutes.profile.reviews, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
+router.get(
+  ClientRoutes.lawyers.reviewsByLawyer,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchReviewsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+router.get(
+  ClientRoutes.profile.reviews,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchReviewsByUserIdComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
+  }
+);
 router.get(
-    ClientRoutes.profile.reviewsBySession,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, FetchReviewsBySessionComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  ClientRoutes.profile.reviewsBySession,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchReviewsBySessionComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
 );
 
 router
-    .route(ClientRoutes.profile.reviewById)
-    .all(authenticateUser, authenticateClient)
-    .put(async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, UpdateReviewsComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    })
-    .delete(async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, DeleteReviewComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    });
+  .route(ClientRoutes.profile.reviewById)
+  .all(authenticateUser, authenticateClient)
+  .put(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, UpdateReviewsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  })
+  .delete(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, DeleteReviewComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  });
 
 router.post(
-    ClientRoutes.profile.reportReview,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, ReportReviewComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  ClientRoutes.profile.reportReview,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, ReportReviewComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
 );
 
 // slot area
-router.get(ClientRoutes.lawyers.settings, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
+router.get(
+  ClientRoutes.lawyers.settings,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchSlotSettingsComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
-router.get(ClientRoutes.lawyers.slots, authenticateUser, async (req: Request, res: Response) => {
+  }
+);
+router.get(
+  ClientRoutes.lawyers.slots,
+  authenticateUser,
+  async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, GetLawyerSlotDetailsComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
-router.post(ClientRoutes.slots.checkout, authenticateUser, async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, await CreateCheckoutSessionComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-});
-router.get(ClientRoutes.stripe.session, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FetchStripeSessionDetailsComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-});
-router.delete(
-    ClientRoutes.slots.removeFailed,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, RemoveFailedSessionComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  }
 );
 router.post(
-    ClientRoutes.chat.sendFile,
-    authenticateUser,
-    authenticateClient,
-    handleMulterErrors(chatFile.single("file")),
-    async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const adapter = await expressAdapter(req, SendMessageFileComposer());
-            res.status(adapter.statusCode).json(adapter.body);
-        } catch (error) {
-            next(error);
-        }
-    },
+  ClientRoutes.slots.checkout,
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      await CreateCheckoutSessionComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+router.get(
+  ClientRoutes.stripe.session,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchStripeSessionDetailsComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+router.delete(
+  ClientRoutes.slots.removeFailed,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, RemoveFailedSessionComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+router.post(
+  ClientRoutes.chat.sendFile,
+  authenticateUser,
+  authenticateClient,
+  handleMulterErrors(chatFile.single("file")),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const adapter = await expressAdapter(req, SendMessageFileComposer());
+      res.status(adapter.statusCode).json(adapter.body);
+    } catch (error) {
+      next(error);
+    }
+  }
 );
 
 // stripe  webjook
 router.post(
-    ClientRoutes.stripe.webhook,
-    express.raw({ type: "application/json" }),
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, HandleWebhookComposer());
-        res.status(adapter.statusCode).send(adapter.body);
-        return;
-    },
+  ClientRoutes.stripe.webhook,
+  express.raw({ type: "application/json" }),
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, HandleWebhookComposer());
+    res.status(adapter.statusCode).send(adapter.body);
+    return;
+  }
 );
-router.patch(ClientRoutes.profile.join, authenticateUser, authenticateClient, async (req, res) => {
+router.patch(
+  ClientRoutes.profile.join,
+  authenticateUser,
+  authenticateClient,
+  async (req, res) => {
     const controller = JoinVideoSessionComposer();
     const response = await expressAdapter(req, controller);
     res.status(response.statusCode).json(response.body);
-});
-router.get(ClientRoutes.profile.callLogs, authenticateUser, authenticateClient, async (req, res) => {
+  }
+);
+router.get(
+  ClientRoutes.profile.callLogs,
+  authenticateUser,
+  authenticateClient,
+  async (req, res) => {
     const controller = FetchCallLogsSessionComposer();
     const response = await expressAdapter(req, controller);
     res.status(response.statusCode).json(response.body);
-});
+  }
+);
 
 router.patch(
-    ClientRoutes.notifcation.updateStatus,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, UpdateNotificationStatusComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  ClientRoutes.notifcation.updateStatus,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      UpdateNotificationStatusComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
 );
 
 router.get(
-    ClientRoutes.notifcation.getAllNotifications,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, FetchAllNotificationsComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  ClientRoutes.notifcation.getAllNotifications,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchAllNotificationsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
 );
 
 router.put(
-    ClientRoutes.notifcation.markAllAsRead,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, MarkAllNotificationAsReadComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  ClientRoutes.notifcation.markAllAsRead,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      MarkAllNotificationAsReadComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
 );
 
-router.get(WalletRoutes.base, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
+router.get(
+  WalletRoutes.base,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchWalletByUserComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
+  }
+);
 router.get(
-    WalletRoutes.base + WalletRoutes.transactions,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, FetchTransactionsByWalletComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  WalletRoutes.base + WalletRoutes.transactions,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchTransactionsByWalletComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
 );
 
-router.get(SpecializationRoute.base, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FetchAllSpecializationsComposer());
+router.get(
+  SpecializationRoute.base,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchAllSpecializationsComposer()
+    );
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
+  }
+);
 
-router.get(PracticeAreaRoutes.base, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FindPracticeAreasBySpecIdsComposer());
+router.get(
+  PracticeAreaRoutes.base,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FindPracticeAreasBySpecIdsComposer()
+    );
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
+  }
+);
 
-router.get(CasetypeRoutes.base, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
+router.get(
+  CasetypeRoutes.base,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FindAllCaseTypesComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
-
-router.get(
-    CasetypeRoutes.base + PracticeAreaRoutes.base,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, FindCaseTypesByPracticeAreasComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  }
 );
 
-router.get(CasesRoutes.base, authenticateUser, authenticateClient, async (req: Request, res: Response) => {
+router.get(
+  CasetypeRoutes.base + PracticeAreaRoutes.base,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FindCaseTypesByPracticeAreasComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  CasesRoutes.base,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FindAllCasesByQueryComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
-});
-
-router.get(
-    CasesRoutes.base + CommonParamsRoute.params,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, FindCaseDetailsComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-    },
+  }
 );
 
 router.get(
-    CasesRoutes.base + CasesRoutes.appointments + CommonParamsRoute.params,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, FindAppointmentByCaseComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  CasesRoutes.base + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindCaseDetailsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+  }
+);
+
+router.get(
+  CasesRoutes.base + CasesRoutes.appointments + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindAppointmentByCaseComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
 );
 
 router.post(
-    ClientRoutes.lawyers.walletbook,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, BookAppointmentByWalletComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  ClientRoutes.lawyers.walletbook,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      BookAppointmentByWalletComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
 );
 
 router.get(
-    CasesRoutes.base + CasesRoutes.sessions + CommonParamsRoute.params,
-    authenticateUser,
-    authenticateClient,
-    async (req: Request, res: Response) => {
-        const adapter = await expressAdapter(req, FindSessionsByCaseComposer());
-        res.status(adapter.statusCode).json(adapter.body);
-        return;
-    },
+  CasesRoutes.base + CasesRoutes.sessions + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindSessionsByCaseComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.post(
+  CasesRoutes.base + CasesRoutes.documents,
+  authenticateUser,
+  authenticateClient,
+  caseDocumentUpload.single("file"),
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, UploadCaseDocumentsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
 );
 
 export default router;

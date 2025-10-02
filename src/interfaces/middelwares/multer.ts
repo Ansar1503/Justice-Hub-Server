@@ -38,6 +38,20 @@ export const documentstorage = new CloudinaryStorage({
   },
 });
 
+export const caseDocumentStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    const ext = path.extname(file.originalname);
+    const filename = path.basename(file.originalname, ext);
+    const isRaw = file.mimetype === "application/pdf";
+    return {
+      folder: "JusticeHub/CaseDocuments",
+      public_id: `${filename}-${Date.now()}${ext}`,
+      resource_type: isRaw ? "raw" : "auto",
+    };
+  },
+});
+
 export const chatDocumentstorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
