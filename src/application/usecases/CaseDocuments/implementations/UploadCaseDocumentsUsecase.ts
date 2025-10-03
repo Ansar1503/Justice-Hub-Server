@@ -2,7 +2,7 @@ import {
   UploadDocumentInputDto,
   CaseDocumentDto,
 } from "@src/application/dtos/CaseDocuments/CaseDocumentDto";
-import { IUploadCaseDocuments } from "../UploadCaseDocuments";
+import { IUploadCaseDocuments } from "../IUploadCaseDocuments";
 import { ICaseRepo } from "@domain/IRepository/ICaseRepo";
 import { ICaseDocumentsRepo } from "@domain/IRepository/ICaseDocumentRepo";
 import { CaseDocument } from "@domain/entities/SessionDocument";

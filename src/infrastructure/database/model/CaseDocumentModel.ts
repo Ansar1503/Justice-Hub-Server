@@ -4,6 +4,7 @@ interface DocumentItem {
   name: string;
   type: string;
   url: string;
+  size: number;
 }
 
 export interface ICaseDocumentModel extends Document {
@@ -20,6 +21,7 @@ const DocumentItemSchema = new Schema<DocumentItem>(
     name: { type: String, required: true },
     type: { type: String, required: true },
     url: { type: String, required: true },
+    size: { type: Number, required: true },
   },
   { _id: false }
 );

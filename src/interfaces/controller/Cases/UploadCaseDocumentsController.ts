@@ -1,4 +1,4 @@
-import { IUploadCaseDocuments } from "@src/application/usecases/CaseDocuments/UploadCaseDocuments";
+import { IUploadCaseDocuments } from "@src/application/usecases/CaseDocuments/IUploadCaseDocuments";
 import { IController } from "../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
