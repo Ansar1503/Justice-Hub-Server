@@ -73,6 +73,7 @@ import {
   profilestorage,
 } from "../middelwares/multer";
 import { UploadCaseDocumentsComposer } from "@infrastructure/services/composers/Cases/UploadCaseDocumentComposer";
+import { FindCaseDocumentsByCaseComposer } from "@infrastructure/services/composers/Cases/FindCaseDocumentsQueryComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -658,6 +659,20 @@ router.post(
   caseDocumentUpload.single("file"),
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, UploadCaseDocumentsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  CasesRoutes.base + CasesRoutes.documents + CommonParamsRoute.params,
+  // authenticateUser,
+  // authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FindCaseDocumentsByCaseComposer()
+    );
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }

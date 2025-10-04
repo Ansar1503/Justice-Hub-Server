@@ -1,4 +1,4 @@
-import { CaseDocument } from "@domain/entities/SessionDocument";
+import { CaseDocument } from "@domain/entities/CaseDocument";
 import { ICaseDocumentModel } from "@infrastructure/database/model/CaseDocumentModel";
 import { IMapper } from "../IMapper";
 
@@ -12,7 +12,7 @@ export class caseDocumentsMapper
       document: persistence.document,
       id: persistence._id,
       updatedAt: persistence.updatedAt,
-      uploadBy: persistence.uploadBy,
+      uploadedBy: persistence.uploadBy,
     });
   }
   toDomainArray(persistence: ICaseDocumentModel[]): CaseDocument[] {
@@ -23,7 +23,7 @@ export class caseDocumentsMapper
       _id: entity.id,
       caseId: entity.caseId,
       document: entity.document,
-      uploadBy: entity.uploadBy,
+      uploadBy: entity.uploadedBy,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     };

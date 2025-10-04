@@ -5,7 +5,7 @@ import {
 import { IUploadCaseDocuments } from "../IUploadCaseDocuments";
 import { ICaseRepo } from "@domain/IRepository/ICaseRepo";
 import { ICaseDocumentsRepo } from "@domain/IRepository/ICaseDocumentRepo";
-import { CaseDocument } from "@domain/entities/SessionDocument";
+import { CaseDocument } from "@domain/entities/CaseDocument";
 
 export class UploadCaseDocumentsUsecase implements IUploadCaseDocuments {
   constructor(
@@ -20,7 +20,7 @@ export class UploadCaseDocumentsUsecase implements IUploadCaseDocuments {
     const casepayload = CaseDocument.create({
       caseId: input.caseId,
       document: input.document,
-      uploadBy: input.uploadedBy,
+      uploadedBy: input.uploadedBy,
     });
     const caseDocument = await this._caseDocumentRepo.create(casepayload);
     return {
@@ -30,10 +30,11 @@ export class UploadCaseDocumentsUsecase implements IUploadCaseDocuments {
         name: caseDocument.document.name,
         type: caseDocument.document.type,
         url: caseDocument.document.url,
+        size: caseDocument.document.size,
       },
       id: caseDocument.id,
       updatedAt: caseDocument.updatedAt,
-      uploadedBy: caseDocument.uploadBy,
+      uploadedBy: caseDocument.uploadedBy,
     };
   }
 }

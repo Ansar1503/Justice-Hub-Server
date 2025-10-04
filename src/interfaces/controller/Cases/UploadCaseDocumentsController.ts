@@ -16,6 +16,7 @@ export class UploadCaseDocumentsController implements IController {
     let fileUrl = "";
     let fileType = "";
     let fileName = "";
+    let fileSize = 0;
     let caseId = "";
     if (
       httpRequest.user &&
@@ -24,7 +25,6 @@ export class UploadCaseDocumentsController implements IController {
     ) {
       userId = String(httpRequest.user.id);
     }
-    // console.log("f/ile", httpRequest.file);
     if (!userId) {
       return this._errors.error_400("user id not found");
     }
@@ -47,6 +47,9 @@ export class UploadCaseDocumentsController implements IController {
       if ("path" in httpRequest.file) {
         fileUrl = String(httpRequest.file.path);
       }
+      if ("size" in httpRequest.file) {
+        fileSize = Number(httpRequest.file.size);
+      }
     }
     if (
       httpRequest.body &&
@@ -55,17 +58,27 @@ export class UploadCaseDocumentsController implements IController {
     ) {
       caseId = String(httpRequest.body.caseId);
     }
-    if (!fileName || !fileType || fileType === "unknown" || !fileUrl) {
+    if (
+      !fileName ||
+      !fileType ||
+      fileType === "unknown" ||
+      !fileUrl ||
+      !fileSize ||
+      isNaN(fileSize)
+    ) {
       return this._errors.error_400("Invalid file");
     }
     if (!caseId) {
       return this._errors.error_400("case Id not found");
     }
-    const document: { name: string; type: string; url: string } = {
-      name: fileName,
-      type: fileType,
-      url: fileUrl,
-    };
+    const document: { name: string; type: string; url: string; size: number } =
+      {
+        name: fileName,
+        type: fileType,
+        url: fileUrl,
+        size: fileSize,
+      };
+
     try {
       const result = await this._CaseDocumentUpload.execute({
         caseId,

@@ -1,4 +1,4 @@
-import { CaseDocument } from "@domain/entities/SessionDocument";
+import { CaseDocument } from "@domain/entities/CaseDocument";
 import { IBaseRepository } from "./IBaseRepo";
 import {
   FetchCasesDocumentsByCaseInputDto,

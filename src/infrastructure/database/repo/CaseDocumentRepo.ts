@@ -1,6 +1,5 @@
 import { ICaseDocumentsRepo } from "@domain/IRepository/ICaseDocumentRepo";
 import { BaseRepository } from "./base/BaseRepo";
-import { CaseDocument } from "@domain/entities/SessionDocument";
 import CaseDocumentModel, {
   ICaseDocumentModel,
 } from "../model/CaseDocumentModel";
@@ -9,6 +8,7 @@ import {
   FetchCasesDocumentsByCaseInputDto,
   FetchCasesDocumentsByCaseOutputDto,
 } from "@src/application/dtos/CaseDocuments/CaseDocumentDto";
+import { CaseDocument } from "@domain/entities/CaseDocument";
 
 export class CaseDocumentRepo
   extends BaseRepository<CaseDocument, ICaseDocumentModel>

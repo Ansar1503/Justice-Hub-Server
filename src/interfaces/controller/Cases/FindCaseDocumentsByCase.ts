@@ -27,9 +27,15 @@ export class FindCaseDocumentsByCaseController implements IController {
     );
     if (!parsed.success) {
       const er = parsed.error.errors[0];
+      WLogger.error(er.message, er);
       return this._errors.error_400(er.message);
     }
-    if (!caseId) throw new Error("case id not found");
+    if (!caseId) {
+      WLogger.error("Case Id not found", {
+        page: "FindCaseDocumentsByCaseController",
+      });
+      throw new Error("case id not found");
+    }
     try {
       const result = await this._findCaseDocuments.execute({
         ...parsed.data,

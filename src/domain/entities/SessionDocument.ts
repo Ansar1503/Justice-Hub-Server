@@ -6,7 +6,7 @@ export interface DocumentItem {
   url: string;
 }
 
-export interface PersistedCaseDocumentProps {
+export interface PersistedSessionDocumentProps {
   id: string;
   caseId: string;
   uploadBy: string;
@@ -15,13 +15,13 @@ export interface PersistedCaseDocumentProps {
   updatedAt: Date;
 }
 
-export interface CreateCaseDocumentProps {
+export interface CreateSessionDocumentProps {
   caseId: string;
   uploadBy: string;
   document: DocumentItem;
 }
 
-export class CaseDocument {
+export class SessionDocument {
   private _id: string;
   private _caseId: string;
   private _uploadBy: string;
@@ -29,7 +29,7 @@ export class CaseDocument {
   private _createdAt: Date;
   private _updatedAt: Date;
 
-  private constructor(props: PersistedCaseDocumentProps) {
+  private constructor(props: PersistedSessionDocumentProps) {
     this._id = props.id;
     this._caseId = props.caseId;
     this._uploadBy = props.uploadBy;
@@ -38,9 +38,9 @@ export class CaseDocument {
     this._updatedAt = props.updatedAt;
   }
 
-  static create(props: CreateCaseDocumentProps): CaseDocument {
+  static create(props: CreateSessionDocumentProps): SessionDocument {
     const now = new Date();
-    return new CaseDocument({
+    return new SessionDocument({
       id: uuidv4(),
       caseId: props.caseId,
       uploadBy: props.uploadBy,
@@ -50,8 +50,10 @@ export class CaseDocument {
     });
   }
 
-  static fromPersistence(props: PersistedCaseDocumentProps): CaseDocument {
-    return new CaseDocument(props);
+  static fromPersistence(
+    props: PersistedSessionDocumentProps
+  ): SessionDocument {
+    return new SessionDocument(props);
   }
 
   // Getters
