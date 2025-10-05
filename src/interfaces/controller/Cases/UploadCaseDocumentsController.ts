@@ -41,8 +41,8 @@ export class UploadCaseDocumentsController implements IController {
           fileType = "unknown";
         }
       }
-      if ("filename" in httpRequest.file) {
-        fileName = String(httpRequest.file.filename);
+      if ("originalname" in httpRequest.file) {
+        fileName = String(httpRequest.file.originalname);
       }
       if ("path" in httpRequest.file) {
         fileUrl = String(httpRequest.file.path);
