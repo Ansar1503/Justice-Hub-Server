@@ -19,8 +19,6 @@ export class FindCaseDocumentsByCaseUsecase
     const caseExists = await this._caseRepo.findById(input.caseId);
     if (!caseExists) throw new Error("no case has been found");
     const data = await this._caseDocumentRepo.findByCase(input);
-    if (!data.data || data.data.length === 0)
-      throw new Error("documents not found");
     return data;
   }
 }

@@ -666,8 +666,8 @@ router.post(
 
 router.get(
   CasesRoutes.base + CasesRoutes.documents + CommonParamsRoute.params,
-  // authenticateUser,
-  // authenticateClient,
+  authenticateUser,
+  authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
       req,
@@ -679,3 +679,4 @@ router.get(
 );
 
 export default router;
+ 

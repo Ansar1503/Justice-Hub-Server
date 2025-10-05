@@ -35,7 +35,8 @@ export class CaseDocumentRepo
 
     const match: any = { caseId };
 
-    if (search) match["document.name"] = { $regex: search, $options: "i" };
+    if (search.trim())
+      match["document.name"] = { $regex: search, $options: "i" };
 
     const sortQuery: any = {};
     switch (sort) {
@@ -57,7 +58,7 @@ export class CaseDocumentRepo
       {
         $lookup: {
           from: "users",
-          localField: "uploadedBy",
+          localField: "uploadBy",
           foreignField: "user_id",
           as: "uploadedByUserDetails",
         },
@@ -71,7 +72,7 @@ export class CaseDocumentRepo
       {
         $lookup: {
           from: "clients",
-          localField: "uploadedBy",
+          localField: "uploadBy",
           foreignField: "user_id",
           as: "uploadedByClientDetails",
         },
@@ -125,7 +126,7 @@ export class CaseDocumentRepo
       { $skip: skip },
       { $limit: limit },
     ];
-
+    console.log("pipeline",pipeline)
     const [data, totalCount] = await Promise.all([
       this.model.aggregate(pipeline),
       this.model.countDocuments(match),
