@@ -74,6 +74,7 @@ import {
 } from "../middelwares/multer";
 import { UploadCaseDocumentsComposer } from "@infrastructure/services/composers/Cases/UploadCaseDocumentComposer";
 import { FindCaseDocumentsByCaseComposer } from "@infrastructure/services/composers/Cases/FindCaseDocumentsQueryComposer";
+import { DeleteCaseDocumentComposer } from "@infrastructure/services/composers/Cases/DeleteCaseDocumentsComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -678,5 +679,15 @@ router.get(
   }
 );
 
+router.delete(
+  CasesRoutes.base + CasesRoutes.documents + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, DeleteCaseDocumentComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
 export default router;
- 

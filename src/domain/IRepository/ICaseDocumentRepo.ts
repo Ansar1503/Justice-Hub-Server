@@ -9,4 +9,6 @@ export interface ICaseDocumentsRepo extends IBaseRepository<CaseDocument> {
   findByCase(
     payload: FetchCasesDocumentsByCaseInputDto
   ): Promise<FetchCasesDocumentsByCaseOutputDto>;
+  delete(id: string): Promise<void>;
+  findById(id: string): Promise<CaseDocument | null>;
 }

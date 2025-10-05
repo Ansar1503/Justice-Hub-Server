@@ -126,7 +126,7 @@ export class CaseDocumentRepo
       { $skip: skip },
       { $limit: limit },
     ];
-    console.log("pipeline",pipeline)
+    console.log("pipeline", pipeline);
     const [data, totalCount] = await Promise.all([
       this.model.aggregate(pipeline),
       this.model.countDocuments(match),
@@ -138,5 +138,12 @@ export class CaseDocumentRepo
       totalPage: Math.ceil(totalCount / limit),
       data: data,
     };
+  }
+  async delete(id: string): Promise<void> {
+    await this.model.findOneAndDelete({ _id: id });
+  }
+  async findById(id: string): Promise<CaseDocument | null> {
+    const data = await this.model.findOne({ _id: id });
+    return data ? this.mapper.toDomain(data) : null;
   }
 }
