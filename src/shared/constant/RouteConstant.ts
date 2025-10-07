@@ -148,4 +148,6 @@ export const CasesRoutes = {
   appointments: "/appointments",
   sessions: "/sessions",
   documents: "/documents",
+  caseTypes: "/caseTypes",
+  ids: "/ids",
 };

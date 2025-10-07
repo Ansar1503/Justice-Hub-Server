@@ -75,6 +75,7 @@ import {
 import { UploadCaseDocumentsComposer } from "@infrastructure/services/composers/Cases/UploadCaseDocumentComposer";
 import { FindCaseDocumentsByCaseComposer } from "@infrastructure/services/composers/Cases/FindCaseDocumentsQueryComposer";
 import { DeleteCaseDocumentComposer } from "@infrastructure/services/composers/Cases/DeleteCaseDocumentsComposer";
+import { FetchCaseByCaseTypesComposer } from "@infrastructure/services/composers/Cases/FetchCaseByCaseTypesComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -685,6 +686,17 @@ router.delete(
   authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, DeleteCaseDocumentComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  CasesRoutes.base + CasesRoutes.caseTypes + CasesRoutes.ids,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchCaseByCaseTypesComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }
