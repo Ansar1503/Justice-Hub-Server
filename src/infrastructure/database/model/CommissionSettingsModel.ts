@@ -20,6 +20,6 @@ const CommissionSettingsSchema = new Schema<ICommissionSettingsModel>(
 );
 
 export const CommissionSettingsModel = mongoose.model(
-  "commission_settings",
+  "commissionSettings",
   CommissionSettingsSchema
 );

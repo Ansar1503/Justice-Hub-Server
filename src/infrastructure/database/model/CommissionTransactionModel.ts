@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 type BookingType = "initial" | "followup";
-type TransactionStatus = "pending" | "credited";
+type TransactionStatus = "pending" | "credited" | "failed";
 
 export interface ICommissionTransactionModel extends Document {
   _id: string;
@@ -37,6 +37,6 @@ const CommissionTransactionSchema = new Schema<ICommissionTransactionModel>(
 );
 
 export const CommissionTransactionModel = mongoose.model(
-  "commission_transaction",
+  "commissionTransaction",
   CommissionTransactionSchema
 );

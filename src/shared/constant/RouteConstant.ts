@@ -151,3 +151,9 @@ export const CasesRoutes = {
   caseTypes: "/caseTypes",
   ids: "/ids",
 };
+
+export const CommissionRoutes = {
+  base: "/commission",
+  settings: "/settings",
+  transactions: "/transactions",
+};
