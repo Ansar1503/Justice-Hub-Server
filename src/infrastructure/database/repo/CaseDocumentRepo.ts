@@ -126,7 +126,7 @@ export class CaseDocumentRepo
       { $skip: skip },
       { $limit: limit },
     ];
-    console.log("pipeline", pipeline);
+    // console.log("pipeline", pipeline);
     const [data, totalCount] = await Promise.all([
       this.model.aggregate(pipeline),
       this.model.countDocuments(match),
