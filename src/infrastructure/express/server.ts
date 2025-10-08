@@ -23,8 +23,8 @@ const app: Application = express();
 const server = createServer(app);
 const io = InitialiseSocketServer(server);
 const rateLimiter = rateLimit({
-  windowMs: 60000,
-  max: 100,
+  windowMs: 1000,
+  max: 1000,
   message: "Too many requests from this IP, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,

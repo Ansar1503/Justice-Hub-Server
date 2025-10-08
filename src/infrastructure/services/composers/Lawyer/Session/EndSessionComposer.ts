@@ -1,15 +1,9 @@
 import { IController } from "@interfaces/controller/Interface/IController";
 import { EndSessionController } from "@interfaces/controller/Lawyer/Sessions/EndSessionController";
 import { EndSessionUseCase } from "@src/application/usecases/Lawyer/implementations/EndSessionUseCase";
-import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
-import { CallLogsRepository } from "@infrastructure/database/repo/CallLogsRepo";
-import { AppointmentsRepository } from "@infrastructure/database/repo/AppointmentsRepo";
+import { MongoUnitofWork } from "@infrastructure/database/UnitofWork/implementations/UnitofWork";
 
 export function EndSessionComposer(): IController {
-    const usecase = new EndSessionUseCase(
-        new SessionsRepository(),
-        new CallLogsRepository(),
-        new AppointmentsRepository(),
-    );
-    return new EndSessionController(usecase);
+  const usecase = new EndSessionUseCase(new MongoUnitofWork());
+  return new EndSessionController(usecase);
 }
