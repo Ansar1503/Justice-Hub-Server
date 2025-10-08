@@ -40,6 +40,9 @@ import { IUnitofWork } from "../IUnitofWork";
 import { ICommissionTransactionRepo } from "@domain/IRepository/ICommissionTransactionRepo";
 import { CommissionTransactionRepo } from "@infrastructure/database/repo/CommissionTransactionRepo";
 import { CommissionTransactionMapper } from "@infrastructure/Mapper/Implementations/CommissionTransactionMapper";
+import { ICallLogs } from "@domain/IRepository/ICallLogs";
+import { CallLogsRepository } from "@infrastructure/database/repo/CallLogsRepo";
+import { CallLogsMapper } from "@infrastructure/Mapper/Implementations/CallLogsMapper";
 
 export class MongoUnitofWork implements IUnitofWork {
   private _session?: ClientSession;
@@ -59,9 +62,25 @@ export class MongoUnitofWork implements IUnitofWork {
   private _overrideSlotsRepo: IOverrideRepo | undefined;
   private _sessionRepo: ISessionsRepo | undefined;
   private _commissionTransactionRepo: ICommissionTransactionRepo | undefined;
+  private _callLogsRepo: ICallLogs | undefined;
 
   constructor(session?: ClientSession) {
     this._session = session;
+  }
+
+  get callLogsRepo(): ICallLogs {
+    if (!this._session) {
+      throw new Error(
+        "Unit of Work session not initialized. Call startTransaction() first."
+      );
+    }
+    if (!this._callLogsRepo) {
+      this._callLogsRepo = new CallLogsRepository(
+        new CallLogsMapper(),
+        this._session
+      );
+    }
+    return this._callLogsRepo;
   }
 
   get commissionTransactionRepo(): ICommissionTransactionRepo {
