@@ -16,7 +16,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
         const { body, signature } = input;
         const result = await handleStripeWebHook(body, signature);
         if (!result.eventHandled) return;
-        const { lawyer_id, client_id, date, time, duration, payment_status, amount, reason, title, caseTypeId } =
+        const { lawyer_id, client_id, date, time, duration, payment_status, amountPaid, reason, title, caseTypeId } =
             result;
         if (
             !client_id ||
@@ -25,7 +25,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
             !time ||
             !duration ||
             !payment_status ||
-            !amount ||
+            !amountPaid ||
             !caseTypeId ||
             !title
         ) {
@@ -47,7 +47,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
                 });
                 await uow.caseRepo.create(casepayload);
                 const appointmentPayload = Appointment.create({
-                    amount: Number(amount),
+                    amount: Number(amountPaid),
                     client_id: client_id,
                     date: new Date(date),
                     caseId: casepayload.id,
@@ -89,9 +89,6 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
                 } catch (error) {
                 }
             });
-        } else if (payment_status === "failed") {
-            
-        } else {
         }
     }
 }
