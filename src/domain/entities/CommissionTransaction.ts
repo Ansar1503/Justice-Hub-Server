@@ -24,6 +24,8 @@ interface CreateCommissionTransactionProps {
   lawyerId: string;
   amountPaid: number;
   commissionPercent: number;
+  commissionAmount: number;
+  lawyerAmount: number;
   type: BookingType;
 }
 
@@ -60,10 +62,6 @@ export class CommissionTransaction {
     props: CreateCommissionTransactionProps
   ): CommissionTransaction {
     const now = new Date();
-    const commissionAmount = Math.round(
-      (props.amountPaid * props.commissionPercent) / 100
-    );
-    const lawyerAmount = props.amountPaid - commissionAmount;
 
     return new CommissionTransaction({
       id: `commission-${uuidv4()}`,
@@ -72,8 +70,8 @@ export class CommissionTransaction {
       lawyerId: props.lawyerId,
       amountPaid: props.amountPaid,
       commissionPercent: props.commissionPercent,
-      commissionAmount,
-      lawyerAmount,
+      commissionAmount: props.commissionAmount,
+      lawyerAmount: props.lawyerAmount,
       type: props.type,
       status: "pending",
       createdAt: now,

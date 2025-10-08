@@ -29,7 +29,11 @@ const CommissionTransactionSchema = new Schema<ICommissionTransactionModel>(
     commissionAmount: { type: Number, required: true },
     lawyerAmount: { type: Number, required: true },
     type: { type: String, required: true, enum: ["initial", "followup"] },
-    status: { type: String, required: true, enum: ["pending", "credited"] },
+    status: {
+      type: String,
+      required: true,
+      enum: ["pending", "credited", "failed"],
+    },
     createdAt: { type: Date, required: true },
     updatedAt: { type: Date, required: true },
   },

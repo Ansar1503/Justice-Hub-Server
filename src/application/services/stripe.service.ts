@@ -1,13 +1,14 @@
 import Stripe from "stripe";
 import "dotenv/config";
 import { format } from "date-fns";
-
+type BookingType = "initial" | "followup";
 type WebhookResult = {
   amountPaid?: number;
   lawyer_id?: string;
   client_id?: string;
   commissionPercent?: number;
   commissionAmount?: number;
+  bookingType?: BookingType;
   lawyerAmount?: number;
   date?: string;
   time?: string;
@@ -34,6 +35,7 @@ type payloadType = {
   reason?: string;
   title: string;
   caseTypeId: string;
+  bookingType: BookingType;
 };
 
 export async function getStripeSession(payload: payloadType) {
@@ -73,6 +75,7 @@ export async function getStripeSession(payload: payloadType) {
       commissionPercent: payload.commissionPercent,
       commissionAmount: payload.commissionAmount,
       lawyerAmount: payload.lawyerAmount,
+      bookingType: payload.bookingType,
     },
   });
 
@@ -168,5 +171,9 @@ function pluckMeta(md: Stripe.Metadata | null | undefined) {
     commissionAmount: md?.commissionAmount
       ? Number(md.commissionAmount)
       : undefined,
+    bookingType:
+      md?.bookingType === "initial" || md?.bookingType === "followup"
+        ? (md.bookingType as BookingType)
+        : undefined,
   };
 }

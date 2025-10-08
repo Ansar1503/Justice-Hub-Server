@@ -189,6 +189,7 @@ export class CreateCheckoutSessionUseCase
           commissionAmount,
           commissionPercent,
           lawyerAmount,
+          bookingType: "initial",
         });
         return stripe;
       }
@@ -279,6 +280,7 @@ export class CreateCheckoutSessionUseCase
       commissionAmount,
       commissionPercent,
       lawyerAmount,
+      bookingType: "initial",
     });
     return stripe;
   }
