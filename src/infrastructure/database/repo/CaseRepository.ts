@@ -354,7 +354,7 @@ export class CaseRepository
 
   async findAllByUser(userId: string): Promise<Case[] | []> {
     const data = await this.model.find({
-      $or: [{ clientId: userId, lawyerId: userId }],
+      $or: [{ clientId: userId }, { lawyerId: userId }],
     });
     return data && this.mapper.toDomainArray
       ? this.mapper.toDomainArray(data)
