@@ -8,6 +8,8 @@ export const AuthRoute = {
 };
 
 export const AdminRoutes = {
+  dashboard: "/dashboard",
+  overview: "/overview",
   users: "/users",
   lawyers: "/lawyers",
   blockUser: "/user",
