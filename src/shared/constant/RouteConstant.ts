@@ -63,6 +63,7 @@ export const ClientRoutes = {
 
   slots: {
     checkout: "/lawyer/slots/checkout-session",
+    followup: "/lawyer/slots/checkout-session/follow-up",
     removeFailed: "/lawyer/slots/session/:id",
   },
   notifcation: {

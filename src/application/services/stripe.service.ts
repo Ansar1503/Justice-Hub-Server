@@ -6,6 +6,7 @@ type WebhookResult = {
   amountPaid?: number;
   lawyer_id?: string;
   client_id?: string;
+  caseId?: string;
   commissionPercent?: number;
   commissionAmount?: number;
   bookingType?: BookingType;
@@ -37,6 +38,68 @@ type payloadType = {
   caseTypeId: string;
   bookingType: BookingType;
 };
+
+type FollowupPayloadType = {
+  userEmail: string;
+  commissionPercent: number;
+  commissionAmount: number;
+  lawyerAmount: number;
+  lawyer_name: string;
+  date: string;
+  slot: string;
+  amountPaid: number;
+  lawyer_id: string;
+  duration: number;
+  client_id: string;
+  reason?: string;
+  caseId: string;
+  bookingType: BookingType;
+};
+
+export async function getFollowupStripeSession(payload: FollowupPayloadType) {
+  if (!process.env.STRIPE_SECRET_KEY) throw new Error("SECRETKEYNOTFOUND");
+
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const formattedDate = format(new Date(payload.date), "MMMM d yyyy");
+
+  const session = await stripe.checkout.sessions.create({
+    customer_email: payload.userEmail,
+    line_items: [
+      {
+        price_data: {
+          currency: "inr",
+          product_data: {
+            name: `Follow-up Consultation: ${payload.lawyer_name}`,
+            description: `Slot: ${formattedDate}, Time: ${payload.slot}`,
+            images: ["noimage"],
+          },
+          unit_amount: payload.amountPaid * 100,
+        },
+        quantity: 1,
+      },
+    ],
+    mode: "payment",
+    success_url: `${process.env.FRONTEND_URL}/client/lawyers/payment_success/?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${process.env.FRONTEND_URL}/client/lawyers/${payload.lawyer_id}?session_id={CHECKOUT_SESSION_ID}`,
+    metadata: {
+      lawyer_name: payload.lawyer_name,
+      lawyer_id: payload.lawyer_id,
+      time: payload.slot,
+      date: payload.date,
+      amount: String(payload.amountPaid),
+      clientId: payload.client_id,
+      duration: String(payload.duration),
+      reason: payload?.reason ?? "",
+      caseId: payload.caseId,
+      commissionPercent: payload.commissionPercent,
+      commissionAmount: payload.commissionAmount,
+      lawyerAmount: payload.lawyerAmount,
+      bookingType: payload.bookingType,
+    },
+  });
+
+  return session;
+}
 
 export async function getStripeSession(payload: payloadType) {
   if (!process.env.STRIPE_SECRET_KEY) throw new Error("SECRETKEYNOTFOUND");
@@ -175,5 +238,6 @@ function pluckMeta(md: Stripe.Metadata | null | undefined) {
       md?.bookingType === "initial" || md?.bookingType === "followup"
         ? (md.bookingType as BookingType)
         : undefined,
+    caseId: md?.caseId,
   };
 }

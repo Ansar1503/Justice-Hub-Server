@@ -43,6 +43,7 @@ import {
   CasesRoutes,
   CasetypeRoutes,
   ClientRoutes,
+  CommissionRoutes,
   CommonParamsRoute,
   PracticeAreaRoutes,
   SpecializationRoute,
@@ -76,6 +77,8 @@ import { UploadCaseDocumentsComposer } from "@infrastructure/services/composers/
 import { FindCaseDocumentsByCaseComposer } from "@infrastructure/services/composers/Cases/FindCaseDocumentsQueryComposer";
 import { DeleteCaseDocumentComposer } from "@infrastructure/services/composers/Cases/DeleteCaseDocumentsComposer";
 import { FetchCaseByCaseTypesComposer } from "@infrastructure/services/composers/Cases/FetchCaseByCaseTypesComposer";
+import { CreateFollowupCheckoutSessionComposer } from "@infrastructure/services/composers/Client/sessions/CreateFollowupSessionComposer";
+import { FetchCommissionSettingsComposer } from "@infrastructure/services/composers/Commission/FetchCommissionSettingsComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -412,6 +415,20 @@ router.post(
     return;
   }
 );
+
+router.post(
+  ClientRoutes.slots.followup,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      await CreateFollowupCheckoutSessionComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
 router.get(
   ClientRoutes.stripe.session,
   authenticateUser,
@@ -697,6 +714,20 @@ router.get(
   authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchCaseByCaseTypesComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  CommissionRoutes.base + CommissionRoutes.settings,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchCommissionSettingsComposer()
+    );
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }
