@@ -626,27 +626,6 @@ router.get(
   }
 );
 
-router.get(
-  CasesRoutes.base + CommonParamsRoute.params,
-  authenticateUser,
-  authenticateClient,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FindCaseDetailsComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-  }
-);
-
-router.get(
-  CasesRoutes.base + CasesRoutes.appointments + CommonParamsRoute.params,
-  authenticateUser,
-  authenticateClient,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FindAppointmentByCaseComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
-);
-
 router.post(
   ClientRoutes.lawyers.walletbook,
   authenticateUser,
@@ -661,17 +640,6 @@ router.post(
   }
 );
 
-router.get(
-  CasesRoutes.base + CasesRoutes.sessions + CommonParamsRoute.params,
-  authenticateUser,
-  authenticateClient,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FindSessionsByCaseComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
-);
-
 router.post(
   CasesRoutes.base + CasesRoutes.documents,
   authenticateUser,
@@ -679,31 +647,6 @@ router.post(
   caseDocumentUpload.single("file"),
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, UploadCaseDocumentsComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
-);
-
-router.get(
-  CasesRoutes.base + CasesRoutes.documents + CommonParamsRoute.params,
-  authenticateUser,
-  authenticateClient,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(
-      req,
-      FindCaseDocumentsByCaseComposer()
-    );
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
-);
-
-router.delete(
-  CasesRoutes.base + CasesRoutes.documents + CommonParamsRoute.params,
-  authenticateUser,
-  authenticateClient,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, DeleteCaseDocumentComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }
@@ -742,6 +685,63 @@ router.get(
     const adapter = await expressAdapter(req, FetchAllCasesByUserComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
+  }
+);
+
+router.get(
+  CasesRoutes.base + CasesRoutes.appointments + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindAppointmentByCaseComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  CasesRoutes.base + CasesRoutes.sessions + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindSessionsByCaseComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  CasesRoutes.base + CasesRoutes.documents + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FindCaseDocumentsByCaseComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.delete(
+  CasesRoutes.base + CasesRoutes.documents + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, DeleteCaseDocumentComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  CasesRoutes.base + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FindCaseDetailsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
   }
 );
 
