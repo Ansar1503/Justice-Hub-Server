@@ -8,4 +8,5 @@ export interface ICommissionTransactionRepo
     id: string;
     status: CommissionTransaction["status"];
   }): Promise<CommissionTransaction | null>;
+  findByUserId(userId: string): Promise<CommissionTransaction[] | []>;
 }

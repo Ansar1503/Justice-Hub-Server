@@ -64,6 +64,7 @@ import { UploadCaseDocumentsComposer } from "@infrastructure/services/composers/
 import { FindAllCaseTypesComposer } from "@infrastructure/services/composers/Casetypes/FindAllCasetypes";
 import { AddSessionSummaryComposer } from "@infrastructure/services/composers/Cases/AddSessionSummaryComposer";
 import { FetchAllCasesByUserComposer } from "@infrastructure/services/composers/Cases/FetchAllCasesByUserComposer";
+import { FetchLawyerDashboardDataComposer } from "@infrastructure/services/composers/Cases/FetchLawyerDashboardDataComposer";
 
 const upload = multer({ storage: documentstorage });
 const caseDocumentUpload = multer({
@@ -577,6 +578,21 @@ router.get(
     const adapter = await expressAdapter(req, FetchAllCasesByUserComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
+  }
+);
+
+router.get(
+  ClientRoutes.dashboard,
+  authenticateUser,
+  authenticateClient,
+  authenticateLawyer,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchLawyerDashboardDataComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return
   }
 );
 

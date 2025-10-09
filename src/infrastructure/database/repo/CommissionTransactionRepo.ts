@@ -37,4 +37,12 @@ export class CommissionTransactionRepo
 
     return updated ? this.mapper.toDomain(updated) : null;
   }
+  async findByUserId(userId: string): Promise<CommissionTransaction[] | []> {
+    const data = await this.model.find({
+      $or: [{ clientId: userId }, { lawyerId: userId }],
+    });
+    return data && this.mapper.toDomainArray
+      ? this.mapper.toDomainArray(data)
+      : [];
+  }
 }

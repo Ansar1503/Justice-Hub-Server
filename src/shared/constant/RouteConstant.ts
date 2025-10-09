@@ -20,6 +20,8 @@ export const AdminRoutes = {
 };
 
 export const ClientRoutes = {
+  base: "/client",
+  dashboard: "/dashboard",
   profile: {
     base: "/profile",
     image: "/image",
@@ -146,7 +148,7 @@ export const CommonParamsRoute = {
 
 export const CasesRoutes = {
   base: "/cases",
-  user:"/user",
+  user: "/user",
   appointments: "/appointments",
   sessions: "/sessions",
   sessionSummary: "/summary",

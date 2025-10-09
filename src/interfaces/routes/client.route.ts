@@ -80,6 +80,7 @@ import { FetchCaseByCaseTypesComposer } from "@infrastructure/services/composers
 import { CreateFollowupCheckoutSessionComposer } from "@infrastructure/services/composers/Client/sessions/CreateFollowupSessionComposer";
 import { FetchCommissionSettingsComposer } from "@infrastructure/services/composers/Commission/FetchCommissionSettingsComposer";
 import { FetchAllCasesByUserComposer } from "@infrastructure/services/composers/Cases/FetchAllCasesByUserComposer";
+import { FetchClientDashboardDataComposer } from "@infrastructure/services/composers/Cases/FetchClientDashboardDataComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -683,6 +684,20 @@ router.get(
   authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchAllCasesByUserComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  ClientRoutes.dashboard,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchClientDashboardDataComposer()
+    );
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }
