@@ -15,4 +15,5 @@ export interface ICaseRepo extends IBaseRepository<Case> {
     userId: string;
     caseTypeIds: string[];
   }): Promise<Case[] | []>;
+  findAllByUser(userId: string): Promise<Case[] | []>;
 }

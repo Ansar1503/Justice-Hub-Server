@@ -146,6 +146,7 @@ export const CommonParamsRoute = {
 
 export const CasesRoutes = {
   base: "/cases",
+  user:"/user",
   appointments: "/appointments",
   sessions: "/sessions",
   sessionSummary: "/summary",
