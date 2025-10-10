@@ -45,4 +45,72 @@ export class CommissionTransactionRepo
       ? this.mapper.toDomainArray(data)
       : [];
   }
+  async getCommissionSummary(
+    start: Date,
+    end: Date
+  ): Promise<{
+    totalCommission: number;
+    totalLawyerShare: number;
+    totalCollected: number;
+  }> {
+    const data = await this.model.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: start, $lte: end },
+          status: "credited",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalCommission: { $sum: "$commissionAmount" },
+          totalLawyerShare: { $sum: "$lawyerAmount" },
+          totalCollected: { $sum: "$amountPaid" },
+        },
+      },
+    ]);
+
+    return (
+      data[0] || {
+        totalCommission: 0,
+        totalLawyerShare: 0,
+        totalCollected: 0,
+      }
+    );
+  }
+
+  async getCommissionTrends(
+    start: Date,
+    end: Date
+  ): Promise<
+    {
+      date: string;
+      revenue: number;
+    }[]
+  > {
+    const data = await this.model.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: start, $lte: end },
+          status: "credited",
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          revenue: { $sum: "$commissionAmount" },
+        },
+      },
+      { $sort: { _id: 1 } },
+      {
+        $project: {
+          date: "$_id",
+          revenue: 1,
+          _id: 0,
+        },
+      },
+    ]);
+
+    return data;
+  }
 }

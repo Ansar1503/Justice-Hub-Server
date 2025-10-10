@@ -9,4 +9,21 @@ export interface ICommissionTransactionRepo
     status: CommissionTransaction["status"];
   }): Promise<CommissionTransaction | null>;
   findByUserId(userId: string): Promise<CommissionTransaction[] | []>;
+  getCommissionSummary(
+    start: Date,
+    end: Date
+  ): Promise<{
+    totalCommission: number;
+    totalLawyerShare: number;
+    totalCollected: number;
+  }>;
+  getCommissionTrends(
+    start: Date,
+    end: Date
+  ): Promise<
+    {
+      date: string;
+      revenue: number;
+    }[]
+  >;
 }
