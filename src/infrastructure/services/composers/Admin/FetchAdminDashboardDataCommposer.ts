@@ -1,8 +1,10 @@
 import { CaseRepository } from "@infrastructure/database/repo/CaseRepository";
+import { CommissionTransactionRepo } from "@infrastructure/database/repo/CommissionTransactionRepo";
 import { DisputesRepo } from "@infrastructure/database/repo/DisputesRepo";
 import { UserRepository } from "@infrastructure/database/repo/UserRepo";
 import { WalletTransactionsRepo } from "@infrastructure/database/repo/WalletTransactionsRepo";
 import { CaseMapper } from "@infrastructure/Mapper/Implementations/CaseMapper";
+import { CommissionTransactionMapper } from "@infrastructure/Mapper/Implementations/CommissionTransactionMapper";
 import { FetchAdminDashboardDataController } from "@interfaces/controller/Admin/FetchAdminDashboardDataController";
 import { IController } from "@interfaces/controller/Interface/IController";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
@@ -14,7 +16,8 @@ export function FetchAdminDashboardDataComposer(): IController {
     new UserRepository(),
     new WalletTransactionsRepo(),
     new DisputesRepo(),
-    new CaseRepository(new CaseMapper())
+    new CaseRepository(new CaseMapper()),
+    new CommissionTransactionRepo(new CommissionTransactionMapper())
   );
   return new FetchAdminDashboardDataController(
     usecase,

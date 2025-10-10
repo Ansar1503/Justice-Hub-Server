@@ -4,6 +4,7 @@ import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { IWalletTransactionsRepo } from "@domain/IRepository/IWalletTransactionsRepo";
 import { IDisputes } from "@domain/IRepository/IDisputesRepo";
 import { ICaseRepo } from "@domain/IRepository/ICaseRepo";
+import { ICommissionTransactionRepo } from "@domain/IRepository/ICommissionTransactionRepo";
 
 export class FetchAdminDashboardDataUsecase
   implements IFetchDashboardDataUsecase
@@ -12,7 +13,8 @@ export class FetchAdminDashboardDataUsecase
     private _userRepo: IUserRepository,
     private _transactionRepo: IWalletTransactionsRepo,
     private _disputesRepo: IDisputes,
-    private _casesRepo: ICaseRepo
+    private _casesRepo: ICaseRepo,
+    private _commissionRepo: ICommissionTransactionRepo
   ) {}
 
   async execute(input: { start: Date; end: Date }): Promise<AdminDashboardDto> {
@@ -24,7 +26,7 @@ export class FetchAdminDashboardDataUsecase
     const totalUsers = totalClients + totalLawyers;
 
     const [
-      { totalRevenue, commissionPaid },
+      commissionSummary,
       topLawyers,
       recentTransactions,
       recentDisputes,
@@ -32,7 +34,7 @@ export class FetchAdminDashboardDataUsecase
       disputesOpen,
       growthPercent,
     ] = await Promise.all([
-      this._transactionRepo.getRevenueSummary(input.start, input.end),
+      this._commissionRepo.getCommissionSummary(input.start, input.end),
       this._transactionRepo.getTopLawyerByEarnings(input.start, input.end),
       this._transactionRepo.getRecentTransactions(5),
       this._disputesRepo.getRecentDisputes(5),
@@ -41,13 +43,13 @@ export class FetchAdminDashboardDataUsecase
       this._transactionRepo.getGrowthPercent(input.start, input.end),
     ]);
 
-    const [revenueTrends, caseTrends] = await Promise.all([
-      this._transactionRepo.getRevenueTrends(input.start, input.end),
+    const [commissionTrends, caseTrends] = await Promise.all([
+      this._commissionRepo.getCommissionTrends(input.start, input.end),
       this._casesRepo.getCaseTrends(input.start, input.end),
     ]);
 
     const caseMap = new Map(caseTrends.map((c) => [c.date, c.cases]));
-    const trends = revenueTrends.map((r) => ({
+    const trends = commissionTrends.map((r) => ({
       date: r.date,
       revenue: r.revenue,
       cases: caseMap.get(r.date) || 0,
@@ -58,8 +60,8 @@ export class FetchAdminDashboardDataUsecase
         totalUsers,
         totalLawyers,
         totalClients,
-        totalRevenue,
-        commissionPaid,
+        totalRevenue: commissionSummary.totalCommission, // ✅ admin’s profit
+        commissionPaid: commissionSummary.totalLawyerShare, // ✅ paid to lawyers
         activeCases,
         disputesOpen,
         growthPercent,
