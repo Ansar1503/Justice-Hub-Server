@@ -255,6 +255,7 @@ router
 
 router.get(
   AdminRoutes.dashboard + AdminRoutes.overview,
+  authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
       req,
