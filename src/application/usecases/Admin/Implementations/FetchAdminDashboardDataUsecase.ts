@@ -60,8 +60,8 @@ export class FetchAdminDashboardDataUsecase
         totalUsers,
         totalLawyers,
         totalClients,
-        totalRevenue: commissionSummary.totalCommission, // ✅ admin’s profit
-        commissionPaid: commissionSummary.totalLawyerShare, // ✅ paid to lawyers
+        totalRevenue: commissionSummary.totalCommission, 
+        commissionPaid: commissionSummary.totalLawyerShare, 
         activeCases,
         disputesOpen,
         growthPercent,
