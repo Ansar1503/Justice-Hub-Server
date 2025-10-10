@@ -360,4 +360,48 @@ export class CaseRepository
       ? this.mapper.toDomainArray(data)
       : [];
   }
+  async countOpen(): Promise<number> {
+    return await this.model.countDocuments({ status: "open" });
+  }
+  async getCaseTrends(
+    startDate: Date,
+    endDate: Date
+  ): Promise<{ date: string; cases: number }[]> {
+    const results = await this.model.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startDate, $lte: endDate },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+            day: { $dayOfMonth: "$createdAt" },
+          },
+          cases: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          date: {
+            $dateFromParts: {
+              year: "$_id.year",
+              month: "$_id.month",
+              day: "$_id.day",
+            },
+          },
+          cases: 1,
+        },
+      },
+      { $sort: { date: 1 } },
+    ]);
+
+    return results.map((r) => ({
+      date: r.date.toISOString().split("T")[0],
+      cases: r.cases,
+    }));
+  }
 }

@@ -28,7 +28,6 @@ export interface ClientDashboardDto {
   sessions: BaseSessionDto[];
 }
 
-
 export interface LawyerDashboardDto {
   totalCases: number;
   activeCases: number;
@@ -68,4 +67,49 @@ export interface LawyerDashboardDto {
   totalReviews: number;
   averageRating: number;
   recentReviews: ReviewDto[] | [];
+}
+
+export interface DashboardSummaryDto {
+  totalUsers: number;
+  totalLawyers: number;
+  totalClients: number;
+  totalRevenue: number;
+  commissionPaid: number;
+  activeCases: number;
+  disputesOpen: number;
+  growthPercent: number;
+}
+
+export interface DashboardTrendItemDto {
+  date: string;
+  revenue: number;
+  cases: number;
+}
+
+export interface TopLawyerDto {
+  name: string;
+  casesHandled: number;
+  earnings: number;
+}
+
+export interface TransactionDto {
+  id: string;
+  amount: number;
+  status: "pending" | "completed" | "failed" | "cancelled";
+  date: string;
+}
+
+export interface DisputeDto {
+  id: string;
+  type: string;
+  status: "pending" | "resolved" | "rejected";
+  reportedBy: string;
+}
+
+export interface AdminDashboardDto {
+  summary: DashboardSummaryDto;
+  trends: DashboardTrendItemDto[];
+  topLawyers: TopLawyerDto[];
+  recentTransactions: TransactionDto[];
+  recentDisputes: DisputeDto[];
 }

@@ -33,6 +33,7 @@ import { DeleteCasetypeComposer } from "@infrastructure/services/composers/Caset
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 import { CreateOrUpdateCommissionSettingsComposer } from "@infrastructure/services/composers/Commission/CreateOrUpdateCommissionSettingsComposer";
 import { FetchCommissionSettingsComposer } from "@infrastructure/services/composers/Commission/FetchCommissionSettingsComposer";
+import { FetchAdminDashboardDataComposer } from "@infrastructure/services/composers/Admin/FetchAdminDashboardDataCommposer";
 
 const router = Router();
 
@@ -251,5 +252,17 @@ router
     res.status(adapter.statusCode).json(adapter.body);
     return;
   });
+
+router.get(
+  AdminRoutes.dashboard + AdminRoutes.overview,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchAdminDashboardDataComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
 
 export default router;
