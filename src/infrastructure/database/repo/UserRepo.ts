@@ -369,7 +369,7 @@ export class UserRepository implements IUserRepository {
                 in: { id: "$$spec._id", name: "$$spec.name" },
               },
             },
-            experience: "lawyerData.experience",
+            experience: "$lawyerData.experience",
             consultationFee: "$lawyerData.consultationFee",
             createdAt: "$lawyerData.createdAt",
             updatedAt: "$lawyerData.updatedAt",
