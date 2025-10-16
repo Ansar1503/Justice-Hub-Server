@@ -188,7 +188,7 @@ export class LawyerRepository implements ILawyerRepository {
       { $unwind: { path: "$address", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
-          from: "LawyerVerification",
+          from: "lawyerverifications",
           localField: "userId",
           foreignField: "userId",
           as: "lawyerVerificationDetails",
