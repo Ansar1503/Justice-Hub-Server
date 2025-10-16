@@ -35,6 +35,7 @@ import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 import { CreateOrUpdateCommissionSettingsComposer } from "@infrastructure/services/composers/Commission/CreateOrUpdateCommissionSettingsComposer";
 import { FetchCommissionSettingsComposer } from "@infrastructure/services/composers/Commission/FetchCommissionSettingsComposer";
 import { FetchAdminDashboardDataComposer } from "@infrastructure/services/composers/Admin/FetchAdminDashboardDataCommposer";
+import { AddSubscriptionPlanComposer } from "@infrastructure/services/composers/Subscriptions/AddSubscriptionsComposer";
 
 const router = Router();
 
@@ -270,6 +271,10 @@ router.get(
 router
   .route(SubscriptionRoute.base)
   .all(authenticateUser)
-  .post(async (req: Request, res: Response) => {});
+  .post(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, AddSubscriptionPlanComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  });
 
 export default router;
