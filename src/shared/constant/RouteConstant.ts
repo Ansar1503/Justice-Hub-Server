@@ -164,3 +164,7 @@ export const CommissionRoutes = {
   settings: "/settings",
   transactions: "/transactions",
 };
+
+export const SubscriptionRoute = {
+  base: "/subscriptions",
+};

@@ -15,6 +15,7 @@ import {
   CommissionRoutes,
   PracticeAreaRoutes,
   SpecializationRoute,
+  SubscriptionRoute,
   WalletRoutes,
 } from "@shared/constant/RouteConstant";
 import { FetchTransactionsByWalletComposer } from "@infrastructure/services/composers/Wallet/FetchTransactionsByWalletComposer";
@@ -265,5 +266,10 @@ router.get(
     return;
   }
 );
+
+router
+  .route(SubscriptionRoute.base)
+  .all(authenticateUser)
+  .post(async (req: Request, res: Response) => {});
 
 export default router;
