@@ -13,6 +13,7 @@ import {
   AdminRoutes,
   CasetypeRoutes,
   CommissionRoutes,
+  CommonParamsRoute,
   PracticeAreaRoutes,
   SpecializationRoute,
   SubscriptionRoute,
@@ -36,6 +37,8 @@ import { CreateOrUpdateCommissionSettingsComposer } from "@infrastructure/servic
 import { FetchCommissionSettingsComposer } from "@infrastructure/services/composers/Commission/FetchCommissionSettingsComposer";
 import { FetchAdminDashboardDataComposer } from "@infrastructure/services/composers/Admin/FetchAdminDashboardDataCommposer";
 import { AddSubscriptionPlanComposer } from "@infrastructure/services/composers/Subscriptions/AddSubscriptionsComposer";
+import { FetchAllSubscriptionPlansComposer } from "@infrastructure/services/composers/Subscriptions/FetchAllSubscriptionPlansComposer";
+import { UpdateSubscriptionPlanComposer } from "@infrastructure/services/composers/Subscriptions/UpdateSubscriptionPlanComposer";
 
 const router = Router();
 
@@ -275,6 +278,23 @@ router
     const adapter = await expressAdapter(req, AddSubscriptionPlanComposer());
     res.status(adapter.statusCode).json(adapter.body);
     return;
+  })
+  .get(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchAllSubscriptionPlansComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
   });
+
+router.patch(
+  SubscriptionRoute.base + CommonParamsRoute.params,
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, UpdateSubscriptionPlanComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+  }
+);
 
 export default router;

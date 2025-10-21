@@ -1,18 +1,18 @@
 import { SubscriptionRepository } from "@infrastructure/database/repo/SubscriptionRepository";
 import { SubscriptionPlanMapper } from "@infrastructure/Mapper/Implementations/SubscriptionMapper";
 import { IController } from "@interfaces/controller/Interface/IController";
-import { AddSubscriptionPlanController } from "@interfaces/controller/Subscription/AddSubscriptionPlanController";
+import { UpdateSubscriptionPlanController } from "@interfaces/controller/Subscription/UpdateSubscriptionPlanController";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
-import { AddSubscriptionPlanUsecase } from "@src/application/usecases/Subscription/implementation/AddSubscriptionPlanUsecase";
 import { StripeSubscriptionService } from "@src/application/services/StripeSubscriptionService";
+import { UpdateSubscriptionPlanUsecase } from "@src/application/usecases/Subscription/implementation/UpdateSubscriptionPlanUsecase";
 
-export function AddSubscriptionPlanComposer(): IController {
-  const usecase = new AddSubscriptionPlanUsecase(
+export function UpdateSubscriptionPlanComposer(): IController {
+  const usecase = new UpdateSubscriptionPlanUsecase(
     new SubscriptionRepository(new SubscriptionPlanMapper()),
     new StripeSubscriptionService()
   );
-  return new AddSubscriptionPlanController(
+  return new UpdateSubscriptionPlanController(
     usecase,
     new HttpErrors(),
     new HttpSuccess()

@@ -1,4 +1,4 @@
-import { IAddSubscriptionPlanUsecase } from "@src/application/usecases/Subscription/IAddSubscriptionPlanUsecase";
+import { IUpdateSubscriptionPlanUsecase } from "@src/application/usecases/Subscription/IUpdateSubscriptionPlanUsecase";
 import { IController } from "../Interface/IController";
 import { IHttpErrors } from "@interfaces/helpers/IHttpErrors.";
 import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
@@ -6,9 +6,9 @@ import { IHttpResponse } from "@interfaces/helpers/IHttpResponse";
 import { HttpRequest } from "@interfaces/helpers/implementation/HttpRequest";
 import { AddSubscriptionPlanZodInputSchema } from "@interfaces/middelwares/validator/zod/Subscription/AddSubscriptionPlanZodValidation";
 
-export class AddSubscriptionPlanController implements IController {
+export class UpdateSubscriptionPlanController implements IController {
   constructor(
-    private _addSubscriptionUsecase: IAddSubscriptionPlanUsecase,
+    private _updateSubscriptionPlan: IUpdateSubscriptionPlanUsecase,
     private _errors: IHttpErrors,
     private _success: IHttpSuccess
   ) {}
@@ -17,12 +17,26 @@ export class AddSubscriptionPlanController implements IController {
       httpRequest.body
     );
     if (!parsed.success) {
-      const er = parsed.error.errors[0];
-      return this._errors.error_400(er.message);
+      const error = parsed.error.errors[0];
+      return this._errors.error_400(error.message);
+    }
+    let id = "";
+    if (
+      httpRequest.params &&
+      typeof httpRequest.params === "object" &&
+      "id" in httpRequest.params
+    ) {
+      id = String(httpRequest.params.id);
+    }
+    if (!id.trim()) {
+      return this._errors.error_400("subscription plan Id not found");
     }
     try {
-      const result = await this._addSubscriptionUsecase.execute(parsed.data);
-      return this._success.success_201(result);
+      const result = await this._updateSubscriptionPlan.execute({
+        ...parsed.data,
+        id: id,
+      });
+      return this._success.success_200(result);
     } catch (error) {
       if (error instanceof Error) {
         return this._errors.error_400(error.message);
