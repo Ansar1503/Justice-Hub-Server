@@ -47,6 +47,7 @@ import {
   CommonParamsRoute,
   PracticeAreaRoutes,
   SpecializationRoute,
+  SubscriptionRoute,
   WalletRoutes,
 } from "@shared/constant/RouteConstant";
 import { FetchAllNotificationsComposer } from "@infrastructure/services/composers/Notification/FetchAllNotificationsComposer";
@@ -81,6 +82,7 @@ import { CreateFollowupCheckoutSessionComposer } from "@infrastructure/services/
 import { FetchCommissionSettingsComposer } from "@infrastructure/services/composers/Commission/FetchCommissionSettingsComposer";
 import { FetchAllCasesByUserComposer } from "@infrastructure/services/composers/Cases/FetchAllCasesByUserComposer";
 import { FetchClientDashboardDataComposer } from "@infrastructure/services/composers/Cases/FetchClientDashboardDataComposer";
+import { FetchAllSubscriptionPlansComposer } from "@infrastructure/services/composers/Subscriptions/FetchAllSubscriptionPlansComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -130,6 +132,21 @@ const caseDocumentUpload = multer({
 });
 
 const router = express.Router();
+
+// subscriptions
+router.get(
+  SubscriptionRoute.base,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchAllSubscriptionPlansComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
 
 // profile area
 router.get(
