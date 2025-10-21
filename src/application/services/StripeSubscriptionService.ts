@@ -70,4 +70,29 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
       throw new Error("Failed to deactivate Stripe price");
     }
   }
+  async updateProductActiveStatus(
+    productId: string,
+    isActive: boolean
+  ): Promise<void> {
+    try {
+      await this.stripe.products.update(productId, { active: isActive });
+    } catch (error) {
+      throw new Error(
+        `Failed to ${isActive ? "activate" : "deactivate"} Stripe product`
+      );
+    }
+  }
+
+  async updatePriceActiveStatus(
+    priceId: string,
+    isActive: boolean
+  ): Promise<void> {
+    try {
+      await this.stripe.prices.update(priceId, { active: isActive });
+    } catch (error) {
+      throw new Error(
+        `Failed to ${isActive ? "activate" : "deactivate"} Stripe price`
+      );
+    }
+  }
 }

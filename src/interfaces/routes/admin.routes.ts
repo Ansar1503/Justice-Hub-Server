@@ -39,6 +39,7 @@ import { FetchAdminDashboardDataComposer } from "@infrastructure/services/compos
 import { AddSubscriptionPlanComposer } from "@infrastructure/services/composers/Subscriptions/AddSubscriptionsComposer";
 import { FetchAllSubscriptionPlansComposer } from "@infrastructure/services/composers/Subscriptions/FetchAllSubscriptionPlansComposer";
 import { UpdateSubscriptionPlanComposer } from "@infrastructure/services/composers/Subscriptions/UpdateSubscriptionPlanComposer";
+import { ChangeActiveSubscriptionStatusComposer } from "@infrastructure/services/composers/Subscriptions/ChangeActiveSubscriptionStatusComposer";
 
 const router = Router();
 
@@ -293,6 +294,17 @@ router.patch(
   authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, UpdateSubscriptionPlanComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+  }
+);
+router.patch(
+  SubscriptionRoute.base + SubscriptionRoute.status + CommonParamsRoute.params,
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      ChangeActiveSubscriptionStatusComposer()
+    );
     res.status(adapter.statusCode).json(adapter.body);
   }
 );

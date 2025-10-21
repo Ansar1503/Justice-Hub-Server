@@ -167,4 +167,5 @@ export const CommissionRoutes = {
 
 export const SubscriptionRoute = {
   base: "/subscriptions",
+  status: "/status",
 };

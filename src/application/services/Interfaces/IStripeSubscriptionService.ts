@@ -16,5 +16,7 @@ export interface CreateStripeSubscriptionProduct {
     deleteProduct(productId: string): Promise<void>;
     updateProduct(productId: string, data: { name?: string; description?: string }): Promise<void>;
     deactivatePrice(priceId: string): Promise<void>;
+    updateProductActiveStatus(productId: string, isActive: boolean): Promise<void>; 
+    updatePriceActiveStatus(priceId: string, isActive: boolean): Promise<void>;     
   }
   
