@@ -23,6 +23,24 @@ export class UserSubscriptionRepository
     if (!data) return null;
     return this.mapper.toDomain(data);
   }
+  async findByStripeCustomerId(
+    customerId: string
+  ): Promise<UserSubscription | null> {
+    const data = await this.model.findOne({ stripeCustomerId: customerId });
+    if (!data) return null;
+    return this.mapper.toDomain(data);
+  }
+
+  async findByStripeSubscriptionId(
+    subscriptionId: string
+  ): Promise<UserSubscription | null> {
+    const data = await this.model.findOne({
+      stripeSubscriptionId: subscriptionId,
+    });
+    if (!data) return null;
+    return this.mapper.toDomain(data);
+  }
+
   async createOrUpdate(
     subscription: UserSubscription
   ): Promise<UserSubscription | null> {

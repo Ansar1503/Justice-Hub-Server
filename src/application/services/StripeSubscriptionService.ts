@@ -113,6 +113,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
     priceId: string;
     successUrl: string;
     cancelUrl: string;
+    metadata?: Record<string, string>;
   }) {
     try {
       const session = await this.stripe.checkout.sessions.create({
@@ -121,6 +122,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
         line_items: [{ price: data.priceId, quantity: 1 }],
         success_url: data.successUrl,
         cancel_url: data.cancelUrl,
+        metadata: data.metadata,
       });
 
       return { url: session.url! };
@@ -128,6 +130,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
       throw new Error("Failed to create Stripe checkout session");
     }
   }
+
   async createSubscription(data: { customerId: string; priceId: string }) {
     try {
       const subscription = await this.stripe.subscriptions.create({
@@ -150,6 +153,22 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
           error instanceof Error ? error.message : "Unknown error"
         }`
       );
+    }
+  }
+  async constructWebhookEvent(data: {
+    rawBody: Buffer;
+    signature: string;
+  }): Promise<Stripe.Event> {
+    try {
+      const event = this.stripe.webhooks.constructEvent(
+        data.rawBody,
+        data.signature,
+        process.env.STRIPE_SUBSCRIPTION_WEBHOOK_SECRET!
+      );
+      return event;
+    } catch (error: any) {
+      console.error("⚠️ Webhook signature verification failed:", error);
+      throw new Error("Invalid Stripe webhook signature");
     }
   }
 }

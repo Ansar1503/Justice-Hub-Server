@@ -55,6 +55,10 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
         priceId: plan.stripePriceId,
         successUrl: process.env.STRIPE_SUCCESS_URL!,
         cancelUrl: process.env.STRIPE_CANCEL_URL!,
+        metadata: {
+          userId: input.userId,
+          planId: input.planId,
+        },
       });
 
     const userSubscription = existingSub

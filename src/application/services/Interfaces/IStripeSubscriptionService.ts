@@ -1,3 +1,5 @@
+import Stripe from "stripe";
+
 export interface CreateStripeSubscriptionProduct {
   name: string;
   description?: string;
@@ -20,6 +22,7 @@ export interface CreateCheckoutSessionInput {
   priceId: string;
   successUrl: string;
   cancelUrl: string;
+  metadata?: Record<string, string>;
 }
 
 export interface CreateSubscriptionInput {
@@ -48,4 +51,8 @@ export interface IStripeSubscriptionService {
   ): Promise<{ url: string }>;
   createSubscription(data: CreateSubscriptionInput): Promise<{ id: string }>;
   cancelSubscription(subscriptionId: string): Promise<void>;
+  constructWebhookEvent(data: {
+    rawBody: Buffer;
+    signature: string;
+  }): Promise<Stripe.Event>;
 }

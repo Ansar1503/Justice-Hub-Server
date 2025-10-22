@@ -7,4 +7,8 @@ export interface IUserSubscriptionRepo
   createOrUpdate(
     subscription: UserSubscription
   ): Promise<UserSubscription | null>;
+  findByStripeSubscriptionId(
+    subscriptionId: string
+  ): Promise<UserSubscription | null>;
+  findByStripeCustomerId(customerId: string): Promise<UserSubscription | null>;
 }
