@@ -18,4 +18,25 @@ export class UserSubscriptionRepository
   ) {
     super(UserSubscriptionModel, mapper, session);
   }
+  async findByUser(userId: string): Promise<UserSubscription | null> {
+    const data = await this.model.findOne({ userId });
+    if (!data) return null;
+    return this.mapper.toDomain(data);
+  }
+  async createOrUpdate(
+    subscription: UserSubscription
+  ): Promise<UserSubscription | null> {
+    const updated = await this.model.findOneAndUpdate(
+      { userId: subscription.userId },
+      this.mapper.toPersistence(subscription),
+      {
+        new: true,
+        upsert: true,
+        setDefaultsOnInsert: true,
+      }
+    );
+
+    if (!updated) throw new Error("Failed to upsert UserSubscription");
+    return this.mapper.toDomain(updated);
+  }
 }

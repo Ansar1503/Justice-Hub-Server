@@ -95,4 +95,61 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
       );
     }
   }
+
+  async createCustomer(data: { email: string; name: string }) {
+    try {
+      const customer = await this.stripe.customers.create({
+        email: data.email,
+        name: data.name,
+      });
+      return { id: customer.id };
+    } catch (error) {
+      throw new Error("Failed to create Stripe customer");
+    }
+  }
+
+  async createCheckoutSession(data: {
+    customerId: string;
+    priceId: string;
+    successUrl: string;
+    cancelUrl: string;
+  }) {
+    try {
+      const session = await this.stripe.checkout.sessions.create({
+        mode: "subscription",
+        customer: data.customerId,
+        line_items: [{ price: data.priceId, quantity: 1 }],
+        success_url: data.successUrl,
+        cancel_url: data.cancelUrl,
+      });
+
+      return { url: session.url! };
+    } catch (error) {
+      throw new Error("Failed to create Stripe checkout session");
+    }
+  }
+  async createSubscription(data: { customerId: string; priceId: string }) {
+    try {
+      const subscription = await this.stripe.subscriptions.create({
+        customer: data.customerId,
+        items: [{ price: data.priceId }],
+        payment_behavior: "default_incomplete",
+        expand: ["latest_invoice.payment_intent"],
+      });
+      return { id: subscription.id };
+    } catch (error) {
+      throw new Error("Failed to create Stripe subscription");
+    }
+  }
+  async cancelSubscription(subscriptionId: string): Promise<void> {
+    try {
+      await this.stripe.subscriptions.cancel(subscriptionId);
+    } catch (error: any) {
+      throw new Error(
+        `Failed to cancel subscription: ${
+          error instanceof Error ? error.message : "Unknown error"
+        }`
+      );
+    }
+  }
 }

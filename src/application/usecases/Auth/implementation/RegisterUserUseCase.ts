@@ -46,6 +46,8 @@ export class RegisterUserUseCase implements IRegiserUserUseCase {
       if (user.role === "client") {
         const freePlan = await uow.subscriptionRepo.findFreeTier();
         if (freePlan) {
+          const endDate = new Date();
+          endDate.setDate(endDate.getDate() + 30);
           const benefits = freePlan.benefits;
           const userSub = UserSubscription.create({
             benefitsSnapshot: {
@@ -61,6 +63,7 @@ export class RegisterUserUseCase implements IRegiserUserUseCase {
             planId: freePlan.id,
             startDate: new Date(),
             autoRenew: false,
+            endDate: endDate,
           });
           await uow.userSubscriptionRepo.create(userSub);
         }
