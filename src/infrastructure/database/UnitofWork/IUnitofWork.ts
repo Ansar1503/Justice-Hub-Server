@@ -11,7 +11,9 @@ import { IOtpRepository } from "@domain/IRepository/IOtpRepo";
 import { IOverrideRepo } from "@domain/IRepository/IOverrideRepo";
 import { IScheduleSettingsRepo } from "@domain/IRepository/IScheduleSettingsRepo";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
+import { ISubscriptionRepo } from "@domain/IRepository/ISubscriptionRepo";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
+import { IUserSubscriptionRepo } from "@domain/IRepository/IUserSubscriptionRepo";
 import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
 import { IWalletTransactionsRepo } from "@domain/IRepository/IWalletTransactionsRepo";
 
@@ -19,6 +21,8 @@ export interface IUnitofWork {
   startTransaction<T>(callback: (uow: IUnitofWork) => Promise<T>): Promise<T>;
   rollback(): Promise<void>;
 
+  userSubscriptionRepo: IUserSubscriptionRepo;
+  subscriptionRepo: ISubscriptionRepo;
   callLogsRepo: ICallLogs;
   commissionTransactionRepo: ICommissionTransactionRepo;
   caseRepo: ICaseRepo;

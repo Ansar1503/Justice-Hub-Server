@@ -43,6 +43,12 @@ import { CommissionTransactionMapper } from "@infrastructure/Mapper/Implementati
 import { ICallLogs } from "@domain/IRepository/ICallLogs";
 import { CallLogsRepository } from "@infrastructure/database/repo/CallLogsRepo";
 import { CallLogsMapper } from "@infrastructure/Mapper/Implementations/CallLogsMapper";
+import { ISubscriptionRepo } from "@domain/IRepository/ISubscriptionRepo";
+import { IUserSubscriptionRepo } from "@domain/IRepository/IUserSubscriptionRepo";
+import { SubscriptionRepository } from "@infrastructure/database/repo/SubscriptionRepository";
+import { UserSubscriptionRepository } from "@infrastructure/database/repo/UserSubscriptionRepository";
+import { UserSubscriptionMapper } from "@infrastructure/Mapper/Implementations/UserSubscriptionMapper";
+import { SubscriptionPlanMapper } from "@infrastructure/Mapper/Implementations/SubscriptionMapper";
 
 export class MongoUnitofWork implements IUnitofWork {
   private _session?: ClientSession;
@@ -63,9 +69,41 @@ export class MongoUnitofWork implements IUnitofWork {
   private _sessionRepo: ISessionsRepo | undefined;
   private _commissionTransactionRepo: ICommissionTransactionRepo | undefined;
   private _callLogsRepo: ICallLogs | undefined;
+  private _subscriptionRepo: ISubscriptionRepo | undefined;
+  private _userSubscriptionRepo: IUserSubscriptionRepo | undefined;
 
   constructor(session?: ClientSession) {
     this._session = session;
+  }
+
+  get subscriptionRepo(): ISubscriptionRepo {
+    if (!this._session) {
+      throw new Error(
+        "Unit of Work session not initialized. Call startTransaction() first."
+      );
+    }
+    if (!this._subscriptionRepo) {
+      this._subscriptionRepo = new SubscriptionRepository(
+        new SubscriptionPlanMapper(),
+        this._session
+      );
+    }
+    return this._subscriptionRepo;
+  }
+
+  get userSubscriptionRepo(): IUserSubscriptionRepo {
+    if (!this._session) {
+      throw new Error(
+        "Unit of Work session not initialized. Call startTransaction() first."
+      );
+    }
+    if (!this._userSubscriptionRepo) {
+      this._userSubscriptionRepo = new UserSubscriptionRepository(
+        new UserSubscriptionMapper(),
+        this._session
+      );
+    }
+    return this._userSubscriptionRepo;
   }
 
   get callLogsRepo(): ICallLogs {

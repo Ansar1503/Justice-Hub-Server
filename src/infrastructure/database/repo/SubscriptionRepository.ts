@@ -54,4 +54,8 @@ export class SubscriptionRepository
     if (!data) return null;
     return this.mapper.toDomain(data);
   }
+  async findFreeTier(): Promise<SubscriptionPlan | null> {
+    const data = await this.model.findOne({ isFree: true });
+    return data ? this.mapper.toDomain(data) : null;
+  }
 }

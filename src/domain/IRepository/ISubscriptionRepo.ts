@@ -12,4 +12,5 @@ export interface ISubscriptionRepo extends IBaseRepository<SubscriptionPlan> {
     id: string,
     status: boolean
   ): Promise<SubscriptionPlan | null>;
+  findFreeTier(): Promise<SubscriptionPlan | null >;
 }
