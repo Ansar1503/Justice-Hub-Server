@@ -33,6 +33,14 @@ export class SubscriptionWebhookHandlerUsecase
           throw new Error("Missing metadata");
           break;
         }
+        const endDate = new Date();
+        if (plan.interval === "monthly") {
+          endDate.setDate(endDate.getDate() + 30);
+        } else if (plan.interval === "yearly") {
+          endDate.setDate(endDate.getDate() + 365);
+        } else {
+          endDate.setDate(endDate.getDate() + 30);
+        }
         const benefits = plan.benefits;
         const newSub = UserSubscription.create({
           userId,
@@ -40,6 +48,8 @@ export class SubscriptionWebhookHandlerUsecase
           stripeCustomerId: customerId,
           stripeSubscriptionId: subscriptionId,
           startDate: new Date(),
+          endDate,
+          autoRenew: benefits.autoRenew,
           benefitsSnapshot: {
             autoRenew: benefits.autoRenew,
             bookingsPerMonth: benefits.bookingsPerMonth,

@@ -60,7 +60,15 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
           planId: input.planId,
         },
       });
-
+    const endDate = new Date();
+    if (plan.interval === "monthly") {
+      endDate.setDate(endDate.getDate() + 30);
+    } else if (plan.interval === "yearly") {
+      endDate.setDate(endDate.getDate() + 365);
+    } else {
+      endDate.setDate(endDate.getDate() + 30);
+    }
+    const benefits = plan.benefits;
     const userSubscription = existingSub
       ? existingSub
       : UserSubscription.create({
@@ -68,7 +76,17 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
           planId: plan.id,
           stripeCustomerId,
           startDate: new Date(),
-          benefitsSnapshot: plan.benefits,
+          benefitsSnapshot: {
+            autoRenew: benefits.autoRenew,
+            bookingsPerMonth: benefits.bookingsPerMonth,
+            chatAccess: benefits.chatAccess,
+            discountPercent: benefits.discountPercent,
+            documentUploadLimit: benefits.documentUploadLimit,
+            expiryAlert: benefits.expiryAlert,
+            followupBookingsPerCase: benefits.followupBookingsPerCase,
+          },
+          autoRenew: plan.benefits.autoRenew,
+          endDate,
         });
 
     await this._userSubscriptionRepo.createOrUpdate(
