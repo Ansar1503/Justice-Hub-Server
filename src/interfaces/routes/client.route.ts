@@ -83,6 +83,8 @@ import { FetchCommissionSettingsComposer } from "@infrastructure/services/compos
 import { FetchAllCasesByUserComposer } from "@infrastructure/services/composers/Cases/FetchAllCasesByUserComposer";
 import { FetchClientDashboardDataComposer } from "@infrastructure/services/composers/Cases/FetchClientDashboardDataComposer";
 import { FetchAllSubscriptionPlansComposer } from "@infrastructure/services/composers/Subscriptions/FetchAllSubscriptionPlansComposer";
+import { SubscribePlanComposer } from "@infrastructure/services/composers/Subscriptions/SubscribePlanComposer";
+import { HandleSubscribeWebhookComposer } from "@infrastructure/services/composers/Subscriptions/HandleSubscriptionWebhookHandlerComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -144,6 +146,27 @@ router.get(
       FetchAllSubscriptionPlansComposer()
     );
     res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.post(
+  SubscriptionRoute.base + SubscriptionRoute.subscribe,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, SubscribePlanComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.post(
+  ClientRoutes.stripe.subscriptionWebhook,
+  express.raw({ type: "application/json" }),
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, HandleSubscribeWebhookComposer());
+    res.status(adapter.statusCode).send(adapter.body);
     return;
   }
 );

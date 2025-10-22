@@ -134,6 +134,18 @@ export class UserSubscription {
     this._updatedAt = new Date();
   }
 
+  setStatus(status: SubscriptionStatus) {
+    this._status = status;
+    this._updatedAt = new Date();
+  }
+  setCustomerId(id: string) {
+    this._stripeCustomerId = id;
+    this._updatedAt = new Date();
+  }
+  setPlanID(id: string) {
+    this._planId = id;
+    this._updatedAt = new Date();
+  }
   renew(nextEndDate: Date) {
     this._endDate = nextEndDate;
     this._status = "active";

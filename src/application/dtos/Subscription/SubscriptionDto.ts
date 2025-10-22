@@ -24,3 +24,20 @@ export interface SubscriptionBaseDto {
   createdAt: Date;
   updatedAt: Date;
 }
+
+type SubscriptionStatus = "active" | "expired" | "canceled" | "trialing";
+
+export interface UserSubscriptionDto {
+  id: string;
+  userId: string;
+  planId: string;
+  stripeSubscriptionId?: string;
+  stripeCustomerId?: string;
+  status: SubscriptionStatus;
+  startDate: Date;
+  endDate?: Date;
+  autoRenew: boolean;
+  benefitsSnapshot: PlanBenefits;
+  createdAt: Date;
+  updatedAt: Date;
+}

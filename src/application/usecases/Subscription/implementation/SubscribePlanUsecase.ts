@@ -3,7 +3,6 @@ import { ISubscribePlanUsecase } from "../ISubscribePlanUsecase";
 import { IUserSubscriptionRepo } from "@domain/IRepository/IUserSubscriptionRepo";
 import { IStripeSubscriptionService } from "@src/application/services/Interfaces/IStripeSubscriptionService";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
-import { UserSubscription } from "@domain/entities/UserSubscriptionPlan";
 import "dotenv/config";
 
 export class SubscribePlanUsecase implements ISubscribePlanUsecase {
@@ -48,55 +47,17 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
         console.error("Failed to cancel previous subscription:", error);
       }
     }
-
     const checkoutSession =
       await this._stripeSubscriptionService.createCheckoutSession({
         customerId: stripeCustomerId,
         priceId: plan.stripePriceId,
-        successUrl: process.env.STRIPE_SUCCESS_URL!,
-        cancelUrl: process.env.STRIPE_CANCEL_URL!,
+        successUrl: process.env.STRIPE_SUBSCRIPTION_SUCCESS_URL!,
+        cancelUrl: process.env.STRIPE_SUBSCRIPTION_CANCEL_URL!,
         metadata: {
           userId: input.userId,
           planId: input.planId,
         },
       });
-    const endDate = new Date();
-    if (plan.interval === "monthly") {
-      endDate.setDate(endDate.getDate() + 30);
-    } else if (plan.interval === "yearly") {
-      endDate.setDate(endDate.getDate() + 365);
-    } else {
-      endDate.setDate(endDate.getDate() + 30);
-    }
-    const benefits = plan.benefits;
-    const userSubscription = existingSub
-      ? existingSub
-      : UserSubscription.create({
-          userId: user.user_id,
-          planId: plan.id,
-          stripeCustomerId,
-          startDate: new Date(),
-          benefitsSnapshot: {
-            autoRenew: benefits.autoRenew,
-            bookingsPerMonth: benefits.bookingsPerMonth,
-            chatAccess: benefits.chatAccess,
-            discountPercent: benefits.discountPercent,
-            documentUploadLimit: benefits.documentUploadLimit,
-            expiryAlert: benefits.expiryAlert,
-            followupBookingsPerCase: benefits.followupBookingsPerCase,
-          },
-          autoRenew: plan.benefits.autoRenew,
-          endDate,
-        });
-
-    await this._userSubscriptionRepo.createOrUpdate(
-      Object.assign(userSubscription, {
-        planId: plan.id,
-        stripeCustomerId,
-        status: "trialing",
-      })
-    );
-
     return { checkoutUrl: checkoutSession.url };
   }
 }

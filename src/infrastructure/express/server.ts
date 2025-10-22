@@ -46,6 +46,11 @@ app.use(
   express.raw({ type: "application/json" }),
   clientRoute
 );
+app.use(
+  "/api/client/stripe/subscription/webhooks",
+  express.raw({ type: "application/json" }),
+  clientRoute
+);
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());

@@ -127,6 +127,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
 
       return { url: session.url! };
     } catch (error) {
+      console.log("error",error)
       throw new Error("Failed to create Stripe checkout session");
     }
   }
@@ -163,7 +164,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
       const event = this.stripe.webhooks.constructEvent(
         data.rawBody,
         data.signature,
-        process.env.STRIPE_SUBSCRIPTION_WEBHOOK_SECRET!
+        process.env.STRIPE_WEBHOOK_SECRET!
       );
       return event;
     } catch (error: any) {

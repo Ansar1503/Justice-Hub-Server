@@ -78,6 +78,7 @@ export const ClientRoutes = {
   stripe: {
     session: "/stripe/session/:id",
     webhook: "/stripe/webhooks",
+    subscriptionWebhook: "/stripe/subscription/webhooks",
   },
 
   chat: {
@@ -168,4 +169,5 @@ export const CommissionRoutes = {
 export const SubscriptionRoute = {
   base: "/subscriptions",
   status: "/status",
+  subscribe: "/subscibe",
 };
