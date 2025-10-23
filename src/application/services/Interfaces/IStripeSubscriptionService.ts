@@ -18,7 +18,8 @@ export interface CreateStripeCustomer {
 }
 
 export interface CreateCheckoutSessionInput {
-  customerId: string;
+  customerId?: string;
+  customerEmail?: string;
   priceId: string;
   successUrl: string;
   cancelUrl: string;
@@ -56,4 +57,6 @@ export interface IStripeSubscriptionService {
     rawBody: Buffer;
     signature: string;
   }): Promise<Stripe.Event>;
+  getSubscription(stripeSubscriptionId: string): Promise<any>;
+  cancelAtPeriodEnd(subscriptionId: string): Promise<void>;
 }

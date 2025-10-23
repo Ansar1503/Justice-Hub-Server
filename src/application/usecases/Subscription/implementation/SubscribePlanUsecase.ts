@@ -27,12 +27,28 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
       input.userId
     );
 
-    if (
-      existingSub &&
-      existingSub.planId === plan.id &&
-      existingSub.status === "active"
-    ) {
-      throw new Error("You already have an active subscription for this plan.");
+    if (existingSub && existingSub.status === "active") {
+      const currentPlan = await this._subscriptionRepo.findById(
+        existingSub.planId
+      );
+      if (!currentPlan) throw new Error("Current plan not found");
+
+      const isDowngrade = currentPlan.price > plan.price || plan.isFree;
+
+      if (isDowngrade) {
+        let endDate = new Date()
+        if(existingSub.endDate){
+          endDate = existingSub.endDate
+        }else{
+          if (currentPlan.interval === "yearly") endDate.setDate(endDate.getDate() + 365);
+          else endDate.setDate(endDate.getDate() + 30);
+        }
+        if (new Date() < endDate) {
+          throw new Error(
+            `You can only downgrade after ${endDate.toDateString()}.`
+          );
+        }
+      }
     }
 
     if (plan.isFree) {
@@ -42,34 +58,16 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
         existingSub.stripeSubscriptionId
       ) {
         throw new Error(
-          "To downgrade to free plan please cancel your current paid subscription first."
+          "To downgrade to free plan, please wait until your current paid subscription period ends."
         );
       }
     }
-    let stripeCustomerId = existingSub?.stripeCustomerId;
-    const stripeSubscriptionId = existingSub?.stripeSubscriptionId;
 
-    if (!stripeCustomerId) {
-      const customer = await this._stripeSubscriptionService.createCustomer({
-        email: user.email,
-        name: user.name,
-      });
-      stripeCustomerId = customer.id;
-    }
-
-    if (stripeSubscriptionId) {
-      try {
-        await this._stripeSubscriptionService.cancelSubscription(
-          stripeSubscriptionId
-        );
-      } catch (error) {
-        console.error("Failed to cancel previous subscription:", error);
-      }
-    }
     const checkoutSession =
       await this._stripeSubscriptionService.createCheckoutSession({
-        customerId: stripeCustomerId,
+        customerId: existingSub?.stripeCustomerId,
         priceId: plan.stripePriceId,
+        customerEmail: user.email,
         successUrl: process.env.STRIPE_SUBSCRIPTION_SUCCESS_URL!,
         cancelUrl: process.env.STRIPE_SUBSCRIPTION_CANCEL_URL!,
         metadata: {
@@ -78,6 +76,7 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
           oldStripeSubscriptionId: existingSub?.stripeSubscriptionId ?? "",
         },
       });
+
     return { checkoutUrl: checkoutSession.url };
   }
 }

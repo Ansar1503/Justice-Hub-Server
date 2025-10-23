@@ -49,7 +49,7 @@ export class SubscriptionWebhookHandlerUsecase
     const oldStripeSubscriptionId = session.metadata?.oldStripeSubscriptionId;
 
     if (!userId || !planId) {
-      console.warn("Missing metadata in checkout session.");
+      console.warn("⚠️ Missing metadata in checkout session.");
       return;
     }
 
@@ -63,7 +63,7 @@ export class SubscriptionWebhookHandlerUsecase
     const benefits = plan.benefits;
     const existingSub = await this._userSubscriptionRepo.findByUser(userId);
 
-    const newSub = existingSub
+    const sub = existingSub
       ? existingSub
       : UserSubscription.create({
           userId,
@@ -76,12 +76,14 @@ export class SubscriptionWebhookHandlerUsecase
           benefitsSnapshot: { ...benefits },
         });
 
-    newSub.setCustomerId(customerId);
-    newSub.setStripeSubscriptionId(subscriptionId);
-    newSub.setStatus("active");
-    newSub.renew(endDate);
+    sub.setPlanID(planId);
+    sub.setCustomerId(customerId);
+    sub.setStripeSubscriptionId(subscriptionId);
+    sub.setStatus("active");
+    sub.renew(endDate);
+    sub.renewBenefits(benefits);
 
-    await this._userSubscriptionRepo.createOrUpdate(newSub);
+    await this._userSubscriptionRepo.createOrUpdate(sub);
 
     if (oldStripeSubscriptionId && oldStripeSubscriptionId !== subscriptionId) {
       try {
@@ -94,7 +96,7 @@ export class SubscriptionWebhookHandlerUsecase
       }
     }
 
-    console.log(`Subscription activated for user=${userId}, plan=${planId}`);
+    console.log(`✅ Subscription activated for user=${userId}, plan=${planId}`);
   }
 
   private async handleInvoicePaid(event: any): Promise<void> {
@@ -135,9 +137,11 @@ export class SubscriptionWebhookHandlerUsecase
       );
 
     if (existingSub) {
-      existingSub.cancel();
+      existingSub.markExpired();
       await this._userSubscriptionRepo.createOrUpdate(existingSub);
-      console.log(`❌ Subscription ${stripeSubscriptionId} canceled`);
+      console.log(
+        `❌ Subscription ${stripeSubscriptionId} expired (Stripe deleted event)`
+      );
     }
   }
 }

@@ -86,6 +86,7 @@ import { FetchAllSubscriptionPlansComposer } from "@infrastructure/services/comp
 import { SubscribePlanComposer } from "@infrastructure/services/composers/Subscriptions/SubscribePlanComposer";
 import { HandleSubscribeWebhookComposer } from "@infrastructure/services/composers/Subscriptions/HandleSubscriptionWebhookHandlerComposer";
 import { FetchCurrentUserSubscriptionComposer } from "@infrastructure/services/composers/Subscriptions/FetchUserSubscriptionComposer";
+import { CancelSubscriptionComposer } from "@infrastructure/services/composers/Subscriptions/CancelSubscriptionComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -172,6 +173,17 @@ router.post(
   }
 );
 
+router.delete(
+  SubscriptionRoute.base + SubscriptionRoute.user,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, CancelSubscriptionComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
 router.get(
   SubscriptionRoute.base + SubscriptionRoute.user,
   authenticateUser,
@@ -182,7 +194,7 @@ router.get(
       FetchCurrentUserSubscriptionComposer()
     );
     res.status(adapter.statusCode).json(adapter.body);
-    return
+    return;
   }
 );
 

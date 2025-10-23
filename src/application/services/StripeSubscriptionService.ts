@@ -8,9 +8,11 @@ import "dotenv/config";
 
 export class StripeSubscriptionService implements IStripeSubscriptionService {
   private stripe: Stripe;
+
   constructor() {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
   }
+
   async createProduct(data: CreateStripeSubscriptionProduct): Promise<string> {
     try {
       const product = await this.stripe.products.create({
@@ -18,7 +20,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
         description: data.description,
       });
       return product.id;
-    } catch (error) {
+    } catch {
       throw new Error("Failed to create product in Stripe");
     }
   }
@@ -41,24 +43,26 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
         });
       }
       return price.id;
-    } catch (error) {
+    } catch {
       throw new Error("Failed to create price in Stripe");
     }
   }
+
   async deleteProduct(productId: string): Promise<void> {
     try {
       await this.stripe.products.del(productId);
-    } catch (error) {
+    } catch {
       throw new Error("Failed to delete Stripe product");
     }
   }
+
   async updateProduct(
     productId: string,
     data: { name?: string; description?: string }
   ): Promise<void> {
     try {
       await this.stripe.products.update(productId, data);
-    } catch (error) {
+    } catch {
       throw new Error("Failed to update Stripe product");
     }
   }
@@ -66,17 +70,18 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
   async deactivatePrice(priceId: string): Promise<void> {
     try {
       await this.stripe.prices.update(priceId, { active: false });
-    } catch (error) {
+    } catch {
       throw new Error("Failed to deactivate Stripe price");
     }
   }
+
   async updateProductActiveStatus(
     productId: string,
     isActive: boolean
   ): Promise<void> {
     try {
       await this.stripe.products.update(productId, { active: isActive });
-    } catch (error) {
+    } catch {
       throw new Error(
         `Failed to ${isActive ? "activate" : "deactivate"} Stripe product`
       );
@@ -89,7 +94,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
   ): Promise<void> {
     try {
       await this.stripe.prices.update(priceId, { active: isActive });
-    } catch (error) {
+    } catch {
       throw new Error(
         `Failed to ${isActive ? "activate" : "deactivate"} Stripe price`
       );
@@ -103,31 +108,38 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
         name: data.name,
       });
       return { id: customer.id };
-    } catch (error) {
+    } catch {
       throw new Error("Failed to create Stripe customer");
     }
   }
 
   async createCheckoutSession(data: {
-    customerId: string;
+    customerId?: string;
     priceId: string;
+    customerEmail?: string;
     successUrl: string;
     cancelUrl: string;
     metadata?: Record<string, string>;
   }) {
     try {
-      const session = await this.stripe.checkout.sessions.create({
+      const payload: any = {
         mode: "subscription",
-        customer: data.customerId,
         line_items: [{ price: data.priceId, quantity: 1 }],
         success_url: data.successUrl,
         cancel_url: data.cancelUrl,
         metadata: data.metadata,
-      });
+      };
 
-      return { url: session.url!, sessionId: session.id };
+      if (data.customerId && data.customerId.trim().length > 0) {
+        payload.customer = data.customerId;
+      } else if (data.customerEmail) {
+        payload.customer_email = data.customerEmail;
+      }
+
+      const session = await this.stripe.checkout.sessions.create(payload);
+      return { url: session.url! };
     } catch (error) {
-      console.log("error creating checkout session", error);
+      console.log("error creating checkout session:", error);
       throw new Error("Failed to create Stripe checkout session");
     }
   }
@@ -141,10 +153,11 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
         expand: ["latest_invoice.payment_intent"],
       });
       return { id: subscription.id };
-    } catch (error) {
+    } catch {
       throw new Error("Failed to create Stripe subscription");
     }
   }
+
   async cancelSubscription(subscriptionId: string): Promise<void> {
     try {
       await this.stripe.subscriptions.cancel(subscriptionId);
@@ -156,6 +169,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
       );
     }
   }
+
   async constructWebhookEvent(data: {
     rawBody: Buffer;
     signature: string;
@@ -172,6 +186,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
       throw new Error("Invalid Stripe webhook signature");
     }
   }
+
   async deleteCustomer(customerId: string): Promise<void> {
     try {
       await this.stripe.customers.del(customerId);
@@ -179,6 +194,29 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
     } catch (error) {
       console.error("❌ Failed to delete Stripe customer:", error);
       throw new Error("Failed to delete Stripe customer");
+    }
+  }
+
+  async getSubscription(
+    stripeSubscriptionId: string
+  ): Promise<Stripe.Subscription> {
+    try {
+      const subscription =
+        await this.stripe.subscriptions.retrieve(stripeSubscriptionId);
+      return subscription;
+    } catch (error) {
+      console.error("❌ Failed to fetch Stripe subscription:", error);
+      throw new Error("Failed to fetch Stripe subscription details");
+    }
+  }
+  async cancelAtPeriodEnd(subscriptionId: string): Promise<void> {
+    try {
+      await this.stripe.subscriptions.update(subscriptionId, {
+        cancel_at_period_end: true,
+      });
+    } catch (error) {
+      console.error("❌ Stripe cancel_at_period_end failed:", error);
+      throw new Error("Failed to schedule subscription cancellation.");
     }
   }
 }

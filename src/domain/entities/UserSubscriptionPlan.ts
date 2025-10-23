@@ -155,7 +155,9 @@ export class UserSubscription {
     this._status = "active";
     this._updatedAt = new Date();
   }
-
+  renewBenefits(benefits: PlanBenefits) {
+    this._benefitsSnapshot = benefits;
+  }
   isActive(): boolean {
     return this._status === "active";
   }
