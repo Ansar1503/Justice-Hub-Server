@@ -19,6 +19,7 @@ import { GetAppointmentRedisKey } from "@shared/utils/helpers/GetAppointmentKey"
 import { IRedisService } from "@domain/IRepository/Redis/IRedisService";
 import { ICreateCheckoutSessionUseCase } from "../ICreateCheckoutSessionUseCase";
 import { ICommissionSettingsRepo } from "@domain/IRepository/ICommissionSettingsRepo";
+import { IUserSubscriptionRepo } from "@domain/IRepository/IUserSubscriptionRepo";
 
 export class CreateCheckoutSessionUseCase
   implements ICreateCheckoutSessionUseCase
@@ -33,7 +34,8 @@ export class CreateCheckoutSessionUseCase
     private _walletRepo: IWalletRepo,
     private _lawyerRepo: ILawyerRepository,
     private _redisService: IRedisService,
-    private _commissionSettingsRepo: ICommissionSettingsRepo
+    private _commissionSettingsRepo: ICommissionSettingsRepo,
+    private _userSubscriptionRepo: IUserSubscriptionRepo
   ) {}
   async execute(input: CreateCheckoutSessionInputDto): Promise<any> {
     const { client_id, date, duration, lawyer_id, reason, timeSlot } = input;
@@ -59,11 +61,21 @@ export class CreateCheckoutSessionUseCase
       await this._commissionSettingsRepo.fetchCommissionSettings();
     if (!commissionSettings)
       throw new Error("Commission settings not set by Admin");
+    const baseFee = lawyerDetails.consultationFee;
+
+    let discountedFee = baseFee;
+    const userSubs = await this._userSubscriptionRepo.findByUser(client_id);
+    if (userSubs && userSubs.benefitsSnapshot.discountPercent) {
+      discountedFee =
+        baseFee -
+        Math.round((baseFee * userSubs.benefitsSnapshot.discountPercent) / 100);
+    }
+
     const commissionPercent = commissionSettings.initialCommission;
     const commissionAmount = Math.round(
-      (lawyerDetails.consultationFee * commissionPercent) / 100
+      (discountedFee * commissionPercent) / 100
     );
-    const lawyerAmount = lawyerDetails.consultationFee - commissionAmount;
+    const lawyerAmount = discountedFee - commissionAmount;
 
     if (!slotSettings) {
       const error: any = new Error("slot settings not found for the lawyer");
