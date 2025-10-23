@@ -170,4 +170,5 @@ export const SubscriptionRoute = {
   base: "/subscriptions",
   status: "/status",
   subscribe: "/subscibe",
+  user: "/user",
 };
