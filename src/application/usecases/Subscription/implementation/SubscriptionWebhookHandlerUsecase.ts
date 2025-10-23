@@ -36,7 +36,7 @@ export class SubscriptionWebhookHandlerUsecase
         break;
 
       default:
-        console.log(`⚠️ Unhandled Stripe event: ${event.type}`);
+        console.log(`Unhandled Stripe event: ${event.type}`);
     }
   }
 
@@ -46,56 +46,63 @@ export class SubscriptionWebhookHandlerUsecase
     const subscriptionId = session.subscription as string;
     const userId = session.metadata?.userId;
     const planId = session.metadata?.planId;
+    const oldStripeSubscriptionId = session.metadata?.oldStripeSubscriptionId;
 
     if (!userId || !planId) {
-      console.warn("⚠️ Missing metadata in checkout session.");
-      throw new Error("Missing metadata in Stripe session");
+      console.warn("Missing metadata in checkout session.");
+      return;
     }
 
     const plan = await this._subscriptionRepo.findById(planId);
     if (!plan) throw new Error("Plan not found");
 
     const endDate = new Date();
-    switch (plan.interval) {
-      case "yearly":
-        endDate.setDate(endDate.getDate() + 365);
-        break;
-      case "monthly":
-      default:
-        endDate.setDate(endDate.getDate() + 30);
-        break;
-    }
+    if (plan.interval === "yearly") endDate.setDate(endDate.getDate() + 365);
+    else endDate.setDate(endDate.getDate() + 30);
 
     const benefits = plan.benefits;
-    const newSub = UserSubscription.create({
-      userId,
-      planId,
-      stripeCustomerId: customerId,
-      stripeSubscriptionId: subscriptionId,
-      startDate: new Date(),
-      endDate,
-      autoRenew: benefits.autoRenew,
-      benefitsSnapshot: {
-        autoRenew: benefits.autoRenew,
-        bookingsPerMonth: benefits.bookingsPerMonth,
-        chatAccess: benefits.chatAccess,
-        discountPercent: benefits.discountPercent,
-        documentUploadLimit: benefits.documentUploadLimit,
-        expiryAlert: benefits.expiryAlert,
-        followupBookingsPerCase: benefits.followupBookingsPerCase,
-      },
-    });
+    const existingSub = await this._userSubscriptionRepo.findByUser(userId);
+
+    const newSub = existingSub
+      ? existingSub
+      : UserSubscription.create({
+          userId,
+          planId,
+          stripeCustomerId: customerId,
+          stripeSubscriptionId: subscriptionId,
+          startDate: new Date(),
+          endDate,
+          autoRenew: benefits.autoRenew,
+          benefitsSnapshot: { ...benefits },
+        });
+
+    newSub.setCustomerId(customerId);
+    newSub.setStripeSubscriptionId(subscriptionId);
+    newSub.setStatus("active");
+    newSub.renew(endDate);
 
     await this._userSubscriptionRepo.createOrUpdate(newSub);
-    console.log(`✅ Subscription created for user ${userId}, plan ${planId}`);
+
+    if (oldStripeSubscriptionId && oldStripeSubscriptionId !== subscriptionId) {
+      try {
+        await this._stripeSubscriptionService.cancelSubscription(
+          oldStripeSubscriptionId
+        );
+        console.log(`Canceled old subscription ${oldStripeSubscriptionId}`);
+      } catch (err) {
+        console.error("Failed to cancel old subscription:", err);
+      }
+    }
+
+    console.log(`Subscription activated for user=${userId}, plan=${planId}`);
   }
 
   private async handleInvoicePaid(event: any): Promise<void> {
     const invoice = event.data.object;
-    const customerId = invoice.customer as string;
-
+    const stripeSubId = invoice.subscription as string;
+    if (!stripeSubId) return;
     const subscription =
-      await this._userSubscriptionRepo.findByStripeCustomerId(customerId);
+      await this._userSubscriptionRepo.findByStripeSubscriptionId(stripeSubId);
 
     if (subscription) {
       subscription.setStatus("active");

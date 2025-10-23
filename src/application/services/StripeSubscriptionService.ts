@@ -125,9 +125,9 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
         metadata: data.metadata,
       });
 
-      return { url: session.url! };
+      return { url: session.url!, sessionId: session.id };
     } catch (error) {
-      console.log("error",error)
+      console.log("error creating checkout session", error);
       throw new Error("Failed to create Stripe checkout session");
     }
   }
@@ -170,6 +170,15 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
     } catch (error: any) {
       console.error("⚠️ Webhook signature verification failed:", error);
       throw new Error("Invalid Stripe webhook signature");
+    }
+  }
+  async deleteCustomer(customerId: string): Promise<void> {
+    try {
+      await this.stripe.customers.del(customerId);
+      console.log(`✅ Deleted Stripe customer: ${customerId}`);
+    } catch (error) {
+      console.error("❌ Failed to delete Stripe customer:", error);
+      throw new Error("Failed to delete Stripe customer");
     }
   }
 }

@@ -142,6 +142,10 @@ export class UserSubscription {
     this._stripeCustomerId = id;
     this._updatedAt = new Date();
   }
+  setStripeSubscriptionId(id: string) {
+    this._stripeSubscriptionId = id;
+    this._updatedAt = new Date();
+  }
   setPlanID(id: string) {
     this._planId = id;
     this._updatedAt = new Date();

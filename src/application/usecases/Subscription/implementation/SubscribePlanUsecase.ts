@@ -27,6 +27,25 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
       input.userId
     );
 
+    if (
+      existingSub &&
+      existingSub.planId === plan.id &&
+      existingSub.status === "active"
+    ) {
+      throw new Error("You already have an active subscription for this plan.");
+    }
+
+    if (plan.isFree) {
+      if (
+        existingSub &&
+        existingSub.status === "active" &&
+        existingSub.stripeSubscriptionId
+      ) {
+        throw new Error(
+          "To downgrade to free plan please cancel your current paid subscription first."
+        );
+      }
+    }
     let stripeCustomerId = existingSub?.stripeCustomerId;
     const stripeSubscriptionId = existingSub?.stripeSubscriptionId;
 
@@ -56,6 +75,7 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
         metadata: {
           userId: input.userId,
           planId: input.planId,
+          oldStripeSubscriptionId: existingSub?.stripeSubscriptionId ?? "",
         },
       });
     return { checkoutUrl: checkoutSession.url };

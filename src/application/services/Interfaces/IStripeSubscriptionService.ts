@@ -46,6 +46,7 @@ export interface IStripeSubscriptionService {
   updatePriceActiveStatus(priceId: string, isActive: boolean): Promise<void>;
 
   createCustomer(data: CreateStripeCustomer): Promise<{ id: string }>;
+  deleteCustomer(customerId: string): Promise<void>;
   createCheckoutSession(
     data: CreateCheckoutSessionInput
   ): Promise<{ url: string }>;
