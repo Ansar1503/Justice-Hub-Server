@@ -51,4 +51,5 @@ export interface IAppointmentsRepository {
     findAllAggregate(payload: FetchAppointmentsInputDto): Promise<FetchAppointmentsOutputDto>;
     findByClientID(client: string): Promise<Appointment[] | []>;
     findByCaseId(id: string): Promise<appointmentOutputDto[] | []>;
+    findAppointmentsByLawyerAndRange(lawyer_id: string, startDate: Date, endDate: Date): Promise<Appointment[]>;
 }

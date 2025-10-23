@@ -678,4 +678,17 @@ export class AppointmentsRepository
     const data = await this.model.findOne({ bookingId: id });
     return data ? this.mapper.toDomain(data) : null;
   }
+  async findAppointmentsByLawyerAndRange(
+    lawyer_id: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<Appointment[]> {
+    const data = await this.model.find({
+      lawyer_id,
+      date: { $gte: startDate, $lte: endDate },
+    });
+    return data && this.mapper.toDomainArray
+      ? this.mapper.toDomainArray(data)
+      : [];
+  }
 }

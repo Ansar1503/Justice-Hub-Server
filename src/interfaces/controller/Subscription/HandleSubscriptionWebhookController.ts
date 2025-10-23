@@ -31,6 +31,7 @@ export class HandleSubscribeWebhookController implements IController {
       });
       return this._success.success_200({ success: true });
     } catch (error) {
+      console.log("errors",error)
       if (error instanceof Error) {
         return this._errors.error_400(error.message);
       }

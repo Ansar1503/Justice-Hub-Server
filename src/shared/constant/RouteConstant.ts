@@ -59,6 +59,7 @@ export const ClientRoutes = {
     base: "/lawyers",
     walletbook: "/lawyer/slots/book-wallet",
     byId: "/lawyers/:id",
+    FetchLawyerCalendarAvailabilty: "/lawyers/:lawyerId/availability/calendar",
     review: "/lawyers/review",
     reviewsByLawyer: "/lawyers/reviews/:id",
     settings: "/lawyers/settings/:id",

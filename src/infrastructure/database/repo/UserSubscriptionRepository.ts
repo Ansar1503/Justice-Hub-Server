@@ -51,6 +51,7 @@ export class UserSubscriptionRepository
         new: true,
         upsert: true,
         setDefaultsOnInsert: true,
+        session: this.session,
       }
     );
 

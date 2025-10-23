@@ -1,7 +1,6 @@
 import { SubscriptionPlanMapper } from "@infrastructure/Mapper/Implementations/SubscriptionMapper";
-import { UserSubscriptionMapper } from "@infrastructure/Mapper/Implementations/UserSubscriptionMapper";
+import { MongoUnitofWork } from "@infrastructure/database/UnitofWork/implementations/UnitofWork";
 import { SubscriptionRepository } from "@infrastructure/database/repo/SubscriptionRepository";
-import { UserSubscriptionRepository } from "@infrastructure/database/repo/UserSubscriptionRepository";
 import { IController } from "@interfaces/controller/Interface/IController";
 import { HandleSubscribeWebhookController } from "@interfaces/controller/Subscription/HandleSubscriptionWebhookController";
 import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
@@ -12,8 +11,8 @@ import { SubscriptionWebhookHandlerUsecase } from "@src/application/usecases/Sub
 export function HandleSubscribeWebhookComposer(): IController {
   const usecase = new SubscriptionWebhookHandlerUsecase(
     new SubscriptionRepository(new SubscriptionPlanMapper()),
-    new UserSubscriptionRepository(new UserSubscriptionMapper()),
-    new StripeSubscriptionService()
+    new StripeSubscriptionService(),
+    new MongoUnitofWork()
   );
   return new HandleSubscribeWebhookController(
     usecase,

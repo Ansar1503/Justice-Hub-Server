@@ -87,6 +87,7 @@ import { SubscribePlanComposer } from "@infrastructure/services/composers/Subscr
 import { HandleSubscribeWebhookComposer } from "@infrastructure/services/composers/Subscriptions/HandleSubscriptionWebhookHandlerComposer";
 import { FetchCurrentUserSubscriptionComposer } from "@infrastructure/services/composers/Subscriptions/FetchUserSubscriptionComposer";
 import { CancelSubscriptionComposer } from "@infrastructure/services/composers/Subscriptions/CancelSubscriptionComposer";
+import { FetchLawyerCalendarAvailabilityComposer } from "@infrastructure/services/composers/Client/FetchLawyerCalendarAvailabiltyComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -170,6 +171,19 @@ router.post(
     const adapter = await expressAdapter(req, HandleSubscribeWebhookComposer());
     res.status(adapter.statusCode).send(adapter.body);
     return;
+  }
+);
+
+router.get(
+  ClientRoutes.lawyers.FetchLawyerCalendarAvailabilty,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchLawyerCalendarAvailabilityComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
   }
 );
 
