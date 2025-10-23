@@ -27,20 +27,20 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
       input.userId
     );
 
-    if (existingSub && existingSub.status === "active") {
+    if (existingSub) {
       const currentPlan = await this._subscriptionRepo.findById(
         existingSub.planId
       );
       if (!currentPlan) throw new Error("Current plan not found");
-
       const isDowngrade = currentPlan.price > plan.price || plan.isFree;
 
       if (isDowngrade) {
-        let endDate = new Date()
-        if(existingSub.endDate){
-          endDate = existingSub.endDate
-        }else{
-          if (currentPlan.interval === "yearly") endDate.setDate(endDate.getDate() + 365);
+        let endDate = new Date();
+        if (existingSub.endDate) {
+          endDate = existingSub.endDate;
+        } else {
+          if (currentPlan.interval === "yearly")
+            endDate.setDate(endDate.getDate() + 365);
           else endDate.setDate(endDate.getDate() + 30);
         }
         if (new Date() < endDate) {
