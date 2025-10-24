@@ -63,13 +63,13 @@ export class CreateCheckoutSessionUseCase
       throw new Error("Commission settings not set by Admin");
     const baseFee = lawyerDetails.consultationFee;
 
-    let discountedFee = baseFee;
-    const userSubs = await this._userSubscriptionRepo.findByUser(client_id);
-    if (userSubs && userSubs.benefitsSnapshot.discountPercent) {
-      discountedFee =
-        baseFee -
-        Math.round((baseFee * userSubs.benefitsSnapshot.discountPercent) / 100);
-    }
+    const discountedFee = baseFee;
+    // const userSubs = await this._userSubscriptionRepo.findByUser(client_id);
+    // if (userSubs && userSubs.benefitsSnapshot.discountPercent) {
+    //   discountedFee =
+    //     baseFee -
+    //     Math.round((baseFee * userSubs.benefitsSnapshot.discountPercent) / 100);
+    // }
 
     const commissionPercent = commissionSettings.initialCommission;
     const commissionAmount = Math.round(
