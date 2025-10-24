@@ -1,35 +1,41 @@
-import { Case } from "@domain/entities/Case";
-import { ICaseModel } from "@infrastructure/database/model/CaseModel";
+import { IBlogModel } from "@infrastructure/database/model/BlogModel";
 import { IMapper } from "../IMapper";
+import { Blog } from "@domain/entities/BlogEntity";
 
-export class CaseMapper implements IMapper<Case, ICaseModel> {
-    toDomain(persistence: ICaseModel): Case {
-        return Case.fromPersistance({
-            caseType: persistence.caseType,
-            clientId: persistence.clientId,
-            createdAt: persistence.createdAt,
-            id: persistence._id,
-            lawyerId: persistence.lawyerId,
-            status: persistence.status,
-            title: persistence.title,
-            updatedAt: persistence.updatedAt,
-            summary: persistence.summary,
-        });
-    }
-    toDomainArray(persistence: ICaseModel[]): Case[] {
-        return persistence.map((p) => this.toDomain(p));
-    }
-    toPersistence(entity: Case): Partial<ICaseModel> {
-        return {
-            _id: entity.id,
-            caseType: entity.caseType,
-            clientId: entity.clientId,
-            createdAt: entity.createdAt,
-            lawyerId: entity.lawyerId,
-            status: entity.status,
-            title: entity.title,
-            updatedAt: entity.updatedAt,
-            summary: entity.summary,
-        };
-    }
+export class BlogMapper implements IMapper<Blog, IBlogModel> {
+  toDomain(persistence: IBlogModel): Blog {
+    return Blog.fromPersistence({
+      id: persistence._id,
+      lawyerId: persistence.lawyerId,
+      title: persistence.title,
+      content: persistence.content,
+      coverImage: persistence.coverImage,
+      tags: persistence.tags ?? [],
+      isPublished: persistence.isPublished,
+      likes: persistence.likes ?? [],
+      comments: persistence.comments ?? [],
+      createdAt: persistence.createdAt,
+      updatedAt: persistence.updatedAt,
+    });
+  }
+
+  toDomainArray(persistence: IBlogModel[]): Blog[] {
+    return persistence.map((p) => this.toDomain(p));
+  }
+
+  toPersistence(entity: Blog): Partial<IBlogModel> {
+    return {
+      _id: entity.id,
+      lawyerId: entity.lawyerId,
+      title: entity.title,
+      content: entity.content,
+      coverImage: entity.coverImage,
+      tags: entity.tags,
+      isPublished: entity.isPublished,
+      likes: entity.likes,
+      comments: entity.comments,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    };
+  }
 }
