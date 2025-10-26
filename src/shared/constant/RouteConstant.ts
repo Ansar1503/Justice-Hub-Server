@@ -173,3 +173,7 @@ export const SubscriptionRoute = {
   subscribe: "/subscibe",
   user: "/user",
 };
+
+export const BlogRoute = {
+  base: "/blogs",
+};

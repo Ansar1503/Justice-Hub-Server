@@ -15,12 +15,15 @@ import { SocketEventEnum } from "../../infrastructure/constant/SocketEventEnum";
 import { ChatUseCase } from "../../application/usecases/chat.usecase";
 import { socketStore } from "./SocketStore";
 import { WLogger } from "@shared/utils/Winston/WinstonLoggerConfig";
+import { UserSubscriptionRepository } from "@infrastructure/database/repo/UserSubscriptionRepository";
+import { UserSubscriptionMapper } from "@infrastructure/Mapper/Implementations/UserSubscriptionMapper";
 
 const chatUsecase = new ChatUseCase(
   new ChatSessionRepository(),
   new ChatMessageRepository(),
   new SessionsRepository(),
-  new DisputesRepo()
+  new DisputesRepo(),
+  new UserSubscriptionRepository(new UserSubscriptionMapper())
 );
 const CreateNotification = new NotificationUsecase(
   new NotificationRepository(),

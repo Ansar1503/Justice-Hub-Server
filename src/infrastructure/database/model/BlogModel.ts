@@ -6,7 +6,6 @@ export interface IBlogModel extends Document {
   title: string;
   content: string;
   coverImage?: string;
-  tags?: string[];
   isPublished: boolean;
   likes: string[];
   comments: {
@@ -25,7 +24,6 @@ const BlogSchema = new Schema<IBlogModel>(
     title: { type: String, required: true, trim: true },
     content: { type: String, required: true },
     coverImage: { type: String },
-    tags: [{ type: String }],
     isPublished: { type: Boolean, default: false },
     likes: [{ type: String, ref: "user" }],
     comments: [

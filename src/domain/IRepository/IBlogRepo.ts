@@ -13,4 +13,5 @@ export interface IBlogRepo extends IBaseRepository<Blog> {
     like: boolean
   ): Promise<Blog | null>;
   findById(blogId: string): Promise<Blog | null>;
+  findByLawyerAndTitle(title: string, lawyerId: string): Promise<Blog | null>;
 }

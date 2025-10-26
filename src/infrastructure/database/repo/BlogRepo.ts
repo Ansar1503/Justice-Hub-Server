@@ -61,4 +61,15 @@ export class BlogRepo
       );
     }
   }
+  async findByLawyerAndTitle(
+    title: string,
+    lawyerId: string
+  ): Promise<Blog | null> {
+    const blogDoc = await BlogModel.findOne({
+      lawyerId,
+      title: { $regex: new RegExp(`^${title}$`, "i") },
+    });
+
+    return blogDoc ? this.mapper.toDomain(blogDoc) : null;
+  }
 }

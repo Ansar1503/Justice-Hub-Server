@@ -11,7 +11,6 @@ export interface CreateBlogProps {
   title: string;
   content: string;
   coverImage?: string;
-  tags?: string[];
   isPublished?: boolean;
 }
 
@@ -21,7 +20,6 @@ export interface PersistedBlogProps {
   title: string;
   content: string;
   coverImage?: string;
-  tags: string[];
   isPublished: boolean;
   likes: string[];
   comments: BlogComment[];
@@ -35,7 +33,6 @@ export class Blog {
   private _title: string;
   private _content: string;
   private _coverImage?: string;
-  private _tags: string[];
   private _isPublished: boolean;
   private _likes: string[];
   private _comments: BlogComment[];
@@ -48,7 +45,6 @@ export class Blog {
     this._title = props.title;
     this._content = props.content;
     this._coverImage = props.coverImage;
-    this._tags = props.tags;
     this._isPublished = props.isPublished;
     this._likes = props.likes;
     this._comments = props.comments;
@@ -64,7 +60,6 @@ export class Blog {
       title: props.title.trim(),
       content: props.content.trim(),
       coverImage: props.coverImage,
-      tags: props.tags ?? [],
       isPublished: props.isPublished ?? false,
       likes: [],
       comments: [],
@@ -95,10 +90,6 @@ export class Blog {
 
   get coverImage() {
     return this._coverImage;
-  }
-
-  get tags() {
-    return this._tags;
   }
 
   get isPublished() {

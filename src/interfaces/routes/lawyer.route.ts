@@ -25,6 +25,7 @@ import { NextFunction } from "express-serve-static-core";
 import { SendMessageFileComposer } from "@infrastructure/services/composers/Client/SendMessageFileComposer";
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 import {
+  BlogRoute,
   CasesRoutes,
   CasetypeRoutes,
   ClientRoutes,
@@ -53,6 +54,7 @@ import { authenticateClient } from "../middelwares/Auth/authenticateClient";
 import { authenticateLawyer } from "../middelwares/Auth/authenticateLawyer";
 import { authenticateUser } from "../middelwares/Auth/auth.middleware";
 import {
+  blogImageStorage,
   caseDocumentStorage,
   chatDocumentstorage,
   documentstorage,
@@ -65,6 +67,7 @@ import { FindAllCaseTypesComposer } from "@infrastructure/services/composers/Cas
 import { AddSessionSummaryComposer } from "@infrastructure/services/composers/Cases/AddSessionSummaryComposer";
 import { FetchAllCasesByUserComposer } from "@infrastructure/services/composers/Cases/FetchAllCasesByUserComposer";
 import { FetchLawyerDashboardDataComposer } from "@infrastructure/services/composers/Cases/FetchLawyerDashboardDataComposer";
+import { CreateBlogComposer } from "@infrastructure/services/composers/Blog/CreateBlogComposer";
 
 const upload = multer({ storage: documentstorage });
 const caseDocumentUpload = multer({
@@ -88,6 +91,18 @@ const caseDocumentUpload = multer({
 const chatFile = multer({
   storage: chatDocumentstorage,
   limits: { fileSize: 10 * 1024 * 1024, files: 3 },
+});
+const blogImageUpload = multer({
+  storage: blogImageStorage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error("Invalid file type. Only JPG, PNG, or WEBP allowed."));
+    }
+  },
 });
 const router = express.Router();
 
@@ -115,6 +130,22 @@ router.get(
     return;
   }
 );
+
+router
+  .route(BlogRoute.base)
+  .all(authenticateUser, authenticateClient, authenticateLawyer)
+  .post(
+    handleMulterErrors(blogImageUpload.single("coverImage")),
+    async (req: Request, res: Response) => {
+      if (req.file) {
+        req.body.coverImage = req.file.path;
+      }
+
+      const adapter = await expressAdapter(req, CreateBlogComposer());
+      res.status(adapter.statusCode).json(adapter.body);
+      return;
+    }
+  );
 
 router
   .route(LawyerRoutes.schedule.settings)
@@ -592,7 +623,7 @@ router.get(
       FetchLawyerDashboardDataComposer()
     );
     res.status(adapter.statusCode).json(adapter.body);
-    return
+    return;
   }
 );
 

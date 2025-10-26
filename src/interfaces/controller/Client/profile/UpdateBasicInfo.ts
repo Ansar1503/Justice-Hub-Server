@@ -20,7 +20,7 @@ export class UpdateBasicInfoController implements IController {
             const err = this._errors.error_400();
             return new HttpResponse(err.statusCode, err.body);
         }
-        const profile_image = (httpRequest as Record<string, any>)?.file?.filename;
+        const profile_image = (httpRequest as Record<string, any>)?.file?.path
         const user_id = (httpRequest as Record<string, any>)?.user?.id;
         try {
             const updateData = await this._udpateClientData.execute({

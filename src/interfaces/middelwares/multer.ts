@@ -52,6 +52,23 @@ export const caseDocumentStorage = new CloudinaryStorage({
   },
 });
 
+export const blogImageStorage = new CloudinaryStorage({
+  cloudinary,
+  params: async (req, file) => {
+    const ext = path.extname(file.originalname);
+    const filename = path.basename(file.originalname, ext);
+    return {
+      folder: "JusticeHub/BlogImages",
+      public_id: `${filename}-${Date.now()}${ext}`,
+      allowed_formats: ["jpg", "jpeg", "png", "webp"],
+      transformation: [
+        { width: 1280, height: 720, crop: "limit", quality: "auto" },
+      ],
+      resource_type: "image",
+    };
+  },
+});
+
 export const chatDocumentstorage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => {
