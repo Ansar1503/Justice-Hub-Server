@@ -1,5 +1,10 @@
 import { Blog } from "@domain/entities/BlogEntity";
 import { IBaseRepository } from "./IBaseRepo";
+import {
+  FetchBlogsByLawyerQueryDto,
+  FetchBlogsByLawyerResponseDto,
+  UpdateBlogDto,
+} from "@src/application/dtos/Blog/BlogDto";
 
 export interface IBlogRepo extends IBaseRepository<Blog> {
   addComment(
@@ -12,6 +17,10 @@ export interface IBlogRepo extends IBaseRepository<Blog> {
     userId: string,
     like: boolean
   ): Promise<Blog | null>;
+  update(blogId: string, update: UpdateBlogDto): Promise<Blog | null>;
   findById(blogId: string): Promise<Blog | null>;
   findByLawyerAndTitle(title: string, lawyerId: string): Promise<Blog | null>;
+  findByLawyer(
+    payload: FetchBlogsByLawyerQueryDto
+  ): Promise<FetchBlogsByLawyerResponseDto>;
 }

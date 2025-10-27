@@ -15,5 +15,12 @@ export const CreateBlogSchema = z.object({
       (v) => !v || /^(https?:\/\/|\/)/.test(v),
       "coverImage must be an absolute URL or a relative path (start with '/')"
     ),
-  isPublished: z.boolean().optional(),
+  isPublished: z
+    .union([z.boolean(), z.string()])
+    .optional()
+    .transform((val) => {
+      if (val === "true") return true;
+      if (val === "false") return false;
+      return Boolean(val);
+    }),
 });

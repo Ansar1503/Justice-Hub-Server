@@ -24,3 +24,27 @@ export interface CreateBlogDto {
   coverImage?: string;
   isPublished?: boolean;
 }
+
+export interface UpdateBlogDto {
+  blogId: string;
+  title: string;
+  content: string;
+  coverImage?: string;
+  isPublished?: boolean;
+}
+
+export type FetchBlogsByLawyerQueryDto = {
+  lawyerId: string;
+  page: number;
+  limit: number;
+  search: string;
+  filter: "all" | "published" | "draft";
+  sort: "newest" | "oldest" | "title-asc" | "title-desc" | "likes" | "comments";
+};
+
+export type FetchBlogsByLawyerResponseDto = {
+  totalCount: number;
+  currentPage: number;
+  totalPage: number;
+  data: BaseBlogDto[];
+};

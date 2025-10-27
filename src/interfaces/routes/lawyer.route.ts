@@ -68,6 +68,8 @@ import { AddSessionSummaryComposer } from "@infrastructure/services/composers/Ca
 import { FetchAllCasesByUserComposer } from "@infrastructure/services/composers/Cases/FetchAllCasesByUserComposer";
 import { FetchLawyerDashboardDataComposer } from "@infrastructure/services/composers/Cases/FetchLawyerDashboardDataComposer";
 import { CreateBlogComposer } from "@infrastructure/services/composers/Blog/CreateBlogComposer";
+import { FetchBlogsByLawyerComposer } from "@infrastructure/services/composers/Blog/FetchBlogsByLawyerComposer";
+import { UpdateBlogComposer } from "@infrastructure/services/composers/Blog/UpdateBlogComposer";
 
 const upload = multer({ storage: documentstorage });
 const caseDocumentUpload = multer({
@@ -135,7 +137,7 @@ router
   .route(BlogRoute.base)
   .all(authenticateUser, authenticateClient, authenticateLawyer)
   .post(
-    handleMulterErrors(blogImageUpload.single("coverImage")),
+    handleMulterErrors(blogImageUpload.single("file")),
     async (req: Request, res: Response) => {
       if (req.file) {
         req.body.coverImage = req.file.path;
@@ -145,7 +147,27 @@ router
       res.status(adapter.statusCode).json(adapter.body);
       return;
     }
-  );
+  )
+  .get(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchBlogsByLawyerComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  });
+
+router.patch(
+  BlogRoute.base + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  authenticateLawyer,
+  handleMulterErrors(blogImageUpload.single("file")),
+  async (req: Request, res: Response) => {
+    if (req.file) {
+      req.body.coverImage = req.file.path;
+    }
+    const adapter = await expressAdapter(req, UpdateBlogComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+  }
+);
 
 router
   .route(LawyerRoutes.schedule.settings)

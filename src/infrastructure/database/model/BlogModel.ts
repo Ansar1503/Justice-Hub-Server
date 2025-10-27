@@ -20,15 +20,15 @@ export interface IBlogModel extends Document {
 const BlogSchema = new Schema<IBlogModel>(
   {
     _id: { type: String },
-    lawyerId: { type: String, required: true, ref: "lawyer" },
+    lawyerId: { type: String, required: true },
     title: { type: String, required: true, trim: true },
     content: { type: String, required: true },
     coverImage: { type: String },
     isPublished: { type: Boolean, default: false },
-    likes: [{ type: String, ref: "user" }],
+    likes: [{ type: String }],
     comments: [
       {
-        userId: { type: String, ref: "user" },
+        userId: { type: String },
         comment: { type: String },
         createdAt: { type: Date, default: Date.now },
       },
