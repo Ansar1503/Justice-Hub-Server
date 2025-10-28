@@ -74,6 +74,10 @@ export class BlogRepo
       );
     }
   }
+
+  async delete(blogId: string): Promise<void> {
+    await this.model.findOneAndDelete({ _id: blogId });
+  }
   async findByLawyerAndTitle(
     title: string,
     lawyerId: string
@@ -175,5 +179,17 @@ export class BlogRepo
       totalPage,
       data,
     };
+  }
+
+  async togglePublishStatus(
+    blogId: string,
+    toggle: boolean
+  ): Promise<Blog | null> {
+    const data = await this.model.findOneAndUpdate(
+      { _id: blogId },
+      { $set: { isPublished: toggle } },
+      { new: true }
+    );
+    return data ? this.mapper.toDomain(data) : null;
   }
 }

@@ -176,4 +176,5 @@ export const SubscriptionRoute = {
 
 export const BlogRoute = {
   base: "/blogs",
+  publish: "/publish",
 };
