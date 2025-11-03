@@ -154,8 +154,11 @@ router.get(
   }
 );
 
+
 router.get(
-  BlogRoute.base + BlogRoute.users + CommonParamsRoute.params,
+  BlogRoute.base + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
       req,

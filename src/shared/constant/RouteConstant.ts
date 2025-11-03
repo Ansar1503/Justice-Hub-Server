@@ -178,4 +178,6 @@ export const BlogRoute = {
   base: "/blogs",
   publish: "/publish",
   users: "/users",
+  like: "/like",
+  comment: "/comment",
 };
