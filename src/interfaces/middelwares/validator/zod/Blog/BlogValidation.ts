@@ -24,3 +24,13 @@ export const CreateBlogSchema = z.object({
       return Boolean(val);
     }),
 });
+
+export const FetchBlogsByClientSchema = z.object({
+  cursor: z.preprocess((val) => {
+    if (val === undefined || val === null || val === "") return undefined;
+    const n = Number(val);
+    return Number.isFinite(n) ? Math.floor(n) : undefined;
+  }, z.number().int().min(1).optional()),
+  search: z.string().trim().default(""),
+  sortBy: z.enum(["newest", "most-liked", "most-commented"]).default("newest"),
+});

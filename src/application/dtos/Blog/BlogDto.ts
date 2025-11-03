@@ -48,3 +48,48 @@ export type FetchBlogsByLawyerResponseDto = {
   totalPage: number;
   data: BaseBlogDto[];
 };
+
+type sortByType = "newest" | "most-liked" | "most-commented";
+
+export type FetchBlogsByClientType = {
+  cursor?: number;
+  search: string;
+  sortBy: sortByType;
+};
+
+type UserSummary = {
+  userId: string;
+  name: string;
+  profile_image: string;
+};
+
+type LawyerSummary = {
+  name: string;
+  profile_image: string;
+};
+
+type BlogCommentWithUser = {
+  userId: string;
+  name: string;
+  profile_image: string;
+  comment: string;
+  createdAt: Date | string;
+};
+
+export type FetchedBlogByClient = {
+  id: string;
+  title: string;
+  content: string;
+  coverImage?: string;
+  isPublished: boolean;
+  lawyerDetails: LawyerSummary;
+  likes: UserSummary[];
+  comments: BlogCommentWithUser[];
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+export type infiniteFetchBlogsByClient = {
+  data: FetchedBlogByClient[];
+  nextCursor?: number;
+};

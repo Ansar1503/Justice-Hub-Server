@@ -40,6 +40,7 @@ import { JoinVideoSessionComposer } from "@infrastructure/services/composers/Law
 import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchCallLogsSessionComposer";
 import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsByUserIdComposer";
 import {
+  BlogRoute,
   CasesRoutes,
   CasetypeRoutes,
   ClientRoutes,
@@ -88,6 +89,7 @@ import { HandleSubscribeWebhookComposer } from "@infrastructure/services/compose
 import { FetchCurrentUserSubscriptionComposer } from "@infrastructure/services/composers/Subscriptions/FetchUserSubscriptionComposer";
 import { CancelSubscriptionComposer } from "@infrastructure/services/composers/Subscriptions/CancelSubscriptionComposer";
 import { FetchLawyerCalendarAvailabilityComposer } from "@infrastructure/services/composers/Client/FetchLawyerCalendarAvailabiltyComposer";
+import { FetchBlogsByClientComposer } from "@infrastructure/services/composers/Blog/FetchBlogsByClientComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -137,6 +139,19 @@ const caseDocumentUpload = multer({
 });
 
 const router = express.Router();
+
+// blogs
+
+router.get(
+  BlogRoute.base + BlogRoute.users,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchBlogsByClientComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
 
 // subscriptions
 router.get(

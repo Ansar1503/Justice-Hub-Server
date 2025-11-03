@@ -1,9 +1,11 @@
 import { Blog } from "@domain/entities/BlogEntity";
 import { IBaseRepository } from "./IBaseRepo";
 import {
+  FetchBlogsByClientType,
   FetchBlogsByLawyerQueryDto,
   FetchBlogsByLawyerResponseDto,
   UpdateBlogDto,
+  infiniteFetchBlogsByClient,
 } from "@src/application/dtos/Blog/BlogDto";
 
 export interface IBlogRepo extends IBaseRepository<Blog> {
@@ -25,4 +27,7 @@ export interface IBlogRepo extends IBaseRepository<Blog> {
   findByLawyer(
     payload: FetchBlogsByLawyerQueryDto
   ): Promise<FetchBlogsByLawyerResponseDto>;
+  aggregateAll(
+    payload: FetchBlogsByClientType
+  ): Promise<infiniteFetchBlogsByClient>;
 }
