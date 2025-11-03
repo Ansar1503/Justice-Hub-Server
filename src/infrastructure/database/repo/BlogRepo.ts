@@ -59,7 +59,7 @@ export class BlogRepo
     userId: string,
     like: boolean
   ): Promise<Blog | null> {
-    if (like) {
+    if (!like) {
       return await BlogModel.findOneAndUpdate(
         { _id: blogId },
         {

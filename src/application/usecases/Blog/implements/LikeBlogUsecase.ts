@@ -3,7 +3,10 @@ import { ILikeOrDislikeBlogUsecase } from "../ILikeblogusecase";
 
 export class LikeOrDislikeBlogUsecase implements ILikeOrDislikeBlogUsecase {
   constructor(private _blogRepo: IBlogRepo) {}
-  async execute(input: { blogId: string; userId: string }): Promise<void> {
+  async execute(input: {
+    blogId: string;
+    userId: string;
+  }): Promise<{ liked: true; userId: string; blogId: string }> {
     const exists = await this._blogRepo.findById(input.blogId);
     if (!exists) throw new Error("blog doesnot exists");
     let like: boolean;
@@ -19,5 +22,6 @@ export class LikeOrDislikeBlogUsecase implements ILikeOrDislikeBlogUsecase {
     } catch (error) {
       throw new Error("database update failed");
     }
+    return { liked: true, userId: input.userId, blogId: input.blogId };
   }
 }
