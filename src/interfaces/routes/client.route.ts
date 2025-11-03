@@ -165,9 +165,8 @@ router.patch(
   }
 );
 
-
 router.get(
-  BlogRoute.base + CommonParamsRoute.params,
+  BlogRoute.base + BlogRoute.users + CommonParamsRoute.params,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {

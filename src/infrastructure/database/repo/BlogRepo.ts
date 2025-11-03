@@ -208,7 +208,7 @@ export class BlogRepo
       ? { $regex: search.trim(), $options: "i" }
       : undefined;
 
-    let sortStage: Record<string, 1 | -1> = { createdAt: -1 };
+    let sortStage: Record<string, 1 | -1>;
     switch (sortBy) {
       case "most-commented":
         sortStage = { commentsCount: -1, updatedAt: -1 };
@@ -232,6 +232,7 @@ export class BlogRepo
       {
         $addFields: {
           likesCount: { $size: { $ifNull: ["$likes", []] } },
+          comments: { $ifNull: ["$comments", []] },
           commentsCount: { $size: { $ifNull: ["$comments", []] } },
         },
       },
@@ -251,6 +252,7 @@ export class BlogRepo
       },
       { $unwind: "$data" },
       { $replaceRoot: { newRoot: "$data" } },
+
       {
         $lookup: {
           from: "users",
@@ -285,74 +287,96 @@ export class BlogRepo
           as: "likeClients",
         },
       },
-      {
-        $unwind: {
-          path: "$comments",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
+
       {
         $lookup: {
           from: "users",
-          localField: "comments.userId",
-          foreignField: "user_id",
-          as: "commentUser",
+          let: { commenterIds: "$comments.userId" },
+          pipeline: [
+            { $match: { $expr: { $in: ["$user_id", "$$commenterIds"] } } },
+            { $project: { _id: 0, user_id: 1, name: 1 } },
+          ],
+          as: "commentUsers",
         },
       },
       {
         $lookup: {
           from: "clients",
-          localField: "comments.userId",
-          foreignField: "user_id",
-          as: "commentClient",
+          let: { commenterIds: "$comments.userId" },
+          pipeline: [
+            { $match: { $expr: { $in: ["$user_id", "$$commenterIds"] } } },
+            { $project: { _id: 0, user_id: 1, profile_image: 1 } },
+          ],
+          as: "commentClients",
         },
       },
       {
         $addFields: {
-          "comments.user": {
-            $cond: [
-              { $gt: [{ $size: "$commentClient" }, 0] },
-              {
-                userId: { $arrayElemAt: ["$commentClient.user_id", 0] },
-                name: { $arrayElemAt: ["$commentUser.name", 0] },
+          comments: {
+            $map: {
+              input: { $ifNull: ["$comments", []] },
+              as: "c",
+              in: {
+                userId: "$$c.userId",
+                comment: "$$c.comment",
+                createdAt: "$$c.createdAt",
+                name: {
+                  $let: {
+                    vars: {
+                      u: {
+                        $first: {
+                          $filter: {
+                            input: "$commentUsers",
+                            as: "u",
+                            cond: { $eq: ["$$u.user_id", "$$c.userId"] },
+                          },
+                        },
+                      },
+                    },
+                    in: "$$u.name",
+                  },
+                },
                 profile_image: {
                   $let: {
                     vars: {
-                      img: {
-                        $arrayElemAt: ["$commentClient.profile_image", 0],
+                      cl: {
+                        $first: {
+                          $filter: {
+                            input: "$commentClients",
+                            as: "cl",
+                            cond: { $eq: ["$$cl.user_id", "$$c.userId"] },
+                          },
+                        },
                       },
                     },
-                    in: { $cond: [{ $eq: ["$$img", ""] }, null, "$$img"] },
+                    in: {
+                      $cond: [
+                        {
+                          $or: [
+                            { $eq: ["$$cl.profile_image", ""] },
+                            { $eq: ["$$cl.profile_image", null] },
+                          ],
+                        },
+                        null,
+                        "$$cl.profile_image",
+                      ],
+                    },
                   },
                 },
-                comment: "$comments.comment",
-                createdAt: "$comments.createdAt",
               },
-              {
-                userId: { $arrayElemAt: ["$commentUser.user_id", 0] },
-                name: { $arrayElemAt: ["$commentUser.name", 0] },
-                profile_image: null,
-                comment: "$comments.comment",
-                createdAt: "$comments.createdAt",
-              },
-            ],
+            },
           },
         },
       },
       {
-        $group: {
-          _id: "$_id",
-          title: { $first: "$title" },
-          content: { $first: "$content" },
-          coverImage: { $first: "$coverImage" },
-          isPublished: { $first: "$isPublished" },
-          createdAt: { $first: "$createdAt" },
-          updatedAt: { $first: "$updatedAt" },
-          lawyerUser: { $first: "$lawyerUser" },
-          lawyerClient: { $first: "$lawyerClient" },
-          likeUsers: { $first: "$likeUsers" },
-          likeClients: { $first: "$likeClients" },
-          comments: { $push: "$comments.user" },
+        $addFields: {
+          comments: {
+            $filter: {
+              input: "$comments",
+              as: "c",
+              cond: { $and: [{ $ne: ["$$c.userId", null] }] },
+            },
+          },
         },
       },
       {
@@ -368,9 +392,7 @@ export class BlogRepo
 
           lawyerDetails: {
             name: "$lawyerUser.name",
-            profile_image: {
-              $ifNull: ["$lawyerClient.profile_image", ""],
-            },
+            profile_image: { $ifNull: ["$lawyerClient.profile_image", ""] },
           },
 
           likes: {
@@ -386,18 +408,15 @@ export class BlogRepo
                       $getField: {
                         field: "profile_image",
                         input: {
-                          $arrayElemAt: [
-                            {
-                              $filter: {
-                                input: "$likeClients",
-                                as: "lc",
-                                cond: {
-                                  $eq: ["$$lc.user_id", "$$likeUser.user_id"],
-                                },
+                          $first: {
+                            $filter: {
+                              input: "$likeClients",
+                              as: "lc",
+                              cond: {
+                                $eq: ["$$lc.user_id", "$$likeUser.user_id"],
                               },
                             },
-                            0,
-                          ],
+                          },
                         },
                       },
                     },
@@ -408,24 +427,17 @@ export class BlogRepo
             },
           },
 
-          comments: {
-            $filter: {
-              input: "$comments",
-              as: "c",
-              cond: { $ne: ["$$c", null] },
-            },
-          },
+          comments: { $ifNull: ["$comments", []] },
         },
       },
     ];
 
     const aggResult = await this.model.aggregate(pipeline);
-
     const hasMore = aggResult.length === limit;
     const nextCursor = hasMore ? cursor + 1 : undefined;
-
     return { data: aggResult, nextCursor };
   }
+
   async getBlogById(blogId: string): Promise<FetchedBlogByClient | null> {
     const pipeline: PipelineStage[] = [
       { $match: { _id: blogId, isPublished: true } },
@@ -444,7 +456,6 @@ export class BlogRepo
         },
       },
       { $unwind: { path: "$lawyerUser", preserveNullAndEmptyArrays: true } },
-
       {
         $lookup: {
           from: "clients",
@@ -470,70 +481,96 @@ export class BlogRepo
           as: "likeClients",
         },
       },
-      { $unwind: { path: "$comments", preserveNullAndEmptyArrays: true } },
 
       {
         $lookup: {
           from: "users",
-          localField: "comments.userId",
-          foreignField: "user_id",
-          as: "commentUser",
+          let: { commenterIds: "$comments.userId" },
+          pipeline: [
+            { $match: { $expr: { $in: ["$user_id", "$$commenterIds"] } } },
+            { $project: { _id: 0, user_id: 1, name: 1 } },
+          ],
+          as: "commentUsers",
         },
       },
       {
         $lookup: {
           from: "clients",
-          localField: "comments.userId",
-          foreignField: "user_id",
-          as: "commentClient",
+          let: { commenterIds: "$comments.userId" },
+          pipeline: [
+            { $match: { $expr: { $in: ["$user_id", "$$commenterIds"] } } },
+            { $project: { _id: 0, user_id: 1, profile_image: 1 } },
+          ],
+          as: "commentClients",
         },
       },
       {
         $addFields: {
-          "comments.user": {
-            $cond: [
-              { $gt: [{ $size: "$commentClient" }, 0] },
-              {
-                userId: { $arrayElemAt: ["$commentClient.user_id", 0] },
-                name: { $arrayElemAt: ["$commentUser.name", 0] },
+          comments: {
+            $map: {
+              input: { $ifNull: ["$comments", []] },
+              as: "c",
+              in: {
+                userId: "$$c.userId",
+                comment: "$$c.comment",
+                createdAt: "$$c.createdAt",
+                name: {
+                  $let: {
+                    vars: {
+                      u: {
+                        $first: {
+                          $filter: {
+                            input: "$commentUsers",
+                            as: "u",
+                            cond: { $eq: ["$$u.user_id", "$$c.userId"] },
+                          },
+                        },
+                      },
+                    },
+                    in: "$$u.name",
+                  },
+                },
                 profile_image: {
                   $let: {
                     vars: {
-                      img: {
-                        $arrayElemAt: ["$commentClient.profile_image", 0],
+                      cl: {
+                        $first: {
+                          $filter: {
+                            input: "$commentClients",
+                            as: "cl",
+                            cond: { $eq: ["$$cl.user_id", "$$c.userId"] },
+                          },
+                        },
                       },
                     },
-                    in: { $cond: [{ $eq: ["$$img", ""] }, null, "$$img"] },
+                    in: {
+                      $cond: [
+                        {
+                          $or: [
+                            { $eq: ["$$cl.profile_image", ""] },
+                            { $eq: ["$$cl.profile_image", null] },
+                          ],
+                        },
+                        null,
+                        "$$cl.profile_image",
+                      ],
+                    },
                   },
                 },
-                comment: "$comments.comment",
-                createdAt: "$comments.createdAt",
               },
-              {
-                userId: { $arrayElemAt: ["$commentUser.user_id", 0] },
-                name: { $arrayElemAt: ["$commentUser.name", 0] },
-                profile_image: null,
-                comment: "$comments.comment",
-                createdAt: "$comments.createdAt",
-              },
-            ],
+            },
           },
         },
       },
       {
-        $group: {
-          _id: "$_id",
-          title: { $first: "$title" },
-          content: { $first: "$content" },
-          coverImage: { $first: "$coverImage" },
-          isPublished: { $first: "$isPublished" },
-          createdAt: { $first: "$createdAt" },
-          updatedAt: { $first: "$updatedAt" },
-          lawyerUser: { $first: "$lawyerUser" },
-          lawyerClient: { $first: "$lawyerClient" },
-          likeUsers: { $first: "$likeUsers" },
-          likeClients: { $first: "$likeClients" },
-          comments: { $push: "$comments.user" },
+        $addFields: {
+          comments: {
+            $filter: {
+              input: "$comments",
+              as: "c",
+              cond: { $and: [{ $ne: ["$$c.userId", null] }] },
+            },
+          },
         },
       },
       {
@@ -549,9 +586,7 @@ export class BlogRepo
 
           lawyerDetails: {
             name: "$lawyerUser.name",
-            profile_image: {
-              $ifNull: ["$lawyerClient.profile_image", null],
-            },
+            profile_image: { $ifNull: ["$lawyerClient.profile_image", null] },
           },
 
           likes: {
@@ -567,18 +602,13 @@ export class BlogRepo
                       $getField: {
                         field: "profile_image",
                         input: {
-                          $arrayElemAt: [
-                            {
-                              $filter: {
-                                input: "$likeClients",
-                                as: "lc",
-                                cond: {
-                                  $eq: ["$$lc.user_id", "$$usr.user_id"],
-                                },
-                              },
+                          $first: {
+                            $filter: {
+                              input: "$likeClients",
+                              as: "lc",
+                              cond: { $eq: ["$$lc.user_id", "$$usr.user_id"] },
                             },
-                            0,
-                          ],
+                          },
                         },
                       },
                     },
@@ -589,13 +619,7 @@ export class BlogRepo
             },
           },
 
-          comments: {
-            $filter: {
-              input: "$comments",
-              as: "c",
-              cond: { $ne: ["$$c", null] },
-            },
-          },
+          comments: { $ifNull: ["$comments", []] },
         },
       },
     ];
@@ -614,7 +638,7 @@ export class BlogRepo
       },
 
       { $sort: { createdAt: -1 } },
-      { $limit: 4 },
+      { $limit: 3},
       {
         $lookup: {
           from: "users",
