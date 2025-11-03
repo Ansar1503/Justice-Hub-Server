@@ -89,6 +89,10 @@ export type FetchedBlogByClient = {
   updatedAt: Date;
 };
 
+export type relatedBlogs = {
+  relatedBlogs: FetchedBlogByClient[];
+};
+
 export type infiniteFetchBlogsByClient = {
   data: FetchedBlogByClient[];
   nextCursor?: number;

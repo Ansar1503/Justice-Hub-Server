@@ -90,6 +90,7 @@ import { FetchCurrentUserSubscriptionComposer } from "@infrastructure/services/c
 import { CancelSubscriptionComposer } from "@infrastructure/services/composers/Subscriptions/CancelSubscriptionComposer";
 import { FetchLawyerCalendarAvailabilityComposer } from "@infrastructure/services/composers/Client/FetchLawyerCalendarAvailabiltyComposer";
 import { FetchBlogsByClientComposer } from "@infrastructure/services/composers/Blog/FetchBlogsByClientComposer";
+import { FetchBlogDetailsByBlogIdComposer } from "@infrastructure/services/composers/Blog/FetchBlogDetailsByBlogIdComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -148,6 +149,18 @@ router.get(
   authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchBlogsByClientComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.get(
+  BlogRoute.base + BlogRoute.users + CommonParamsRoute.params,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      FetchBlogDetailsByBlogIdComposer()
+    );
     res.status(adapter.statusCode).json(adapter.body);
     return;
   }

@@ -3,12 +3,13 @@ import { BaseRepository } from "./base/BaseRepo";
 import { Blog } from "@domain/entities/BlogEntity";
 import { BlogModel, IBlogModel } from "../model/BlogModel";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
-import { ClientSession } from "mongoose";
+import { ClientSession, PipelineStage } from "mongoose";
 import {
   BaseBlogDto,
   FetchBlogsByClientType,
   FetchBlogsByLawyerQueryDto,
   FetchBlogsByLawyerResponseDto,
+  FetchedBlogByClient,
   UpdateBlogDto,
   infiniteFetchBlogsByClient,
 } from "@src/application/dtos/Blog/BlogDto";
@@ -114,7 +115,7 @@ export class BlogRepo
     }
 
     const matchStage = { $and: matchConditions };
-    let sortStage: Record<string, number> = { createdAt: -1 };
+    let sortStage: Record<string, 1 | -1> = { createdAt: -1 };
     switch (sort) {
       case "oldest":
         sortStage = { createdAt: 1 };
@@ -133,7 +134,7 @@ export class BlogRepo
         break;
     }
 
-    const pipeline: any[] = [
+    const pipeline: PipelineStage[] = [
       { $match: matchStage },
       {
         $addFields: {
@@ -200,14 +201,14 @@ export class BlogRepo
   ): Promise<infiniteFetchBlogsByClient> {
     const { search, sortBy } = payload;
     const cursor = payload.cursor ?? 1;
-    const limit = 10;
+    const limit = 5;
     const skip = (cursor - 1) * limit;
 
     const regex = search.trim()
       ? { $regex: search.trim(), $options: "i" }
       : undefined;
 
-    let sortStage: Record<string, any> = { createdAt: -1 };
+    let sortStage: Record<string, 1 | -1> = { createdAt: -1 };
     switch (sortBy) {
       case "most-commented":
         sortStage = { commentsCount: -1, updatedAt: -1 };
@@ -221,7 +222,7 @@ export class BlogRepo
         break;
     }
 
-    const pipeline: any[] = [
+    const pipeline: PipelineStage[] = [
       {
         $match: {
           isPublished: true,
@@ -315,7 +316,14 @@ export class BlogRepo
                 userId: { $arrayElemAt: ["$commentClient.user_id", 0] },
                 name: { $arrayElemAt: ["$commentUser.name", 0] },
                 profile_image: {
-                  $arrayElemAt: ["$commentClient.profile_image", 0],
+                  $let: {
+                    vars: {
+                      img: {
+                        $arrayElemAt: ["$commentClient.profile_image", 0],
+                      },
+                    },
+                    in: { $cond: [{ $eq: ["$$img", ""] }, null, "$$img"] },
+                  },
                 },
                 comment: "$comments.comment",
                 createdAt: "$comments.createdAt",
@@ -323,7 +331,7 @@ export class BlogRepo
               {
                 userId: { $arrayElemAt: ["$commentUser.user_id", 0] },
                 name: { $arrayElemAt: ["$commentUser.name", 0] },
-                profile_image: "",
+                profile_image: null,
                 comment: "$comments.comment",
                 createdAt: "$comments.createdAt",
               },
@@ -417,5 +425,239 @@ export class BlogRepo
     const nextCursor = hasMore ? cursor + 1 : undefined;
 
     return { data: aggResult, nextCursor };
+  }
+  async getBlogById(blogId: string): Promise<FetchedBlogByClient | null> {
+    const pipeline: PipelineStage[] = [
+      { $match: { _id: blogId, isPublished: true } },
+      {
+        $addFields: {
+          likesCount: { $size: { $ifNull: ["$likes", []] } },
+          comments: { $ifNull: ["$comments", []] },
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "lawyerId",
+          foreignField: "user_id",
+          as: "lawyerUser",
+        },
+      },
+      { $unwind: { path: "$lawyerUser", preserveNullAndEmptyArrays: true } },
+
+      {
+        $lookup: {
+          from: "clients",
+          localField: "lawyerUser.user_id",
+          foreignField: "user_id",
+          as: "lawyerClient",
+        },
+      },
+      { $unwind: { path: "$lawyerClient", preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: "users",
+          localField: "likes",
+          foreignField: "user_id",
+          as: "likeUsers",
+        },
+      },
+      {
+        $lookup: {
+          from: "clients",
+          localField: "likes",
+          foreignField: "user_id",
+          as: "likeClients",
+        },
+      },
+      { $unwind: { path: "$comments", preserveNullAndEmptyArrays: true } },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "comments.userId",
+          foreignField: "user_id",
+          as: "commentUser",
+        },
+      },
+      {
+        $lookup: {
+          from: "clients",
+          localField: "comments.userId",
+          foreignField: "user_id",
+          as: "commentClient",
+        },
+      },
+      {
+        $addFields: {
+          "comments.user": {
+            $cond: [
+              { $gt: [{ $size: "$commentClient" }, 0] },
+              {
+                userId: { $arrayElemAt: ["$commentClient.user_id", 0] },
+                name: { $arrayElemAt: ["$commentUser.name", 0] },
+                profile_image: {
+                  $let: {
+                    vars: {
+                      img: {
+                        $arrayElemAt: ["$commentClient.profile_image", 0],
+                      },
+                    },
+                    in: { $cond: [{ $eq: ["$$img", ""] }, null, "$$img"] },
+                  },
+                },
+                comment: "$comments.comment",
+                createdAt: "$comments.createdAt",
+              },
+              {
+                userId: { $arrayElemAt: ["$commentUser.user_id", 0] },
+                name: { $arrayElemAt: ["$commentUser.name", 0] },
+                profile_image: null,
+                comment: "$comments.comment",
+                createdAt: "$comments.createdAt",
+              },
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          title: { $first: "$title" },
+          content: { $first: "$content" },
+          coverImage: { $first: "$coverImage" },
+          isPublished: { $first: "$isPublished" },
+          createdAt: { $first: "$createdAt" },
+          updatedAt: { $first: "$updatedAt" },
+          lawyerUser: { $first: "$lawyerUser" },
+          lawyerClient: { $first: "$lawyerClient" },
+          likeUsers: { $first: "$likeUsers" },
+          likeClients: { $first: "$likeClients" },
+          comments: { $push: "$comments.user" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          id: "$_id",
+          title: 1,
+          content: 1,
+          coverImage: 1,
+          isPublished: 1,
+          createdAt: 1,
+          updatedAt: 1,
+
+          lawyerDetails: {
+            name: "$lawyerUser.name",
+            profile_image: {
+              $ifNull: ["$lawyerClient.profile_image", null],
+            },
+          },
+
+          likes: {
+            $map: {
+              input: "$likeUsers",
+              as: "usr",
+              in: {
+                userId: "$$usr.user_id",
+                name: "$$usr.name",
+                profile_image: {
+                  $ifNull: [
+                    {
+                      $getField: {
+                        field: "profile_image",
+                        input: {
+                          $arrayElemAt: [
+                            {
+                              $filter: {
+                                input: "$likeClients",
+                                as: "lc",
+                                cond: {
+                                  $eq: ["$$lc.user_id", "$$usr.user_id"],
+                                },
+                              },
+                            },
+                            0,
+                          ],
+                        },
+                      },
+                    },
+                    null,
+                  ],
+                },
+              },
+            },
+          },
+
+          comments: {
+            $filter: {
+              input: "$comments",
+              as: "c",
+              cond: { $ne: ["$$c", null] },
+            },
+          },
+        },
+      },
+    ];
+
+    const result = await this.model.aggregate(pipeline);
+    return result[0] || null;
+  }
+
+  async getRelatedBlogs(blogId: string): Promise<FetchedBlogByClient[]> {
+    const pipeline: PipelineStage[] = [
+      {
+        $match: {
+          isPublished: true,
+          _id: { $ne: blogId },
+        },
+      },
+
+      { $sort: { createdAt: -1 } },
+      { $limit: 4 },
+      {
+        $lookup: {
+          from: "users",
+          localField: "lawyerId",
+          foreignField: "user_id",
+          as: "lawyerUser",
+        },
+      },
+      { $unwind: { path: "$lawyerUser", preserveNullAndEmptyArrays: true } },
+
+      {
+        $lookup: {
+          from: "clients",
+          localField: "lawyerUser.user_id",
+          foreignField: "user_id",
+          as: "lawyerClient",
+        },
+      },
+      { $unwind: { path: "$lawyerClient", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 0,
+          id: "$_id",
+          title: 1,
+          content: 1,
+          coverImage: 1,
+          isPublished: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          lawyerDetails: {
+            name: "$lawyerUser.name",
+            profile_image: {
+              $ifNull: ["$lawyerClient.profile_image", ""],
+            },
+          },
+
+          likes: [],
+          comments: [],
+        },
+      },
+    ];
+
+    const result = await this.model.aggregate(pipeline);
+    return result;
   }
 }

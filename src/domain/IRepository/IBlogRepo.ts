@@ -4,6 +4,7 @@ import {
   FetchBlogsByClientType,
   FetchBlogsByLawyerQueryDto,
   FetchBlogsByLawyerResponseDto,
+  FetchedBlogByClient,
   UpdateBlogDto,
   infiniteFetchBlogsByClient,
 } from "@src/application/dtos/Blog/BlogDto";
@@ -30,4 +31,6 @@ export interface IBlogRepo extends IBaseRepository<Blog> {
   aggregateAll(
     payload: FetchBlogsByClientType
   ): Promise<infiniteFetchBlogsByClient>;
+  getBlogById(blogId: string): Promise<FetchedBlogByClient | null>;
+  getRelatedBlogs(blogId: string): Promise<FetchedBlogByClient[]>;
 }
