@@ -156,13 +156,12 @@ export class WalletTransactionsRepo
   async getGrowthPercent(startDate: Date, endDate: Date): Promise<number> {
     const total = await this.getRevenueSummary(startDate, endDate);
     const duration = endDate.getTime() - startDate.getTime();
-
     const prevStart = new Date(startDate.getTime() - duration);
     const prevEnd = new Date(endDate.getTime() - duration);
 
     const prev = await this.getRevenueSummary(prevStart, prevEnd);
 
-    if (prev.totalRevenue === 0) return 100;
+    if (prev.totalRevenue === 0) return 0;
     const growth =
       ((total.totalRevenue - prev.totalRevenue) / prev.totalRevenue) * 100;
 

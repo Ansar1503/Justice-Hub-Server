@@ -26,4 +26,5 @@ export interface ICommissionTransactionRepo
       revenue: number;
     }[]
   >;
+  getCommissionGrowth(start: Date, end: Date): Promise<number>;
 }

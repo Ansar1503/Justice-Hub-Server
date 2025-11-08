@@ -32,7 +32,6 @@ export class FetchAdminDashboardDataUsecase
       recentDisputes,
       activeCases,
       disputesOpen,
-      growthPercent,
     ] = await Promise.all([
       this._commissionRepo.getCommissionSummary(input.start, input.end),
       this._transactionRepo.getTopLawyerByEarnings(input.start, input.end),
@@ -40,8 +39,11 @@ export class FetchAdminDashboardDataUsecase
       this._disputesRepo.getRecentDisputes(5),
       this._casesRepo.countOpen(),
       this._disputesRepo.countOpen(),
-      this._transactionRepo.getGrowthPercent(input.start, input.end),
     ]);
+    const growthPercent = await this._commissionRepo.getCommissionGrowth(
+      input.start,
+      input.end
+    );
 
     const [commissionTrends, caseTrends] = await Promise.all([
       this._commissionRepo.getCommissionTrends(input.start, input.end),
@@ -60,8 +62,8 @@ export class FetchAdminDashboardDataUsecase
         totalUsers,
         totalLawyers,
         totalClients,
-        totalRevenue: commissionSummary.totalCommission, 
-        commissionPaid: commissionSummary.totalLawyerShare, 
+        totalRevenue: commissionSummary.totalCommission,
+        commissionPaid: commissionSummary.totalLawyerShare,
         activeCases,
         disputesOpen,
         growthPercent,
