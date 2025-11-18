@@ -67,6 +67,7 @@ export const ClientRoutes = {
   },
 
   slots: {
+    amountPayable: "/lawyer/slots/pricedetails/:id",
     checkout: "/lawyer/slots/checkout-session",
     followup: "/lawyer/slots/checkout-session/follow-up",
     removeFailed: "/lawyer/slots/session/:id",

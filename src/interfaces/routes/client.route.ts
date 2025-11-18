@@ -92,6 +92,7 @@ import { FetchLawyerCalendarAvailabilityComposer } from "@infrastructure/service
 import { FetchBlogsByClientComposer } from "@infrastructure/services/composers/Blog/FetchBlogsByClientComposer";
 import { FetchBlogDetailsByBlogIdComposer } from "@infrastructure/services/composers/Blog/FetchBlogDetailsByBlogIdComposer";
 import { LikeOrDislikeBlogComposer } from "@infrastructure/services/composers/Blog/LikeOrDislikeBlogComposer";
+import { FetchAmountPayableComposer } from "@infrastructure/services/composers/Client/FetchAmountPayableComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -530,6 +531,7 @@ router.get(
 router.post(
   ClientRoutes.slots.checkout,
   authenticateUser,
+  authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
       req,
@@ -539,7 +541,16 @@ router.post(
     return;
   }
 );
-
+router.get(
+  ClientRoutes.slots.amountPayable,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, FetchAmountPayableComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
 router.post(
   ClientRoutes.slots.followup,
   authenticateUser,

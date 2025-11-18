@@ -64,13 +64,13 @@ export class CreateCheckoutSessionUseCase
     const baseFee = lawyerDetails.consultationFee;
 
     const discountedFee = baseFee;
-    const userSubs = await this._userSubscriptionRepo.findByUser(client_id);
-    let subDiscountedFee:number=0
-    if (userSubs && userSubs.benefitsSnapshot.discountPercent) {
-      subDiscountedFee =
-        baseFee -
-        Math.round((baseFee * userSubs.benefitsSnapshot.discountPercent) / 100);
-    }
+    // const userSubs = await this._userSubscriptionRepo.findByUser(client_id);
+    // let subDiscountedFee:number=0
+    // if (userSubs && userSubs.benefitsSnapshot.discountPercent) {
+    //   subDiscountedFee =
+    //     baseFee -
+    //     Math.round((baseFee * userSubs.benefitsSnapshot.discountPercent) / 100);
+    // }
 
     const commissionPercent = commissionSettings.initialCommission;
     const commissionAmount = Math.round(
