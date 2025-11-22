@@ -13,6 +13,7 @@ export class FetchAmountPayableUsecase implements IFetchAmountPayable {
     private _userSubscriptionRepo: IUserSubscriptionRepo,
     private _commissionSettings: ICommissionSettingsRepo
   ) {}
+
   async execute(
     input: FetchAmountPayableInputDto
   ): Promise<FetchAmountPayableOutputDto> {
@@ -24,6 +25,7 @@ export class FetchAmountPayableUsecase implements IFetchAmountPayable {
       await this._commissionSettings.fetchCommissionSettings();
 
     let followUpDiscountAmount = 0;
+
     if (commissionSettings && input.appointmentType === "follow-up") {
       const diff =
         commissionSettings.initialCommission -
@@ -33,6 +35,7 @@ export class FetchAmountPayableUsecase implements IFetchAmountPayable {
         followUpDiscountAmount = Math.round((fee * diff) / 100);
       }
     }
+    let discountedFee = fee - followUpDiscountAmount;
     const userSub = await this._userSubscriptionRepo.findByUser(input.clientId);
 
     let subscriptionDiscountAmount = 0;
@@ -43,14 +46,13 @@ export class FetchAmountPayableUsecase implements IFetchAmountPayable {
       userSub.benefitsSnapshot.discountPercent
     ) {
       subscriptionDiscountAmount = Math.round(
-        (fee * userSub.benefitsSnapshot.discountPercent) / 100
+        (discountedFee * userSub.benefitsSnapshot.discountPercent) / 100
       );
+
+      discountedFee -= subscriptionDiscountAmount;
     }
 
-    const amountPayable = Math.max(
-      0,
-      fee - subscriptionDiscountAmount - followUpDiscountAmount
-    );
+    const amountPayable = Math.max(0, discountedFee);
     console.log({
       amountPayable,
       subscriptionDiscountAmount,

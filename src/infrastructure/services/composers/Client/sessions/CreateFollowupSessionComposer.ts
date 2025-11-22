@@ -6,9 +6,11 @@ import { LawyerVerificationRepo } from "@infrastructure/database/repo/LawyerVeri
 import { OverrideSlotsRepository } from "@infrastructure/database/repo/OverrideSlotsRepo";
 import { ScheduleSettingsRepository } from "@infrastructure/database/repo/ScheduleSettingsRepo";
 import { UserRepository } from "@infrastructure/database/repo/UserRepo";
+import { UserSubscriptionRepository } from "@infrastructure/database/repo/UserSubscriptionRepository";
 import { WalletRepo } from "@infrastructure/database/repo/WalletRepo";
 import { CommissionSettingsMapper } from "@infrastructure/Mapper/Implementations/CommissionSettingsMapper";
 import { LawyerVerificationMapper } from "@infrastructure/Mapper/Implementations/LawyerVerificaitionMapper";
+import { UserSubscriptionMapper } from "@infrastructure/Mapper/Implementations/UserSubscriptionMapper";
 import { connectRedis } from "@infrastructure/Redis/Config/RedisConfig";
 import { RedisService } from "@infrastructure/Redis/RedisService";
 import { CreateFollowupCheckoutSessionController } from "@interfaces/controller/Client/Sessions/CreateFollowupSessionController";
@@ -28,7 +30,8 @@ export async function CreateFollowupCheckoutSessionComposer() {
     new WalletRepo(),
     new LawyerRepository(),
     new RedisService(client),
-    new CommissionSettingsRepo(new CommissionSettingsMapper())
+    new CommissionSettingsRepo(new CommissionSettingsMapper()),
+    new UserSubscriptionRepository(new UserSubscriptionMapper())
   );
   return new CreateFollowupCheckoutSessionController(
     usecase,

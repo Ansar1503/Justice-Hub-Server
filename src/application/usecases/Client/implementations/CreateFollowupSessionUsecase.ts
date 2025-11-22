@@ -19,6 +19,7 @@ import { STATUS_CODES } from "@infrastructure/constant/status.codes";
 import { GetAppointmentRedisKey } from "@shared/utils/helpers/GetAppointmentKey";
 import { getFollowupStripeSession } from "@src/application/services/stripe.service";
 import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
+import { IUserSubscriptionRepo } from "@domain/IRepository/IUserSubscriptionRepo";
 
 export class CreateFollowupCheckoutSessionUsecase
   implements ICreateFollowupCheckoutUsecase
@@ -33,7 +34,8 @@ export class CreateFollowupCheckoutSessionUsecase
     private _walletRepo: IWalletRepo,
     private _lawyerRepo: ILawyerRepository,
     private _redisService: IRedisService,
-    private _commissionSettingsRepo: ICommissionSettingsRepo
+    private _commissionSettingsRepo: ICommissionSettingsRepo,
+    private _userSubscriptionRepo: IUserSubscriptionRepo
   ) {}
   async execute(input: CreateFollowupCheckoutSessionInputDto): Promise<any> {
     const { client_id, date, duration, lawyer_id, reason, timeSlot } = input;
@@ -59,13 +61,29 @@ export class CreateFollowupCheckoutSessionUsecase
       await this._commissionSettingsRepo.fetchCommissionSettings();
     if (!commissionSettings)
       throw new Error("Commission settings not set by Admin");
+    const baseFee = lawyerDetails.consultationFee;
     const commissionPercent = commissionSettings.followupCommission;
     const discountAmount = Math.round(
       (lawyerDetails.consultationFee *
         (commissionSettings.initialCommission - commissionPercent)) /
         100
     );
-    const amountPaid = lawyerDetails.consultationFee - discountAmount;
+    const followupDiscount = discountAmount;
+    let amountPaid = baseFee - followupDiscount;
+
+    const userSubs = await this._userSubscriptionRepo.findByUser(client_id);
+
+    let subscriptionDiscount = 0;
+
+    if (userSubs && userSubs.benefitsSnapshot.discountPercent > 0) {
+      subscriptionDiscount = Math.round(
+        (amountPaid * userSubs.benefitsSnapshot.discountPercent) / 100
+      );
+      amountPaid -= subscriptionDiscount;
+    }
+
+    amountPaid = Math.max(0, amountPaid);
+
     const commissionAmount = Math.round(
       (lawyerDetails.consultationFee * commissionPercent) / 100
     );

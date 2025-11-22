@@ -15,6 +15,8 @@ import { HttpErrors } from "@interfaces/helpers/implementation/HttpErrors";
 import { HttpSuccess } from "@interfaces/helpers/implementation/HttpSuccess";
 import { CommissionSettingsRepo } from "@infrastructure/database/repo/CommissionSettingsRepo";
 import { CommissionSettingsMapper } from "@infrastructure/Mapper/Implementations/CommissionSettingsMapper";
+import { UserSubscriptionRepository } from "@infrastructure/database/repo/UserSubscriptionRepository";
+import { UserSubscriptionMapper } from "@infrastructure/Mapper/Implementations/UserSubscriptionMapper";
 
 export const CreateCheckoutSessionComposer = async () => {
   const client = await connectRedis();
@@ -28,7 +30,8 @@ export const CreateCheckoutSessionComposer = async () => {
     new WalletRepo(),
     new LawyerRepository(),
     new RedisService(client),
-    new CommissionSettingsRepo(new CommissionSettingsMapper())
+    new CommissionSettingsRepo(new CommissionSettingsMapper()),
+    new UserSubscriptionRepository(new UserSubscriptionMapper())
   );
   return new CreateCheckoutSessionController(
     useCase,

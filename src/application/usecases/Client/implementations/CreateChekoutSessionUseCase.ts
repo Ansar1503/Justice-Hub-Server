@@ -64,14 +64,18 @@ export class CreateCheckoutSessionUseCase
     const baseFee = lawyerDetails.consultationFee;
 
     const discountedFee = baseFee;
-    // const userSubs = await this._userSubscriptionRepo.findByUser(client_id);
-    // let subDiscountedFee:number=0
-    // if (userSubs && userSubs.benefitsSnapshot.discountPercent) {
-    //   subDiscountedFee =
-    //     baseFee -
-    //     Math.round((baseFee * userSubs.benefitsSnapshot.discountPercent) / 100);
-    // }
+    let amountPaid = baseFee;
 
+    const userSubs = await this._userSubscriptionRepo.findByUser(client_id);
+
+    if (userSubs && userSubs.benefitsSnapshot.discountPercent > 0) {
+      const subscriptionDiscount = Math.round(
+        (amountPaid * userSubs.benefitsSnapshot.discountPercent) / 100
+      );
+      amountPaid -= subscriptionDiscount;
+    }
+
+    amountPaid = Math.max(0, amountPaid);
     const commissionPercent = commissionSettings.initialCommission;
     const commissionAmount = Math.round(
       (discountedFee * commissionPercent) / 100
@@ -279,7 +283,7 @@ export class CreateCheckoutSessionUseCase
         "Slot already temporarily reserved, please choose another."
       );
     const stripe = await getStripeSession({
-      amountPaid: lawyerDetails.consultationFee,
+      amountPaid,
       date: String(date),
       lawyer_name: user.name,
       slot: timeSlot,
