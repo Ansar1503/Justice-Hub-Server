@@ -14,6 +14,8 @@ export class CaseMapper implements IMapper<Case, ICaseModel> {
             title: persistence.title,
             updatedAt: persistence.updatedAt,
             summary: persistence.summary,
+            estimatedValue: persistence.estimatedValue,
+            nextHearing: persistence.nextHearing,
         });
     }
     toDomainArray(persistence: ICaseModel[]): Case[] {
@@ -30,6 +32,8 @@ export class CaseMapper implements IMapper<Case, ICaseModel> {
             title: entity.title,
             updatedAt: entity.updatedAt,
             summary: entity.summary,
+            estimatedValue: entity.estimatedValue,
+            nextHearing: entity.nextHearing,
         };
     }
 }

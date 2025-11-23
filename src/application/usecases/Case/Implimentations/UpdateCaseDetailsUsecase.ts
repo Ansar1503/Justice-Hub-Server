@@ -21,6 +21,7 @@ export class UpdateCaseDetailsUsecase implements IUpdateCasesDetailsUsecase {
         if (!updatedCase) {
             throw new Error("case update failed")
         }
+        console.log("updatedCase", updatedCase)
         return {
             caseType: updatedCase.caseType,
             clientId: updatedCase.clientId,

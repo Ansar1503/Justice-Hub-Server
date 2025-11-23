@@ -43,6 +43,8 @@ export class Case {
         this._lawyerId = props.lawyerId;
         this._caseType = props.caseType;
         this._summary = props.summary;
+        this._estimatedValue = props.estimatedValue;
+        this._nextHearing = props.nextHearing;
         this._status = props.status;
         this._createdAt = props.createdAt;
         this._updatedAt = props.updatedAt;
