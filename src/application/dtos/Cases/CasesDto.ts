@@ -13,3 +13,13 @@ export type CaseDto = {
     createdAt: Date;
     updatedAt: Date;
 };
+
+
+export interface UpdateCaseDto {
+    caseId: string
+    title?: string;
+    summary?: string;
+    estimatedValue?: number;
+    nextHearing?: string;
+    status?: StatusType;
+}

@@ -240,9 +240,9 @@ router
 // profiles
 router.get(
   LawyerRoutes.profile.base +
-    LawyerRoutes.base +
-    LawyerRoutes.professional +
-    CommonParamsRoute.params,
+  LawyerRoutes.base +
+  LawyerRoutes.professional +
+  CommonParamsRoute.params,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -257,9 +257,9 @@ router.get(
 
 router.get(
   LawyerRoutes.profile.base +
-    LawyerRoutes.base +
-    LawyerRoutes.verification +
-    CommonParamsRoute.params,
+  LawyerRoutes.base +
+  LawyerRoutes.verification +
+  CommonParamsRoute.params,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -596,9 +596,14 @@ router.post(
   }
 );
 
+router.put(CasesRoutes.base + CommonParamsRoute.params, authenticateUser, authenticateClient, authenticateLawyer, async (req: Request, res: Response) => {
+
+})
+
 router.get(
   CasesRoutes.base + CasesRoutes.documents + CommonParamsRoute.params,
   authenticateUser,
+  authenticateClient,
   authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(

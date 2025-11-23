@@ -21,4 +21,5 @@ export interface ICaseRepo extends IBaseRepository<Case> {
     startDate: Date,
     endDate: Date
   ): Promise<{ date: string; cases: number }[]>;
+  update(caseId: string, data: Partial<Case>): Promise<Case | null>
 }
