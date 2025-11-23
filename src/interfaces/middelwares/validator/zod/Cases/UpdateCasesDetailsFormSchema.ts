@@ -19,13 +19,11 @@ export const UpdateCasesDetailsFormSchema = z.object({
 
     estimatedValue: z
         .union([z.string(), z.number()])
-        .optional()
-        .transform((val) =>
-            val === "" || val == null ? undefined : Number(val)
-        )
-        .refine((v) => v === undefined || v >= 500, {
-            message: "Estimated value must be at least ₹500 if provided",
-        }),
+        .transform((val) => Number(val))
+        .refine(
+            (v) => v === 0 || v >= 500,
+            { message: "Estimated value must be 0 or at least ₹500" }
+        ),
 
     nextHearing: z
         .string()

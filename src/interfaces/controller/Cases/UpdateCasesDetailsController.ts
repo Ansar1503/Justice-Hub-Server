@@ -25,6 +25,7 @@ export class UpdateCaseDetailsController implements IController {
             const result = await this._updateCaseDetailsUsecase.execute({ ...parsed.data, caseId })
             return this._success.success_200(result)
         } catch (error) {
+            console.log("errors", error)
             if (error instanceof Error) {
                 return this._errors.error_500(error.message)
             }

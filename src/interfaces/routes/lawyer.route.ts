@@ -72,6 +72,7 @@ import { FetchBlogsByLawyerComposer } from "@infrastructure/services/composers/B
 import { UpdateBlogComposer } from "@infrastructure/services/composers/Blog/UpdateBlogComposer";
 import { DeleteBlogComposer } from "@infrastructure/services/composers/Blog/DeleteBlogComposer";
 import { ToggleBlogPublishComposer } from "@infrastructure/services/composers/Blog/ToggleBlogStatusComposer";
+import { updateCaseDetailsComposer } from "@infrastructure/services/composers/Cases/UpdateCasesDetailsComposer";
 
 const upload = multer({ storage: documentstorage });
 const caseDocumentUpload = multer({
@@ -597,7 +598,9 @@ router.post(
 );
 
 router.put(CasesRoutes.base + CommonParamsRoute.params, authenticateUser, authenticateClient, authenticateLawyer, async (req: Request, res: Response) => {
-
+  const adapter = await expressAdapter(req, updateCaseDetailsComposer())
+  res.status(adapter.statusCode).json(adapter.body)
+  return
 })
 
 router.get(

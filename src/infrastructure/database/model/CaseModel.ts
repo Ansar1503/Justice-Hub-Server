@@ -8,6 +8,8 @@ export interface ICaseModel extends Document {
     lawyerId: string;
     caseType: string;
     summary?: string;
+    estimatedValue?: number;
+    nextHearing?: Date;
     status: StatusType;
     createdAt: Date;
     updatedAt: Date;
@@ -21,6 +23,8 @@ const CaseSchema = new Schema<ICaseModel>(
         lawyerId: { type: String, required: true },
         caseType: { type: String, required: true },
         summary: { type: String },
+        estimatedValue: { type: Number },
+        nextHearing: { type: Date },
         status: {
             type: String,
             required: true,

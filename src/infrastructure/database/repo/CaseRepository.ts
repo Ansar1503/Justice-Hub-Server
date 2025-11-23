@@ -405,6 +405,6 @@ export class CaseRepository
   }
   async update(caseId: string, data: Partial<Case>): Promise<Case | null> {
     const updated = await this.model.findOneAndUpdate({ _id: caseId }, data, { new: true })
-    return updated && this.mapper.toDomain ? this.mapper.toDomain(updated) : null
+    return updated ? this.mapper.toDomain(updated) : null
   }
 }

@@ -9,6 +9,7 @@ export class UpdateCaseDetailsUsecase implements IUpdateCasesDetailsUsecase {
         if (!existsCase) {
             throw new Error("Case not found");
         }
+        console.log("input", input)
         const updatedCase = await this._casesRepo.update(input.caseId, {
             id: input.caseId,
             title: input.title,
