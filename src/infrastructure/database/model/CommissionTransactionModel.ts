@@ -8,10 +8,15 @@ export interface ICommissionTransactionModel extends Document {
   bookingId: string;
   clientId: string;
   lawyerId: string;
+  baseFee: number;
+  subscriptionDiscount?: number;
+  followupDiscount?: number;
+
   amountPaid: number;
   commissionPercent: number;
   commissionAmount: number;
   lawyerAmount: number;
+
   type: BookingType;
   status: TransactionStatus;
   createdAt: Date;
@@ -24,6 +29,9 @@ const CommissionTransactionSchema = new Schema<ICommissionTransactionModel>(
     bookingId: { type: String, required: true },
     clientId: { type: String, required: true },
     lawyerId: { type: String, required: true },
+    baseFee: { type: Number, required: true },
+    subscriptionDiscount: { type: Number, required: false },
+    followupDiscount: { type: Number, required: false },
     amountPaid: { type: Number, required: true },
     commissionPercent: { type: Number, required: true },
     commissionAmount: { type: Number, required: true },
@@ -34,6 +42,7 @@ const CommissionTransactionSchema = new Schema<ICommissionTransactionModel>(
       required: true,
       enum: ["pending", "credited", "failed"],
     },
+
     createdAt: { type: Date, required: true },
     updatedAt: { type: Date, required: true },
   },

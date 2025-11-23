@@ -3,8 +3,7 @@ import { ICommissionTransactionModel } from "@infrastructure/database/model/Comm
 import { IMapper } from "../IMapper";
 
 export class CommissionTransactionMapper
-  implements IMapper<CommissionTransaction, ICommissionTransactionModel>
-{
+  implements IMapper<CommissionTransaction, ICommissionTransactionModel> {
   toDomain(persistence: ICommissionTransactionModel): CommissionTransaction {
     return CommissionTransaction.fromPersistence({
       id: persistence._id,
@@ -19,6 +18,9 @@ export class CommissionTransactionMapper
       status: persistence.status,
       createdAt: persistence.createdAt,
       updatedAt: persistence.updatedAt,
+      baseFee: persistence.baseFee,
+      subscriptionDiscount: persistence.subscriptionDiscount,
+      followupDiscount: persistence.followupDiscount
     });
   }
 
@@ -44,6 +46,9 @@ export class CommissionTransactionMapper
       status: entity.status,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      baseFee: entity.baseFee,
+      subscriptionDiscount: entity.subscriptionDiscount,
+      followupDiscount: entity.followupDiscount
     };
   }
 }
