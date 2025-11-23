@@ -12,7 +12,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
   constructor(
     private _scheduleSettingsRepo: IScheduleSettingsRepo,
     private _unitofwork: IUnitofWork
-  ) {}
+  ) { }
   async execute(input: {
     body: any;
     signature: string | string[];
@@ -35,6 +35,9 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
       commissionPercent,
       lawyerAmount,
       bookingType,
+      subscriptionDiscountAmount,
+      followupDiscountAmount,
+      baseAmount,
     } = result;
     if (payment_status === "success") {
       if (bookingType === "initial") {
@@ -51,7 +54,8 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
           commissionAmount == null ||
           commissionPercent == null ||
           lawyerAmount == null ||
-          bookingType == null
+          bookingType == null ||
+          baseAmount == null
         ) {
           throw new Error("no metadata found");
         }
@@ -129,13 +133,16 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
             commissionAmount,
             lawyerAmount,
             type: bookingType,
+            baseFee: baseAmount,
+            subscriptionDiscount: subscriptionDiscountAmount,
+            followupDiscount: followupDiscountAmount,
           });
           await uow.commissionTransactionRepo.create(
             commissionTransactionpayload
           );
         });
       } else if (bookingType === "followup") {
-        const { caseId } = result; 
+        const { caseId } = result;
         if (
           client_id == null ||
           lawyer_id == null ||
@@ -148,7 +155,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
           commissionAmount == null ||
           commissionPercent == null ||
           lawyerAmount == null ||
-          bookingType == null
+          bookingType == null || baseAmount == null
         ) {
           throw new Error("no metadata found for follow-up");
         }
@@ -166,7 +173,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
         }
 
         this._unitofwork.startTransaction(async (uow) => {
-         
+
           const caseRecord = await uow.caseRepo.findById(caseId);
           if (!caseRecord) throw new Error("Case not found for follow-up");
 
@@ -217,6 +224,9 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
             commissionAmount,
             lawyerAmount,
             type: bookingType,
+            baseFee: baseAmount,
+            subscriptionDiscount: subscriptionDiscountAmount,
+            followupDiscount: followupDiscountAmount,
           });
           await uow.commissionTransactionRepo.create(
             commissionTransactionPayload

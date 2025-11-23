@@ -8,6 +8,9 @@ interface PersistedCommissionTransactionProps {
   bookingId: string;
   clientId: string;
   lawyerId: string;
+  baseFee: number;
+  subscriptionDiscount?: number;
+  followupDiscount?: number;
   amountPaid: number;
   commissionPercent: number;
   commissionAmount: number;
@@ -22,10 +25,14 @@ interface CreateCommissionTransactionProps {
   bookingId: string;
   clientId: string;
   lawyerId: string;
+  baseFee: number;
+  subscriptionDiscount?: number;
+  followupDiscount?: number;
   amountPaid: number;
   commissionPercent: number;
   commissionAmount: number;
   lawyerAmount: number;
+
   type: BookingType;
 }
 
@@ -34,6 +41,9 @@ export class CommissionTransaction {
   private _bookingId: string;
   private _clientId: string;
   private _lawyerId: string;
+  private _baseFee: number;
+  private _subscriptionDiscount?: number;
+  private _followupDiscount?: number;
   private _amountPaid: number;
   private _commissionPercent: number;
   private _commissionAmount: number;
@@ -48,6 +58,9 @@ export class CommissionTransaction {
     this._bookingId = props.bookingId;
     this._clientId = props.clientId;
     this._lawyerId = props.lawyerId;
+    this._baseFee = props.baseFee;
+    this._subscriptionDiscount = props.subscriptionDiscount;
+    this._followupDiscount = props.followupDiscount;
     this._amountPaid = props.amountPaid;
     this._commissionPercent = props.commissionPercent;
     this._commissionAmount = props.commissionAmount;
@@ -68,10 +81,15 @@ export class CommissionTransaction {
       bookingId: props.bookingId,
       clientId: props.clientId,
       lawyerId: props.lawyerId,
+      baseFee: props.baseFee,
+      subscriptionDiscount: props.subscriptionDiscount,
+      followupDiscount: props.followupDiscount,
+
       amountPaid: props.amountPaid,
       commissionPercent: props.commissionPercent,
       commissionAmount: props.commissionAmount,
       lawyerAmount: props.lawyerAmount,
+
       type: props.type,
       status: "pending",
       createdAt: now,
@@ -97,6 +115,18 @@ export class CommissionTransaction {
 
   get lawyerId() {
     return this._lawyerId;
+  }
+
+  get baseFee() {
+    return this._baseFee;
+  }
+
+  get subscriptionDiscount() {
+    return this._subscriptionDiscount;
+  }
+
+  get followupDiscount() {
+    return this._followupDiscount;
   }
 
   get amountPaid() {

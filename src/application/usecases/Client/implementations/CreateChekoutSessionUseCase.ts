@@ -61,23 +61,20 @@ export class CreateCheckoutSessionUseCase
       await this._commissionSettingsRepo.fetchCommissionSettings();
     if (!commissionSettings)
       throw new Error("Commission settings not set by Admin");
-
-    const baseFee = lawyerDetails.consultationFee;
-    let amountPaid = baseFee;
-
+    let amountPaid = lawyerDetails.consultationFee;
     const userSubs = await this._userSubscriptionRepo.findByUser(client_id);
-    const discountPercent = userSubs?.benefitsSnapshot?.discountPercent ?? 0;
-
-    if (discountPercent > 0) {
-      const subscriptionDiscount = Math.round(
-        (amountPaid * discountPercent) / 100
+    const subscriptionDiscountPercent = userSubs?.benefitsSnapshot?.discountPercent ?? 0;
+    let subscriptionDiscountAmount = 0;
+    if (subscriptionDiscountPercent > 0) {
+      subscriptionDiscountAmount = Math.round(
+        (amountPaid * subscriptionDiscountPercent) / 100
       );
-      amountPaid = Math.max(0, amountPaid - subscriptionDiscount);
+      amountPaid = Math.max(0, amountPaid - subscriptionDiscountAmount);
     }
 
     const commissionPercent = commissionSettings.initialCommission;
-    const commissionAmount = Math.round((baseFee * commissionPercent) / 100);
-    const lawyerAmount = baseFee - commissionAmount;
+    const commissionAmount = Math.round((amountPaid * commissionPercent) / 100);
+    const lawyerAmount = amountPaid - commissionAmount;
 
     if (!slotSettings) {
       const error: any = new Error("slot settings not found for the lawyer");
@@ -189,7 +186,7 @@ export class CreateCheckoutSessionUseCase
           );
 
         const stripe = await getStripeSession({
-          amountPaid: lawyerDetails.consultationFee,
+          amountPaid,
           date: String(date),
           lawyer_name: user.name,
           slot: timeSlot,
@@ -204,6 +201,8 @@ export class CreateCheckoutSessionUseCase
           commissionPercent,
           lawyerAmount,
           bookingType: "initial",
+          subscriptionDiscountAmount,
+          baseAmount: lawyerDetails.consultationFee
         });
         return stripe;
       }
@@ -295,6 +294,8 @@ export class CreateCheckoutSessionUseCase
       commissionPercent,
       lawyerAmount,
       bookingType: "initial",
+      subscriptionDiscountAmount,
+      baseAmount: lawyerDetails.consultationFee,
     });
     return stripe;
   }

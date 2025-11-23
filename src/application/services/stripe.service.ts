@@ -19,11 +19,14 @@ type WebhookResult = {
   caseTypeId?: string;
   payment_status?: "pending" | "success" | "failed";
   eventHandled: boolean;
+  baseAmount?: number
+  followupDiscountAmount?: number;
+  subscriptionDiscountAmount?: number;
 };
 
 type payloadType = {
   userEmail: string;
-  subscriptionDiscountPercent: number;
+  baseAmount: number
   subscriptionDiscountAmount: number;
   commissionPercent: number;
   commissionAmount: number;
@@ -43,7 +46,8 @@ type payloadType = {
 
 type FollowupPayloadType = {
   userEmail: string;
-  subscriptionDiscountPercent: number;
+  baseAmount: number
+  followupDiscountAmount: number;
   subscriptionDiscountAmount: number;
   commissionPercent: number;
   commissionAmount: number;
@@ -99,8 +103,9 @@ export async function getFollowupStripeSession(payload: FollowupPayloadType) {
       commissionAmount: payload.commissionAmount,
       lawyerAmount: payload.lawyerAmount,
       bookingType: payload.bookingType,
-      subscriptionDiscountPercent: payload.subscriptionDiscountPercent,
+      followupDiscountAmount: payload.followupDiscountAmount,
       subscriptionDiscountAmount: payload.subscriptionDiscountAmount,
+      baseAmount: payload.baseAmount
     },
   });
 
@@ -145,8 +150,8 @@ export async function getStripeSession(payload: payloadType) {
       commissionAmount: payload.commissionAmount,
       lawyerAmount: payload.lawyerAmount,
       bookingType: payload.bookingType,
-      subscriptionDiscountPercent: payload.subscriptionDiscountPercent,
       subscriptionDiscountAmount: payload.subscriptionDiscountAmount,
+      baseAmount: payload.baseAmount
     },
   });
 
@@ -247,6 +252,9 @@ function pluckMeta(md: Stripe.Metadata | null | undefined) {
         ? (md.bookingType as BookingType)
         : undefined,
     caseId: md?.caseId,
+    followupDiscountAmount: md?.followupDiscountAmount ? Number(md.followupDiscountAmount) : undefined,
+    subscriptionDiscountAmount: md?.subscriptionDiscountAmount ? Number(md.subscriptionDiscountAmount) : undefined,
+    baseAmount: md?.baseAmount ? Number(md.baseAmount) : undefined
   };
 }
 

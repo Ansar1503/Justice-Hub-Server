@@ -22,8 +22,7 @@ import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
 import { IUserSubscriptionRepo } from "@domain/IRepository/IUserSubscriptionRepo";
 
 export class CreateFollowupCheckoutSessionUsecase
-  implements ICreateFollowupCheckoutUsecase
-{
+  implements ICreateFollowupCheckoutUsecase {
   constructor(
     private _userRepository: IUserRepository,
     private _lawyerVerificationRepository: ILawyerVerificationRepo,
@@ -36,7 +35,7 @@ export class CreateFollowupCheckoutSessionUsecase
     private _redisService: IRedisService,
     private _commissionSettingsRepo: ICommissionSettingsRepo,
     private _userSubscriptionRepo: IUserSubscriptionRepo
-  ) {}
+  ) { }
   async execute(input: CreateFollowupCheckoutSessionInputDto): Promise<any> {
     const { client_id, date, duration, lawyer_id, reason, timeSlot } = input;
     const user = await this._userRepository.findByuser_id(lawyer_id);
@@ -66,26 +65,26 @@ export class CreateFollowupCheckoutSessionUsecase
     const discountAmount = Math.round(
       (lawyerDetails.consultationFee *
         (commissionSettings.initialCommission - commissionPercent)) /
-        100
+      100
     );
     const followupDiscount = discountAmount;
     let amountPaid = baseFee - followupDiscount;
 
     const userSubs = await this._userSubscriptionRepo.findByUser(client_id);
 
-    let subscriptionDiscount = 0;
-
-    if (userSubs && userSubs.benefitsSnapshot.discountPercent > 0) {
-      subscriptionDiscount = Math.round(
-        (amountPaid * userSubs.benefitsSnapshot.discountPercent) / 100
+    const subscriptionDiscountPercent = userSubs?.benefitsSnapshot?.discountPercent ?? 0;
+    let subscriptionDiscountAmount = 0;
+    if (subscriptionDiscountPercent > 0) {
+      subscriptionDiscountAmount = Math.round(
+        (amountPaid * subscriptionDiscountPercent) / 100
       );
-      amountPaid -= subscriptionDiscount;
+      amountPaid -= subscriptionDiscountAmount;
     }
 
     amountPaid = Math.max(0, amountPaid);
 
     const commissionAmount = Math.round(
-      (lawyerDetails.consultationFee * commissionPercent) / 100
+      (amountPaid * commissionPercent) / 100
     );
     const lawyerAmount = amountPaid - commissionAmount;
 
@@ -213,6 +212,9 @@ export class CreateFollowupCheckoutSessionUsecase
           commissionPercent,
           lawyerAmount,
           bookingType: "followup",
+          subscriptionDiscountAmount,
+          followupDiscountAmount: followupDiscount,
+          baseAmount: lawyerDetails.consultationFee
         });
         return stripe;
       }
@@ -303,6 +305,9 @@ export class CreateFollowupCheckoutSessionUsecase
       commissionPercent,
       lawyerAmount,
       bookingType: "followup",
+      subscriptionDiscountAmount,
+      followupDiscountAmount: followupDiscount,
+      baseAmount: lawyerDetails.consultationFee
     });
     return stripe;
   }
