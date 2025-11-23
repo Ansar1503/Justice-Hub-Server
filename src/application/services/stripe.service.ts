@@ -23,6 +23,8 @@ type WebhookResult = {
 
 type payloadType = {
   userEmail: string;
+  subscriptionDiscountPercent: number;
+  subscriptionDiscountAmount: number;
   commissionPercent: number;
   commissionAmount: number;
   lawyerAmount: number;
@@ -41,6 +43,8 @@ type payloadType = {
 
 type FollowupPayloadType = {
   userEmail: string;
+  subscriptionDiscountPercent: number;
+  subscriptionDiscountAmount: number;
   commissionPercent: number;
   commissionAmount: number;
   lawyerAmount: number;
@@ -95,6 +99,8 @@ export async function getFollowupStripeSession(payload: FollowupPayloadType) {
       commissionAmount: payload.commissionAmount,
       lawyerAmount: payload.lawyerAmount,
       bookingType: payload.bookingType,
+      subscriptionDiscountPercent: payload.subscriptionDiscountPercent,
+      subscriptionDiscountAmount: payload.subscriptionDiscountAmount,
     },
   });
 
@@ -139,6 +145,8 @@ export async function getStripeSession(payload: payloadType) {
       commissionAmount: payload.commissionAmount,
       lawyerAmount: payload.lawyerAmount,
       bookingType: payload.bookingType,
+      subscriptionDiscountPercent: payload.subscriptionDiscountPercent,
+      subscriptionDiscountAmount: payload.subscriptionDiscountAmount,
     },
   });
 
