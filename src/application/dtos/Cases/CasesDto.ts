@@ -20,6 +20,6 @@ export interface UpdateCaseDto {
     title?: string;
     summary?: string;
     estimatedValue?: number;
-    nextHearing?: string;
+    nextHearing?: Date;
     status?: StatusType;
 }
