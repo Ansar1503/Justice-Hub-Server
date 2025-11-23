@@ -22,8 +22,7 @@ import { ICommissionSettingsRepo } from "@domain/IRepository/ICommissionSettings
 import { IUserSubscriptionRepo } from "@domain/IRepository/IUserSubscriptionRepo";
 
 export class CreateCheckoutSessionUseCase
-  implements ICreateCheckoutSessionUseCase
-{
+  implements ICreateCheckoutSessionUseCase {
   constructor(
     private _userRepository: IUserRepository,
     private _lawyerVerificationRepository: ILawyerVerificationRepo,
@@ -36,7 +35,7 @@ export class CreateCheckoutSessionUseCase
     private _redisService: IRedisService,
     private _commissionSettingsRepo: ICommissionSettingsRepo,
     private _userSubscriptionRepo: IUserSubscriptionRepo
-  ) {}
+  ) { }
   async execute(input: CreateCheckoutSessionInputDto): Promise<any> {
     const { client_id, date, duration, lawyer_id, reason, timeSlot } = input;
     const user = await this._userRepository.findByuser_id(lawyer_id);
@@ -49,6 +48,7 @@ export class CreateCheckoutSessionUseCase
     if (!lawyerVerificaitionDetails) throw new Error(ERRORS.USER_NOT_FOUND);
     if (lawyerVerificaitionDetails.verificationStatus !== "verified")
       throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
+
     const slotDateTime = timeStringToDate(date, timeSlot);
     if (slotDateTime <= new Date()) {
       const err: any = new Error("Selected time slot is in the past");
@@ -61,26 +61,23 @@ export class CreateCheckoutSessionUseCase
       await this._commissionSettingsRepo.fetchCommissionSettings();
     if (!commissionSettings)
       throw new Error("Commission settings not set by Admin");
-    const baseFee = lawyerDetails.consultationFee;
 
-    const discountedFee = baseFee;
+    const baseFee = lawyerDetails.consultationFee;
     let amountPaid = baseFee;
 
     const userSubs = await this._userSubscriptionRepo.findByUser(client_id);
+    const discountPercent = userSubs?.benefitsSnapshot?.discountPercent ?? 0;
 
-    if (userSubs && userSubs.benefitsSnapshot.discountPercent > 0) {
+    if (discountPercent > 0) {
       const subscriptionDiscount = Math.round(
-        (amountPaid * userSubs.benefitsSnapshot.discountPercent) / 100
+        (amountPaid * discountPercent) / 100
       );
-      amountPaid -= subscriptionDiscount;
+      amountPaid = Math.max(0, amountPaid - subscriptionDiscount);
     }
 
-    amountPaid = Math.max(0, amountPaid);
     const commissionPercent = commissionSettings.initialCommission;
-    const commissionAmount = Math.round(
-      (discountedFee * commissionPercent) / 100
-    );
-    const lawyerAmount = discountedFee - commissionAmount;
+    const commissionAmount = Math.round((baseFee * commissionPercent) / 100);
+    const lawyerAmount = baseFee - commissionAmount;
 
     if (!slotSettings) {
       const error: any = new Error("slot settings not found for the lawyer");
