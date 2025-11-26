@@ -5,6 +5,7 @@ export const AuthRoute = {
   verifyMail: "/verify-email",
   verifyOtp: "/verify-otp",
   resendOtp: "/resend-otp",
+  google: "/google"
 };
 
 export const AdminRoutes = {

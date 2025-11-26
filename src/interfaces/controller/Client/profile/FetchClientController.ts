@@ -13,7 +13,7 @@ export class FetchClientDataController implements IController {
         private fetchClientData: IFetchClientDataUseCase,
         private httpErrors: IHttpErrors = new HttpErrors(),
         private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    ) {}
+    ) { }
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const user_id = (httpRequest as Record<string, any>)?.user?.id;
         if (!user_id) {

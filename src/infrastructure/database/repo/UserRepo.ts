@@ -17,9 +17,6 @@ export class UserRepository implements IUserRepository {
     const mapped = this.Mapper.toPersistence(user);
     const savedUser = await new UserModel(mapped)
       .save({ session: this._session })
-      .catch((err) => {
-        throw new Error("Db error creating user");
-      });
     return this.Mapper.toDomain(savedUser);
   }
 

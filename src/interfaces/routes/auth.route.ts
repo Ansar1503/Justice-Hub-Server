@@ -9,6 +9,7 @@ import { ResendOtpComposer } from "@infrastructure/services/composers/Auth/Resen
 import { AuthRoute } from "@shared/constant/RouteConstant";
 import { handleValidationErrors } from "../middelwares/validator/validation.middleware";
 import { validateUser } from "../middelwares/validator/user.validator";
+import { GoogleAuthComposer } from "@infrastructure/services/composers/Auth/GoogleAuthComposer";
 
 const router = express.Router();
 router.post(AuthRoute.signup, validateUser, handleValidationErrors, async (req: Request, res: Response) => {
@@ -49,6 +50,16 @@ router.post(AuthRoute.resendOtp, async (req: Request, res: Response) => {
     res.status(adapter.statusCode).json(adapter.body);
     return;
 });
-// router.post("/google/signup", GoogleRegistration);
+router.post(AuthRoute.google, async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, GoogleAuthComposer())
+    res.cookie("refresh", adapter.body?.refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.status(adapter.statusCode).json(adapter.body)
+    return
+});
 
 export default router;
