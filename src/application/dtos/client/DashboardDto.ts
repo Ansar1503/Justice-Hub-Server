@@ -73,15 +73,23 @@ export interface DashboardSummaryDto {
   totalUsers: number;
   totalLawyers: number;
   totalClients: number;
-  totalRevenue: number;
-  commissionPaid: number;
+  totalCommission: number;
+  totalLawyerPayouts: number;
+  totalBookingAmountCollected: number;
+  commissionGrowthPercent: number;
+  subscriptionRevenue: number;
+  subscriptionGrowthPercent: number;
+  activeSubscriptions: number;
+  expiredSubscriptions: number;
+  newSubscriptions: number;
   activeCases: number;
-  growthPercent: number;
+  totalRevenue: number;
 }
 
 export interface DashboardTrendItemDto {
   date: string;
-  revenue: number;
+  commissionRevenue: number;
+  subscriptionRevenue: number;
   cases: number;
 }
 
