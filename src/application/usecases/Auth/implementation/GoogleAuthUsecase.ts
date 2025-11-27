@@ -45,6 +45,9 @@ export class GoogleAuthUsecase implements IGoogleAuthUsecase {
                     throw new Error("Database Error creating client")
                 }
             }
+            if (user.is_blocked) {
+                throw new Error("User is blocked")
+            }
             const client = await uow.clientRepo.findByUserId(user.user_id)
             if (!client) {
                 try {
