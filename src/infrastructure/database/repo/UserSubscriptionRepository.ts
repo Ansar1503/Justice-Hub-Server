@@ -72,7 +72,7 @@ export class UserSubscriptionRepository
         $lookup: {
           from: "subscriptionplans",
           localField: "planId",
-          foreignField: "id",
+          foreignField: "_id",
           as: "plan",
         },
       },
@@ -110,7 +110,7 @@ export class UserSubscriptionRepository
         $lookup: {
           from: "subscriptionplans",
           localField: "planId",
-          foreignField: "id",
+          foreignField: "_id",
           as: "plan",
         },
       },
