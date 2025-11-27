@@ -11,4 +11,18 @@ export interface IUserSubscriptionRepo
     subscriptionId: string
   ): Promise<UserSubscription | null>;
   findByStripeCustomerId(customerId: string): Promise<UserSubscription | null>;
+  getSubscriptionRevenueSummary(start: Date, end: Date): Promise<{
+    totalSubscriptionRevenue: number;
+    newSubscriptions: number;
+  }>;
+
+  getSubscriptionTrends(start: Date, end: Date): Promise<
+    { date: string; revenue: number }[]
+  >;
+
+  getSubscriptionGrowth(start: Date, end: Date): Promise<number>;
+
+  countActiveSubscriptions(): Promise<number>;
+  countExpiredSubscriptions(): Promise<number>;
+  countNewSubscriptions(start: Date, end: Date): Promise<number>;
 }
