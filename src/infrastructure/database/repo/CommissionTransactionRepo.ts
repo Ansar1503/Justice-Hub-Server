@@ -115,23 +115,17 @@ export class CommissionTransactionRepo
   }
   async getCommissionGrowth(start: Date, end: Date): Promise<number> {
     const duration = end.getTime() - start.getTime();
-  
     const prevStart = new Date(start.getTime() - duration);
     const prevEnd = new Date(end.getTime() - duration);
-  
     const current = await this.getCommissionSummary(start, end);
     const prev = await this.getCommissionSummary(prevStart, prevEnd);
-  
     if (prev.totalCommission === 0) {
       return current.totalCommission === 0 ? 0 : 100;
     }
-  
     const growth =
       ((current.totalCommission - prev.totalCommission) /
         prev.totalCommission) *
       100;
-  
     return Number(growth.toFixed(2));
   }
-  
 }
