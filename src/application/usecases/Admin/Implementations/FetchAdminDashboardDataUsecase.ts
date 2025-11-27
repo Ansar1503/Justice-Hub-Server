@@ -70,33 +70,7 @@ export class FetchAdminDashboardDataUsecase
     const totalRevenue =
       commissionSummary.totalCommission +
       subscriptionSummary.totalSubscriptionRevenue;
-    console.log({
-      summary: {
-        totalUsers,
-        totalLawyers,
-        totalClients,
-        activeCases,
-        totalCommission: commissionSummary.totalCommission,
-        totalLawyerPayouts: commissionSummary.totalLawyerShare,
-        totalBookingAmountCollected: commissionSummary.totalCollected,
-        commissionGrowthPercent: commissionGrowth,
-        subscriptionRevenue: subscriptionSummary.totalSubscriptionRevenue,
-        subscriptionGrowthPercent: subscriptionGrowth,
-        activeSubscriptions,
-        expiredSubscriptions,
-        newSubscriptions,
-        totalRevenue,
-      },
-      trends,
-      topLawyers,
-      recentTransactions: recentTransactions.map((t) => ({
-        id: t.id,
-        amount: t.amount,
-        status: t.status,
-        date: t.createdAt.toISOString(),
-      })),
-      recentDisputes,
-    });
+   
     return {
       summary: {
         totalUsers,
