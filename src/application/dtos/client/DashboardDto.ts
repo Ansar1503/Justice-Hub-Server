@@ -76,7 +76,6 @@ export interface DashboardSummaryDto {
   totalRevenue: number;
   commissionPaid: number;
   activeCases: number;
-  disputesOpen: number;
   growthPercent: number;
 }
 

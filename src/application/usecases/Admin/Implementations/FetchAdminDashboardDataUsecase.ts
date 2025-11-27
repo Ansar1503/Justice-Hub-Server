@@ -7,15 +7,14 @@ import { ICaseRepo } from "@domain/IRepository/ICaseRepo";
 import { ICommissionTransactionRepo } from "@domain/IRepository/ICommissionTransactionRepo";
 
 export class FetchAdminDashboardDataUsecase
-  implements IFetchDashboardDataUsecase
-{
+  implements IFetchDashboardDataUsecase {
   constructor(
     private _userRepo: IUserRepository,
     private _transactionRepo: IWalletTransactionsRepo,
     private _disputesRepo: IDisputes,
     private _casesRepo: ICaseRepo,
     private _commissionRepo: ICommissionTransactionRepo
-  ) {}
+  ) { }
 
   async execute(input: { start: Date; end: Date }): Promise<AdminDashboardDto> {
     const [totalClients, totalLawyers] = await Promise.all([
@@ -31,14 +30,12 @@ export class FetchAdminDashboardDataUsecase
       recentTransactions,
       recentDisputes,
       activeCases,
-      disputesOpen,
     ] = await Promise.all([
       this._commissionRepo.getCommissionSummary(input.start, input.end),
       this._transactionRepo.getTopLawyerByEarnings(input.start, input.end),
       this._transactionRepo.getRecentTransactions(5),
       this._disputesRepo.getRecentDisputes(5),
       this._casesRepo.countOpen(),
-      this._disputesRepo.countOpen(),
     ]);
     const growthPercent = await this._commissionRepo.getCommissionGrowth(
       input.start,
@@ -65,7 +62,6 @@ export class FetchAdminDashboardDataUsecase
         totalRevenue: commissionSummary.totalCommission,
         commissionPaid: commissionSummary.totalLawyerShare,
         activeCases,
-        disputesOpen,
         growthPercent,
       },
       trends,
