@@ -40,6 +40,7 @@ import { AddSubscriptionPlanComposer } from "@infrastructure/services/composers/
 import { FetchAllSubscriptionPlansComposer } from "@infrastructure/services/composers/Subscriptions/FetchAllSubscriptionPlansComposer";
 import { UpdateSubscriptionPlanComposer } from "@infrastructure/services/composers/Subscriptions/UpdateSubscriptionPlanComposer";
 import { ChangeActiveSubscriptionStatusComposer } from "@infrastructure/services/composers/Subscriptions/ChangeActiveSubscriptionStatusComposer";
+import { GenerateSalesReportComposer } from "@infrastructure/services/composers/Admin/GenerateSalesReportComposer";
 
 const router = Router();
 
@@ -305,6 +306,15 @@ router.patch(
       req,
       ChangeActiveSubscriptionStatusComposer()
     );
+    res.status(adapter.statusCode).json(adapter.body);
+  }
+);
+
+router.get(
+  `${AdminRoutes.dashboard}${AdminRoutes.salesReport}`,
+  authenticateUser,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, GenerateSalesReportComposer());
     res.status(adapter.statusCode).json(adapter.body);
   }
 );

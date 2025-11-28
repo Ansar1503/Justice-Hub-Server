@@ -128,4 +128,71 @@ export class CommissionTransactionRepo
       100;
     return Number(growth.toFixed(2));
   }
+  async getSalesReport(start: string, end: string): Promise<any[]> {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+
+    const results = await this.model.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startDate, $lte: endDate },
+          status: "credited",
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "lawyerId",
+          foreignField: "user_id",
+          as: "lawyer",
+        },
+      },
+      {
+        $unwind: {
+          path: "$lawyer",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "clientId",
+          foreignField: "user_id",
+          as: "client",
+        },
+      },
+      {
+        $unwind: {
+          path: "$client",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          id: "$_id",
+          bookingId: 1,
+          clientId: 1,
+          lawyerId: 1,
+          baseFee: 1,
+          subscriptionDiscount: 1,
+          followupDiscount: 1,
+          amountPaid: 1,
+          commissionPercent: 1,
+          commissionAmount: 1,
+          lawyerAmount: 1,
+          type: 1,
+          status: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          lawyerName: "$lawyer.name",
+          clientName: "$client.name",
+        },
+      },
+
+      { $sort: { createdAt: 1 } },
+    ]);
+
+    return results ? results : [];
+  }
 }

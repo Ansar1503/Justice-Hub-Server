@@ -10,6 +10,7 @@ export const AuthRoute = {
 
 export const AdminRoutes = {
   dashboard: "/dashboard",
+  salesReport: "/sales-report",
   overview: "/overview",
   users: "/users",
   lawyers: "/lawyers",
