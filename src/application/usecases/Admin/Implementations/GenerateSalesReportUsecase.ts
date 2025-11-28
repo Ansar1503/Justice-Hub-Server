@@ -43,8 +43,14 @@ export class GenerateSalesReportUsecase implements IGenerateSalesReport {
       lawyerAmount: t.lawyerAmount,
       status: t.status,
     }));
+    const summary = {
+      totalPaid: rows.reduce((sum, r) => sum + r.amountPaid, 0),
+      totalCommission: rows.reduce((sum, r) => sum + r.commissionAmount, 0),
+      totalLawyerShare: rows.reduce((sum, r) => sum + r.lawyerAmount, 0),
+      totalBookings: rows.length,
+    };
     const generator = this._reportService.get(format);
-    const buffer = await generator.generateReport(rows);
+    const buffer = await generator.generateReport(rows, summary);
     return {
       buffer,
       mimeType: generator.getMimeType(),
