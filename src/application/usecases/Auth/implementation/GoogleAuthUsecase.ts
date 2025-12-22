@@ -67,7 +67,6 @@ export class GoogleAuthUsecase implements IGoogleAuthUsecase {
           });
           await uow.clientRepo.create(client);
         } catch (error) {
-          console.log(error);
           throw new Error("Database Error creating client");
         }
       }

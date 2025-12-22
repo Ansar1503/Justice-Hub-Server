@@ -25,7 +25,6 @@ export class GoogleAuthController implements IController {
                 user: result.user
             })
         } catch (error) {
-            console.log(error)
             if (error instanceof Error) {
                 return this._errors.error_400(error.message)
             }
