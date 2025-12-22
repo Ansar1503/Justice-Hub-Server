@@ -3,7 +3,6 @@ import {
   GoogleAuthOutputDto,
 } from "@src/application/dtos/client/GoogleAuthDto";
 import { IGoogleAuthUsecase } from "../IgoogleAuthUsecase";
-import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { IGoogleAuthProvider } from "@src/application/providers/IGoogleAuthProvider";
 import { User } from "@domain/entities/User";
 import { IJwtProvider } from "@src/application/providers/JwtProvider";
@@ -68,6 +67,7 @@ export class GoogleAuthUsecase implements IGoogleAuthUsecase {
           });
           await uow.clientRepo.create(client);
         } catch (error) {
+          console.log(error);
           throw new Error("Database Error creating client");
         }
       }
