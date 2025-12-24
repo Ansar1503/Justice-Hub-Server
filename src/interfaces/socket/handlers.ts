@@ -29,7 +29,8 @@ const CreateNotification = new NotificationUsecase(
   new NotificationRepository(),
   new SessionsRepository(),
   new ChatSessionRepository(),
-  new AppointmentsRepository()
+  new AppointmentsRepository(),
+  new UserSubscriptionRepository(new UserSubscriptionMapper())
 );
 
 export class SocketHandlers {
