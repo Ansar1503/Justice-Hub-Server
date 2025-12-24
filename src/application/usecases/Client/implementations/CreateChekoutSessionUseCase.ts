@@ -20,9 +20,11 @@ import { IRedisService } from "@domain/IRepository/Redis/IRedisService";
 import { ICreateCheckoutSessionUseCase } from "../ICreateCheckoutSessionUseCase";
 import { ICommissionSettingsRepo } from "@domain/IRepository/ICommissionSettingsRepo";
 import { IUserSubscriptionRepo } from "@domain/IRepository/IUserSubscriptionRepo";
+import { endOfMonth, startOfMonth } from "date-fns";
 
 export class CreateCheckoutSessionUseCase
-  implements ICreateCheckoutSessionUseCase {
+  implements ICreateCheckoutSessionUseCase
+{
   constructor(
     private _userRepository: IUserRepository,
     private _lawyerVerificationRepository: ILawyerVerificationRepo,
@@ -35,7 +37,7 @@ export class CreateCheckoutSessionUseCase
     private _redisService: IRedisService,
     private _commissionSettingsRepo: ICommissionSettingsRepo,
     private _userSubscriptionRepo: IUserSubscriptionRepo
-  ) { }
+  ) {}
   async execute(input: CreateCheckoutSessionInputDto): Promise<any> {
     const { client_id, date, duration, lawyer_id, reason, timeSlot } = input;
     const user = await this._userRepository.findByuser_id(lawyer_id);
@@ -63,7 +65,8 @@ export class CreateCheckoutSessionUseCase
       throw new Error("Commission settings not set by Admin");
     let amountPaid = lawyerDetails.consultationFee;
     const userSubs = await this._userSubscriptionRepo.findByUser(client_id);
-    const subscriptionDiscountPercent = userSubs?.benefitsSnapshot?.discountPercent ?? 0;
+    const subscriptionDiscountPercent =
+      userSubs?.benefitsSnapshot?.discountPercent ?? 0;
     let subscriptionDiscountAmount = 0;
     if (subscriptionDiscountPercent > 0) {
       subscriptionDiscountAmount = Math.round(
@@ -115,7 +118,26 @@ export class CreateCheckoutSessionUseCase
       (appointment) =>
         appointment.time === timeSlot && appointment.payment_status !== "failed"
     );
+
     const existingApps = await this._appointmentRepo.findByClientID(client_id);
+    if (
+      userSubs?.benefitsSnapshot.bookingsPerMonth &&
+      userSubs?.benefitsSnapshot?.bookingsPerMonth !== "unlimited" &&
+      userSubs?.benefitsSnapshot?.bookingsPerMonth > 0
+    ) {
+      const monthStart = startOfMonth(new Date());
+      const monthEnd = endOfMonth(new Date());
+      const existingAppsOnMonth = existingApps.filter(
+        (a) => a.date >= monthStart && a.date <= monthEnd
+      );
+      if (
+        existingAppsOnMonth.length >=
+        userSubs?.benefitsSnapshot?.bookingsPerMonth
+      ) {
+        throw new Error("Number of booking exceeded");
+      }
+    }
+
     let numberOfCancel;
     if (existingApps && existingApps.length > 0) {
       numberOfCancel = existingApps.filter(
@@ -202,7 +224,7 @@ export class CreateCheckoutSessionUseCase
           lawyerAmount,
           bookingType: "initial",
           subscriptionDiscountAmount,
-          baseAmount: lawyerDetails.consultationFee
+          baseAmount: lawyerDetails.consultationFee,
         });
         return stripe;
       }

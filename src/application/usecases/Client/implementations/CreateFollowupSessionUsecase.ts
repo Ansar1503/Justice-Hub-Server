@@ -20,9 +20,11 @@ import { GetAppointmentRedisKey } from "@shared/utils/helpers/GetAppointmentKey"
 import { getFollowupStripeSession } from "@src/application/services/stripe.service";
 import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
 import { IUserSubscriptionRepo } from "@domain/IRepository/IUserSubscriptionRepo";
+import { endOfMonth, startOfMonth } from "date-fns";
 
 export class CreateFollowupCheckoutSessionUsecase
-  implements ICreateFollowupCheckoutUsecase {
+  implements ICreateFollowupCheckoutUsecase
+{
   constructor(
     private _userRepository: IUserRepository,
     private _lawyerVerificationRepository: ILawyerVerificationRepo,
@@ -35,7 +37,7 @@ export class CreateFollowupCheckoutSessionUsecase
     private _redisService: IRedisService,
     private _commissionSettingsRepo: ICommissionSettingsRepo,
     private _userSubscriptionRepo: IUserSubscriptionRepo
-  ) { }
+  ) {}
   async execute(input: CreateFollowupCheckoutSessionInputDto): Promise<any> {
     const { client_id, date, duration, lawyer_id, reason, timeSlot } = input;
     const user = await this._userRepository.findByuser_id(lawyer_id);
@@ -65,14 +67,15 @@ export class CreateFollowupCheckoutSessionUsecase
     const discountAmount = Math.round(
       (lawyerDetails.consultationFee *
         (commissionSettings.initialCommission - commissionPercent)) /
-      100
+        100
     );
     const followupDiscount = discountAmount;
     let amountPaid = baseFee - followupDiscount;
 
     const userSubs = await this._userSubscriptionRepo.findByUser(client_id);
 
-    const subscriptionDiscountPercent = userSubs?.benefitsSnapshot?.discountPercent ?? 0;
+    const subscriptionDiscountPercent =
+      userSubs?.benefitsSnapshot?.discountPercent ?? 0;
     let subscriptionDiscountAmount = 0;
     if (subscriptionDiscountPercent > 0) {
       subscriptionDiscountAmount = Math.round(
@@ -83,9 +86,7 @@ export class CreateFollowupCheckoutSessionUsecase
 
     amountPaid = Math.max(0, amountPaid);
 
-    const commissionAmount = Math.round(
-      (amountPaid * commissionPercent) / 100
-    );
+    const commissionAmount = Math.round((amountPaid * commissionPercent) / 100);
     const lawyerAmount = amountPaid - commissionAmount;
 
     if (!slotSettings) {
@@ -128,6 +129,25 @@ export class CreateFollowupCheckoutSessionUsecase
         appointment.time === timeSlot && appointment.payment_status !== "failed"
     );
     const existingApps = await this._appointmentRepo.findByClientID(client_id);
+
+    if (
+      userSubs?.benefitsSnapshot.bookingsPerMonth &&
+      userSubs?.benefitsSnapshot?.bookingsPerMonth !== "unlimited" &&
+      userSubs?.benefitsSnapshot?.bookingsPerMonth > 0
+    ) {
+      const monthStart = startOfMonth(new Date());
+      const monthEnd = endOfMonth(new Date());
+      const existingAppsOnMonth = existingApps.filter(
+        (a) => a.date >= monthStart && a.date <= monthEnd
+      );
+      if (
+        existingAppsOnMonth.length >=
+        userSubs?.benefitsSnapshot?.bookingsPerMonth
+      ) {
+        throw new Error("Number of booking exceeded");
+      }
+    }
+
     let numberOfCancel;
     if (existingApps && existingApps.length > 0) {
       numberOfCancel = existingApps.filter(
@@ -214,7 +234,7 @@ export class CreateFollowupCheckoutSessionUsecase
           bookingType: "followup",
           subscriptionDiscountAmount,
           followupDiscountAmount: followupDiscount,
-          baseAmount: lawyerDetails.consultationFee
+          baseAmount: lawyerDetails.consultationFee,
         });
         return stripe;
       }
@@ -307,7 +327,7 @@ export class CreateFollowupCheckoutSessionUsecase
       bookingType: "followup",
       subscriptionDiscountAmount,
       followupDiscountAmount: followupDiscount,
-      baseAmount: lawyerDetails.consultationFee
+      baseAmount: lawyerDetails.consultationFee,
     });
     return stripe;
   }
