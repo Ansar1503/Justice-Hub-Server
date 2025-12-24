@@ -128,7 +128,11 @@ export class CreateCheckoutSessionUseCase
       const monthStart = startOfMonth(new Date());
       const monthEnd = endOfMonth(new Date());
       const existingAppsOnMonth = existingApps.filter(
-        (a) => a.date >= monthStart && a.date <= monthEnd
+        (a) =>
+          a.date >= monthStart &&
+          a.date <= monthEnd &&
+          a.status !== "cancelled" &&
+          a.status !== "rejected"
       );
       if (
         existingAppsOnMonth.length >=
