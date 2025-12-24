@@ -49,20 +49,6 @@ export class BookFollowupAppointmentByWalletUsecase
         error.code = 404;
         throw error;
       }
-      const myWallet = await uow.walletRepo.getWalletByUserId(client_id);
-      if (!myWallet) throw new Error("wallet not found");
-
-      if (myWallet.balance < lawyerDetails.consultationFee) {
-        throw new Error("Insufficient balance");
-      }
-
-      const availableSlots =
-        await uow.availableSlotsRepo.findAvailableSlots(lawyer_id);
-      if (!availableSlots) {
-        const error: any = new Error("No available slots found for the lawyer");
-        error.code = 404;
-        throw error;
-      }
       const commissionSettings =
         await this.commissionSettingsRepo.fetchCommissionSettings();
       if (!commissionSettings) {
@@ -70,6 +56,9 @@ export class BookFollowupAppointmentByWalletUsecase
         error.code = 404;
         throw error;
       }
+
+      const myWallet = await uow.walletRepo.getWalletByUserId(client_id);
+      if (!myWallet) throw new Error("wallet not found");
       const userSubs = await uow.userSubscriptionRepo.findByUser(client_id);
       const baseFee = lawyerDetails.consultationFee;
       const followupDiscount = Math.round(
@@ -99,6 +88,17 @@ export class BookFollowupAppointmentByWalletUsecase
         (amountPaid * commissionPercent) / 100
       );
       const lawyerAmount = amountPaid - commissionAmount;
+      if (myWallet.balance < amountPaid) {
+        throw new Error("Insufficient balance");
+      }
+
+      const availableSlots =
+        await uow.availableSlotsRepo.findAvailableSlots(lawyer_id);
+      if (!availableSlots) {
+        const error: any = new Error("No available slots found for the lawyer");
+        error.code = 404;
+        throw error;
+      }
       const override = await uow.overrideSlotsRepo.fetcghOverrideSlotByDate(
         lawyer_id,
         date
