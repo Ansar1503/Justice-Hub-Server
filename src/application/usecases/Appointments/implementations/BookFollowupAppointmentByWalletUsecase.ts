@@ -10,11 +10,16 @@ import { ERRORS } from "@infrastructure/constant/errors";
 import { STATUS_CODES } from "@infrastructure/constant/status.codes";
 import { Appointment as AppointmentEntity } from "@domain/entities/Appointment";
 import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
+import { ICommissionSettingsRepo } from "@domain/IRepository/ICommissionSettingsRepo";
+import { CommissionTransaction } from "@domain/entities/CommissionTransaction";
 
 export class BookFollowupAppointmentByWalletUsecase
   implements IBookFollowupAppointmentByWalletUsecase
 {
-  constructor(private _uow: IUnitofWork) {}
+  constructor(
+    private _uow: IUnitofWork,
+    private commissionSettingsRepo: ICommissionSettingsRepo
+  ) {}
   async execute(
     input: CreateFollowupCheckoutSessionInputDto
   ): Promise<Appointment> {
@@ -46,9 +51,11 @@ export class BookFollowupAppointmentByWalletUsecase
       }
       const myWallet = await uow.walletRepo.getWalletByUserId(client_id);
       if (!myWallet) throw new Error("wallet not found");
+
       if (myWallet.balance < lawyerDetails.consultationFee) {
         throw new Error("Insufficient balance");
       }
+
       const availableSlots =
         await uow.availableSlotsRepo.findAvailableSlots(lawyer_id);
       if (!availableSlots) {
@@ -56,6 +63,42 @@ export class BookFollowupAppointmentByWalletUsecase
         error.code = 404;
         throw error;
       }
+      const commissionSettings =
+        await this.commissionSettingsRepo.fetchCommissionSettings();
+      if (!commissionSettings) {
+        const error: any = new Error("Commission settings not found");
+        error.code = 404;
+        throw error;
+      }
+      const userSubs = await uow.userSubscriptionRepo.findByUser(client_id);
+      const baseFee = lawyerDetails.consultationFee;
+      const followupDiscount = Math.round(
+        (baseFee *
+          (commissionSettings.initialCommission -
+            commissionSettings.followupCommission)) /
+          100
+      );
+
+      let amountPaid = baseFee - followupDiscount;
+      const subscriptionDiscountPercent =
+        userSubs?.benefitsSnapshot?.discountPercent ?? 0;
+
+      let subscriptionDiscountAmount = 0;
+      if (subscriptionDiscountPercent > 0) {
+        subscriptionDiscountAmount = Math.round(
+          (amountPaid * subscriptionDiscountPercent) / 100
+        );
+        amountPaid -= subscriptionDiscountAmount;
+      }
+      amountPaid = Math.max(0, amountPaid);
+      if (myWallet.balance < amountPaid) {
+        throw new Error("Insufficient balance");
+      }
+      const commissionPercent = commissionSettings.followupCommission;
+      const commissionAmount = Math.round(
+        (amountPaid * commissionPercent) / 100
+      );
+      const lawyerAmount = amountPaid - commissionAmount;
       const override = await uow.overrideSlotsRepo.fetcghOverrideSlotByDate(
         lawyer_id,
         date
@@ -150,6 +193,20 @@ export class BookFollowupAppointmentByWalletUsecase
             adminWallet.user_id,
             adminWallet.balance + appointmentCreated.amount
           );
+          const commissionTransaction = CommissionTransaction.create({
+            amountPaid,
+            bookingId: appointmentCreated.bookingId,
+            clientId: client_id,
+            lawyerId: lawyer_id,
+            commissionPercent,
+            commissionAmount,
+            lawyerAmount,
+            type: "followup",
+            baseFee,
+            subscriptionDiscount: subscriptionDiscountAmount,
+            followupDiscount,
+          });
+          await uow.commissionTransactionRepo.create(commissionTransaction);
           return {
             amount: appointmentCreated.amount,
             bookingId: appointmentCreated.bookingId,
@@ -233,10 +290,31 @@ export class BookFollowupAppointmentByWalletUsecase
       });
       const appointmentCreated =
         await uow.appointmentRepo.create(newappointment);
+      const adminWallet = await uow.walletRepo.getAdminWallet();
+      if (!adminWallet) throw new Error("Admin wallet not found");
       await uow.walletRepo.updateBalance(
         myWallet.user_id,
         Math.max(0, myWallet.balance - appointmentCreated.amount)
       );
+      await uow.walletRepo.updateBalance(
+        adminWallet.user_id,
+        adminWallet.balance + amountPaid
+      );
+      const commissionTransaction = CommissionTransaction.create({
+        amountPaid,
+        bookingId: appointmentCreated.bookingId,
+        clientId: client_id,
+        lawyerId: lawyer_id,
+        commissionPercent,
+        commissionAmount,
+        lawyerAmount,
+        type: "followup",
+        baseFee,
+        subscriptionDiscount: subscriptionDiscountAmount,
+        followupDiscount,
+      });
+      await uow.commissionTransactionRepo.create(commissionTransaction);
+
       return {
         amount: appointmentCreated.amount,
         bookingId: appointmentCreated.bookingId,
