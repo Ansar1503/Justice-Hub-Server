@@ -93,6 +93,7 @@ import { FetchBlogsByClientComposer } from "@infrastructure/services/composers/B
 import { FetchBlogDetailsByBlogIdComposer } from "@infrastructure/services/composers/Blog/FetchBlogDetailsByBlogIdComposer";
 import { LikeOrDislikeBlogComposer } from "@infrastructure/services/composers/Blog/LikeOrDislikeBlogComposer";
 import { FetchAmountPayableComposer } from "@infrastructure/services/composers/Client/FetchAmountPayableComposer";
+import { BookFollowupAppointmentByWalletComposer } from "@infrastructure/services/composers/Client/Appointment/BookFollowupAppointmentByWalletComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -768,6 +769,20 @@ router.post(
     const adapter = await expressAdapter(
       req,
       BookAppointmentByWalletComposer()
+    );
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
+
+router.post(
+  ClientRoutes.lawyers.walletbookFollowup,
+  authenticateUser,
+  authenticateClient,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(
+      req,
+      BookFollowupAppointmentByWalletComposer()
     );
     res.status(adapter.statusCode).json(adapter.body);
     return;
