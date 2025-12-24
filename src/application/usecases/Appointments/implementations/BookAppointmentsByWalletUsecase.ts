@@ -13,6 +13,8 @@ import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
 import { IBookAppointmentsByWalletUsecase } from "../IBookAppointmentsByWalletUsecase";
 import { ICommissionSettingsRepo } from "@domain/IRepository/ICommissionSettingsRepo";
 import { CommissionTransaction } from "@domain/entities/CommissionTransaction";
+import { generateDescription } from "@shared/utils/helpers/WalletDescriptionsHelper";
+import { WalletTransaction } from "@domain/entities/WalletTransactions";
 
 export class BookAppointmentByWalletUsecase
   implements IBookAppointmentsByWalletUsecase
@@ -183,6 +185,34 @@ export class BookAppointmentByWalletUsecase
             await uow.appointmentRepo.create(newappointment);
           const adminWallet = await uow.walletRepo.getAdminWallet();
           if (!adminWallet) throw new Error("admins wallet not found");
+          const adminDescription = generateDescription({
+            amount: amountPaid,
+            category: "transfer",
+            type: "credit",
+          });
+          const clientDescription = generateDescription({
+            amount: amountPaid,
+            category: "transfer",
+            type: "debit",
+          });
+          const clientTransaction = WalletTransaction.create({
+            amount: amountPaid,
+            category: "transfer",
+            type: "debit",
+            description: clientDescription,
+            walletId: myWallet.id,
+            status: "completed",
+          });
+          const adminTransaction = WalletTransaction.create({
+            amount: amountPaid,
+            category: "transfer",
+            type: "credit",
+            description: adminDescription,
+            walletId: adminWallet.id,
+            status: "completed",
+          });
+          await uow.transactionsRepo.create(clientTransaction);
+          await uow.transactionsRepo.create(adminTransaction);
           await uow.walletRepo.updateBalance(
             myWallet.user_id,
             Math.max(0, myWallet.balance - appointmentCreated.amount)
@@ -299,7 +329,34 @@ export class BookAppointmentByWalletUsecase
         await uow.appointmentRepo.create(newappointment);
       const adminWallet = await uow.walletRepo.getAdminWallet();
       if (!adminWallet) throw new Error("admins wallet not found");
-      
+      const adminDescription = generateDescription({
+        amount: amountPaid,
+        category: "transfer",
+        type: "credit",
+      });
+      const clientDescription = generateDescription({
+        amount: amountPaid,
+        category: "transfer",
+        type: "debit",
+      });
+      const clientTransaction = WalletTransaction.create({
+        amount: amountPaid,
+        category: "transfer",
+        type: "debit",
+        description: clientDescription,
+        walletId: myWallet.id,
+        status: "completed",
+      });
+      const adminTransaction = WalletTransaction.create({
+        amount: amountPaid,
+        category: "transfer",
+        type: "credit",
+        description: adminDescription,
+        walletId: adminWallet.id,
+        status: "completed",
+      });
+      await uow.transactionsRepo.create(clientTransaction);
+      await uow.transactionsRepo.create(adminTransaction);
       await uow.walletRepo.updateBalance(
         myWallet.user_id,
         Math.max(0, myWallet.balance - appointmentCreated.amount)
