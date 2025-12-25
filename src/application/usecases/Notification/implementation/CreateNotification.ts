@@ -35,13 +35,13 @@ export class NotificationUsecase implements ICreateNotification {
       startTime.setMinutes(
         startTime.getMinutes() + appointmentDetails.duration + 5
       );
-      const newDate = new Date();
-      if (newDate < startTime) {
-        throw new ValidationError("Session has not started yet");
-      }
-      if (newDate > startTime) {
-        throw new ValidationError("Session has ended");
-      }
+      // const newDate = new Date();
+      // if (newDate < startTime) {
+      //   throw new ValidationError("Session has not started yet");
+      // }
+      // if (newDate > startTime) {
+      //   throw new ValidationError("Session has ended");
+      // }
     } else {
       const chatSession = await this._chatSessionRepo.findById(
         input.sessionId || ""
