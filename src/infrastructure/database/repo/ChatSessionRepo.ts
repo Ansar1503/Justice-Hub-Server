@@ -26,14 +26,13 @@ export class ChatSessionRepository implements IChatSessionRepo {
     const limit = 10;
     const skip = page > 0 ? Math.abs(page - 1) * limit : 0;
 
-    const matchStage = {
+    const matchStage: Record<string, any> = {
       [role === "client" ? "participants.client_id" : "participants.lawyer_id"]:
         user_id,
     };
     if (search.trim()) {
-      matchStage["name"] = search;
+      matchStage["name"] = { $regex: search, $options: "i" };
     }
-
     const pipeline: any[] = [
       { $match: matchStage },
 
