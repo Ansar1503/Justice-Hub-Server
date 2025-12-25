@@ -273,7 +273,6 @@ export class SessionsRepository implements ISessionsRepo {
     } = payload;
     const skip = (page - 1) * limit;
     const order = sortOrder === "asc" ? 1 : -1;
-
     const matchStage: Record<string, any> = {};
     if (user_id) {
       matchStage["$or"] = [{ client_id: user_id }, { lawyer_id: user_id }];
