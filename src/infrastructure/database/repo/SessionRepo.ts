@@ -273,6 +273,10 @@ export class SessionsRepository implements ISessionsRepo {
     } = payload;
     const skip = (page - 1) * limit;
     const order = sortOrder === "asc" ? 1 : -1;
+    console.log({
+      sortBy,
+      sortOrder,
+    })
     const matchStage: Record<string, any> = {};
     if (user_id) {
       matchStage["$or"] = [{ client_id: user_id }, { lawyer_id: user_id }];
@@ -297,15 +301,15 @@ export class SessionsRepository implements ISessionsRepo {
     const sortStage: Record<string, any> = (() => {
       switch (sortBy) {
         case "amount":
-          return { amount: order };
+          return { "appointmentDetails.amount": order };
         case "date":
-          return { scheduled_date: order };
+          return { "appointmentDetails.date": order };
         case "client_name":
           return { "clientData.name": order };
         case "lawyer_name":
           return { "lawyerData.name": order };
         default:
-          return { scheduled_date: -1 };
+          return { "appointmentDetails.date": -1 };
       }
     })();
 
