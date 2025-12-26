@@ -7,33 +7,33 @@ import { IChangeMailUseCase } from "../IChangeMailUseCase";
 
 export class ChangeMailUseCase implements IChangeMailUseCase {
     constructor(
-        private userRepository: IUserRepository,
-        private nodemailerProvider: INodeMailerProvider,
-        private tokenProvider: IJwtProvider,
+        private _userRepository: IUserRepository,
+        private _nodemailerProvider: INodeMailerProvider,
+        private _tokenProvider: IJwtProvider,
     ) {}
     async execute(input: { email: string; user_id: string }): Promise<ResposeUserDto> {
         try {
-            const userDetails = await this.userRepository.findByuser_id(input.user_id);
+            const userDetails = await this._userRepository.findByuser_id(input.user_id);
             if (!userDetails) {
                 throw new Error("NO_USER_FOUND");
             }
-            const userExist = await this.userRepository.findByEmail(input.email);
+            const userExist = await this._userRepository.findByEmail(input.email);
             if (userExist?.email) {
                 throw new Error("EMAIL_ALREADY_EXIST");
             }
             // console.log("email", email);
-            await this.userRepository.update({
+            await this._userRepository.update({
                 email: input.email,
                 user_id: input.user_id,
                 is_verified: false,
             });
             // console.log("email updated");
             const otp = generateOtp();
-            const token = this.tokenProvider.GenerateEmailToken({
+            const token = this._tokenProvider.GenerateEmailToken({
                 user_id: input.user_id,
             });
             try {
-                await this.nodemailerProvider.sendVerificationMail(input.email, token, otp);
+                await this._nodemailerProvider.sendVerificationMail(input.email, token, otp);
             } catch (error) {
                 throw new Error("MAIL_SEND_ERROR");
             }

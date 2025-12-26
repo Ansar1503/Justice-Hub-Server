@@ -10,9 +10,9 @@ import { IJoinSessionUseCase } from "@src/application/usecases/Lawyer/IJoinSessi
 
 export class JoinVideoSessionController implements IController {
     constructor(
-        private JoinSession: IJoinSessionUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _JoinSession: IJoinSessionUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let sessionId: string = "";
@@ -20,13 +20,13 @@ export class JoinVideoSessionController implements IController {
             sessionId = String(httpRequest.body.sessionId);
         }
         try {
-            const result = await this.JoinSession.execute({ sessionId });
-            return this.httpSuccess.success_200(result);
+            const result = await this._JoinSession.execute({ sessionId });
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof AppError) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

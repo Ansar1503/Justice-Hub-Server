@@ -6,9 +6,9 @@ import {
 import { IFetchReviewDisputesUseCase } from "../IFetchReviewDisputesUseCase";
 
 export class FetchReviewDisputesUseCase implements IFetchReviewDisputesUseCase {
-    constructor(private DisputesRepo: IDisputes) {}
+    constructor(private _DisputesRepo: IDisputes) {}
     async execute(input: FetchReviewDisputesInputDto): Promise<FetchReviewDisputesOutputDto> {
-        const disputes = await this.DisputesRepo.findReviewDisputes(input);
+        const disputes = await this._DisputesRepo.findReviewDisputes(input);
         return disputes;
     }
 }

@@ -4,21 +4,21 @@ import { IJwtProvider } from "@src/application/providers/JwtProvider";
 import { JwtPayloadDto } from "@src/application/dtos/JwtPayloadDto"; // adjust path
 
 export class JwtProvider implements IJwtProvider {
-    private accessSecret: jwt.Secret;
-    private refreshSecret: jwt.Secret;
-    private emailSecret: jwt.Secret;
-    private accessExpiry: jwt.SignOptions["expiresIn"];
-    private refreshExpiry: jwt.SignOptions["expiresIn"];
+    private _accessSecret: jwt.Secret;
+    private _refreshSecret: jwt.Secret;
+    private _emailSecret: jwt.Secret;
+    private _accessExpiry: jwt.SignOptions["expiresIn"];
+    private _refreshExpiry: jwt.SignOptions["expiresIn"];
 
     constructor() {
-        this.accessSecret = process.env.JWT_ACCESS_SECRET || "access_secret";
-        this.refreshSecret = process.env.JWT_REFRESH_SECRET || "refresh_secret";
-        this.emailSecret = process.env.JWT_EMAIL_SECRET || "email_secret";
-        this.accessExpiry = (process.env.JWT_ACCESS_EXPIRY as jwt.SignOptions["expiresIn"]) || "15m";
-        this.refreshExpiry = (process.env.JWT_REFRESH_EXPIRY as jwt.SignOptions["expiresIn"]) || "1d";
+        this._accessSecret = process.env.JWT_ACCESS_SECRET || "access_secret";
+        this._refreshSecret = process.env.JWT_REFRESH_SECRET || "refresh_secret";
+        this._emailSecret = process.env.JWT_EMAIL_SECRET || "email_secret";
+        this._accessExpiry = (process.env.JWT_ACCESS_EXPIRY as jwt.SignOptions["expiresIn"]) || "15m";
+        this._refreshExpiry = (process.env.JWT_REFRESH_EXPIRY as jwt.SignOptions["expiresIn"]) || "1d";
     }
 
-    private signToken<T extends object>(
+    private _signToken<T extends object>(
         payload: T,
         secret: jwt.Secret,
         expiresIn: jwt.SignOptions["expiresIn"],
@@ -28,31 +28,31 @@ export class JwtProvider implements IJwtProvider {
 
     GenerateAccessToken(payload: JwtPayloadDto): string {
         const { exp, iat, ...safePayload } = payload as any;
-        return this.signToken<JwtPayloadDto>(safePayload, this.accessSecret, this.accessExpiry);
+        return this._signToken<JwtPayloadDto>(safePayload, this._accessSecret, this._accessExpiry);
     }
 
     GenerateRefreshToken(payload: JwtPayloadDto): string {
         const { exp, iat, ...safePayload } = payload as any;
-        return this.signToken<JwtPayloadDto>(safePayload, this.refreshSecret, this.refreshExpiry);
+        return this._signToken<JwtPayloadDto>(safePayload, this._refreshSecret, this._refreshExpiry);
     }
 
     GenerateEmailToken(payload: { user_id: string }): string {
-        return this.signToken(payload, this.emailSecret, "15m");
+        return this._signToken(payload, this._emailSecret, "15m");
     }
 
     VerifyAccessToken(token: string): JwtPayloadDto {
-        return this.verifyToken<JwtPayloadDto>(token, this.accessSecret);
+        return this._verifyToken<JwtPayloadDto>(token, this._accessSecret);
     }
 
     VerifyRefreshToken(token: string): JwtPayloadDto {
-        return this.verifyToken<JwtPayloadDto>(token, this.refreshSecret);
+        return this._verifyToken<JwtPayloadDto>(token, this._refreshSecret);
     }
 
     VerifyEmailToken(token: string): { user_id: string } {
-        return this.verifyToken<{ user_id: string }>(token, this.emailSecret);
+        return this._verifyToken<{ user_id: string }>(token, this._emailSecret);
     }
 
-    private verifyToken<T>(token: string, secret: jwt.Secret): T {
+    private _verifyToken<T>(token: string, secret: jwt.Secret): T {
         try {
             return jwt.verify(token, secret) as T;
         } catch (error) {

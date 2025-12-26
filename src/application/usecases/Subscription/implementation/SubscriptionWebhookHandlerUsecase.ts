@@ -39,7 +39,7 @@ export class SubscriptionWebhookHandlerUsecase
     }
   }
 
-  private async handleCheckoutSessionCompleted(event: any): Promise<void> {
+  private _async handleCheckoutSessionCompleted(event: any): Promise<void> {
     const session = event.data.object;
     const customerId = session.customer as string;
     const subscriptionId = session.subscription as string;
@@ -123,7 +123,7 @@ export class SubscriptionWebhookHandlerUsecase
     console.log(`✅ Subscription activated for user=${userId}, plan=${planId}`);
   }
 
-  private async handleInvoicePaid(event: any): Promise<void> {
+  private _async handleInvoicePaid(event: any): Promise<void> {
     const invoice = event.data.object;
     const stripeSubId = invoice.subscription as string;
     const amountPaid = invoice.amount_paid / 100;
@@ -165,7 +165,7 @@ export class SubscriptionWebhookHandlerUsecase
     console.log(`💰 Invoice paid for subscription: ${stripeSubId}`);
   }
 
-  private async handleInvoicePaymentFailed(event: any): Promise<void> {
+  private _async handleInvoicePaymentFailed(event: any): Promise<void> {
     const invoice = event.data.object;
     const customerId = invoice.customer as string;
 
@@ -181,7 +181,7 @@ export class SubscriptionWebhookHandlerUsecase
     });
   }
 
-  private async handleSubscriptionDeleted(event: any): Promise<void> {
+  private _async handleSubscriptionDeleted(event: any): Promise<void> {
     const subscription = event.data.object;
     const stripeSubscriptionId = subscription.id;
 

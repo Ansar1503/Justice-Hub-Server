@@ -4,7 +4,7 @@ import { LawyerResponseDto } from "@src/application/dtos/lawyer.dto";
 import { IGetLawyersUseCase } from "../IGetLawyerUseCase";
 
 export class GetLawyersUseCase implements IGetLawyersUseCase {
-    constructor(private lawyerRepository: ILawyerRepository) {}
+    constructor(private _lawyerRepository: ILawyerRepository) {}
     async execute(input: GetLawyersInputDto): Promise<GetLawyersOutputDto> {
         const {
             search,
@@ -57,7 +57,7 @@ export class GetLawyersUseCase implements IGetLawyersUseCase {
         // console.log("search:", search);
         // console.log("page:", page);
         // console.log("limit:", limit);
-        const response = await this.lawyerRepository.findAllLawyersWithQuery({
+        const response = await this._lawyerRepository.findAllLawyersWithQuery({
             matchStage,
             sortStage,
             search,

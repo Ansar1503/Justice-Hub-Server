@@ -6,13 +6,13 @@ import { IUpdatePasswordUseCase } from "../IUpdatePasswordUseCase";
 
 export class UpdatePasswordUseCase implements IUpdatePasswordUseCase {
     constructor(
-        private userRepository: IUserRepository,
-        private clientRepository: IClientRepository,
-        private passwordManager: IPasswordManager,
+        private _userRepository: IUserRepository,
+        private _clientRepository: IClientRepository,
+        private _passwordManager: IPasswordManager,
     ) {}
     async execute(input: { currentPassword: string; user_id: string; password: string }): Promise<ClientUpdateDto> {
-        const userDetails = await this.userRepository.findByuser_id(input.user_id);
-        const clientDetails = await this.clientRepository.findByUserId(input.user_id);
+        const userDetails = await this._userRepository.findByuser_id(input.user_id);
+        const clientDetails = await this._clientRepository.findByUserId(input.user_id);
 
         if (!userDetails) {
             throw new Error("USER_NOT_FOUND");
@@ -21,19 +21,19 @@ export class UpdatePasswordUseCase implements IUpdatePasswordUseCase {
             throw new Error("USER_BLOCKED");
         }
 
-        const currpassmatch = await this.passwordManager.comparePasswords(input.currentPassword, userDetails.password);
+        const currpassmatch = await this._passwordManager.comparePasswords(input.currentPassword, userDetails.password);
 
         if (!currpassmatch) {
             throw new Error("PASS_NOT_MATCH");
         }
 
-        const passmatch = await this.passwordManager.comparePasswords(input.password, userDetails.password);
+        const passmatch = await this._passwordManager.comparePasswords(input.password, userDetails.password);
 
         if (passmatch) {
             throw new Error("PASS_EXIST");
         }
 
-        const newpass = await this.passwordManager.hashPassword(input.password);
+        const newpass = await this._passwordManager.hashPassword(input.password);
 
         const updateData = new ClientUpdateDto({
             email: userDetails.email,
@@ -50,7 +50,7 @@ export class UpdatePasswordUseCase implements IUpdatePasswordUseCase {
             profile_image: clientDetails?.profile_image,
         });
 
-        await this.userRepository.update(updateData);
+        await this._userRepository.update(updateData);
         return updateData;
     }
 }

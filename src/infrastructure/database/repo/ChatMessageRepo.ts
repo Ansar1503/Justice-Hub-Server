@@ -5,11 +5,11 @@ import { ChatMessageMapper } from "@infrastructure/Mapper/Implementations/ChatMe
 import { IChatMessageModel, MessageModel } from "../model/ChatMessageModel";
 
 export class ChatMessageRepository implements IChatMessagesRepo {
-    constructor(private mapper: IMapper<ChatMessage, IChatMessageModel> = new ChatMessageMapper()) {}
+    constructor(private _mapper: IMapper<ChatMessage, IChatMessageModel> = new ChatMessageMapper()) {}
     async create(payload: ChatMessage): Promise<ChatMessage> {
-        const newmessage = new MessageModel(this.mapper.toPersistence(payload));
+        const newmessage = new MessageModel(this._mapper.toPersistence(payload));
         await newmessage.save();
-        return this.mapper.toDomain(newmessage);
+        return this._mapper.toDomain(newmessage);
     }
     async findMessagesBySessionId(
         id: string,
@@ -25,7 +25,7 @@ export class ChatMessageRepository implements IChatMessagesRepo {
         const data = hasNextPage ? messages.slice(0, limit) : messages;
 
         return {
-            data: this.mapper.toDomainArray && data ? this.mapper.toDomainArray(data).reverse() : [],
+            data: this._mapper.toDomainArray && data ? this._mapper.toDomainArray(data).reverse() : [],
             nextCursor: hasNextPage ? page + 1 : undefined,
         };
     }
@@ -60,11 +60,11 @@ export class ChatMessageRepository implements IChatMessagesRepo {
 
         const data = await MessageModel.findOneAndUpdate({ _id: messageId }, { $set: update }, { new: true });
 
-        return data ? this.mapper.toDomain(data) : null;
+        return data ? this._mapper.toDomain(data) : null;
     }
     async findById(messageId: string): Promise<ChatMessage | null> {
         const data = await MessageModel.findOne({ _id: messageId });
-        return data ? this.mapper.toDomain(data) : null;
+        return data ? this._mapper.toDomain(data) : null;
     }
     async fetchDisputesAggregation(payload: {
         search: string;

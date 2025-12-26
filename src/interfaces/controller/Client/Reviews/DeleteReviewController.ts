@@ -10,9 +10,9 @@ import { IController } from "../../Interface/IController";
 
 export class DeleteReviewController implements IController {
     constructor(
-        private deleteReview: IDeleteReviewUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _deleteReview: IDeleteReviewUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
@@ -23,18 +23,18 @@ export class DeleteReviewController implements IController {
                     : undefined;
 
             if (!reviewId) {
-                const error = this.httpErrors.error_400();
+                const error = this._httpErrors.error_400();
                 return new HttpResponse(error.statusCode, error.body);
             }
 
-            const result = await this.deleteReview.execute({
+            const result = await this._deleteReview.execute({
                 review_id: reviewId,
             });
 
-            const success = this.httpSuccess.success_200(result);
+            const success = this._httpSuccess.success_200(result);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            const err = this.httpErrors.error_500();
+            const err = this._httpErrors.error_500();
             return new HttpResponse(err.statusCode, err.body);
         }
     }

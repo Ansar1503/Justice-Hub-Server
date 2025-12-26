@@ -10,9 +10,9 @@ import { IController } from "../Interface/IController";
 
 export class GetLawyerDetailController implements IController {
     constructor(
-        private getLawyerDetails: IGetLawyerDetailUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _getLawyerDetails: IGetLawyerDetailUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
@@ -20,7 +20,7 @@ export class GetLawyerDetailController implements IController {
             const { id } = httpRequest.params as { id: string };
 
             try {
-                const response = await this.getLawyerDetails.execute(id);
+                const response = await this._getLawyerDetails.execute(id);
 
                 return new HttpResponse(200, {
                     success: true,

@@ -20,7 +20,7 @@ export class BookFollowupAppointmentByWalletUsecase
 {
   constructor(
     private _uow: IUnitofWork,
-    private commissionSettingsRepo: ICommissionSettingsRepo
+    private _commissionSettingsRepo: ICommissionSettingsRepo
   ) {}
   async execute(
     input: CreateFollowupCheckoutSessionInputDto
@@ -52,7 +52,7 @@ export class BookFollowupAppointmentByWalletUsecase
         throw error;
       }
       const commissionSettings =
-        await this.commissionSettingsRepo.fetchCommissionSettings();
+        await this._commissionSettingsRepo.fetchCommissionSettings();
       if (!commissionSettings) {
         const error: any = new Error("Commission settings not found");
         error.code = 404;

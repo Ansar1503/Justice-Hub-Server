@@ -8,14 +8,14 @@ import ClientModel, { IClientModel } from "../model/ClientModel";
 
 export class ClientRepository implements IClientRepository {
     constructor(
-        private mapper: IMapper<Client, IClientModel> = new ClientMapper(),
+        private _mapper: IMapper<Client, IClientModel> = new ClientMapper(),
         private readonly _session?: ClientSession,
     ) {}
 
     async create(client: Client): Promise<Client> {
-        const mapped = this.mapper.toPersistence(client);
+        const mapped = this._mapper.toPersistence(client);
         const data = await new ClientModel(mapped).save({ session: this._session });
-        return this.mapper.toDomain(data);
+        return this._mapper.toDomain(data);
     }
     async findByUserId(user_id: string): Promise<Client | null> {
         return await ClientModel.findOne({ user_id });
@@ -35,6 +35,6 @@ export class ClientRepository implements IClientRepository {
     }
     async findAll(): Promise<Client[] | []> {
         const data = await ClientModel.find({}).populate("address");
-        return data && this.mapper.toDomainArray ? this.mapper.toDomainArray(data) : [];
+        return data && this._mapper.toDomainArray ? this._mapper.toDomainArray(data) : [];
     }
 }

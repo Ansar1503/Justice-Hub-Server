@@ -9,9 +9,9 @@ import { IController } from "../Interface/IController";
 
 export class ChangeDisputesStatusController implements IController {
     constructor(
-        private changeDisputesStatus: IUpdateDisputesStatusUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpError: IHttpErrors = new HttpErrors(),
+        private _changeDisputesStatus: IUpdateDisputesStatusUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpError: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let dispute_id: string = "";
@@ -39,24 +39,24 @@ export class ChangeDisputesStatusController implements IController {
             }
         }
         if (!dispute_id) {
-            return this.httpError.error_400("id is required");
+            return this._httpError.error_400("id is required");
         }
 
         if (!status) {
-            return this.httpError.error_400("status is required");
+            return this._httpError.error_400("status is required");
         }
         try {
-            const result = await this.changeDisputesStatus.execute({
+            const result = await this._changeDisputesStatus.execute({
                 action: action ? action : undefined,
                 disputesId: dispute_id,
                 status,
             });
-            return this.httpSuccess.success_200(result);
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpError.error_400(error.message);
+                return this._httpError.error_400(error.message);
             }
-            return this.httpError.error_500("An error occurred");
+            return this._httpError.error_500("An error occurred");
         }
     }
 }

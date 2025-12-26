@@ -7,9 +7,9 @@ import { IController } from "../Interface/IController";
 
 export class AddSpecializationController implements IController {
     constructor(
-        private AddSpecialization: IAddSpecializationUsecase,
-        private httpErrors: IHttpErrors,
-        private httpSuccess: IHttpSuccess,
+        private _AddSpecialization: IAddSpecializationUsecase,
+        private _httpErrors: IHttpErrors,
+        private _httpSuccess: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let id = "";
@@ -23,16 +23,16 @@ export class AddSpecializationController implements IController {
             }
         }
         if (!name.trim()) {
-            return this.httpErrors.error_400("Please provied a name");
+            return this._httpErrors.error_400("Please provied a name");
         }
         try {
-            const result = await this.AddSpecialization.execute({ name, id });
-            return this.httpSuccess.success_200(result);
+            const result = await this._AddSpecialization.execute({ name, id });
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

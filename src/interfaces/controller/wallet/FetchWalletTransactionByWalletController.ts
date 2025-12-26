@@ -10,9 +10,9 @@ import { IController } from "../Interface/IController";
 
 export class FetchWalletTransactionByWalletController implements IController {
     constructor(
-    private fetchTransactionByWallet: IFetchWalletTransactionsByWallet,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+    private _fetchTransactionByWallet: IFetchWalletTransactionsByWallet,
+    private _httpErrors: IHttpErrors = new HttpErrors(),
+    private _httpSuccess: IHttpSuccess = new HttpSuccess()
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let userId = "";
@@ -25,7 +25,7 @@ export class FetchWalletTransactionByWalletController implements IController {
             userId = httpRequest.user.id;
         }
         if (!userId) {
-            return this.httpErrors.error_400("user id not found");
+            return this._httpErrors.error_400("user id not found");
         }
 
         const parsed = FetchWalletTransactionsQuerySchema.safeParse(
@@ -33,19 +33,19 @@ export class FetchWalletTransactionByWalletController implements IController {
         );
         if (!parsed.success) {
             const err = parsed.error.errors[0];
-            return this.httpErrors.error_400(err.message);
+            return this._httpErrors.error_400(err.message);
         }
         try {
-            const result = await this.fetchTransactionByWallet.execute({
+            const result = await this._fetchTransactionByWallet.execute({
                 ...parsed.data,
                 userId,
             });
-            return this.httpSuccess.success_200(result);
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500("internal server error");
+            return this._httpErrors.error_500("internal server error");
         }
     }
 }

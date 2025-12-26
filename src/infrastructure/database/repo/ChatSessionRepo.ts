@@ -6,15 +6,15 @@ import { ChatModel, IChatSessionModel } from "../model/ChatSessionModel";
 
 export class ChatSessionRepository implements IChatSessionRepo {
   constructor(
-    private mapper: IMapper<
+    private _mapper: IMapper<
       ChatSession,
       IChatSessionModel
     > = new ChatSessionMapper()
   ) {}
   async create(payload: ChatSession): Promise<ChatSession> {
-    const chat = new ChatModel(this.mapper.toPersistence(payload));
+    const chat = new ChatModel(this._mapper.toPersistence(payload));
     await chat.save();
-    return this.mapper.toDomain(chat);
+    return this._mapper.toDomain(chat);
   }
   async aggregate(payload: {
     user_id: string;
@@ -206,12 +206,12 @@ export class ChatSessionRepository implements IChatSessionRepo {
     );
     if (!updatedChatSession) return null;
 
-    return this.mapper.toDomain(updatedChatSession);
+    return this._mapper.toDomain(updatedChatSession);
   }
 
   async findById(id: string): Promise<ChatSession | null> {
     const data = await ChatModel.findOne({ _id: id });
-    return data ? this.mapper.toDomain(data) : null;
+    return data ? this._mapper.toDomain(data) : null;
   }
   async findByUserId(userId: string): Promise<ChatSession[] | []> {
     const data = await ChatModel.find({
@@ -220,8 +220,8 @@ export class ChatSessionRepository implements IChatSessionRepo {
         { "participants.client_id": userId },
       ],
     });
-    return this.mapper.toDomainArray && data
-      ? this.mapper.toDomainArray(data)
+    return this._mapper.toDomainArray && data
+      ? this._mapper.toDomainArray(data)
       : [];
   }
 }

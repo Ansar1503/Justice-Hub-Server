@@ -5,7 +5,7 @@ import { ScheduleSettingsMapper } from "@infrastructure/Mapper/Implementations/S
 import ScheduleSettingsModel, { IscheduleSettingsModel } from "../model/ScheduleSettingsModel";
 
 export class ScheduleSettingsRepository implements IScheduleSettingsRepo {
-    constructor(private mapper: IMapper<ScheduleSettings, IscheduleSettingsModel> = new ScheduleSettingsMapper()) {}
+    constructor(private _mapper: IMapper<ScheduleSettings, IscheduleSettingsModel> = new ScheduleSettingsMapper()) {}
     async updateScheduleSettings(payload: ScheduleSettings): Promise<ScheduleSettings | null> {
         const update = await ScheduleSettingsModel.findOneAndUpdate(
             { lawyer_id: payload.lawyerId },
@@ -18,11 +18,11 @@ export class ScheduleSettingsRepository implements IScheduleSettingsRepo {
             },
             { upsert: true, new: true },
         );
-        return this.mapper.toDomain(update);
+        return this._mapper.toDomain(update);
     }
 
     async fetchScheduleSettings(lawyer_id: string): Promise<ScheduleSettings | null> {
         const data = await ScheduleSettingsModel.findOne({ lawyer_id });
-        return data ? this.mapper.toDomain(data) : null;
+        return data ? this._mapper.toDomain(data) : null;
     }
 }

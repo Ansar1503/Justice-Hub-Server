@@ -6,9 +6,9 @@ import { ILoginUserUseCase } from "../ILoginUserUseCase";
 
 export class LoginUserUseCase implements ILoginUserUseCase {
     constructor(
-        private userRepo: IUserRepository,
-        private passwordManager: IPasswordManager,
-        private tokenManager: IJwtProvider,
+        private _userRepo: IUserRepository,
+        private _passwordManager: IPasswordManager,
+        private _tokenManager: IJwtProvider,
     ) {}
     async execute(input: { email: string; password: string }): Promise<{
         user: ResposeUserDto;
@@ -17,13 +17,13 @@ export class LoginUserUseCase implements ILoginUserUseCase {
     }> {
         let user;
         try {
-            user = await this.userRepo.findByEmail(input.email);
+            user = await this._userRepo.findByEmail(input.email);
         } catch (error) {
             throw new Error("DB_ERROR");
         }
         if (!user) throw new Error("USER_NOT_FOUND");
 
-        const isMatch = await this.passwordManager.comparePasswords(input.password, user.password);
+        const isMatch = await this._passwordManager.comparePasswords(input.password, user.password);
         if (!isMatch) throw new Error("INVALID_PASSWORD");
 
         if (user.is_blocked) throw new Error("USER_BLOCKED");
@@ -33,9 +33,9 @@ export class LoginUserUseCase implements ILoginUserUseCase {
             role: user.role,
             status: user.is_blocked,
         };
-        const accesstoken = this.tokenManager.GenerateAccessToken(paylod);
+        const accesstoken = this._tokenManager.GenerateAccessToken(paylod);
 
-        const refreshtoken = this.tokenManager.GenerateRefreshToken(paylod);
+        const refreshtoken = this._tokenManager.GenerateRefreshToken(paylod);
 
         return { user: new ResposeUserDto(user), accesstoken, refreshtoken };
     }

@@ -9,9 +9,9 @@ import { IController } from "../Interface/IController";
 
 export class FetchLawyerController implements IController {
     constructor(
-        private FetchLawyer: IFetchLawyerDataUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _FetchLawyer: IFetchLawyerDataUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
@@ -19,16 +19,16 @@ export class FetchLawyerController implements IController {
             user_id = String(httpRequest.user.id);
         }
         if (!user_id) {
-            return this.httpErrors.error_400("User_id Not found");
+            return this._httpErrors.error_400("User_id Not found");
         }
         try {
-            const lawyers = await this.FetchLawyer.execute(user_id);
-            return this.httpSuccess.success_200(lawyers);
+            const lawyers = await this._FetchLawyer.execute(user_id);
+            return this._httpSuccess.success_200(lawyers);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500("Something went wrong");
+            return this._httpErrors.error_500("Something went wrong");
         }
     }
 }

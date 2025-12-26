@@ -9,9 +9,9 @@
 
 // export class FetchAppointmentsController implements IController {
 //     constructor(
-//         private FetchAppointmentsLawyer: IFetchAppointmentDetailsLawyerUseCase,
-//         private httpSuccess: IHttpSuccess = new HttpSuccess(),
-//         private httpErrors: IHttpErrors = new HttpErrors(),
+//         private _FetchAppointmentsLawyer: IFetchAppointmentDetailsLawyerUseCase,
+//         private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+//         private _httpErrors: IHttpErrors = new HttpErrors(),
 //     ) {}
 //     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
 //         let user_id: string = "";
@@ -26,7 +26,7 @@
 //             user_id = String(httpRequest.user.id);
 //         }
 //         if (!user_id) {
-//             return this.httpErrors.error_400("User_id Not found");
+//             return this._httpErrors.error_400("User_id Not found");
 //         }
 //         if (httpRequest.query && typeof httpRequest.query === "object") {
 //             if ("search" in httpRequest.query) {
@@ -74,7 +74,7 @@
 //             }
 //         }
 //         try {
-//             const result = await this.FetchAppointmentsLawyer.execute({
+//             const result = await this._FetchAppointmentsLawyer.execute({
 //                 appointmentStatus,
 //                 appointmentType,
 //                 lawyer_id: user_id,
@@ -84,7 +84,7 @@
 //                 sortField,
 //                 sortOrder,
 //             });
-//             return this.httpSuccess.success_200({
+//             return this._httpSuccess.success_200({
 //                 success: true,
 //                 message: "success",
 //                 data: result.data,
@@ -94,9 +94,9 @@
 //             });
 //         } catch (error) {
 //             if (error instanceof Error) {
-//                 return this.httpErrors.error_400(error.message);
+//                 return this._httpErrors.error_400(error.message);
 //             }
-//             return this.httpErrors.error_500();
+//             return this._httpErrors.error_500();
 //         }
 //     }
 // }

@@ -6,8 +6,8 @@ import {
 import { IFindAllPracticeAreasUsecase } from "../IFindAllPracticeAreasUsecase";
 
 export class FindAllpracticeAreasUsecase implements IFindAllPracticeAreasUsecase {
-    constructor(private practiceAreaRepo: IPracticAreaRepo) {}
+    constructor(private _practiceAreaRepo: IPracticAreaRepo) {}
     async execute(input: FindAllPracticeAreaInputDto): Promise<FindAllPracticeAreaOutputDto> {
-        return await this.practiceAreaRepo.findAll(input);
+        return await this._practiceAreaRepo.findAll(input);
     }
 }

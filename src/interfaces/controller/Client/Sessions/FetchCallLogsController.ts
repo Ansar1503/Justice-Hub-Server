@@ -10,9 +10,9 @@
 
 // export class FetchCallLogsController implements IController {
 //   constructor(
-//     private clientUseCase: I_clientUsecase,
-//     private httpErrors: IHttpErrors = new HttpErrors(),
-//     private httpSuccess: IHttpSuccess = new HttpSuccess()
+//     private _clientUseCase: I_clientUsecase,
+//     private _httpErrors: IHttpErrors = new HttpErrors(),
+//     private _httpSuccess: IHttpSuccess = new HttpSuccess()
 //   ) {}
 
 //   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
@@ -29,20 +29,20 @@
 //       const page = !isNaN(Number(query.page)) ? Number(query.page) : 1;
 
 //       if (!sessionId) {
-//         const error = this.httpErrors.error_400("sessionId is required");
+//         const error = this._httpErrors.error_400("sessionId is required");
 //         return new HttpResponse(error.statusCode, error.body);
 //       }
 
-//       const result = await this.clientUseCase.fetchCallLogs({
+//       const result = await this._clientUseCase.fetchCallLogs({
 //         sessionId,
 //         limit,
 //         page,
 //       });
 
-//       const success = this.httpSuccess.success_200(result);
+//       const success = this._httpSuccess.success_200(result);
 //       return new HttpResponse(success.statusCode, success.body);
 //     } catch (error) {
-//       const err = this.httpErrors.error_500();
+//       const err = this._httpErrors.error_500();
 //       return new HttpResponse(err.statusCode, err.body);
 //     }
 //   }

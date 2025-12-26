@@ -7,7 +7,7 @@
 // import { ICancelSessionUseCase } from "@src/application/usecases/Lawyer/ICancellSessionUseCase";
 
 // export class CancelSessionController implements IController {
-//   constructor(private cancelSession: ICancelSessionUseCase) {}
+//   constructor(private _cancelSession: ICancelSessionUseCase) {}
 
 //   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
 //     const { id } = (httpRequest.body as { id?: string }) || {};
@@ -16,7 +16,7 @@
 //       throw new ValidationError("Session ID is required");
 //     }
 
-//     const result = await this.cancelSession.execute({ session_id: id });
+//     const result = await this._cancelSession.execute({ session_id: id });
 
 //     return new HttpResponse(200, {
 //       success: true,

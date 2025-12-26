@@ -4,9 +4,9 @@ import { PracticeAreaDto } from "@src/application/dtos/PracticeAreas/PracticeAre
 import { IFindPracticeareasByspecIdsUsecase } from "../IFindPracticeAreasBySpecIdsUsecase";
 
 export class FindPracticeAreasBySpecIdsUsecase implements IFindPracticeareasByspecIdsUsecase {
-    constructor(private PracticeAreaRepo: IPracticAreaRepo) {}
+    constructor(private _PracticeAreaRepo: IPracticAreaRepo) {}
     async execute(input: findPracticeAreasBySpecIdsInputDto): Promise<PracticeAreaDto[] | []> {
-        const practiceArea = await this.PracticeAreaRepo.findBySpecIds(input.specIds);
+        const practiceArea = await this._PracticeAreaRepo.findBySpecIds(input.specIds);
         if (!practiceArea) return [];
         return practiceArea.map((p) => ({
             createdAt: p.createdAt,

@@ -3,9 +3,9 @@ import { ISessionDocumentRepo } from "@domain/IRepository/ISessionDocumentsRepo"
 import { IFetchExistingSessionDocumentsUseCase } from "../IFetchExistingSessionDocumentUseCase";
 
 export class FetchExistingSessionDocumentUseCase implements IFetchExistingSessionDocumentsUseCase {
-    constructor(private sessionDocumentRepo: ISessionDocumentRepo) {}
+    constructor(private _sessionDocumentRepo: ISessionDocumentRepo) {}
     async execute(input: string): Promise<UploadSessionDocumentOutPutDto | null> {
-        const documents = await this.sessionDocumentRepo.findBySessionId({
+        const documents = await this._sessionDocumentRepo.findBySessionId({
             session_id: input,
         });
         if (!documents) return null;

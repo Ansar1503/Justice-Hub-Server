@@ -11,14 +11,14 @@ import { IController } from "../Interface/IController";
 
 export class RegisterUser implements IController {
     constructor(
-        private registerUseCase: IRegiserUserUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _registerUseCase: IRegiserUserUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         if (!httpRequest.body || typeof httpRequest.body !== "object") {
-            const err = this.httpErrors.error_400();
+            const err = this._httpErrors.error_400();
             return new HttpResponse(err.statusCode, err.body);
         }
 
@@ -51,26 +51,26 @@ export class RegisterUser implements IController {
         }
         try {
             if (!payload.email || !payload.mobile || !payload.name || !payload.password || !payload.role) {
-                return this.httpErrors.error_400("Invalid Credentials");
+                return this._httpErrors.error_400("Invalid Credentials");
             }
             const dto = new RegisterUserDto(payload as RegisterUserDto);
 
-            const user = await this.registerUseCase.execute(dto);
+            const user = await this._registerUseCase.execute(dto);
 
             if (!user) {
-                const err = this.httpErrors.error_500();
+                const err = this._httpErrors.error_500();
                 return new HttpResponse(err.statusCode, {
                     message: "Error Registering User",
                 });
             }
 
-            const success = this.httpSuccess.success_201(user);
+            const success = this._httpSuccess.success_201(user);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500("Error Registering User");
+            return this._httpErrors.error_500("Error Registering User");
         }
     }
 }

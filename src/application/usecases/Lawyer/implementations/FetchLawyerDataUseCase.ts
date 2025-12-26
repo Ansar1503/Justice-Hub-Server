@@ -7,13 +7,13 @@ import { IFetchLawyerDataUseCase } from "../IFetchLawyerDataUseCase";
 
 export class FetchLawyerDataUseCase implements IFetchLawyerDataUseCase {
     constructor(
-        private userRepo: IUserRepository,
-        private lawyerRepo: ILawyerRepository,
-        private lawyerDocRepo: ILawyerDocumentsRepository,
-        private lawyerVerificationRepo: ILawyerVerificationRepo,
+        private _userRepo: IUserRepository,
+        private _lawyerRepo: ILawyerRepository,
+        private _lawyerDocRepo: ILawyerDocumentsRepository,
+        private _lawyerVerificationRepo: ILawyerVerificationRepo,
     ) {}
     async execute(input: string): Promise<LawyerOutputDto> {
-        const userDetails = await this.userRepo.findByuser_id(input);
+        const userDetails = await this._userRepo.findByuser_id(input);
 
         if (!userDetails) {
             throw new Error("USER_NOT_FOUND");
@@ -24,13 +24,13 @@ export class FetchLawyerDataUseCase implements IFetchLawyerDataUseCase {
         if (userDetails.is_blocked) {
             throw new Error("USER_BLOCKED");
         }
-        const lawyerDetails = await this.lawyerRepo.findUserId(input);
+        const lawyerDetails = await this._lawyerRepo.findUserId(input);
         if (!lawyerDetails) {
             throw new Error("USER_NOT_FOUND");
         }
-        const lawyerVerificaitionDetails = await this.lawyerVerificationRepo.findByUserId(userDetails.user_id);
+        const lawyerVerificaitionDetails = await this._lawyerVerificationRepo.findByUserId(userDetails.user_id);
         if (!lawyerVerificaitionDetails) throw new Error("Lawyer verification details not foumd");
-        const lawyerDocs = await this.lawyerDocRepo.find(userDetails.user_id);
+        const lawyerDocs = await this._lawyerDocRepo.find(userDetails.user_id);
         if (!lawyerDocs) {
             throw new Error("lawyerDocs not found");
         }

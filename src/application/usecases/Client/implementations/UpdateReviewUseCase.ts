@@ -4,11 +4,11 @@ import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { IUpdateReviewUseCase } from "../IUpdateReviewUseCase";
 
 export class UpdateReviewUseCase implements IUpdateReviewUseCase {
-    constructor(private reviewRepository: IReviewRepo) {}
+    constructor(private _reviewRepository: IReviewRepo) {}
     async execute(input: UpdateReviewInputDto): Promise<UpdateReviewOutputDto | null> {
-        const review = await this.reviewRepository.findByReview_id(input.review_id);
+        const review = await this._reviewRepository.findByReview_id(input.review_id);
         if (!review) throw new ValidationError("review not found");
-        const updated = await this.reviewRepository.update(input);
+        const updated = await this._reviewRepository.update(input);
         if (!updated) return null;
         return {
             client_id: updated.clientId,

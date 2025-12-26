@@ -3,7 +3,7 @@ import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 import { IGetSessionMetadataUseCase } from "../IGetSessionMetadataUseCase";
 
 export class GetSessionMetadataUseCase implements IGetSessionMetadataUseCase {
-    constructor(private appointmentRepo: IAppointmentsRepository) {}
+    constructor(private _appointmentRepo: IAppointmentsRepository) {}
     async execute(input: string): Promise<any> {
         const metadata = await getSessionMetaData(input);
         const { client_id, date, duration, lawyer_id, time } = metadata;
@@ -12,7 +12,7 @@ export class GetSessionMetadataUseCase implements IGetSessionMetadataUseCase {
             error.code = 404;
             throw error;
         }
-        return await this.appointmentRepo.delete({
+        return await this._appointmentRepo.delete({
             client_id,
             date: new Date(date),
             duration: Number(duration),

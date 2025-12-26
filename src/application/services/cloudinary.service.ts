@@ -9,10 +9,10 @@ cloudinary.config({
 });
 
 export class CloudinaryService implements ICloudinaryService {
-  private cloudinary;
+  private _cloudinary;
 
   constructor() {
-    this.cloudinary = cloudinary;
+    this._cloudinary = cloudinary;
   }
   extractPublicIdFromUrl(input: string): string {
     if (!input.includes("res.cloudinary.com") && !input.includes("/upload/")) {
@@ -28,7 +28,7 @@ export class CloudinaryService implements ICloudinaryService {
     try {
       const fileId = this.extractPublicIdFromUrl(url);
       //   console.log("fileId:", fileId);
-      await this.cloudinary.uploader.destroy(fileId, { resource_type: "raw" });
+      await this._cloudinary.uploader.destroy(fileId, { resource_type: "raw" });
     } catch (error) {
       throw error;
     }

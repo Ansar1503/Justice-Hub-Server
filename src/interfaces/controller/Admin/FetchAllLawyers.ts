@@ -10,9 +10,9 @@ import { IController } from "../Interface/IController";
 
 export class FetchAllLawyers implements IController {
     constructor(
-        private fetchAllLawyerUseCase: IFetchLawyerUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _fetchAllLawyerUseCase: IFetchLawyerUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     private isValidSortField(value: unknown): value is "name" | "experience" | "consultation_fee" | "createdAt" {
@@ -29,7 +29,7 @@ export class FetchAllLawyers implements IController {
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         if (!httpRequest.query || typeof httpRequest.query !== "object") {
-            const error = this.httpErrors.error_400();
+            const error = this._httpErrors.error_400();
             return new HttpResponse(error.statusCode, {
                 error: "Query is missing or invalid",
             });
@@ -53,12 +53,12 @@ export class FetchAllLawyers implements IController {
         };
 
         try {
-            const result = await this.fetchAllLawyerUseCase.execute(input);
+            const result = await this._fetchAllLawyerUseCase.execute(input);
 
-            const success = this.httpSuccess.success_200(result);
+            const success = this._httpSuccess.success_200(result);
             return new HttpResponse(success.statusCode, success.body);
         } catch (err) {
-            const error = this.httpErrors.error_500();
+            const error = this._httpErrors.error_500();
             return new HttpResponse(error.statusCode, {
                 error: "Internal Server Error",
             });

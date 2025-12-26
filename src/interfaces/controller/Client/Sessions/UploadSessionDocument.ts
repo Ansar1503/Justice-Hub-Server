@@ -10,9 +10,9 @@ import { IController } from "../../Interface/IController";
 
 export class UploadSessionDocumentsController implements IController {
     constructor(
-        private uploadSessionDocument: IUploadSessionDocumentUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _uploadSessionDocument: IUploadSessionDocumentUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const req = httpRequest as Record<string, any>;
@@ -48,14 +48,14 @@ export class UploadSessionDocumentsController implements IController {
             });
         });
         try {
-            const result = await this.uploadSessionDocument.execute({
+            const result = await this._uploadSessionDocument.execute({
                 sessionId,
                 document: documents,
             });
-            const success = this.httpSuccess.success_200(result);
+            const success = this._httpSuccess.success_200(result);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            const err = this.httpErrors.error_500();
+            const err = this._httpErrors.error_500();
             return new HttpResponse(err.statusCode, err.body);
         }
     }

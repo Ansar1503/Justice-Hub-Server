@@ -8,20 +8,20 @@ import { IGetLawyerDetailUseCase } from "../IGetLawyerDetailUseCase";
 
 export class GetLawyerDetailsUseCase implements IGetLawyerDetailUseCase {
     constructor(
-        private userRepository: IUserRepository,
-        private clientRepository: IClientRepository,
-        private addressRepository: IAddressRepository,
-        private lawyerRepository: ILawyerRepository,
-        private lawyerVerification: ILawyerVerificationRepo,
+        private _userRepository: IUserRepository,
+        private _clientRepository: IClientRepository,
+        private _addressRepository: IAddressRepository,
+        private _lawyerRepository: ILawyerRepository,
+        private _lawyerVerification: ILawyerVerificationRepo,
     ) {}
     async execute(input: string): Promise<LawyerResponseDto | null> {
-        const user = await this.userRepository.findByuser_id(input);
+        const user = await this._userRepository.findByuser_id(input);
         if (!user) throw new Error("USER_NOT_FOUND");
         if (user.is_blocked) throw new Error("USER_BLOCKED");
-        const client = await this.clientRepository.findByUserId(input);
-        const address = await this.addressRepository.find(input);
-        const lawyer = await this.lawyerRepository.findUserId(input);
-        const lawyerVerification = await this.lawyerVerification.findByUserId(input);
+        const client = await this._clientRepository.findByUserId(input);
+        const address = await this._addressRepository.find(input);
+        const lawyer = await this._lawyerRepository.findUserId(input);
+        const lawyerVerification = await this._lawyerVerification.findByUserId(input);
         if (!lawyerVerification) throw new Error("LAWYER_UNVERIFIED");
         if (!lawyer) throw new Error("LAWYER_UNAVAILABLE");
         if (lawyerVerification.verificationStatus !== "verified") throw new Error("LAWYER_UNVERIFIED");

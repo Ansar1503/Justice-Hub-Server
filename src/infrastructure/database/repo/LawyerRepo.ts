@@ -10,16 +10,16 @@ import { ISpecializationModel } from "../model/SpecializationModel";
 
 export class LawyerRepository implements ILawyerRepository {
   constructor(
-    private mapper: IMapper<Lawyer, ILawyerModel> = new LawyerMapper(),
+    private _mapper: IMapper<Lawyer, ILawyerModel> = new LawyerMapper(),
     private _session?: ClientSession
   ) {}
 
   async create(lawyer: Lawyer): Promise<Lawyer> {
-    const mapped = this.mapper.toPersistence(lawyer);
+    const mapped = this._mapper.toPersistence(lawyer);
     const lawyerData = await lawyerModel.create([mapped], {
       session: this._session,
     });
-    return this.mapper.toDomain(lawyerData[0]);
+    return this._mapper.toDomain(lawyerData[0]);
   }
   async findUserId(
     user_id: string
@@ -59,7 +59,7 @@ export class LawyerRepository implements ILawyerRepository {
     };
   }
   async update(update: Partial<Lawyer>): Promise<Lawyer | null> {
-    const mapped = this.mapper.toPersistence(update as Lawyer);
+    const mapped = this._mapper.toPersistence(update as Lawyer);
     const updatedData = await lawyerModel.findOneAndUpdate(
       { userId: update.userId },
       mapped,
@@ -69,11 +69,11 @@ export class LawyerRepository implements ILawyerRepository {
         session: this._session,
       }
     );
-    return updatedData ? this.mapper.toDomain(updatedData) : null;
+    return updatedData ? this._mapper.toDomain(updatedData) : null;
   }
   async findAll(): Promise<Lawyer[] | []> {
     const lawyerData = await lawyerModel.find({}).populate("documents");
-    return lawyerData ? (this.mapper?.toDomainArray?.(lawyerData) ?? []) : [];
+    return lawyerData ? (this._mapper?.toDomainArray?.(lawyerData) ?? []) : [];
   }
   async findAllLawyersWithQuery(query: {
     matchStage: any;

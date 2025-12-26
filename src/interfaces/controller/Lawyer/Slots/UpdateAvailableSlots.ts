@@ -10,9 +10,9 @@ import { IController } from "../../Interface/IController";
 
 export class UpdateAvailableSlotsController implements IController {
     constructor(
-        private updateAvailableSlots: IUpdateAvailableSlotsUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _updateAvailableSlots: IUpdateAvailableSlotsUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
@@ -22,23 +22,23 @@ export class UpdateAvailableSlotsController implements IController {
         }
 
         if (!user_id) {
-            return this.httpErrors.error_400("User_id Not found");
+            return this._httpErrors.error_400("User_id Not found");
         }
 
         try {
             const parsed = UpdateAvailableSlotsBodyValidateSchema.safeParse(httpRequest.body);
             if (!parsed.success) {
                 const err = parsed.error.errors[0];
-                return this.httpErrors.error_400(err.message);
+                return this._httpErrors.error_400(err.message);
             }
             const payload = { ...parsed.data, lawyer_id: user_id };
-            const result = await this.updateAvailableSlots.execute(payload);
-            return this.httpSuccess.success_200(result);
+            const result = await this._updateAvailableSlots.execute(payload);
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_500(error.message);
+                return this._httpErrors.error_500(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

@@ -6,9 +6,9 @@ import {
 import { IFetchChatDisputesUseCase } from "../IFetchChatDisputesUseCase";
 
 export class FetchChatDisputesUseCase implements IFetchChatDisputesUseCase {
-    constructor(private disputesRepository: IDisputes) {}
+    constructor(private _disputesRepository: IDisputes) {}
     async execute(input: FetchChatDisputesInputDto): Promise<FetchChatDisputesOutputDto> {
-        const disputes = await this.disputesRepository.findAllChatDisputes(input);
+        const disputes = await this._disputesRepository.findAllChatDisputes(input);
         return disputes;
     }
 }

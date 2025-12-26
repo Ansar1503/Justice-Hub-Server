@@ -34,13 +34,13 @@ const CreateNotification = new NotificationUsecase(
 );
 
 export class SocketHandlers {
-  private eventEnum = SocketEventEnum;
+  private _eventEnum = SocketEventEnum;
   constructor(
-    private socket: Socket,
-    private io: SocketIOServer
+    private _socket: Socket,
+    private _io: SocketIOServer
   ) {}
   handleEmiter(id: string, event: SocketEventEnum, payload: unknown) {
-    this.socket.to(id).emit(event, payload);
+    this._socket.to(id).emit(event, payload);
   }
   getChatSessionDetails(sessionId: string) {
     return chatUsecase.getChatSessionById(sessionId);
@@ -68,7 +68,7 @@ export class SocketHandlers {
       cb({ success: true, savedMessage: chatSend || undefined });
       this.handleEmiter(
         chatSend?.receiverId || "",
-        this.eventEnum.MESSAGE_RECEIVED_EVENT,
+        this._eventEnum.MESSAGE_RECEIVED_EVENT,
         chatSend
       );
     } catch (error) {
@@ -80,17 +80,17 @@ export class SocketHandlers {
   }
 
   handleSocketDisconnect() {
-    const userId = this.socket.data.user?.id;
+    const userId = this._socket.data.user?.id;
     if (userId) {
-      for (const room of this.socket.rooms) {
-        if (room !== this.socket.id) {
-          this.socket.leave(room);
+      for (const room of this._socket.rooms) {
+        if (room !== this._socket.id) {
+          this._socket.leave(room);
         }
       }
-      this.socket.disconnect();
+      this._socket.disconnect();
       if (socketStore.onlineUsers.has(userId)) {
         socketStore.onlineUsers.delete(userId);
-        this.io.emit(this.eventEnum.ONLINE_USERS, {
+        this._io.emit(this._eventEnum.ONLINE_USERS, {
           users: Array.from(socketStore.onlineUsers),
         });
       }
@@ -99,12 +99,12 @@ export class SocketHandlers {
 
   async handleSocketJoin(data: { sessionId: string }) {
     const sessionId = data?.sessionId;
-    const userId = this.socket.data.user?.id;
+    const userId = this._socket.data.user?.id;
 
     if (!sessionId || !userId) return;
-    this.socket.join(userId);
+    this._socket.join(userId);
     socketStore.onlineUsers.add(userId);
-    this.io.emit(SocketEventEnum.ONLINE_USERS, {
+    this._io.emit(SocketEventEnum.ONLINE_USERS, {
       users: Array.from(socketStore.onlineUsers),
     });
     const chatSessionDetails = await this.getChatSessionDetails(sessionId);
@@ -132,9 +132,9 @@ export class SocketHandlers {
       return;
     }
 
-    this.socket.data.userId = userId;
+    this._socket.data.userId = userId;
 
-    const socketsInRoom = await this.io.in(sessionId).fetchSockets();
+    const socketsInRoom = await this._io.in(sessionId).fetchSockets();
 
     const userAlreadyInRoom = socketsInRoom.some(
       (s) => s.data.userId === userId
@@ -149,8 +149,8 @@ export class SocketHandlers {
       });
       return;
     }
-    this.socket.join(sessionId);
-    this.socket.emit(SocketEventEnum.CONNECTED_EVENT, {
+    this._socket.join(sessionId);
+    this._socket.emit(SocketEventEnum.CONNECTED_EVENT, {
       isConnected: true,
     });
   }
@@ -189,7 +189,7 @@ export class SocketHandlers {
   async handleDeleteMessage(payload: { messageId: string; sessionId: string }) {
     try {
       const lastMessage = await chatUsecase.deleteMessage(payload);
-      this.io.in(payload.sessionId).emit(this.eventEnum.MESSAGE_DELETE_EVENT, {
+      this._io.in(payload.sessionId).emit(this._eventEnum.MESSAGE_DELETE_EVENT, {
         ...payload,
         lastMessage: lastMessage,
       });
@@ -253,7 +253,7 @@ export class SocketHandlers {
   async handleSendNotification(payload: NotificationDto) {
     try {
       if (payload.type === "message") {
-        const socketsInRoom = await this.io
+        const socketsInRoom = await this._io
           .in(payload?.sessionId || "")
           .fetchSockets();
         const userAlreadyInRoom = socketsInRoom.some(
@@ -261,21 +261,21 @@ export class SocketHandlers {
         );
         if (!userAlreadyInRoom) {
           const newNotification = await CreateNotification.execute(payload);
-          this.io
+          this._io
             .to(payload.recipientId)
-            .emit(this.eventEnum.NOTIFICATION_RECEIVED, newNotification);
+            .emit(this._eventEnum.NOTIFICATION_RECEIVED, newNotification);
         }
       } else if (payload.type === "session") {
         const newNotification = await CreateNotification.execute(payload);
-        this.io
+        this._io
           .to(payload.recipientId)
-          .emit(this.eventEnum.NOTIFICATION_RECEIVED, newNotification);
+          .emit(this._eventEnum.NOTIFICATION_RECEIVED, newNotification);
       }
     } catch (error) {
-      this.io
+      this._io
         .to(payload.senderId)
         .emit(
-          this.eventEnum.ERROR,
+          this._eventEnum.ERROR,
           error instanceof Error ? error.message : "Something Went Wrong"
         );
     }

@@ -4,11 +4,11 @@ import { PracticeAreaDto } from "@src/application/dtos/PracticeAreas/PracticeAre
 import { IDeletePracticeAreaUsecase } from "../IDeletePracticeAreaUsecase";
 
 export class DeletePracticeAreaUsecase implements IDeletePracticeAreaUsecase {
-    constructor(private practiceAreaRepo: IPracticAreaRepo) {}
+    constructor(private _practiceAreaRepo: IPracticAreaRepo) {}
     async execute(input: string): Promise<PracticeAreaDto> {
-        const exists = await this.practiceAreaRepo.findById(input);
+        const exists = await this._practiceAreaRepo.findById(input);
         if (!exists) throw new ValidationError("no practice area found");
-        const delted = await this.practiceAreaRepo.delete(input);
+        const delted = await this._practiceAreaRepo.delete(input);
         if (!delted) throw new Error("practice area delte error");
         return {
             id: exists.id,

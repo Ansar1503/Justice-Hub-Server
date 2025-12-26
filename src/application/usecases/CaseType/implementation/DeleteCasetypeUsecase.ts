@@ -3,11 +3,11 @@ import { CaseTypeDto } from "@src/application/dtos/CaseType/CaseTypeDto";
 import { IDeleteCasetypeUsecase } from "../IDeleteCasetypeUsecase";
 
 export class DeleteCasetypeUsecase implements IDeleteCasetypeUsecase {
-    constructor(private casetypeRepo: ICasetype) {}
+    constructor(private _casetypeRepo: ICasetype) {}
     async execute(input: string): Promise<CaseTypeDto> {
-        const casetypeExists = await this.casetypeRepo.findById(input);
+        const casetypeExists = await this._casetypeRepo.findById(input);
         if (!casetypeExists) throw new Error("case type doesnot exists");
-        await this.casetypeRepo.delete(input);
+        await this._casetypeRepo.delete(input);
         return {
             createdAt: casetypeExists.createdAt,
             id: casetypeExists.id,

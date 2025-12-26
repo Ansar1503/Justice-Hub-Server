@@ -8,14 +8,14 @@ import { IAddOverrideSlotsUseCase } from "../IAddOverrideSlotsUseCase";
 
 export class AddOverrideSlotsUseCase implements IAddOverrideSlotsUseCase {
     constructor(
-        private slotSettingsRepo: IScheduleSettingsRepo,
-        private overrideSlotRepo: IOverrideRepo,
+        private _slotSettingsRepo: IScheduleSettingsRepo,
+        private _overrideSlotRepo: IOverrideRepo,
     ) {}
     async execute(input: OverrideSlotsDto): Promise<OverrideSlotsDto> {
         input.overrideDates.forEach((oveerride) => {
             oveerride.date = new Date(oveerride.date.getTime() - oveerride.date.getTimezoneOffset() * 60000);
         });
-        const slotSettings = await this.slotSettingsRepo.fetchScheduleSettings(input.lawyer_id);
+        const slotSettings = await this._slotSettingsRepo.fetchScheduleSettings(input.lawyer_id);
         if (!slotSettings) {
             const error: any = new Error("Settings not found, please create settings.");
             error.code = STATUS_CODES.NOT_FOUND;
@@ -76,7 +76,7 @@ export class AddOverrideSlotsUseCase implements IAddOverrideSlotsUseCase {
         }
 
         const overridePayload = Override.create(input);
-        const updatedOverrideSlots = await this.overrideSlotRepo.addOverrideSlots(overridePayload);
+        const updatedOverrideSlots = await this._overrideSlotRepo.addOverrideSlots(overridePayload);
         if (!updatedOverrideSlots) throw new Error("update failed");
         return {
             lawyer_id: updatedOverrideSlots.lawyerId,

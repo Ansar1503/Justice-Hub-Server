@@ -9,9 +9,9 @@ import { IController } from "../Interface/IController";
 
 export class UpdateNotificationStatusController implements IController {
     constructor(
-        private updateNotificationUseCase: IUpdateNotificationStatus,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _updateNotificationUseCase: IUpdateNotificationStatus,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let status: boolean = false;
@@ -35,16 +35,16 @@ export class UpdateNotificationStatusController implements IController {
             id = httpRequest.params.id;
         }
         try {
-            const result = await this.updateNotificationUseCase.execute({
+            const result = await this._updateNotificationUseCase.execute({
                 id,
                 status,
             });
-            return this.httpSuccess.success_200(result);
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

@@ -6,13 +6,13 @@ import { IVerifyEmailUseCase } from "../IVerifyEmailUseCase";
 
 export class VerifyEmailUseCase implements IVerifyEmailUseCase {
     constructor(
-        private userRepo: IUserRepository,
-        private otpRepo: IOtpRepository,
-        private jwtManager: IJwtProvider,
+        private _userRepo: IUserRepository,
+        private _otpRepo: IOtpRepository,
+        private _jwtManager: IJwtProvider,
     ) {}
     async execute(input: VerifyEmailInput): Promise<void> {
         try {
-            const user = await this.userRepo.findByEmail(input.email);
+            const user = await this._userRepo.findByEmail(input.email);
             if (!user) {
                 // console.log("user not found", user);
                 throw new Error("USER_NOT_FOUND");
@@ -23,9 +23,9 @@ export class VerifyEmailUseCase implements IVerifyEmailUseCase {
             if (user.is_verified) {
                 throw new Error("USER_VERIFIED");
             }
-            await this.jwtManager.VerifyEmailToken(input.token);
-            await this.userRepo.update({ email: input.email, is_verified: true });
-            await this.otpRepo.delete(input.email);
+            await this._jwtManager.VerifyEmailToken(input.token);
+            await this._userRepo.update({ email: input.email, is_verified: true });
+            await this._otpRepo.delete(input.email);
         } catch (error) {
             if (error instanceof Error) {
                 throw new Error(error.message);

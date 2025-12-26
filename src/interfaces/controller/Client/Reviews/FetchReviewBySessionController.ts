@@ -9,9 +9,9 @@ import { IController } from "../../Interface/IController";
 
 export class FetchReviewsBySessionController implements IController {
     constructor(
-        private fetchReviewBySessionId: IFetchReviewsBySessionUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _fetchReviewBySessionId: IFetchReviewsBySessionUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
@@ -22,20 +22,20 @@ export class FetchReviewsBySessionController implements IController {
                     : undefined;
 
             if (!sessionId) {
-                const error = this.httpErrors.error_400();
+                const error = this._httpErrors.error_400();
                 return error;
             }
 
-            const result = await this.fetchReviewBySessionId.execute({
+            const result = await this._fetchReviewBySessionId.execute({
                 session_id: sessionId,
             });
-            const success = this.httpSuccess.success_200(result);
+            const success = this._httpSuccess.success_200(result);
             return success;
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

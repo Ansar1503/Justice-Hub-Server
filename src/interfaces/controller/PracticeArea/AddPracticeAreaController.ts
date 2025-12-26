@@ -7,9 +7,9 @@ import { IController } from "../Interface/IController";
 
 export class AddPracticeAreaController implements IController {
     constructor(
-        private addPracticeArea: IAddPracticeAreasUsecase,
-        private httpSuccess: IHttpSuccess,
-        private httpErrors: IHttpErrors,
+        private _addPracticeArea: IAddPracticeAreasUsecase,
+        private _httpSuccess: IHttpSuccess,
+        private _httpErrors: IHttpErrors,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let specId = "";
@@ -23,19 +23,19 @@ export class AddPracticeAreaController implements IController {
             }
         }
         if (!specId.trim()) {
-            return this.httpErrors.error_400("specification Id is required");
+            return this._httpErrors.error_400("specification Id is required");
         }
         if (!name.trim()) {
-            return this.httpErrors.error_400("name is required");
+            return this._httpErrors.error_400("name is required");
         }
         try {
-            const result = await this.addPracticeArea.execute({ name, specId });
-            return this.httpSuccess.success_200(result);
+            const result = await this._addPracticeArea.execute({ name, specId });
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

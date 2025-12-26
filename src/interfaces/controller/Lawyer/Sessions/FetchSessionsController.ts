@@ -10,9 +10,9 @@ import { IFetchSessionUseCase } from "@src/application/usecases/Lawyer/IFetchSes
 
 export class FetchSessionsController implements IController {
     constructor(
-        private fetchSession: IFetchSessionUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _fetchSession: IFetchSessionUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
@@ -27,7 +27,7 @@ export class FetchSessionsController implements IController {
             user_id = String(httpRequest.user.id);
         }
         if (!user_id) {
-            return this.httpErrors.error_400("User_id Not found");
+            return this._httpErrors.error_400("User_id Not found");
         }
         if (httpRequest.query && typeof httpRequest.query === "object") {
             if ("search" in httpRequest.query) {
@@ -73,7 +73,7 @@ export class FetchSessionsController implements IController {
             }
         }
         try {
-            const result = await this.fetchSession.execute({
+            const result = await this._fetchSession.execute({
                 limit,
                 order,
                 page,
@@ -83,7 +83,7 @@ export class FetchSessionsController implements IController {
                 consultation_type,
                 status,
             });
-            return this.httpSuccess.success_200({
+            return this._httpSuccess.success_200({
                 success: true,
                 message: "success",
                 data: result.data,
@@ -97,7 +97,7 @@ export class FetchSessionsController implements IController {
                     typeof error?.code === "number" && error.code >= 100 && error.code < 600 ? error.code : 500;
                 return new HttpResponse(statusCode, { message: error.message });
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

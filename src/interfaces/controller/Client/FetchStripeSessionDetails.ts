@@ -5,7 +5,7 @@ import { IFetchStripeSessionDetailsUseCase } from "@src/application/usecases/Cli
 import { IController } from "../Interface/IController";
 
 export class FetchStripeSessionDetailsController implements IController {
-    constructor(private FetchStripeSessionDetails: IFetchStripeSessionDetailsUseCase) {}
+    constructor(private _FetchStripeSessionDetails: IFetchStripeSessionDetailsUseCase) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const session_id = (httpRequest.params as { id?: string })?.id;
@@ -18,7 +18,7 @@ export class FetchStripeSessionDetailsController implements IController {
         }
 
         try {
-            const response = await this.FetchStripeSessionDetails.execute(session_id);
+            const response = await this._FetchStripeSessionDetails.execute(session_id);
             return new HttpResponse(200, response);
         } catch (error: any) {
             switch (error.message) {

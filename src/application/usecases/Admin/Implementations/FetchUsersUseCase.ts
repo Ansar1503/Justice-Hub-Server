@@ -4,10 +4,10 @@ import { IFetchUsersUseCase } from "../IFetchUsersUseCase";
 import { UseCaseInputDto, UseCaseOutputDto } from "../../../dtos/Admin/FetchAllUsersDto";
 
 export class FetchUsersUseCase implements IFetchUsersUseCase {
-    constructor(private userRepo: IUserRepository) {}
+    constructor(private _userRepo: IUserRepository) {}
     async execute(input: UseCaseInputDto): Promise<UseCaseOutputDto> {
         try {
-            const users = await this.userRepo.findAll(input);
+            const users = await this._userRepo.findAll(input);
             return users;
         } catch (error) {
             throw new InternalError("Database Error");

@@ -10,9 +10,9 @@ import { IFetchReviewUseCase } from "@src/application/usecases/Review/IFetchRevi
 
 export class FetchReviewsList implements IController {
     constructor(
-        private fetchReviews: IFetchReviewUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _fetchReviews: IFetchReviewUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
@@ -26,24 +26,24 @@ export class FetchReviewsList implements IController {
             user_id = String(httpRequest.user.id);
             role = httpRequest.user.role as "admin" | "client" | "lawyer";
         }
-        if (!httpRequest.query) return this.httpErrors.error_400("Invalid query");
+        if (!httpRequest.query) return this._httpErrors.error_400("Invalid query");
         const parsed = FetchReviewsQueryValidation.safeParse(httpRequest.query);
         if (!parsed.success) {
             const err = parsed.error.errors[0];
-            return this.httpErrors.error_400(err.message);
+            return this._httpErrors.error_400(err.message);
         }
         if (!user_id || !role) {
-            return this.httpErrors.error_400("Invalid user");
+            return this._httpErrors.error_400("Invalid user");
         }
         try {
             const payload = { ...parsed.data, user_id, role };
-            const result = await this.fetchReviews.execute(payload);
-            return this.httpSuccess.success_200(result);
+            const result = await this._fetchReviews.execute(payload);
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500("Internal server error");
+            return this._httpErrors.error_500("Internal server error");
         }
     }
 }

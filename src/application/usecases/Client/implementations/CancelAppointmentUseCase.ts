@@ -11,14 +11,14 @@ import { ICancelAppointmentUseCase } from "../ICancelAppointmentUseCase";
 
 export class CancelAppointmentUseCase implements ICancelAppointmentUseCase {
   constructor(
-    private appointmentRepo: IAppointmentsRepository,
-    private unitofWork: IUnitofWork
+    private _appointmentRepo: IAppointmentsRepository,
+    private _unitofWork: IUnitofWork
   ) {}
   async execute(
     input: ChangeAppointmentStatusInputDto
   ): Promise<ChangeAppointmentStatusOutputDto> {
-    return await this.unitofWork.startTransaction(async (uow) => {
-      const appointment = await this.appointmentRepo.findById(input.id);
+    return await this._unitofWork.startTransaction(async (uow) => {
+      const appointment = await this._appointmentRepo.findById(input.id);
       if (!appointment) {
         const error: any = new Error("appointment not found");
         error.code = STATUS_CODES.BAD_REQUEST;

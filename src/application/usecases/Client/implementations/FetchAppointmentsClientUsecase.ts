@@ -6,8 +6,8 @@ import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 import { IFetchAppointmentsClientUseCase } from "../IFetchAppointmentsUseCase";
 
 export class FetchAppointmentsClientUseCase implements IFetchAppointmentsClientUseCase {
-    constructor(private appointmentRepo: IAppointmentsRepository) {}
+    constructor(private _appointmentRepo: IAppointmentsRepository) {}
     async execute(input: FetchAppointmentsInputDto): Promise<FetchAppointmentsOutputDto> {
-        return await this.appointmentRepo.findAllAggregate(input);
+        return await this._appointmentRepo.findAllAggregate(input);
     }
 }

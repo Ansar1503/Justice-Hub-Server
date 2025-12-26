@@ -5,16 +5,16 @@ import { IVerifyMailUseCase } from "../IVerifyMailUseCase";
 
 export class VerifyMailUseCase implements IVerifyMailUseCase {
     constructor(
-        private mailProvider: INodeMailerProvider,
-        private tokenProvider: IJwtProvider,
+        private _mailProvider: INodeMailerProvider,
+        private _tokenProvider: IJwtProvider,
     ) {}
     async execute(input: { email: string; user_id: string }): Promise<void> {
         const otp = generateOtp();
-        const token = this.tokenProvider.GenerateEmailToken({
+        const token = this._tokenProvider.GenerateEmailToken({
             user_id: input.user_id,
         });
         try {
-            await this.mailProvider.sendVerificationMail(input.email, token, otp);
+            await this._mailProvider.sendVerificationMail(input.email, token, otp);
         } catch (error: any) {
             throw new Error(error.message);
         }

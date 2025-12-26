@@ -5,7 +5,7 @@ import { IAddressRepository } from "../../../domain/IRepository/IAddressRepo";
 import AddressModel, { IAddresModel } from "../model/AddressModel";
 
 export class AddressRepository implements IAddressRepository {
-    constructor(private mapper: IMapper<Address, IAddresModel> = new AddressMapper()) {}
+    constructor(private _mapper: IMapper<Address, IAddresModel> = new AddressMapper()) {}
 
     async update(payload: Address): Promise<Address> {
         const data = await AddressModel.findOneAndUpdate(
@@ -20,14 +20,14 @@ export class AddressRepository implements IAddressRepository {
             },
             { upsert: true, new: true },
         );
-        return this.mapper.toDomain(data);
+        return this._mapper.toDomain(data);
     }
     async find(user_id: string): Promise<Address | null> {
         const data = await AddressModel.findOne({ user_id: user_id });
-        return data ? this.mapper.toDomain(data) : null;
+        return data ? this._mapper.toDomain(data) : null;
     }
     async findAll(): Promise<Address[]> {
         const data = await AddressModel.find({});
-        return data && this.mapper.toDomainArray ? this.mapper.toDomainArray(data) : [];
+        return data && this._mapper.toDomainArray ? this._mapper.toDomainArray(data) : [];
     }
 }

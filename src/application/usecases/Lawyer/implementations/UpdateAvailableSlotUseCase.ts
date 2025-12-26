@@ -8,11 +8,11 @@ import { IUpdateAvailableSlotsUseCase } from "../IUpdateAvailableSlotsUseCase";
 
 export class UpdateAvailableSlotUseCase implements IUpdateAvailableSlotsUseCase {
     constructor(
-        private scheduleSettings: IScheduleSettingsRepo,
-        private availableSlotRepo: IAvailableSlots,
+        private _scheduleSettings: IScheduleSettingsRepo,
+        private _availableSlotRepo: IAvailableSlots,
     ) {}
     async execute(input: AvailabilityInputDto): Promise<AvailabilityOutputDto> {
-        const settings = await this.scheduleSettings.fetchScheduleSettings(input.lawyer_id);
+        const settings = await this._scheduleSettings.fetchScheduleSettings(input.lawyer_id);
         if (!settings) {
             const error: any = new Error("Settings not found, please create settings.");
             error.code = STATUS_CODES.NOT_FOUND;
@@ -70,7 +70,7 @@ export class UpdateAvailableSlotUseCase implements IUpdateAvailableSlotsUseCase 
             saturday: input.saturday,
             sunday: input.sunday,
         });
-        const updatedAvailability = await this.availableSlotRepo.updateAvailbleSlot(availibilitypayload);
+        const updatedAvailability = await this._availableSlotRepo.updateAvailbleSlot(availibilitypayload);
         if (!updatedAvailability) throw new Error("availble slot updation failed");
         return {
             id: updatedAvailability.id,

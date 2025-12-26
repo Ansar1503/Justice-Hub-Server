@@ -9,9 +9,9 @@ import { IReportReviewUseCase } from "@src/application/usecases/Client/IReportRe
 
 export class ReportReviewController implements IController {
     constructor(
-        private readonly reportReviewUseCase: IReportReviewUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private readonly _reportReviewUseCase: IReportReviewUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: IHttpRequest): Promise<IHttpResponse> {
@@ -24,34 +24,34 @@ export class ReportReviewController implements IController {
             };
 
             if (!review_id || review_id.trim() === "") {
-                return this.httpErrors.error_400("reviewId required");
+                return this._httpErrors.error_400("reviewId required");
             }
             if (!reason || reason.trim() === "") {
-                return this.httpErrors.error_400("reason required");
+                return this._httpErrors.error_400("reason required");
             }
             if (!reportedBy || reportedBy.trim() === "") {
-                return this.httpErrors.error_400("reportedBy required");
+                return this._httpErrors.error_400("reportedBy required");
             }
             if (!reportedUser || reportedUser.trim() === "") {
-                return this.httpErrors.error_400("reportedUser required");
+                return this._httpErrors.error_400("reportedUser required");
             }
 
-            await this.reportReviewUseCase.execute({
+            await this._reportReviewUseCase.execute({
                 review_id,
                 reason,
                 reportedBy,
                 reportedUser,
             });
 
-            return this.httpSuccess.success_200({
+            return this._httpSuccess.success_200({
                 success: true,
                 message: "Review reported ",
             });
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500("Something went wrong");
+            return this._httpErrors.error_500("Something went wrong");
         }
     }
 }

@@ -11,9 +11,9 @@ import { ICancelSessionUseCase } from "@src/application/usecases/Lawyer/ICancell
 
 export class CancelSessionController implements IController {
     constructor(
-        private cancelSession: ICancelSessionUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _cancelSession: ICancelSessionUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let id: string = "";
@@ -21,13 +21,13 @@ export class CancelSessionController implements IController {
             id = String(httpRequest.body.id);
         }
         try {
-            const result = await this.cancelSession.execute({ session_id: id });
-            return this.httpSuccess.success_200(result);
+            const result = await this._cancelSession.execute({ session_id: id });
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof AppError) {
                 return new HttpResponse(error.statusCode, error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

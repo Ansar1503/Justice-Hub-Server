@@ -9,15 +9,15 @@ import { IRejectAppointmentUseCase } from "@src/application/usecases/Lawyer/IRej
 
 export class RejectClientAppointmentController implements IController {
     constructor(
-        private RejectAppointment: IRejectAppointmentUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _RejectAppointment: IRejectAppointmentUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let id: string = "";
         let status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected" | "" = "";
         if (!httpRequest.body) {
-            return this.httpErrors.error_400("Invalid query");
+            return this._httpErrors.error_400("Invalid query");
         }
         if (typeof httpRequest.body === "object" && "id" in httpRequest.body) {
             id = String(httpRequest.body.id);
@@ -34,23 +34,23 @@ export class RejectClientAppointmentController implements IController {
             }
         }
         if (!id || !status) {
-            return this.httpErrors.error_400("Invalid Credentials");
+            return this._httpErrors.error_400("Invalid Credentials");
         }
         try {
-            const result = await this.RejectAppointment.execute({
+            const result = await this._RejectAppointment.execute({
                 id,
                 status,
             });
-            return this.httpSuccess.success_200({
+            return this._httpSuccess.success_200({
                 success: true,
                 message: "rejected appointnment",
                 data: result,
             });
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

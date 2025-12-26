@@ -9,9 +9,9 @@ import { IController } from "../Interface/IController";
 
 export class GetMessages implements IController {
     constructor(
-        private readonly chatUseCase: IChatusecase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private readonly _chatUseCase: IChatusecase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         try {
@@ -19,13 +19,13 @@ export class GetMessages implements IController {
                 cursor?: string | number;
                 sId?: string | number;
             };
-            const result = await this.chatUseCase.fetchChatMessages({
+            const result = await this._chatUseCase.fetchChatMessages({
                 page: Number(cursor),
                 session_id: String(sId),
             });
-            return this.httpSuccess.success_200(result);
+            return this._httpSuccess.success_200(result);
         } catch (error) {
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

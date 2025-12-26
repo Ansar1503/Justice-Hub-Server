@@ -14,13 +14,13 @@ import { IConfirmAppointmentUseCase } from "../IConfirmAppointmentUseCase";
 
 export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
     constructor(
-        private appointmentRepo: IAppointmentsRepository,
-        private sessionRepo: ISessionsRepo,
-        private userRepo: IUserRepository,
-        private chatRepo: IChatSessionRepo,
+        private _appointmentRepo: IAppointmentsRepository,
+        private _sessionRepo: ISessionsRepo,
+        private _userRepo: IUserRepository,
+        private _chatRepo: IChatSessionRepo,
     ) {}
     async execute(input: ChangeAppointmentStatusInputDto): Promise<ChangeAppointmentStatusOutputDto> {
-        const appointment = await this.appointmentRepo.findById(input.id);
+        const appointment = await this._appointmentRepo.findById(input.id);
         if (!appointment) {
             const error: any = new Error("appointment not found");
             error.code = STATUS_CODES.BAD_REQUEST;
@@ -61,15 +61,15 @@ export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
             bookingId: appointment.bookingId,
             caseId: appointment.caseId,
         });
-        const newsession = await this.sessionRepo.create(sessionPayload);
+        const newsession = await this._sessionRepo.create(sessionPayload);
 
         if (!newsession || !newsession.id) {
             const error: any = new Error("failed to create session");
             error.code = STATUS_CODES.BAD_REQUEST;
             throw error;
         }
-        const lawyer = await this.userRepo.findByuser_id(newsession.lawyer_id);
-        const response = await this.appointmentRepo.updateWithId(input);
+        const lawyer = await this._userRepo.findByuser_id(newsession.lawyer_id);
+        const response = await this._appointmentRepo.updateWithId(input);
         if (!response) throw new Error("session creation failed");
         const chatSessionpayload = ChatSession.create({
             last_message: "",
@@ -80,7 +80,7 @@ export class ConfirmAppointmentUseCase implements IConfirmAppointmentUseCase {
             },
             session_id: newsession.id,
         });
-        await this.chatRepo.create(chatSessionpayload);
+        await this._chatRepo.create(chatSessionpayload);
         return {
             bookingId: response.bookingId,
             caseId: response.caseId,

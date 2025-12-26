@@ -7,7 +7,7 @@ import otpModel, { IotpModel } from "../model/OtpModel";
 
 export class OtpRepository implements IOtpRepository {
     constructor(
-        private mapper: IMapper<Otp, IotpModel> = new OtpMapper(),
+        private _mapper: IMapper<Otp, IotpModel> = new OtpMapper(),
         private readonly _session?: ClientSession,
     ) {}
 
@@ -20,7 +20,7 @@ export class OtpRepository implements IOtpRepository {
     }
     async findOtp(email: string): Promise<Otp | null> {
         const data = await otpModel.findOne({ email });
-        return data ? this.mapper.toDomain(data) : null;
+        return data ? this._mapper.toDomain(data) : null;
     }
     async delete(email: string): Promise<void> {
         await otpModel.deleteOne({ email });

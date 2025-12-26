@@ -11,12 +11,12 @@ import { IRejectAppointmentUseCase } from "../IRejectAppointmentUseCase";
 
 export class RejectAppointmentUseCase implements IRejectAppointmentUseCase {
     constructor(
-        private appointmentRepo: IAppointmentsRepository,
-        private UnitofWork: IUnitofWork,
+        private _appointmentRepo: IAppointmentsRepository,
+        private _UnitofWork: IUnitofWork,
     ) {}
     async execute(input: ChangeAppointmentStatusInputDto): Promise<ChangeAppointmentStatusOutputDto> {
-        return await this.UnitofWork.startTransaction(async (uow) => {
-            const appointment = await this.appointmentRepo.findById(input.id);
+        return await this._UnitofWork.startTransaction(async (uow) => {
+            const appointment = await this._appointmentRepo.findById(input.id);
             if (!appointment) {
                 const error: any = new Error("appointment not found");
                 error.code = STATUS_CODES.BAD_REQUEST;

@@ -7,11 +7,11 @@ import { IRemoveSessionDocumentsUseCase } from "../IRemoveSessionDocumentsUseCas
 
 export class RemoveSessionDocumentsUseCase implements IRemoveSessionDocumentsUseCase {
     constructor(
-        private sessionDocumentsRepo: ISessionDocumentRepo,
-        private cloudinaryService: ICloudinaryService,
+        private _sessionDocumentsRepo: ISessionDocumentRepo,
+        private _cloudinaryService: ICloudinaryService,
     ) {}
     async execute(input: { documentId: string; sessionId: string }): Promise<UploadSessionDocumentOutPutDto | null> {
-        const existingDoc = await this.sessionDocumentsRepo.findBySessionId({
+        const existingDoc = await this._sessionDocumentsRepo.findBySessionId({
             session_id: input.sessionId,
         });
         if (!existingDoc) {
@@ -20,13 +20,13 @@ export class RemoveSessionDocumentsUseCase implements IRemoveSessionDocumentsUse
 
         const urltoDelete = existingDoc?.documents?.filter((doc) => doc?._id == input.documentId)[0].url;
 
-        this.cloudinaryService.deleteFile(urltoDelete);
+        this._cloudinaryService.deleteFile(urltoDelete);
 
-        const deleted = await this.sessionDocumentsRepo.removeOne(input.documentId);
+        const deleted = await this._sessionDocumentsRepo.removeOne(input.documentId);
         // console.log("deleted", deleted);r
         if (!deleted?.documents?.length) {
             // console.log("working....");
-            await this.sessionDocumentsRepo.removeAll(deleted?.id || "");
+            await this._sessionDocumentsRepo.removeAll(deleted?.id || "");
             return null;
         }
         return {

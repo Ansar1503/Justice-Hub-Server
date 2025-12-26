@@ -5,25 +5,25 @@ import { INotificationRepo } from "../../../domain/IRepository/INotificationRepo
 import { INotificationModel, NotificationModel } from "../model/NotificationModel";
 
 export class NotificationRepository implements INotificationRepo {
-    constructor(private mapper: IMapper<Notification, INotificationModel> = new NotificationMapper()) {}
+    constructor(private _mapper: IMapper<Notification, INotificationModel> = new NotificationMapper()) {}
     async addNotification(notification: Notification): Promise<Notification> {
-        const newNotification = new NotificationModel(this.mapper.toPersistence(notification));
+        const newNotification = new NotificationModel(this._mapper.toPersistence(notification));
         newNotification.save();
-        return this.mapper.toDomain(newNotification);
+        return this._mapper.toDomain(newNotification);
     }
     async getNotification(receipntId: string): Promise<Notification | null> {
         const notification = await NotificationModel.findOne({
             recipientId: receipntId,
         });
-        return notification ? this.mapper.toDomain(notification) : null;
+        return notification ? this._mapper.toDomain(notification) : null;
     }
     async findById(id: string): Promise<Notification | null> {
         const data = await NotificationModel.findOne({ _id: id });
-        return data ? this.mapper.toDomain(data) : null;
+        return data ? this._mapper.toDomain(data) : null;
     }
     async updateStatusById(id: string, status: boolean): Promise<Notification | null> {
         const updated = await NotificationModel.findOneAndUpdate({ _id: id }, { isRead: status }, { new: true });
-        return updated ? this.mapper.toDomain(updated) : null;
+        return updated ? this._mapper.toDomain(updated) : null;
     }
 
     async findAllByUserId({
@@ -42,7 +42,7 @@ export class NotificationRepository implements INotificationRepo {
         const hasNextPage = notifications.length > limit;
         const data = hasNextPage ? notifications.slice(0, limit) : notifications;
         return {
-            data: this.mapper.toDomainArray && data ? this.mapper.toDomainArray(data) : [],
+            data: this._mapper.toDomainArray && data ? this._mapper.toDomainArray(data) : [],
             nextCursor: hasNextPage ? cursor + 1 : undefined,
         };
     }

@@ -7,9 +7,9 @@ import { IController } from "../Interface/IController";
 
 export class DeleteSpecializationController implements IController {
     constructor(
-        private deleteSpecialization: IDeleteSpecializationUsecase,
-        private httpErrors: IHttpErrors,
-        private httpSuccess: IHttpSuccess,
+        private _deleteSpecialization: IDeleteSpecializationUsecase,
+        private _httpErrors: IHttpErrors,
+        private _httpSuccess: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let id = "";
@@ -17,16 +17,16 @@ export class DeleteSpecializationController implements IController {
             id = String(httpRequest.params.id);
         }
         if (!id) {
-            return this.httpErrors.error_400("id not found");
+            return this._httpErrors.error_400("id not found");
         }
         try {
-            const result = await this.deleteSpecialization.execute(id);
-            return this.httpSuccess.success_200(result);
+            const result = await this._deleteSpecialization.execute(id);
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

@@ -3,9 +3,9 @@ import { ISessionDocumentRepo } from "@domain/IRepository/ISessionDocumentsRepo"
 import { IFetchSessionDocumentsUseCase } from "../IFetchSessionDocumentsUseCase";
 
 export class FetchSessionsDocumentsUseCase implements IFetchSessionDocumentsUseCase {
-    constructor(private sessionDocumentsRepo: ISessionDocumentRepo) {}
+    constructor(private _sessionDocumentsRepo: ISessionDocumentRepo) {}
     async execute(input: string): Promise<FindSessionDocumentOutputDto> {
-        const result = await this.sessionDocumentsRepo.findBySessionId({
+        const result = await this._sessionDocumentsRepo.findBySessionId({
             session_id: input,
         });
         if (!result) throw new Error("session docuemt not found");

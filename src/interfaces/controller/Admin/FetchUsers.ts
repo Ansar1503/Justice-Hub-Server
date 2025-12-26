@@ -11,9 +11,9 @@ import { IController } from "../Interface/IController";
 
 export class FetchALLUsers implements IController {
     constructor(
-        private fetchUserUseCase: IFetchUsersUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _fetchUserUseCase: IFetchUsersUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     private isValidRole(value: unknown): value is UseCaseInputDto["role"] {
@@ -26,7 +26,7 @@ export class FetchALLUsers implements IController {
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         if (!httpRequest.query || typeof httpRequest.query !== "object") {
-            const error = this.httpErrors.error_400();
+            const error = this._httpErrors.error_400();
             return new HttpResponse(error.statusCode, {
                 error: "Query is missing or invalid",
             });
@@ -36,7 +36,7 @@ export class FetchALLUsers implements IController {
         const { role, search, page, limit, sort, order, status } = query;
 
         if (!this.isValidRole(role)) {
-            const error = this.httpErrors.error_400();
+            const error = this._httpErrors.error_400();
             return new HttpResponse(error.statusCode, {
                 error: role ? "Invalid role provided" : "Role is required",
             });
@@ -52,11 +52,11 @@ export class FetchALLUsers implements IController {
         };
 
         try {
-            const result = await this.fetchUserUseCase.execute(input);
-            const success = this.httpSuccess.success_200(result);
+            const result = await this._fetchUserUseCase.execute(input);
+            const success = this._httpSuccess.success_200(result);
             return new HttpResponse(success.statusCode, success.body);
         } catch (err) {
-            const error = this.httpErrors.error_500();
+            const error = this._httpErrors.error_500();
             return new HttpResponse(error.statusCode, {
                 error: "Internal Server Error",
             });

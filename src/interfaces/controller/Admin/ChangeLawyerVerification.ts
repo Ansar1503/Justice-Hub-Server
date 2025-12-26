@@ -10,38 +10,38 @@ import { IController } from "../Interface/IController";
 
 export class ChangeLawyerVerificationStatusController implements IController {
     constructor(
-        private ChangeLawyerVerificationUseCase: IChangeLawyerVerificationStatus,
-        private httpError: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _ChangeLawyerVerificationUseCase: IChangeLawyerVerificationStatus,
+        private _httpError: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const { user_id, status, rejectReason } = httpRequest.body as Record<string, any>;
         if (!user_id) {
-            const error = this.httpError.error_400();
+            const error = this._httpError.error_400();
             return new HttpResponse(error.statusCode, "UserId not found");
         }
         if (!status || !["verified", "rejected", "pending", "requested"].includes(status)) {
-            const error = this.httpError.error_400();
+            const error = this._httpError.error_400();
             return new HttpResponse(error.statusCode, "Status not found or Invalid status");
         }
         try {
-            const result = await this.ChangeLawyerVerificationUseCase.execute({
+            const result = await this._ChangeLawyerVerificationUseCase.execute({
                 user_id,
                 status,
                 rejectReason,
             });
             if (!result) {
-                const error = this.httpError.error_400();
+                const error = this._httpError.error_400();
                 return new HttpResponse(error.statusCode, error.body);
             } else {
-                const success = this.httpSuccess.success_200(result);
+                const success = this._httpSuccess.success_200(result);
                 return new HttpResponse(success.statusCode, success.body);
             }
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpError.error_400(error.message);
+                return this._httpError.error_400(error.message);
             }
-            return this.httpError.error_500();
+            return this._httpError.error_500();
         }
     }
 }

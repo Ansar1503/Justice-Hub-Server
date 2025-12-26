@@ -3,12 +3,12 @@ import { INotificationRepo } from "@domain/IRepository/INotificationRepo";
 import { IFetchAllNotificationsUseCase } from "../IFetchAllNotificationsUseCase";
 
 export class FetchAllNotificationsUseCase implements IFetchAllNotificationsUseCase {
-    constructor(private notificationRepo: INotificationRepo) {}
+    constructor(private _notificationRepo: INotificationRepo) {}
     async execute(input: {
         user_id: string;
         cursor: number;
     }): Promise<{ data: NotificationDto[] | []; nextCursor?: number }> {
-        const notification = await this.notificationRepo.findAllByUserId({
+        const notification = await this._notificationRepo.findAllByUserId({
             userId: input.user_id,
             cursor: input.cursor,
         });

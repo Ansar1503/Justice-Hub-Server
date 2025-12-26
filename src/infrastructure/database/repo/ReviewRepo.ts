@@ -15,14 +15,14 @@ import ReviewModel from "../model/ReviewModel";
 
 export class ReviewRepo implements IReviewRepo {
   constructor(
-    private mappper: IMapper<Review, IreviewModel> = new ReviewMapper()
+    private _mappper: IMapper<Review, IreviewModel> = new ReviewMapper()
   ) {}
 
   async create(payload: Review): Promise<Review> {
     const review = await new ReviewModel(
-      this.mappper.toPersistence(payload)
+      this._mappper.toPersistence(payload)
     ).save();
-    return this.mappper.toDomain(review);
+    return this._mappper.toDomain(review);
   }
   async update(payload: {
     review_id: string;
@@ -50,7 +50,7 @@ export class ReviewRepo implements IReviewRepo {
       { new: true }
     );
     if (!updatedData) return null;
-    return this.mappper.toDomain(updatedData);
+    return this._mappper.toDomain(updatedData);
   }
   async findBySession_id(
     session_id: string
@@ -199,7 +199,7 @@ export class ReviewRepo implements IReviewRepo {
   }
   async findByReview_id(id: string): Promise<Review | null> {
     const data = await reviewModel.findOne({ _id: id });
-    return data ? this.mappper.toDomain(data) : null;
+    return data ? this._mappper.toDomain(data) : null;
   }
   async findReviewsByUser_id(
     payload: FetchReviewInputDto
@@ -348,8 +348,8 @@ export class ReviewRepo implements IReviewRepo {
     const data = await reviewModel.find({
       $or: [{ client_id: userId }, { lawyer_id: userId }],
     });
-    return data && this.mappper.toDomainArray
-      ? this.mappper.toDomainArray(data)
+    return data && this._mappper.toDomainArray
+      ? this._mappper.toDomainArray(data)
       : [];
   }
 }

@@ -3,8 +3,8 @@ import { CasetypeFetchQueryDto, CaseTypeFetchResultDto } from "@src/application/
 import { IFechAllCasetypeUsecase } from "../IFetchAllCasetypeUsecase";
 
 export class FetchCasetypeUsecase implements IFechAllCasetypeUsecase {
-    constructor(private casetypeRepo: ICasetype) {}
+    constructor(private _casetypeRepo: ICasetype) {}
     async execute(input: CasetypeFetchQueryDto): Promise<CaseTypeFetchResultDto> {
-        return await this.casetypeRepo.findAllByQuery(input);
+        return await this._casetypeRepo.findAllByQuery(input);
     }
 }

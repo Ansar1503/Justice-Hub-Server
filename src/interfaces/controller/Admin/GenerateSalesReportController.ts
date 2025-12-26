@@ -7,7 +7,7 @@ import { IHttpSuccess } from "@interfaces/helpers/IHttpSuccess";
 
 export class DownloadSalesReportController implements IController {
   constructor(
-    private readonly usecase: IGenerateSalesReport,
+    private readonly _usecase: IGenerateSalesReport,
     private _errors: IHttpErrors,
     private _success: IHttpSuccess
   ) {}
@@ -22,7 +22,7 @@ export class DownloadSalesReportController implements IController {
         return this._errors.error_400("Invalid credentials");
       }
 
-      const result = await this.usecase.execute({
+      const result = await this._usecase.execute({
         startDate,
         endDate,
         format,

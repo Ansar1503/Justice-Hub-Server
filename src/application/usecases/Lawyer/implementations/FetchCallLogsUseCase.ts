@@ -3,9 +3,9 @@ import { ICallLogs } from "@domain/IRepository/ICallLogs";
 import { IFetchCallLogsUseCase } from "../IFetchCallLogsUseCase";
 
 export class FetchCallLogsUseCase implements IFetchCallLogsUseCase {
-    constructor(private callLogsRepo: ICallLogs) {}
+    constructor(private _callLogsRepo: ICallLogs) {}
     async execute(input: FetchCallLogsInputDto): Promise<FetchCallLogsOutputDto> {
-        const result = await this.callLogsRepo.findBySessionId(input);
+        const result = await this._callLogsRepo.findBySessionId(input);
         return {
             currentPage: result.currentPage,
             totalCount: result.totalCount,

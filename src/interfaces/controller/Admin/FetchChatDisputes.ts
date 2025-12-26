@@ -10,24 +10,24 @@ import { IController } from "../Interface/IController";
 
 export class FetchChatDisputesController implements IController {
     constructor(
-        private fetchChatDisputes: IFetchChatDisputesUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _fetchChatDisputes: IFetchChatDisputesUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const parsed = FetchChatDisputesQueryZodValidator.safeParse(httpRequest.query);
         if (!parsed.success) {
             const err = parsed.error.errors[0];
-            return this.httpErrors.error_400(err.message);
+            return this._httpErrors.error_400(err.message);
         }
         try {
-            const response = await this.fetchChatDisputes.execute(parsed.data);
-            return this.httpSuccess.success_200(response);
+            const response = await this._fetchChatDisputes.execute(parsed.data);
+            return this._httpSuccess.success_200(response);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

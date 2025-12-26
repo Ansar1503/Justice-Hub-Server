@@ -7,7 +7,7 @@ import LawyerDocumentsModel, { ILawyerDocumentsModel } from "../model/LawyerDocu
 
 export class LawyerDocumentsRepository implements ILawyerDocumentsRepository {
     constructor(
-        private mapper: IMapper<LawyerDocuments, ILawyerDocumentsModel> = new lawyerDocumentsMapper(),
+        private _mapper: IMapper<LawyerDocuments, ILawyerDocumentsModel> = new lawyerDocumentsMapper(),
         private _session?: ClientSession,
     ) {}
     async create(documents: LawyerDocuments): Promise<LawyerDocuments> {
@@ -21,11 +21,11 @@ export class LawyerDocumentsRepository implements ILawyerDocumentsRepository {
             { upsert: true, new: true, session: this._session },
         );
 
-        return this.mapper.toDomain(createdDocument);
+        return this._mapper.toDomain(createdDocument);
     }
 
     async find(user_id: string): Promise<LawyerDocuments | null> {
         const data = await LawyerDocumentsModel.findOne({ userId: user_id }, {}, { session: this._session });
-        return data ? this.mapper.toDomain(data) : null;
+        return data ? this._mapper.toDomain(data) : null;
     }
 }

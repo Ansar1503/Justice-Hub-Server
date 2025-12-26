@@ -7,9 +7,9 @@ import { IController } from "../Interface/IController";
 
 export class AddCasetypeController implements IController {
     constructor(
-        private AddCasetype: IAddCasetypeUsecase,
-        private httpErrors: IHttpErrors,
-        private httpSuccess: IHttpSuccess,
+        private _AddCasetype: IAddCasetypeUsecase,
+        private _httpErrors: IHttpErrors,
+        private _httpSuccess: IHttpSuccess,
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let name = "";
@@ -23,22 +23,22 @@ export class AddCasetypeController implements IController {
             }
         }
         if (!name) {
-            return this.httpErrors.error_400("name field is required");
+            return this._httpErrors.error_400("name field is required");
         }
         if (!practiceid) {
-            return this.httpErrors.error_400("practice area Id is required");
+            return this._httpErrors.error_400("practice area Id is required");
         }
         try {
-            const result = await this.AddCasetype.execute({
+            const result = await this._AddCasetype.execute({
                 name,
                 practiceareaId: practiceid,
             });
-            return this.httpSuccess.success_200(result);
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

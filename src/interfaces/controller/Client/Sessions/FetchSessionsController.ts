@@ -10,16 +10,16 @@ import { IController } from "../../Interface/IController";
 
 export class FetchSessionController implements IController {
     constructor(
-        private fetchSessions: IFetchSessionsUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _fetchSessions: IFetchSessionsUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const req = httpRequest as Record<string, any>;
         const user_id = req.user?.id;
         const { search, status, sort, order, consultation_type, page, limit } = req.query;
         try {
-            const result = await this.fetchSessions.execute({
+            const result = await this._fetchSessions.execute({
                 user_id,
                 search: typeof search === "string" ? search : "",
                 status:
@@ -43,10 +43,10 @@ export class FetchSessionController implements IController {
                 page: page ? Number(page) : 1,
                 limit: limit ? Number(limit) : 10,
             });
-            const success = this.httpSuccess.success_200(result);
+            const success = this._httpSuccess.success_200(result);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            const err = this.httpErrors.error_500();
+            const err = this._httpErrors.error_500();
             return new HttpResponse(err.statusCode, err.body);
         }
     }

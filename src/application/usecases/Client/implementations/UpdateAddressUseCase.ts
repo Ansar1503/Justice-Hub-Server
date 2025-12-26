@@ -8,13 +8,13 @@ import { IUpdateAddressUseCase } from "../IUpdateAddressUseCase";
 
 export class UpdateAddressUseCase implements IUpdateAddressUseCase {
     constructor(
-        private userRepository: IUserRepository,
-        private clientRepository: IClientRepository,
-        private addressRepository: IAddressRepository,
+        private _userRepository: IUserRepository,
+        private _clientRepository: IClientRepository,
+        private _addressRepository: IAddressRepository,
     ) {}
     async execute(input: AddressInputDto): Promise<void> {
-        const userDetails = await this.userRepository.findByuser_id(input.user_id);
-        const clientDetails = await this.clientRepository.findByUserId(input.user_id);
+        const userDetails = await this._userRepository.findByuser_id(input.user_id);
+        const clientDetails = await this._clientRepository.findByUserId(input.user_id);
         if (!userDetails) {
             throw new Error("USER_NOT_FOUND");
         }
@@ -29,7 +29,7 @@ export class UpdateAddressUseCase implements IUpdateAddressUseCase {
             pincode: input.pincode,
             state: input.state,
         });
-        const updatedAddress = await this.addressRepository.update(addresspayload);
+        const updatedAddress = await this._addressRepository.update(addresspayload);
         const updateData = new ClientUpdateDto({
             email: userDetails.email,
             mobile: userDetails.mobile || "",
@@ -43,6 +43,6 @@ export class UpdateAddressUseCase implements IUpdateAddressUseCase {
             is_blocked: userDetails.is_blocked,
             is_verified: userDetails.is_blocked,
         });
-        await this.clientRepository.update(updateData);
+        await this._clientRepository.update(updateData);
     }
 }

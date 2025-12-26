@@ -11,9 +11,9 @@ import { IStartSessionUseCase } from "@src/application/usecases/Lawyer/IStartSes
 
 export class StartSessionController implements IController {
     constructor(
-        private startSessionUseCase: IStartSessionUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _startSessionUseCase: IStartSessionUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let sessionId: string = "";
@@ -21,16 +21,16 @@ export class StartSessionController implements IController {
             sessionId = String(httpRequest.body.sessionId);
         }
         if (!sessionId) {
-            return this.httpErrors.error_400("session id is required");
+            return this._httpErrors.error_400("session id is required");
         }
         try {
-            const result = await this.startSessionUseCase.execute({ sessionId });
-            return this.httpSuccess.success_200(result);
+            const result = await this._startSessionUseCase.execute({ sessionId });
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof AppError) {
                 return new HttpResponse(error.statusCode, error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

@@ -5,10 +5,10 @@ import { ForbiddenError, InternalError, UnauthorizedError } from "@interfaces/mi
 import { ITokenManagerProvider } from "@src/application/providers/ITokenManagerProvider";
 
 export class TokenManagerProvider implements ITokenManagerProvider {
-    private ACCESS_SECRET_KEY: Secret = process.env.JWT_ACCESS_SECRET || "your-access-secret-key";
+    private _ACCESS_SECRET_KEY: Secret = process.env.JWT_ACCESS_SECRET || "your-access-secret-key";
     validateToken(token: string): AuthenticatedUser {
         try {
-            const user = jwt.verify(token, this.ACCESS_SECRET_KEY);
+            const user = jwt.verify(token, this._ACCESS_SECRET_KEY);
             return user as AuthenticatedUser;
         } catch (error) {
             if (error instanceof jwt.TokenExpiredError) {

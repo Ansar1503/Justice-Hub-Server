@@ -10,9 +10,9 @@ import { IController } from "../../Interface/IController";
 
 export class RemoveSessionDocumentController implements IController {
     constructor(
-        private removeSessionDocument: IRemoveSessionDocumentsUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _removeSessionDocument: IRemoveSessionDocumentsUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const req = httpRequest as Record<string, any>;
@@ -25,17 +25,17 @@ export class RemoveSessionDocumentController implements IController {
             return new HttpResponse(400, { message: "session id not found" });
         }
         try {
-            const result = await this.removeSessionDocument.execute({
+            const result = await this._removeSessionDocument.execute({
                 documentId: documentId,
                 sessionId: String(session),
             });
-            const success = this.httpSuccess.success_200(result);
+            const success = this._httpSuccess.success_200(result);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

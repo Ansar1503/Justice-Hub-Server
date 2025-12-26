@@ -7,15 +7,15 @@ import {
 import "dotenv/config";
 
 export class StripeSubscriptionService implements IStripeSubscriptionService {
-  private stripe: Stripe;
+  private _stripe: Stripe;
 
   constructor() {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+    this._stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
   }
 
   async createProduct(data: CreateStripeSubscriptionProduct): Promise<string> {
     try {
-      const product = await this.stripe.products.create({
+      const product = await this._stripe.products.create({
         name: data.name,
         description: data.description,
       });
@@ -29,14 +29,14 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
     try {
       let price: Stripe.Price;
       if (data.interval !== "none") {
-        price = await this.stripe.prices.create({
+        price = await this._stripe.prices.create({
           product: data.productId,
           unit_amount: data.amount * 100,
           currency: data.currency,
           recurring: { interval: data.interval },
         });
       } else {
-        price = await this.stripe.prices.create({
+        price = await this._stripe.prices.create({
           product: data.productId,
           unit_amount: data.amount * 100,
           currency: data.currency,
@@ -50,7 +50,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
 
   async deleteProduct(productId: string): Promise<void> {
     try {
-      await this.stripe.products.del(productId);
+      await this._stripe.products.del(productId);
     } catch {
       throw new Error("Failed to delete Stripe product");
     }
@@ -61,7 +61,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
     data: { name?: string; description?: string }
   ): Promise<void> {
     try {
-      await this.stripe.products.update(productId, data);
+      await this._stripe.products.update(productId, data);
     } catch {
       throw new Error("Failed to update Stripe product");
     }
@@ -69,7 +69,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
 
   async deactivatePrice(priceId: string): Promise<void> {
     try {
-      await this.stripe.prices.update(priceId, { active: false });
+      await this._stripe.prices.update(priceId, { active: false });
     } catch {
       throw new Error("Failed to deactivate Stripe price");
     }
@@ -80,7 +80,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
     isActive: boolean
   ): Promise<void> {
     try {
-      await this.stripe.products.update(productId, { active: isActive });
+      await this._stripe.products.update(productId, { active: isActive });
     } catch {
       throw new Error(
         `Failed to ${isActive ? "activate" : "deactivate"} Stripe product`
@@ -93,7 +93,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
     isActive: boolean
   ): Promise<void> {
     try {
-      await this.stripe.prices.update(priceId, { active: isActive });
+      await this._stripe.prices.update(priceId, { active: isActive });
     } catch {
       throw new Error(
         `Failed to ${isActive ? "activate" : "deactivate"} Stripe price`
@@ -103,7 +103,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
 
   async createCustomer(data: { email: string; name: string }) {
     try {
-      const customer = await this.stripe.customers.create({
+      const customer = await this._stripe.customers.create({
         email: data.email,
         name: data.name,
       });
@@ -136,7 +136,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
         payload.customer_email = data.customerEmail;
       }
 
-      const session = await this.stripe.checkout.sessions.create(payload);
+      const session = await this._stripe.checkout.sessions.create(payload);
       return { url: session.url! };
     } catch (error) {
       console.log("error creating checkout session:", error);
@@ -146,7 +146,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
 
   async createSubscription(data: { customerId: string; priceId: string }) {
     try {
-      const subscription = await this.stripe.subscriptions.create({
+      const subscription = await this._stripe.subscriptions.create({
         customer: data.customerId,
         items: [{ price: data.priceId }],
         payment_behavior: "default_incomplete",
@@ -160,7 +160,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
 
   async cancelSubscription(subscriptionId: string): Promise<void> {
     try {
-      await this.stripe.subscriptions.cancel(subscriptionId);
+      await this._stripe.subscriptions.cancel(subscriptionId);
     } catch (error: any) {
       throw new Error(
         `Failed to cancel subscription: ${
@@ -175,7 +175,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
     signature: string;
   }): Promise<Stripe.Event> {
     try {
-      const event = this.stripe.webhooks.constructEvent(
+      const event = this._stripe.webhooks.constructEvent(
         data.rawBody,
         data.signature,
         process.env.STRIPE_WEBHOOK_SECRET!
@@ -189,7 +189,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
 
   async deleteCustomer(customerId: string): Promise<void> {
     try {
-      await this.stripe.customers.del(customerId);
+      await this._stripe.customers.del(customerId);
       console.log(`✅ Deleted Stripe customer: ${customerId}`);
     } catch (error) {
       console.error("❌ Failed to delete Stripe customer:", error);
@@ -202,7 +202,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
   ): Promise<Stripe.Subscription> {
     try {
       const subscription =
-        await this.stripe.subscriptions.retrieve(stripeSubscriptionId);
+        await this._stripe.subscriptions.retrieve(stripeSubscriptionId);
       return subscription;
     } catch (error) {
       console.error("❌ Failed to fetch Stripe subscription:", error);
@@ -211,7 +211,7 @@ export class StripeSubscriptionService implements IStripeSubscriptionService {
   }
   async cancelAtPeriodEnd(subscriptionId: string): Promise<void> {
     try {
-      await this.stripe.subscriptions.update(subscriptionId, {
+      await this._stripe.subscriptions.update(subscriptionId, {
         cancel_at_period_end: true,
       });
     } catch (error) {

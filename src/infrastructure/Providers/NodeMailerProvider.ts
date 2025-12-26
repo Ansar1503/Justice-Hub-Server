@@ -3,29 +3,29 @@ import { INodeMailerProvider } from "@src/application/providers/NodeMailerProvid
 import "dotenv/config";
 
 export class NodeMailerProvider implements INodeMailerProvider {
-    private smtpUser = process.env.SMTP_USER;
-    private smtpPass = process.env.SMTP_PASS;
-    private baseUrl = process.env.BASE_URL;
-    private transporter;
+    private _smtpUser = process.env.SMTP_USER;
+    private _smtpPass = process.env.SMTP_PASS;
+    private _baseUrl = process.env.BASE_URL;
+    private _transporter;
     constructor() {
-        this.transporter = nodemailer.createTransport({
+        this._transporter = nodemailer.createTransport({
             service: "gmail",
             port: 587,
             auth: {
-                user: this.smtpUser,
-                pass: this.smtpPass,
+                user: this._smtpUser,
+                pass: this._smtpPass,
             },
         });
     }
 
     async sendVerificationMail(email: string, token: string, otp: string): Promise<void> {
         const mailoptions = {
-            from: this.smtpUser,
+            from: this._smtpUser,
             to: email,
             subject: "Verification mail",
             html: `<h2> Justice Hub verify Mail</h2><br/>
             <p>Click <button><a href="${
-    this.baseUrl
+    this._baseUrl
 }/api/user/verify-email?token=${token}&email=${email}">here</a></button> to verify your email.</p><br/>
             ${
     otp &&
@@ -34,7 +34,7 @@ export class NodeMailerProvider implements INodeMailerProvider {
 }`,
         };
         try {
-            await this.transporter.sendMail(mailoptions);
+            await this._transporter.sendMail(mailoptions);
         } catch (error) {
             throw new Error("MAIL_SEND_ERROR");
         }

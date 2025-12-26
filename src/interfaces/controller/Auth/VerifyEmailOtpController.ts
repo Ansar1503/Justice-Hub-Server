@@ -10,25 +10,25 @@ import { IController } from "../Interface/IController";
 
 export class VerifyEmailOtpController implements IController {
     constructor(
-        private verifyEmailByOtpUseCase: IVerifyEmailByOtp,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _verifyEmailByOtpUseCase: IVerifyEmailByOtp,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const { otpValue: otp, email } = httpRequest.body as Record<string, any>;
         if (!otp || !email) {
-            const err = this.httpErrors.error_400();
+            const err = this._httpErrors.error_400();
             return new HttpResponse(err.statusCode, err.body);
         }
         try {
-            await this.verifyEmailByOtpUseCase.execute({ email, otp });
-            const success = this.httpSuccess.success_200();
+            await this._verifyEmailByOtpUseCase.execute({ email, otp });
+            const success = this._httpSuccess.success_200();
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

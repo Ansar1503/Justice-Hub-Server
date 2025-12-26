@@ -10,15 +10,15 @@ import { IConfirmAppointmentUseCase } from "@src/application/usecases/Lawyer/ICo
 
 export class ConfirmClientAppointment implements IController {
     constructor(
-        private confirmAppointment: IConfirmAppointmentUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _confirmAppointment: IConfirmAppointmentUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let id: string = "";
         let status: "confirmed" | "pending" | "completed" | "cancelled" | "rejected" | "" = "";
         if (!httpRequest.body) {
-            return this.httpErrors.error_400("Invalid query");
+            return this._httpErrors.error_400("Invalid query");
         }
         if (typeof httpRequest.body === "object" && "id" in httpRequest.body) {
             id = String(httpRequest.body.id);
@@ -35,14 +35,14 @@ export class ConfirmClientAppointment implements IController {
             }
         }
         if (!id || !status) {
-            return this.httpErrors.error_400("Invalid Credentials");
+            return this._httpErrors.error_400("Invalid Credentials");
         }
         try {
-            const result = await this.confirmAppointment.execute({
+            const result = await this._confirmAppointment.execute({
                 id,
                 status,
             });
-            return this.httpSuccess.success_200({
+            return this._httpSuccess.success_200({
                 success: true,
                 message: "session created",
                 data: result,
@@ -53,7 +53,7 @@ export class ConfirmClientAppointment implements IController {
                     typeof error?.code === "number" && error.code >= 100 && error.code < 600 ? error.code : 500;
                 return new HttpResponse(statusCode, { message: error.message });
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

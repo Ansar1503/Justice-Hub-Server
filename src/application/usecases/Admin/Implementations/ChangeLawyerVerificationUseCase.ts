@@ -6,12 +6,12 @@ import { IChangeLawyerVerificationStatus } from "../IChangeLawyerVerificationSta
 
 export class ChangeLawyerVerificationStatus implements IChangeLawyerVerificationStatus {
     constructor(
-        private UserRepo: IUserRepository,
+        private _UserRepo: IUserRepository,
         private _lawyerVerificationRepo: ILawyerVerificationRepo,
     ) {}
 
     async execute(input: ChangeLawyerVerificationInnOutDto): Promise<ChangeLawyerVerificationInnOutDto> {
-        const userDetails = await this.UserRepo.findByuser_id(input.user_id);
+        const userDetails = await this._UserRepo.findByuser_id(input.user_id);
         if (!userDetails) {
             throw new ValidationError("USER_NOT_FOUND");
         }

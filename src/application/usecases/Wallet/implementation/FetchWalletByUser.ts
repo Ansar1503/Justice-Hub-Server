@@ -3,9 +3,9 @@ import { IWalletRepo } from "@domain/IRepository/IWalletRepo";
 import { IFetchWalletByUser } from "../IFetchWalletByUser";
 
 export class FetchWalletByUser implements IFetchWalletByUser {
-    constructor(private walletRepo: IWalletRepo) {}
+    constructor(private _walletRepo: IWalletRepo) {}
     async execute(input: string): Promise<WalletDto> {
-        const wallet = await this.walletRepo.getWalletByUserId(input);
+        const wallet = await this._walletRepo.getWalletByUserId(input);
         if (!wallet) throw new Error("Wallet not found");
         return {
             balance: wallet.balance,

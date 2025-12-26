@@ -10,9 +10,9 @@ import { IController } from "../../Interface/IController";
 
 export class AddReviewController implements IController {
     constructor(
-        private addReview: IAddReviewUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _addReview: IAddReviewUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
@@ -23,26 +23,26 @@ export class AddReviewController implements IController {
             const { review, rating, sessionId, heading } = body;
 
             if (!client_id) {
-                const error = this.httpErrors.error_403("unauthorised access");
+                const error = this._httpErrors.error_403("unauthorised access");
                 return new HttpResponse(error.statusCode, error.body);
             }
 
             if (!lawyer_id) {
-                const error = this.httpErrors.error_400("lawyer not found");
+                const error = this._httpErrors.error_400("lawyer not found");
                 return new HttpResponse(error.statusCode, error.body);
             }
 
             if (!review || !rating || !heading) {
-                const error = this.httpErrors.error_400("please provide a review");
+                const error = this._httpErrors.error_400("please provide a review");
                 return new HttpResponse(error.statusCode, error.body);
             }
 
             if (!sessionId) {
-                const error = this.httpErrors.error_400("You had no session with this lawyer");
+                const error = this._httpErrors.error_400("You had no session with this lawyer");
                 return new HttpResponse(error.statusCode, error.body);
             }
 
-            await this.addReview.execute({
+            await this._addReview.execute({
                 client_id,
                 lawyer_id,
                 rating,
@@ -51,7 +51,7 @@ export class AddReviewController implements IController {
                 heading,
             });
 
-            const success = this.httpSuccess.success_200({ message: "review added" });
+            const success = this._httpSuccess.success_200({ message: "review added" });
             return new HttpResponse(success.statusCode, success.body);
         } catch (error: any) {
             switch (error.message) {

@@ -8,26 +8,26 @@ import UserModel, { IUserModel } from "../model/UserModel";
 
 export class UserRepository implements IUserRepository {
   constructor(
-    private readonly Mapper: IMapper<User, IUserModel> = new UserMapper(),
+    private readonly _Mapper: IMapper<User, IUserModel> = new UserMapper(),
     private readonly _session?: ClientSession
   ) {
     // super(UserModel, Mapper);
   }
   async create(user: User): Promise<User> {
-    const mapped = this.Mapper.toPersistence(user);
+    const mapped = this._Mapper.toPersistence(user);
     const savedUser = await new UserModel(mapped)
       .save({ session: this._session })
-    return this.Mapper.toDomain(savedUser);
+    return this._Mapper.toDomain(savedUser);
   }
 
   async findByEmail(email: string): Promise<User | null> {
     const userDoc = await UserModel.findOne({ email });
-    return userDoc ? this.Mapper.toDomain(userDoc) : null;
+    return userDoc ? this._Mapper.toDomain(userDoc) : null;
   }
 
   async findByuser_id(user_id: string): Promise<User | null> {
     const userDoc = await UserModel.findOne({ user_id });
-    return userDoc ? this.Mapper?.toDomain(userDoc) : null;
+    return userDoc ? this._Mapper?.toDomain(userDoc) : null;
   }
 
   async update(user: Partial<User>): Promise<User | null> {
@@ -73,7 +73,7 @@ export class UserRepository implements IUserRepository {
     const updated = await UserModel.findOneAndUpdate(query, update, {
       new: true,
     });
-    return updated ? this.Mapper.toDomain(updated) : null;
+    return updated ? this._Mapper.toDomain(updated) : null;
   }
   async findAll(query: {
     role: "lawyer" | "client";

@@ -5,7 +5,7 @@ import { IHandleStripeHookUseCase } from "@src/application/usecases/Client/IHand
 import { IController } from "../Interface/IController";
 
 export class HandleWebhookController implements IController {
-    constructor(private handleWebHook: IHandleStripeHookUseCase) {}
+    constructor(private _handleWebHook: IHandleStripeHookUseCase) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const signature =
@@ -16,7 +16,7 @@ export class HandleWebhookController implements IController {
         }
 
         try {
-            await this.handleWebHook.execute({ body: httpRequest.body, signature });
+            await this._handleWebHook.execute({ body: httpRequest.body, signature });
             return new HttpResponse(200, "Webhook received");
         } catch (error: any) {
             return new HttpResponse(400, "Webhook error");

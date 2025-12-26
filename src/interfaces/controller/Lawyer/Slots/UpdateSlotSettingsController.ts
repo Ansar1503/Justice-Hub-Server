@@ -9,9 +9,9 @@ import { IController } from "../../Interface/IController";
 
 export class UpdateLawyerSlotSettingsController implements IController {
     constructor(
-        private updateSlotSettings: IUpdateSlotSettingsUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _updateSlotSettings: IUpdateSlotSettingsUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
@@ -23,7 +23,7 @@ export class UpdateLawyerSlotSettingsController implements IController {
             user_id = String(httpRequest.user.id);
         }
         if (!user_id) {
-            return this.httpErrors.error_400("User_id Not found");
+            return this._httpErrors.error_400("User_id Not found");
         }
 
         if (httpRequest.body && typeof httpRequest.body === "object") {
@@ -53,21 +53,21 @@ export class UpdateLawyerSlotSettingsController implements IController {
         }
 
         if (!slotDuration || !maxDaysInAdvance || autoConfirm === undefined || autoConfirm === null) {
-            return this.httpErrors.error_400("Provide required fields");
+            return this._httpErrors.error_400("Provide required fields");
         }
         try {
-            const slotSettings = await this.updateSlotSettings.execute({
+            const slotSettings = await this._updateSlotSettings.execute({
                 autoConfirm: autoConfirm,
                 lawyer_id: user_id,
                 maxDaysInAdvance: maxDaysInAdvance,
                 slotDuration: slotDuration,
             });
-            return this.httpSuccess.success_200(slotSettings);
+            return this._httpSuccess.success_200(slotSettings);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

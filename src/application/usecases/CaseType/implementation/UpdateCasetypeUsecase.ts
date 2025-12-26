@@ -5,21 +5,21 @@ import { IUpdateCaseTypeUsecase } from "../IUpdatedCaseTypeUsecase";
 
 export class UpdateCasetypeUsecase implements IUpdateCaseTypeUsecase {
     constructor(
-        private caseTypeRepo: ICasetype,
-        private practiceAreaRepo: IPracticAreaRepo,
+        private _caseTypeRepo: ICasetype,
+        private _practiceAreaRepo: IPracticAreaRepo,
     ) {}
     async execute(input: UpdateCasetypeInputDto): Promise<CaseTypeDto> {
-        const existsCasetype = await this.caseTypeRepo.findById(input.id);
+        const existsCasetype = await this._caseTypeRepo.findById(input.id);
         if (!existsCasetype) throw new Error("no case type exists");
-        const existsPracticeArea = await this.practiceAreaRepo.findById(input.practiceareaId);
+        const existsPracticeArea = await this._practiceAreaRepo.findById(input.practiceareaId);
         if (!existsPracticeArea) throw new Error("practice area not found");
         existsCasetype.updateName(input.name);
         existsCasetype.updatePracticeareaId(input.practiceareaId);
-        const existsName = await this.caseTypeRepo.findByName(input.name);
+        const existsName = await this._caseTypeRepo.findByName(input.name);
         if (existsName && existsName.id !== input.id) {
             throw new Error("another case type exists with the name " + input.name);
         }
-        const updatedCasetype = await this.caseTypeRepo.update({
+        const updatedCasetype = await this._caseTypeRepo.update({
             id: input.id,
             name: input.name,
             practiceareaId: input.practiceareaId,

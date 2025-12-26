@@ -10,9 +10,9 @@ import { IController } from "../../Interface/IController";
 
 export class FetchSessionsDocumentsController implements IController {
     constructor(
-        private fetchSessionDocuments: IFetchExistingSessionDocumentsUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _fetchSessionDocuments: IFetchExistingSessionDocumentsUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
@@ -23,14 +23,14 @@ export class FetchSessionsDocumentsController implements IController {
         }
 
         try {
-            const result = await this.fetchSessionDocuments.execute(session_id);
-            const success = this.httpSuccess.success_200(result);
+            const result = await this._fetchSessionDocuments.execute(session_id);
+            const success = this._httpSuccess.success_200(result);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

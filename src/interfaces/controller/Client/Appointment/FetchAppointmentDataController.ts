@@ -10,9 +10,9 @@ import { IController } from "../../Interface/IController";
 
 export class FetchAppointmentDataController implements IController {
     constructor(
-        private fetchAppointments: IFetchAppointmentsClientUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _fetchAppointments: IFetchAppointmentsClientUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
@@ -30,20 +30,20 @@ export class FetchAppointmentDataController implements IController {
         const parsedData = zodAppointmentQuerySchema.safeParse(httpRequest.query);
         if (!parsedData.success) {
             const err = parsedData.error.errors[0];
-            return this.httpErrors.error_400(err.message);
+            return this._httpErrors.error_400(err.message);
         }
         try {
-            const result = await this.fetchAppointments.execute({
+            const result = await this._fetchAppointments.execute({
                 ...parsedData.data,
                 user_id,
             });
-            const success = this.httpSuccess.success_200(result);
+            const success = this._httpSuccess.success_200(result);
             return success;
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

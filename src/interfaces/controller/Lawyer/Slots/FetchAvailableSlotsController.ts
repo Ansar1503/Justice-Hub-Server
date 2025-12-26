@@ -9,9 +9,9 @@ import { IController } from "../../Interface/IController";
 
 export class FetchAvailableSlotsController implements IController {
     constructor(
-        private availableSlots: IFetchAvailableSlotsUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _availableSlots: IFetchAvailableSlotsUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
@@ -19,20 +19,20 @@ export class FetchAvailableSlotsController implements IController {
             user_id = String(httpRequest.user.id);
         }
         if (!user_id) {
-            return this.httpErrors.error_400("User_id Not found");
+            return this._httpErrors.error_400("User_id Not found");
         }
         try {
-            const response = await this.availableSlots.execute(user_id);
-            return this.httpSuccess.success_200({
+            const response = await this._availableSlots.execute(user_id);
+            return this._httpSuccess.success_200({
                 success: true,
                 message: "fetched data",
                 data: response,
             });
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_500(error.message);
+                return this._httpErrors.error_500(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

@@ -10,13 +10,13 @@
 
 // export class AddFundsUsecase implements IAddFundsUsecase {
 //   constructor(
-//     private walletRepo: IWalletRepo,
-//     private walletTransaction: IWalletTransactionsRepo
+//     private _walletRepo: IWalletRepo,
+//     private _walletTransaction: IWalletTransactionsRepo
 //   ) {}
 //   async execute(
 //     input: addFundsToWalletInputDto
 //   ): Promise<addFundsToWalletOutputDto> {
-//     const wallet = await this.walletRepo.getWalletByUserId(input.userId);
+//     const wallet = await this._walletRepo.getWalletByUserId(input.userId);
 //     if (!wallet) throw new Error("Wallet  does not exist");
 //     const desc = generateDescription({
 //       amount: input.amount,

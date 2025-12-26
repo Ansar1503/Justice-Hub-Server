@@ -10,28 +10,28 @@ import { IController } from "../Interface/IController";
 
 export class LoginController implements IController {
   constructor(
-    private loginUseCase: ILoginUserUseCase,
-    private httpErrors: IHttpErrors = new HttpErrors(),
-    private httpSuccess: IHttpSuccess = new HttpSuccess()
+    private _loginUseCase: ILoginUserUseCase,
+    private _httpErrors: IHttpErrors = new HttpErrors(),
+    private _httpSuccess: IHttpSuccess = new HttpSuccess()
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
     const { email, password } = httpRequest.body as Record<string, any>;
     if (!email || !password) {
-      const err = this.httpErrors.error_400();
+      const err = this._httpErrors.error_400();
       return new HttpResponse(err.statusCode, err.body);
     }
     try {
-      const responsedata = await this.loginUseCase.execute({
+      const responsedata = await this._loginUseCase.execute({
         email: email.toLowerCase(),
         password,
       });
-      const success = this.httpSuccess.success_200(responsedata);
+      const success = this._httpSuccess.success_200(responsedata);
       return new HttpResponse(success.statusCode, success.body);
     } catch (error) {
       if (error instanceof Error) {
-        return this.httpErrors.error_400(error.message);
+        return this._httpErrors.error_400(error.message);
       }
-      const err = this.httpErrors.error_500();
+      const err = this._httpErrors.error_500();
       return new HttpResponse(err.statusCode, err.body);
     }
   }

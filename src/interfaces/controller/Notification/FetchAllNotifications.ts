@@ -9,9 +9,9 @@ import { IController } from "../Interface/IController";
 
 export class FetchAllNotificationsController implements IController {
     constructor(
-        private fetchAllNotificationsUseCase: IFetchAllNotificationsUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _fetchAllNotificationsUseCase: IFetchAllNotificationsUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id = "";
@@ -31,16 +31,16 @@ export class FetchAllNotificationsController implements IController {
             }
         }
         try {
-            const result = await this.fetchAllNotificationsUseCase.execute({
+            const result = await this._fetchAllNotificationsUseCase.execute({
                 user_id: user_id,
                 cursor,
             });
-            return this.httpSuccess.success_200(result);
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

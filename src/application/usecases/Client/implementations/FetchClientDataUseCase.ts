@@ -8,23 +8,23 @@ import { IFetchClientDataUseCase } from "../IFetchClientData";
 
 export class FetchClientDataUseCaseDto implements IFetchClientDataUseCase {
     constructor(
-        private userRepository: IUserRepository,
-        private clientRepository: IClientRepository,
-        private addressRepository: IAddressRepository,
-        private lawyerRepository: ILawyerVerificationRepo,
+        private _userRepository: IUserRepository,
+        private _clientRepository: IClientRepository,
+        private _addressRepository: IAddressRepository,
+        private _lawyerRepository: ILawyerVerificationRepo,
     ) {}
     async execute(input: string): Promise<FetchClientDto> {
         try {
-            const userDetails = await this.userRepository.findByuser_id(input);
+            const userDetails = await this._userRepository.findByuser_id(input);
             if (!userDetails) {
                 throw new Error("USER_NOT_FOUND");
             }
-            const clientdetails = await this.clientRepository.findByUserId(input);
-            const addressDetails = await this.addressRepository.find(input);
+            const clientdetails = await this._clientRepository.findByUserId(input);
+            const addressDetails = await this._addressRepository.find(input);
             let lawyerVerfication;
             let rejectReason;
             if (userDetails.role === "lawyer") {
-                const lawyerData = await this.lawyerRepository.findByUserId(input);
+                const lawyerData = await this._lawyerRepository.findByUserId(input);
                 lawyerVerfication = lawyerData?.verificationStatus;
                 rejectReason = lawyerData?.rejectReason;
             }

@@ -8,13 +8,13 @@ import { IFetchWalletTransactionsByWallet } from "../IFetchWalletTransactionsByW
 
 export class FetchWalletTransactionsByWallet implements IFetchWalletTransactionsByWallet {
     constructor(
-        private walletRepo: IWalletRepo,
-        private transactionsRepo: IWalletTransactionsRepo,
+        private _walletRepo: IWalletRepo,
+        private _transactionsRepo: IWalletTransactionsRepo,
     ) {}
     async execute(input: getWalletTransactionsInputDto): Promise<getWalletTransactionsOutputDto> {
-        const wallet = await this.walletRepo.getWalletByUserId(input.userId);
+        const wallet = await this._walletRepo.getWalletByUserId(input.userId);
         if (!wallet) throw new Error("Wallet not found");
-        const transactions = await this.transactionsRepo.findTransactionsByWalletId({
+        const transactions = await this._transactionsRepo.findTransactionsByWalletId({
             page: input.page,
             walletId: wallet.id,
             limit: input.limit,

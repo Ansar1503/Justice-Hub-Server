@@ -7,14 +7,14 @@ import { IReportReviewUseCase } from "../IReportReviewUseCase";
 
 export class ReportReviewUseCase implements IReportReviewUseCase {
     constructor(
-        private reviewRepository: IReviewRepo,
-        private disputesRepo: IDisputes,
+        private _reviewRepository: IReviewRepo,
+        private _disputesRepo: IDisputes,
     ) {}
     async execute(input: ReportReviewInputDto): Promise<void> {
-        const review = await this.reviewRepository.findByReview_id(input.review_id);
+        const review = await this._reviewRepository.findByReview_id(input.review_id);
         if (!review) throw new ValidationError("review not found");
 
-        const exists = await this.disputesRepo.findByContentId({
+        const exists = await this._disputesRepo.findByContentId({
             contentId: input.review_id,
         });
         if (exists && Object.keys(exists).length > 0) throw new ValidationError("content already reported");
@@ -28,6 +28,6 @@ export class ReportReviewUseCase implements IReportReviewUseCase {
             status: "pending",
         });
 
-        await this.disputesRepo.create(disputesPayload);
+        await this._disputesRepo.create(disputesPayload);
     }
 }

@@ -4,7 +4,7 @@ import { UpdateSlotSettingsInputDto } from "@src/application/dtos/Lawyer/UpdateS
 import { IUpdateSlotSettingsUseCase } from "../IUpdateSlotSettingsUseCase";
 
 export class UpdateSlotSettingsUseCase implements IUpdateSlotSettingsUseCase {
-    constructor(private SchduleSettingRepo: IScheduleSettingsRepo) {}
+    constructor(private _SchduleSettingRepo: IScheduleSettingsRepo) {}
     async execute(input: UpdateSlotSettingsInputDto): Promise<ScheduleSettings | null> {
         if (input.slotDuration > 120 || input.slotDuration < 15) throw new Error("INVALIDDURATION");
         if (input.maxDaysInAdvance < 15 || input.maxDaysInAdvance > 90) throw new Error("INVALIDADVANCE");
@@ -14,7 +14,7 @@ export class UpdateSlotSettingsUseCase implements IUpdateSlotSettingsUseCase {
             maxDaysInAdvance: input.maxDaysInAdvance,
             slotDuration: input.slotDuration,
         });
-        const updatedSettings = await this.SchduleSettingRepo.updateScheduleSettings(settingspayload);
+        const updatedSettings = await this._SchduleSettingRepo.updateScheduleSettings(settingspayload);
         return updatedSettings;
     }
 }

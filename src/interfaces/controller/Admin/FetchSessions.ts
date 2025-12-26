@@ -10,9 +10,9 @@ import { IController } from "../Interface/IController";
 
 export class FetchSessions implements IController {
     constructor(
-        private fetchSessionUseCase: IFetchSessionUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _fetchSessionUseCase: IFetchSessionUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id = "";
@@ -29,25 +29,25 @@ export class FetchSessions implements IController {
         const parsedData = zodSessionQuerySchema.safeParse(httpRequest.query);
         if (!parsedData.success) {
             const err = parsedData.error.errors[0];
-            return this.httpErrors.error_400(err.message);
+            return this._httpErrors.error_400(err.message);
         }
         try {
             if (!parsedData.data) {
-                return this.httpErrors.error_400("Invalid Credentials");
+                return this._httpErrors.error_400("Invalid Credentials");
             }
-            const result = await this.fetchSessionUseCase.execute({
+            const result = await this._fetchSessionUseCase.execute({
                 ...parsedData.data,
                 user_id,
             });
             // console.log("result", result);
-            const success = this.httpSuccess.success_200(result);
+            const success = this._httpSuccess.success_200(result);
             return success;
         } catch (error) {
             // console.log("error:", error);
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

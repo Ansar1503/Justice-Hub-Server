@@ -5,13 +5,13 @@ import { AvailableSlotsMapper } from "@infrastructure/Mapper/Implementations/Ava
 import AvailabilityModel, { IAvailabilityModel } from "../model/AvailabilityModel";
 
 export class AvailableSlotRepository implements IAvailableSlots {
-    constructor(private mapper: IMapper<Availability, IAvailabilityModel> = new AvailableSlotsMapper()) {}
+    constructor(private _mapper: IMapper<Availability, IAvailabilityModel> = new AvailableSlotsMapper()) {}
     async findAvailableSlots(lawyer_id: string): Promise<Availability | null> {
         const data = await AvailabilityModel.findOne({ lawyer_id });
-        return data ? this.mapper.toDomain(data) : null;
+        return data ? this._mapper.toDomain(data) : null;
     }
     async updateAvailbleSlot(payload: Availability): Promise<Availability | null> {
-        const newpayload = this.mapper.toPersistence(payload);
+        const newpayload = this._mapper.toPersistence(payload);
         const { _id, ...updateData } = newpayload;
         const data = await AvailabilityModel.findOneAndUpdate(
             {
@@ -20,6 +20,6 @@ export class AvailableSlotRepository implements IAvailableSlots {
             { $set: updateData },
             { upsert: true, new: true },
         );
-        return data ? this.mapper.toDomain(data) : null;
+        return data ? this._mapper.toDomain(data) : null;
     }
 }

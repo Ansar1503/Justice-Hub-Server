@@ -4,12 +4,12 @@ import { IReviewRepo } from "@domain/IRepository/IReviewRepo";
 import { IDeleteReviewUseCase } from "../IDeleteReviewUseCase";
 
 export class DelereReviewUseCase implements IDeleteReviewUseCase {
-    constructor(private reviewRepository: IReviewRepo) {}
+    constructor(private _reviewRepository: IReviewRepo) {}
     async execute(input: { review_id: string }): Promise<UpdateReviewOutputDto> {
-        const deletingReview = await this.reviewRepository.findByReview_id(input.review_id);
+        const deletingReview = await this._reviewRepository.findByReview_id(input.review_id);
         if (!deletingReview) throw new ValidationError("review not found");
         deletingReview.deleteReview();
-        await this.reviewRepository.update({
+        await this._reviewRepository.update({
             review_id: input.review_id,
             updates: deletingReview,
         });

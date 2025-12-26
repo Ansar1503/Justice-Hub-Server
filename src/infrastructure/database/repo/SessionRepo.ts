@@ -12,8 +12,8 @@ import SessionModel, { ISessionModel } from "../model/SessionModel";
 
 export class SessionsRepository implements ISessionsRepo {
   constructor(
-    private mapper: IMapper<Session, ISessionModel> = new SessionMapper(),
-    private clientSession?: ClientSession
+    private _mapper: IMapper<Session, ISessionModel> = new SessionMapper(),
+    private _clientSession?: ClientSession
   ) {}
   async aggregate(payload: {
     user_id: string;
@@ -174,12 +174,12 @@ export class SessionsRepository implements ISessionsRepo {
   }
 
   async create(payload: Session): Promise<Session> {
-    const newpayload = this.mapper.toPersistence(payload);
+    const newpayload = this._mapper.toPersistence(payload);
     const newSessions = new SessionModel(newpayload);
     const savedSession = await newSessions.save({
-      session: this.clientSession,
+      session: this._clientSession,
     });
-    return this.mapper.toDomain(savedSession);
+    return this._mapper.toDomain(savedSession);
   }
   async update(payload: {
     end_time?: Date;
@@ -249,14 +249,14 @@ export class SessionsRepository implements ISessionsRepo {
         _id: payload.session_id,
       },
       { $set: update },
-      { new: true, session: this.clientSession }
+      { new: true, session: this._clientSession }
     );
 
-    return sessions ? this.mapper.toDomain(sessions) : null;
+    return sessions ? this._mapper.toDomain(sessions) : null;
   }
   async findById(payload: { session_id: string }): Promise<Session | null> {
     const sessions = await SessionModel.findById(payload.session_id);
-    return sessions ? this.mapper.toDomain(sessions) : null;
+    return sessions ? this._mapper.toDomain(sessions) : null;
   }
   async findSessionsAggregate(
     payload: FetchSessionsInputDto
@@ -645,8 +645,8 @@ export class SessionsRepository implements ISessionsRepo {
     const data = await SessionModel.find({
       $or: [{ client_id: userId }, { lawyer_id: userId }],
     });
-    return data && this.mapper.toDomainArray
-      ? this.mapper.toDomainArray(data)
+    return data && this._mapper.toDomainArray
+      ? this._mapper.toDomainArray(data)
       : [];
   }
 }

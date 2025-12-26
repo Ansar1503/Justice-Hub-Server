@@ -9,9 +9,9 @@ import { IRemoveOverrideSlotUseCase } from "@src/application/usecases/Lawyer/IRe
 
 export class RemoveOverrideSlotsController implements IController {
     constructor(
-        private removeOverrideSlots: IRemoveOverrideSlotUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _removeOverrideSlots: IRemoveOverrideSlotUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
@@ -20,10 +20,10 @@ export class RemoveOverrideSlotsController implements IController {
             user_id = String(httpRequest.user.id);
         }
         if (!user_id) {
-            return this.httpErrors.error_400("User_id Not found");
+            return this._httpErrors.error_400("User_id Not found");
         }
         if (!httpRequest.params) {
-            return this.httpErrors.error_400("Invalid Params");
+            return this._httpErrors.error_400("Invalid Params");
         }
         if (typeof httpRequest.query === "object" && httpRequest.query !== null) {
             if ("date" in httpRequest.query) {
@@ -35,20 +35,20 @@ export class RemoveOverrideSlotsController implements IController {
         }
 
         try {
-            const response = await this.removeOverrideSlots.execute({
+            const response = await this._removeOverrideSlots.execute({
                 lawyer_id: user_id,
                 date: date,
             });
-            return this.httpSuccess.success_200({
+            return this._httpSuccess.success_200({
                 success: true,
                 message: "override slots removed",
                 data: response,
             });
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

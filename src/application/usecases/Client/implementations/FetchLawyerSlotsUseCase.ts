@@ -11,12 +11,12 @@ import { IFetchLawyerSlotsUseCase } from "../IFetchLawyerSlotsUseCase";
 
 export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
     constructor(
-        private userRepository: IUserRepository,
-        private lawyerRepository: ILawyerVerificationRepo,
-        private scheduleSettingsRepo: IScheduleSettingsRepo,
-        private appointmentRepo: IAppointmentsRepository,
-        private ovverrideRepo: IOverrideRepo,
-        private availableSlotsRepo: IAvailableSlots,
+        private _userRepository: IUserRepository,
+        private _lawyerRepository: ILawyerVerificationRepo,
+        private _scheduleSettingsRepo: IScheduleSettingsRepo,
+        private _appointmentRepo: IAppointmentsRepository,
+        private _ovverrideRepo: IOverrideRepo,
+        private _availableSlotsRepo: IAvailableSlots,
     ) {}
     async execute(input: {
         lawyer_id: string;
@@ -43,21 +43,21 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
         };
 
         const filterBookedSlots = (slots: string[]) => slots.filter((t) => !booked.has(t));
-        const user = await this.userRepository.findByuser_id(lawyer_id);
+        const user = await this._userRepository.findByuser_id(lawyer_id);
         if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
         if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
-        const lawyer = await this.lawyerRepository.findByUserId(lawyer_id);
+        const lawyer = await this._lawyerRepository.findByUserId(lawyer_id);
         if (!lawyer) throw new Error(ERRORS.USER_NOT_FOUND);
         if (lawyer.verificationStatus !== "verified") throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
 
-        const slotSettings = await this.scheduleSettingsRepo.fetchScheduleSettings(lawyer_id);
+        const slotSettings = await this._scheduleSettingsRepo.fetchScheduleSettings(lawyer_id);
 
         if (!slotSettings) {
             const error: any = new Error("slot settings not found for the lawyer");
             error.code = 404;
             throw error;
         }
-        const existingAppointment = await this.appointmentRepo.findByDateandLawyer_id({
+        const existingAppointment = await this._appointmentRepo.findByDateandLawyer_id({
             date,
             lawyer_id,
         });
@@ -67,9 +67,9 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
 
         const slotDuration = slotSettings.slotDuration;
 
-        const override = await this.ovverrideRepo.fetcghOverrideSlotByDate(lawyer_id, date);
+        const override = await this._ovverrideRepo.fetcghOverrideSlotByDate(lawyer_id, date);
 
-        const availableSlots = await this.availableSlotsRepo.findAvailableSlots(lawyer_id);
+        const availableSlots = await this._availableSlotsRepo.findAvailableSlots(lawyer_id);
 
         if (!availableSlots) {
             const error: any = new Error("No available slots found for the lawyer");

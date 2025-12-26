@@ -10,9 +10,9 @@ import { IController } from "../Interface/IController";
 
 export class GetLawyersController implements IController {
     constructor(
-        private getLawyerUsecase: IGetLawyersUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _getLawyerUsecase: IGetLawyersUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const req = httpRequest as Record<string, any>;
@@ -50,15 +50,15 @@ export class GetLawyersController implements IController {
             limit: Number(limit),
         };
         try {
-            const lawyers = await this.getLawyerUsecase.execute(filters);
-            const success = this.httpSuccess.success_200({
+            const lawyers = await this._getLawyerUsecase.execute(filters);
+            const success = this._httpSuccess.success_200({
                 success: true,
                 message: "lawyers fetch success",
                 data: lawyers,
             });
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            const err = this.httpErrors.error_500();
+            const err = this._httpErrors.error_500();
             return new HttpResponse(err.statusCode, err.body);
         }
     }

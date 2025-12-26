@@ -10,9 +10,9 @@ import { IController } from "../../Interface/IController";
 
 export class CancelAppointmentController implements IController {
     constructor(
-        private cancelAppointment: ICancelAppointmentUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _cancelAppointment: ICancelAppointmentUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const req = httpRequest as Record<string, any>;
@@ -25,17 +25,17 @@ export class CancelAppointmentController implements IController {
             return new HttpResponse(400, { message: "Credentials not found" });
         }
         try {
-            const result = await this.cancelAppointment.execute({
+            const result = await this._cancelAppointment.execute({
                 id,
                 status,
             });
-            const success = this.httpSuccess.success_200(result);
+            const success = this._httpSuccess.success_200(result);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

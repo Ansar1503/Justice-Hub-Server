@@ -11,9 +11,9 @@ import { IEndSessionUseCase } from "@src/application/usecases/Lawyer/IEndSession
 
 export class EndSessionController implements IController {
   constructor(
-    private endSession: IEndSessionUseCase,
-    private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    private httpErrors: IHttpErrors = new HttpErrors()
+    private _endSession: IEndSessionUseCase,
+    private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+    private _httpErrors: IHttpErrors = new HttpErrors()
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
     let sessionId: string = "";
@@ -25,19 +25,19 @@ export class EndSessionController implements IController {
       sessionId = String(httpRequest.body.sessionId);
     }
     if (!sessionId) {
-      return this.httpErrors.error_400("session id is required");
+      return this._httpErrors.error_400("session id is required");
     }
     try {
-      const result = await this.endSession.execute({ sessionId });
-      return this.httpSuccess.success_200(result);
+      const result = await this._endSession.execute({ sessionId });
+      return this._httpSuccess.success_200(result);
     } catch (error) {
       if (error instanceof Error) {
-        return this.httpErrors.error_400(error.message);
+        return this._httpErrors.error_400(error.message);
       }
       if (error instanceof AppError) {
         return new HttpResponse(error.statusCode, error.message);
       }
-      return this.httpErrors.error_500();
+      return this._httpErrors.error_500();
     }
   }
 }

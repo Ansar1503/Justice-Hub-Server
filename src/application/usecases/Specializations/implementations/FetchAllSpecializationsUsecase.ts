@@ -6,9 +6,9 @@ import { ISpecializationRepo } from "@domain/IRepository/ISpecialization";
 import { IFetchAllSpecializationsUsecase } from "../IFetchAllSpecializationsUsecase";
 
 export class FetchAllSpecializationsUsecase implements IFetchAllSpecializationsUsecase {
-    constructor(private specializationRepo: ISpecializationRepo) {}
+    constructor(private _specializationRepo: ISpecializationRepo) {}
     async execute(input: FetchSpecializationInputDto): Promise<FetchSpecializationOutputDto> {
-        const specializations = await this.specializationRepo.findAll(input);
+        const specializations = await this._specializationRepo.findAll(input);
         return {
             data: specializations.data
                 ? specializations.data.map((sp) => ({

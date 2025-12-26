@@ -3,14 +3,14 @@ import { INotificationRepo } from "@domain/IRepository/INotificationRepo";
 import { IUpdateNotificationStatus } from "../IUpdateNotificationStatus";
 
 export class UpdateNotificationStatus implements IUpdateNotificationStatus {
-    constructor(private notificationRepo: INotificationRepo) {}
+    constructor(private _notificationRepo: INotificationRepo) {}
 
     async execute(input: { id: string; status: boolean }): Promise<NotificationDto> {
-        const notifcationExist = await this.notificationRepo.findById(input.id);
+        const notifcationExist = await this._notificationRepo.findById(input.id);
         if (!notifcationExist) {
             throw new Error("Notification not found");
         }
-        await this.notificationRepo.updateStatusById(input.id, input.status);
+        await this._notificationRepo.updateStatusById(input.id, input.status);
         return {
             id: notifcationExist.id,
             createdAt: notifcationExist.createdAt,

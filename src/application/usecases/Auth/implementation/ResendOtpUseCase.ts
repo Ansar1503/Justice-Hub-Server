@@ -8,13 +8,13 @@ import { IResendOtpUseCase } from "../IResendOtpUseCase";
 
 export class ResendOtpUseCase implements IResendOtpUseCase {
     constructor(
-    private userRepo: IUserRepository,
-    private otpRepo: IOtpRepository,
-    private emailProvider: INodeMailerProvider,
-    private tokenProvider: IJwtProvider
+    private _userRepo: IUserRepository,
+    private _otpRepo: IOtpRepository,
+    private _emailProvider: INodeMailerProvider,
+    private _tokenProvider: IJwtProvider
     ) {}
     async execute(input: string): Promise<void> {
-        const user = await this.userRepo.findByEmail(input);
+        const user = await this._userRepo.findByEmail(input);
         if (!user) {
             throw new Error("INVALID_EMAIL");
         }
@@ -25,17 +25,17 @@ export class ResendOtpUseCase implements IResendOtpUseCase {
             throw new Error("USER_BLOCKED");
         }
         const otp = generateOtp();
-        const token = this.tokenProvider.GenerateEmailToken({
+        const token = this._tokenProvider.GenerateEmailToken({
             user_id: user.user_id,
         });
         try {
-            await this.emailProvider.sendVerificationMail(user.email, token, otp);
+            await this._emailProvider.sendVerificationMail(user.email, token, otp);
         } catch (error: any) {
             throw new Error("MAIL_SEND_ERROR");
         }
         try {
             const newotp = Otp.create({ email: input, otp: otp });
-            await this.otpRepo.storeOtp(newotp);
+            await this._otpRepo.storeOtp(newotp);
         } catch (error: any) {
             throw new Error("DB_ERROR");
         }

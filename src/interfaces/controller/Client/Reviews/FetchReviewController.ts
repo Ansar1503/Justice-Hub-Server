@@ -9,9 +9,9 @@ import { IController } from "../../Interface/IController";
 
 export class FetchReviewsController implements IController {
     constructor(
-        private fetchReviews: IFetchReviewsUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _fetchReviews: IFetchReviewsUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
@@ -27,23 +27,23 @@ export class FetchReviewsController implements IController {
                     : undefined;
 
             if (!lawyer_id || !cursor) {
-                const err = this.httpErrors.error_400("Please provide lawyer_id and cursor.");
+                const err = this._httpErrors.error_400("Please provide lawyer_id and cursor.");
                 return err;
             }
 
-            const result = await this.fetchReviews.execute({
+            const result = await this._fetchReviews.execute({
                 lawyer_id,
                 page: Number(cursor),
             });
 
-            const success = this.httpSuccess.success_200(result);
+            const success = this._httpSuccess.success_200(result);
             return success;
         } catch (error) {
             // console.log("error in fetch reviews controller",error);
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

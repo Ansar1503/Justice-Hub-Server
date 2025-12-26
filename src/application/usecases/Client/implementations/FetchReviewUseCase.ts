@@ -3,9 +3,9 @@ import { IReviewRepo } from "@domain/IRepository/IReviewRepo";
 import { IFetchReviewsUseCase } from "../IFetchReviewsUseCase";
 
 export class FetchReviewUseCase implements IFetchReviewsUseCase {
-    constructor(private reviewRepository: IReviewRepo) {}
+    constructor(private _reviewRepository: IReviewRepo) {}
     async execute(input: FetchReviewInputDto): Promise<FetchReviewsOutputDto> {
-        const reviews = await this.reviewRepository.findByLawyer_id(input);
+        const reviews = await this._reviewRepository.findByLawyer_id(input);
         return reviews;
     }
 }

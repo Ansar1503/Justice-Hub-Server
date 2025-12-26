@@ -3,9 +3,9 @@ import { IAvailableSlots } from "@domain/IRepository/IAvailableSlots";
 import { IFetchAvailableSlotsUseCase } from "../IFetchAvailableSlotsUseCase";
 
 export class FetchAvailableSlotsUseCase implements IFetchAvailableSlotsUseCase {
-    constructor(private AvailableSlotRepo: IAvailableSlots) {}
+    constructor(private _AvailableSlotRepo: IAvailableSlots) {}
     async execute(input: string): Promise<AvailabilityOutputDto> {
-        const availability = await this.AvailableSlotRepo.findAvailableSlots(input);
+        const availability = await this._AvailableSlotRepo.findAvailableSlots(input);
         if (!availability) throw new Error("Availble Slots not found");
         return {
             id: availability.id,

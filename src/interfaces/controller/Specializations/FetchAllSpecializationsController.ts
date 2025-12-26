@@ -10,24 +10,24 @@ import { IController } from "../Interface/IController";
 
 export class FetchAllSpecializationsController implements IController {
     constructor(
-        private FetchAllSpecializations: IFetchAllSpecializationsUsecase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _FetchAllSpecializations: IFetchAllSpecializationsUsecase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const parsed = FetchAllSpecializationsQueryValidatorSchema.safeParse(httpRequest.query);
         if (!parsed.success) {
             const error = parsed.error.errors[0];
-            return this.httpErrors.error_400(error.message);
+            return this._httpErrors.error_400(error.message);
         }
         try {
-            const result = await this.FetchAllSpecializations.execute(parsed.data);
-            return this.httpSuccess.success_200(result);
+            const result = await this._FetchAllSpecializations.execute(parsed.data);
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

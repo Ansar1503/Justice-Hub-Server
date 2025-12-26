@@ -9,9 +9,9 @@ import { IFetchSessionDocumentsUseCase } from "@src/application/usecases/Lawyer/
 
 export class FetchSessionsDocumentsController implements IController {
     constructor(
-        private fetchSessionDocuments: IFetchSessionDocumentsUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _fetchSessionDocuments: IFetchSessionDocumentsUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let session_id: string = "";
@@ -19,20 +19,20 @@ export class FetchSessionsDocumentsController implements IController {
             session_id = String(httpRequest.params.id);
         }
         if (!session_id) {
-            return this.httpErrors.error_400("session id is required");
+            return this._httpErrors.error_400("session id is required");
         }
         try {
-            const result = await this.fetchSessionDocuments.execute(session_id);
-            return this.httpSuccess.success_200({
+            const result = await this._fetchSessionDocuments.execute(session_id);
+            return this._httpSuccess.success_200({
                 success: true,
                 message: "document fetched successfully",
                 data: result,
             });
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_500(error.message);
+                return this._httpErrors.error_500(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

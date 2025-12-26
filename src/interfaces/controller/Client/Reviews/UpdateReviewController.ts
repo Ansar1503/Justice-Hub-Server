@@ -10,9 +10,9 @@ import { IController } from "../../Interface/IController";
 
 export class UpdateReviewsController implements IController {
     constructor(
-        private updateReview: IUpdateReviewUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _updateReview: IUpdateReviewUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) {}
 
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
@@ -25,11 +25,11 @@ export class UpdateReviewsController implements IController {
             const body: any = httpRequest.body && typeof httpRequest.body === "object" ? httpRequest.body : undefined;
 
             if (!reviewId) {
-                const error = this.httpErrors.error_400("review id not found");
+                const error = this._httpErrors.error_400("review id not found");
                 return error;
             }
             if (!body || !body.heading || !body.review || typeof body.rating !== "number") {
-                const error = this.httpErrors.error_400("invalid payload");
+                const error = this._httpErrors.error_400("invalid payload");
                 return error;
             }
 
@@ -42,18 +42,18 @@ export class UpdateReviewsController implements IController {
                 lawyer_id: body.lawyer_id,
             };
 
-            const result = await this.updateReview.execute({
+            const result = await this._updateReview.execute({
                 review_id: reviewId,
                 updates,
             });
 
-            const success = this.httpSuccess.success_200(result);
+            const success = this._httpSuccess.success_200(result);
             return success;
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

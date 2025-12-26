@@ -5,22 +5,22 @@ import { OverrideSlotsMapper } from "@infrastructure/Mapper/Implementations/Over
 import OverrideSlotModel, { IOverrideSlotsModel } from "../model/OverrideSlotModel";
 
 export class OverrideSlotsRepository implements IOverrideRepo {
-    constructor(private mapper: IMapper<Override, IOverrideSlotsModel> = new OverrideSlotsMapper()) {}
+    constructor(private _mapper: IMapper<Override, IOverrideSlotsModel> = new OverrideSlotsMapper()) {}
     async addOverrideSlots(payload: Override): Promise<Override | null> {
-        const mapped = this.mapper.toPersistence(payload);
+        const mapped = this._mapper.toPersistence(payload);
         // console.log("mapped", mapped);
         const data = await OverrideSlotModel.findOneAndUpdate(
             { lawyer_id: payload.lawyerId },
             { $push: { overrideDates: { $each: mapped.overrideDates } } },
             { upsert: true, new: true },
         );
-        return this.mapper.toDomain(data);
+        return this._mapper.toDomain(data);
     }
     async fetchOverrideSlots(lawyer_id: string): Promise<Override | null> {
         // console.log("lalywer", lawyer_id);
         const data = await OverrideSlotModel.findOne({ lawyer_id });
         // console.log("data", data);
-        return data ? this.mapper.toDomain(data) : null;
+        return data ? this._mapper.toDomain(data) : null;
     }
     async removeOverrideSlots(lawyer_id: string, date: Date): Promise<Override | null> {
         const inputDate = new Date(date);
@@ -46,7 +46,7 @@ export class OverrideSlotsRepository implements IOverrideRepo {
             { new: true },
         );
 
-        return data ? this.mapper.toDomain(data) : null;
+        return data ? this._mapper.toDomain(data) : null;
     }
     async fetcghOverrideSlotByDate(lawyer_id: string, date: Date): Promise<Override | null> {
         const inputDate = new Date(date);
@@ -70,6 +70,6 @@ export class OverrideSlotsRepository implements IOverrideRepo {
             },
         );
 
-        return overrideSlots ? this.mapper.toDomain(overrideSlots) : null;
+        return overrideSlots ? this._mapper.toDomain(overrideSlots) : null;
     }
 }

@@ -10,27 +10,27 @@ import { IController } from "../../Interface/IController";
 
 export class FetchClientDataController implements IController {
     constructor(
-        private fetchClientData: IFetchClientDataUseCase,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _fetchClientData: IFetchClientDataUseCase,
+        private _httpErrors: IHttpErrors = new HttpErrors(),
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
     ) { }
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const user_id = (httpRequest as Record<string, any>)?.user?.id;
         if (!user_id) {
-            const err = this.httpErrors.error_400();
+            const err = this._httpErrors.error_400();
             return new HttpResponse(err.statusCode, err.body);
         }
         try {
-            const clientDetails = await this.fetchClientData.execute(user_id);
+            const clientDetails = await this._fetchClientData.execute(user_id);
             if (!clientDetails) {
-                const err = this.httpErrors.error_400();
+                const err = this._httpErrors.error_400();
                 return new HttpResponse(err.statusCode, err.body);
             }
-            const success = this.httpSuccess.success_200(clientDetails);
+            const success = this._httpSuccess.success_200(clientDetails);
             // console.log("success:", success);
             return new HttpResponse(success.statusCode, success.body);
         } catch (error) {
-            const err = this.httpErrors.error_500();
+            const err = this._httpErrors.error_500();
             return new HttpResponse(err.statusCode, err.body);
         }
     }

@@ -5,12 +5,12 @@ import { SessionDocumentMapper } from "@infrastructure/Mapper/Implementations/Se
 import SessionDocumentsModel, { ISessionDocumentModel } from "../model/SessionDocumentsModel";
 
 export class SessionDocumentsRepository implements ISessionDocumentRepo {
-    constructor(private mapper: IMapper<SessionDocument, ISessionDocumentModel> = new SessionDocumentMapper()) {}
+    constructor(private _mapper: IMapper<SessionDocument, ISessionDocumentModel> = new SessionDocumentMapper()) {}
     async create(payload: SessionDocument): Promise<SessionDocument> {
-        const newpayload = this.mapper.toPersistence(payload);
+        const newpayload = this._mapper.toPersistence(payload);
         const newSession = new SessionDocumentsModel(newpayload);
         await newSession.save();
-        return this.mapper.toDomain(newSession);
+        return this._mapper.toDomain(newSession);
     }
 
     async findBySessionId(payload: { session_id: string }): Promise<SessionDocument | null> {
@@ -18,7 +18,7 @@ export class SessionDocumentsRepository implements ISessionDocumentRepo {
             session_id: payload.session_id,
         });
         if (!document) return null;
-        return this.mapper.toDomain(document);
+        return this._mapper.toDomain(document);
     }
 
     async removeOne(documentId: string): Promise<SessionDocument | null> {
@@ -35,7 +35,7 @@ export class SessionDocumentsRepository implements ISessionDocumentRepo {
             },
             { new: true },
         );
-        return data ? this.mapper.toDomain(data) : null;
+        return data ? this._mapper.toDomain(data) : null;
     }
     async removeAll(id: string): Promise<void> {
         await SessionDocumentsModel.findOneAndDelete({ _id: id });

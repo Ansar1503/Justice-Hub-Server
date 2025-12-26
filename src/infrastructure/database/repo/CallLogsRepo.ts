@@ -7,7 +7,7 @@ import { ClientSession } from "mongoose";
 
 export class CallLogsRepository implements ICallLogs {
   constructor(
-    private mapper: IMapper<
+    private _mapper: IMapper<
       CallLogsEntity,
       IcallLogModel
     > = new CallLogsMapper(),
@@ -15,9 +15,9 @@ export class CallLogsRepository implements ICallLogs {
   ) {}
 
   async create(payload: CallLogsEntity): Promise<CallLogsEntity> {
-    const newLog = new CallLogsModel(this.mapper.toPersistence(payload));
+    const newLog = new CallLogsModel(this._mapper.toPersistence(payload));
     await newLog.save({ session: this._session });
-    return this.mapper.toDomain(newLog);
+    return this._mapper.toDomain(newLog);
   }
   async findBySessionId(payload: {
     sessionId: string;
@@ -43,8 +43,8 @@ export class CallLogsRepository implements ICallLogs {
     const currentPage = page;
     return {
       data:
-        data && this.mapper.toDomainArray
-          ? this.mapper.toDomainArray(data)
+        data && this._mapper.toDomainArray
+          ? this._mapper.toDomainArray(data)
           : [],
       totalCount,
       currentPage,
@@ -109,6 +109,6 @@ export class CallLogsRepository implements ICallLogs {
     );
     // console.log("updatedLogs:", updatedLog);
     if (!updatedLog) return null;
-    return this.mapper.toDomain(updatedLog);
+    return this._mapper.toDomain(updatedLog);
   }
 }

@@ -9,9 +9,9 @@ import { IController } from "../Interface/IController";
 
 export class MarkAllNotificationAsReadController implements IController {
     constructor(
-        private markAllNotificationAsReadUseCase: IMarkAllNotificationAsRead,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpError: IHttpErrors = new HttpErrors(),
+        private _markAllNotificationAsReadUseCase: IMarkAllNotificationAsRead,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpError: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id = "";
@@ -24,13 +24,13 @@ export class MarkAllNotificationAsReadController implements IController {
             user_id = httpRequest.user.id;
         }
         try {
-            const result = await this.markAllNotificationAsReadUseCase.execute(user_id);
-            return this.httpSuccess.success_200(result);
+            const result = await this._markAllNotificationAsReadUseCase.execute(user_id);
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpError.error_400(error.message);
+                return this._httpError.error_400(error.message);
             }
-            return this.httpError.error_500();
+            return this._httpError.error_500();
         }
     }
 }

@@ -9,9 +9,9 @@ import { IFetchOverrideSlotsUseCase } from "@src/application/usecases/Lawyer/IFe
 
 export class FetchOverrideSlots implements IController {
     constructor(
-        private fetchOverrideSlots: IFetchOverrideSlotsUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _fetchOverrideSlots: IFetchOverrideSlotsUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
@@ -19,16 +19,16 @@ export class FetchOverrideSlots implements IController {
             user_id = String(httpRequest.user.id);
         }
         if (!user_id) {
-            return this.httpErrors.error_400("User_id Not found");
+            return this._httpErrors.error_400("User_id Not found");
         }
         try {
-            const response = await this.fetchOverrideSlots.execute(user_id);
-            return this.httpSuccess.success_200(response);
+            const response = await this._fetchOverrideSlots.execute(user_id);
+            return this._httpSuccess.success_200(response);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

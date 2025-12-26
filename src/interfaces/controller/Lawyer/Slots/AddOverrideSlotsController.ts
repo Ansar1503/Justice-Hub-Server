@@ -10,9 +10,9 @@ import { IAddOverrideSlotsUseCase } from "@src/application/usecases/Lawyer/IAddO
 
 export class AddOverrideSlotsController implements IController {
     constructor(
-        private addOverrideUsecase: IAddOverrideSlotsUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _addOverrideUsecase: IAddOverrideSlotsUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         let user_id: string = "";
@@ -20,20 +20,20 @@ export class AddOverrideSlotsController implements IController {
             user_id = String(httpRequest.user.id);
         }
         if (!user_id) {
-            return this.httpErrors.error_400("User_id Not found");
+            return this._httpErrors.error_400("User_id Not found");
         }
         const payload = zodOverrideSlotsSchema.safeParse(httpRequest.body);
         if (!payload.success) {
             payload.error.errors.forEach((err) => {
-                return this.httpErrors.error_400(err.message);
+                return this._httpErrors.error_400(err.message);
             });
-            return this.httpErrors.error_400("invalid Credentials");
+            return this._httpErrors.error_400("invalid Credentials");
         }
         if (payload.data && Object.keys(payload.data).length === 0) {
-            return this.httpErrors.error_400("invalid Credentials");
+            return this._httpErrors.error_400("invalid Credentials");
         }
         try {
-            const response = await this.addOverrideUsecase.execute({
+            const response = await this._addOverrideUsecase.execute({
                 overrideDates: payload.data,
                 lawyer_id: user_id,
             });
@@ -42,12 +42,12 @@ export class AddOverrideSlotsController implements IController {
                 message: "override slot added",
                 data: response,
             };
-            return this.httpSuccess.success_200(body);
+            return this._httpSuccess.success_200(body);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500();
+            return this._httpErrors.error_500();
         }
     }
 }

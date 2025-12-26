@@ -9,9 +9,9 @@ import { IController } from "../Interface/IController";
 
 export class VerifyLawyerController implements IController {
     constructor(
-        private verifyLawyer: IVerifyLawyerUseCase,
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-        private httpErrors: IHttpErrors = new HttpErrors(),
+        private _verifyLawyer: IVerifyLawyerUseCase,
+        private _httpSuccess: IHttpSuccess = new HttpSuccess(),
+        private _httpErrors: IHttpErrors = new HttpErrors(),
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const DocumentsPayload: {
@@ -120,7 +120,7 @@ export class VerifyLawyerController implements IController {
             !documents.certificate_of_practice ||
             !documents.enrollment_certificate
         ) {
-            return this.httpErrors.error_400("documents not found");
+            return this._httpErrors.error_400("documents not found");
         }
         const payload = {
             user_id: DocumentsPayload.user_id,
@@ -138,16 +138,16 @@ export class VerifyLawyerController implements IController {
             documents,
         };
         if (payload.specialisation && payload.specialisation.length > 3) {
-            return this.httpErrors.error_400("max 3 specification allowed.");
+            return this._httpErrors.error_400("max 3 specification allowed.");
         }
         try {
-            const result = await this.verifyLawyer.execute(payload);
-            return this.httpSuccess.success_200(result);
+            const result = await this._verifyLawyer.execute(payload);
+            return this._httpSuccess.success_200(result);
         } catch (error) {
             if (error instanceof Error) {
-                return this.httpErrors.error_400(error.message);
+                return this._httpErrors.error_400(error.message);
             }
-            return this.httpErrors.error_500("Something went wrong");
+            return this._httpErrors.error_500("Something went wrong");
         }
     }
 }

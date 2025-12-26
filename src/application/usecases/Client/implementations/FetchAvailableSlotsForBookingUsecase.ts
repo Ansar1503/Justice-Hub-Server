@@ -14,12 +14,12 @@ export class FetchLawyerCalendarAvailabilityUseCase
   implements IFetchLawyerCalendarAvailabilityUseCase
 {
   constructor(
-    private userRepo: IUserRepository,
-    private lawyerRepo: ILawyerVerificationRepo,
-    private scheduleSettingsRepo: IScheduleSettingsRepo,
-    private availabilityRepo: IAvailableSlots,
-    private overrideRepo: IOverrideRepo,
-    private appointmentRepo: IAppointmentsRepository
+    private _userRepo: IUserRepository,
+    private _lawyerRepo: ILawyerVerificationRepo,
+    private _scheduleSettingsRepo: IScheduleSettingsRepo,
+    private _availabilityRepo: IAvailableSlots,
+    private _overrideRepo: IOverrideRepo,
+    private _appointmentRepo: IAppointmentsRepository
   ) {}
 
   async execute(input: {
@@ -28,19 +28,19 @@ export class FetchLawyerCalendarAvailabilityUseCase
   }): Promise<CalendarAvailabilityResponseDto> {
     const { lawyerId, month } = input;
 
-    const user = await this.userRepo.findByuser_id(lawyerId);
+    const user = await this._userRepo.findByuser_id(lawyerId);
     if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
     if (user.is_blocked) throw new Error(ERRORS.USER_BLOCKED);
 
-    const lawyer = await this.lawyerRepo.findByUserId(lawyerId);
+    const lawyer = await this._lawyerRepo.findByUserId(lawyerId);
     if (!lawyer || lawyer.verificationStatus !== "verified")
       throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
 
     const settings =
-      await this.scheduleSettingsRepo.fetchScheduleSettings(lawyerId);
+      await this._scheduleSettingsRepo.fetchScheduleSettings(lawyerId);
     const availability =
-      await this.availabilityRepo.findAvailableSlots(lawyerId);
-    const overrides = await this.overrideRepo.fetchOverrideSlots(lawyerId);
+      await this._availabilityRepo.findAvailableSlots(lawyerId);
+    const overrides = await this._overrideRepo.fetchOverrideSlots(lawyerId);
 
     if (!settings || !availability)
       throw new Error("Lawyer schedule/availability not found");
@@ -53,7 +53,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
     const today = new Date();
 
     const appointments =
-      await this.appointmentRepo.findAppointmentsByLawyerAndRange(
+      await this._appointmentRepo.findAppointmentsByLawyerAndRange(
         lawyerId,
         monthStart,
         monthEnd

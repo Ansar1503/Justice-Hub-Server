@@ -3,9 +3,9 @@ import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { IFetchSessionUseCase } from "../IFetchSessionUseCase";
 
 export class FetchSessionUseCase implements IFetchSessionUseCase {
-    constructor(private sessionRepo: ISessionsRepo) {}
+    constructor(private _sessionRepo: ISessionsRepo) {}
     async execute(input: FetchSessionsInputDto): Promise<FetchSessionsOutputtDto> {
-        const sessions = await this.sessionRepo.findSessionsAggregate(input);
+        const sessions = await this._sessionRepo.findSessionsAggregate(input);
         return sessions;
     }
 }
