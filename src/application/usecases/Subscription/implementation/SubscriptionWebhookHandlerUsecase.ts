@@ -42,7 +42,6 @@ export class SubscriptionWebhookHandlerUsecase
 
   private async handleCheckoutSessionCompleted(event: any): Promise<void> {
     const session = event.data.object;
-    const paymentIntentId = session.payment_intent as string;
     const customerId = session.customer as string;
     const subscriptionId = session.subscription as string;
     const userId = session.metadata?.userId;
