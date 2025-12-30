@@ -49,6 +49,9 @@ import { SubscriptionRepository } from "@infrastructure/database/repo/Subscripti
 import { UserSubscriptionRepository } from "@infrastructure/database/repo/UserSubscriptionRepository";
 import { UserSubscriptionMapper } from "@infrastructure/Mapper/Implementations/UserSubscriptionMapper";
 import { SubscriptionPlanMapper } from "@infrastructure/Mapper/Implementations/SubscriptionMapper";
+import { IPaymentsRepo } from "@domain/IRepository/IPaymentsRepo";
+import { PaymentRepo } from "@infrastructure/database/repo/PaymentRepo";
+import { PaymentMapper } from "@infrastructure/Mapper/Implementations/PaymentsMapper";
 
 export class MongoUnitofWork implements IUnitofWork {
   private _session?: ClientSession;
@@ -71,9 +74,22 @@ export class MongoUnitofWork implements IUnitofWork {
   private _callLogsRepo: ICallLogs | undefined;
   private _subscriptionRepo: ISubscriptionRepo | undefined;
   private _userSubscriptionRepo: IUserSubscriptionRepo | undefined;
+  private _paymentRepo: IPaymentsRepo | undefined;
 
   constructor(session?: ClientSession) {
     this._session = session;
+  }
+
+  get paymentRepo(): IPaymentsRepo {
+    if (!this._session) {
+      throw new Error(
+        "Unit of Work session not initialized. Call startTransaction() first."
+      );
+    }
+    if (!this._paymentRepo) {
+      this._paymentRepo = new PaymentRepo(new PaymentMapper(), this._session);
+    }
+    return this._paymentRepo;
   }
 
   get subscriptionRepo(): ISubscriptionRepo {

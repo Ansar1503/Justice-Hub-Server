@@ -110,8 +110,8 @@ export class Payment {
   get createdAt() {
     return this._createdAt;
   }
-  markAsFailed() {
-    this._status = "failed";
+  updateStatus(status: PaymentStatus) {
+    this._status = status;
   }
 
   refund() {

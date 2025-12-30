@@ -5,6 +5,7 @@ import { UserSubscription } from "@domain/entities/UserSubscriptionPlan";
 import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
 import { WalletTransaction } from "@domain/entities/WalletTransactions";
 import { generateDescription } from "@shared/utils/helpers/WalletDescriptionsHelper";
+import { Payment } from "@domain/entities/PaymentsEntity";
 
 export class SubscriptionWebhookHandlerUsecase
   implements ISubscriptionWebhookHanlderUsecase
@@ -41,6 +42,7 @@ export class SubscriptionWebhookHandlerUsecase
 
   private async handleCheckoutSessionCompleted(event: any): Promise<void> {
     const session = event.data.object;
+    const paymentIntentId = session.payment_intent as string;
     const customerId = session.customer as string;
     const subscriptionId = session.subscription as string;
     const userId = session.metadata?.userId;
@@ -126,6 +128,7 @@ export class SubscriptionWebhookHandlerUsecase
   private async handleInvoicePaid(event: any): Promise<void> {
     const invoice = event.data.object;
     const stripeSubId = invoice.subscription as string;
+    const paymentIntentId = invoice.payment_intent as string;
     const amountPaid = invoice.amount_paid / 100;
 
     if (!stripeSubId) return;
@@ -160,6 +163,17 @@ export class SubscriptionWebhookHandlerUsecase
       });
 
       await uow.transactionsRepo.create(transaction);
+      const payment = Payment.create({
+        clientId: subscription.userId,
+        paidFor: "subscription",
+        referenceId: stripeSubId,
+        amount: amountPaid,
+        currency: "INR",
+        provider: "stripe",
+        providerRefId: paymentIntentId || invoice.id,
+      });
+
+      await uow.paymentRepo.create(payment);
     });
 
     console.log(`💰 Invoice paid for subscription: ${stripeSubId}`);

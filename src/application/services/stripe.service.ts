@@ -3,6 +3,7 @@ import "dotenv/config";
 import { format } from "date-fns";
 type BookingType = "initial" | "followup";
 type WebhookResult = {
+  paymentIntentId?: string;
   amountPaid?: number;
   lawyer_id?: string;
   client_id?: string;
@@ -19,14 +20,14 @@ type WebhookResult = {
   caseTypeId?: string;
   payment_status?: "pending" | "success" | "failed";
   eventHandled: boolean;
-  baseAmount?: number
+  baseAmount?: number;
   followupDiscountAmount?: number;
   subscriptionDiscountAmount?: number;
 };
 
 type payloadType = {
   userEmail: string;
-  baseAmount: number
+  baseAmount: number;
   subscriptionDiscountAmount: number;
   commissionPercent: number;
   commissionAmount: number;
@@ -46,7 +47,7 @@ type payloadType = {
 
 type FollowupPayloadType = {
   userEmail: string;
-  baseAmount: number
+  baseAmount: number;
   followupDiscountAmount: number;
   subscriptionDiscountAmount: number;
   commissionPercent: number;
@@ -105,7 +106,7 @@ export async function getFollowupStripeSession(payload: FollowupPayloadType) {
       bookingType: payload.bookingType,
       followupDiscountAmount: payload.followupDiscountAmount,
       subscriptionDiscountAmount: payload.subscriptionDiscountAmount,
-      baseAmount: payload.baseAmount
+      baseAmount: payload.baseAmount,
     },
   });
 
@@ -151,7 +152,7 @@ export async function getStripeSession(payload: payloadType) {
       lawyerAmount: payload.lawyerAmount,
       bookingType: payload.bookingType,
       subscriptionDiscountAmount: payload.subscriptionDiscountAmount,
-      baseAmount: payload.baseAmount
+      baseAmount: payload.baseAmount,
     },
   });
 
@@ -177,12 +178,14 @@ export async function handleStripeWebHook(
       if (!session.payment_intent) {
         return {
           ...pluckMeta(session.metadata),
+          paymentIntentId: session.id,
           payment_status: "failed",
           eventHandled: true,
         };
       }
       return {
         ...pluckMeta(session.metadata),
+        paymentIntentId: session.id,
         amountPaid: Number(session.amount_total ?? 0) / 100,
         payment_status: "success",
         eventHandled: true,
@@ -193,6 +196,7 @@ export async function handleStripeWebHook(
       const intent = event.data.object as Stripe.PaymentIntent;
       return {
         ...pluckMeta(intent.metadata),
+        paymentIntentId: intent.id,
         amountPaid: Number(intent.amount ?? 0) / 100,
         payment_status: "failed",
         eventHandled: true,
@@ -203,6 +207,7 @@ export async function handleStripeWebHook(
       const session = event.data.object as Stripe.Checkout.Session;
       return {
         ...pluckMeta(session.metadata),
+        paymentIntentId: session.id,
         payment_status: "failed",
         eventHandled: true,
       };
@@ -252,9 +257,12 @@ function pluckMeta(md: Stripe.Metadata | null | undefined) {
         ? (md.bookingType as BookingType)
         : undefined,
     caseId: md?.caseId,
-    followupDiscountAmount: md?.followupDiscountAmount ? Number(md.followupDiscountAmount) : undefined,
-    subscriptionDiscountAmount: md?.subscriptionDiscountAmount ? Number(md.subscriptionDiscountAmount) : undefined,
-    baseAmount: md?.baseAmount ? Number(md.baseAmount) : undefined
+    followupDiscountAmount: md?.followupDiscountAmount
+      ? Number(md.followupDiscountAmount)
+      : undefined,
+    subscriptionDiscountAmount: md?.subscriptionDiscountAmount
+      ? Number(md.subscriptionDiscountAmount)
+      : undefined,
+    baseAmount: md?.baseAmount ? Number(md.baseAmount) : undefined,
   };
 }
-
