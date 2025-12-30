@@ -14,7 +14,6 @@ export class ResetPasswordController implements IController {
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
     let token = "";
     let password = "";
-    console.log(httpRequest.body);
     if (httpRequest.body && typeof httpRequest.body === "object") {
       if ("token" in httpRequest.body) {
         token = String(httpRequest.body.token);
