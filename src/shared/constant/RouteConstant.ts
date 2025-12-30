@@ -7,6 +7,7 @@ export const AuthRoute = {
   resendOtp: "/resend-otp",
   google: "/google",
   forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
 };
 
 export const AdminRoutes = {

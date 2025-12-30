@@ -17,9 +17,9 @@ import { UserSubscription } from "@domain/entities/UserSubscriptionPlan";
 
 export class RegisterUserUseCase implements IRegiserUserUseCase {
   constructor(
-    private passwordHasher: IPasswordManager,
-    private nodemailProvider: INodeMailerProvider,
-    private jwtprovider: IJwtProvider,
+    private _passwordHasher: IPasswordManager,
+    private _nodemailProvider: INodeMailerProvider,
+    private _jwtprovider: IJwtProvider,
     private _unitOfWork: IUnitofWork
   ) {}
   async execute(input: RegisterUserDto): Promise<ResposeUserDto> {
@@ -28,7 +28,7 @@ export class RegisterUserUseCase implements IRegiserUserUseCase {
       if (existingUser) {
         throw new ValidationError("User Already Exists");
       }
-      const hashedPassword = await this.passwordHasher.hashPassword(
+      const hashedPassword = await this._passwordHasher.hashPassword(
         input.password
       );
       const newUser = User.create(input);
@@ -69,7 +69,7 @@ export class RegisterUserUseCase implements IRegiserUserUseCase {
         }
       }
       const otp = await generateOtp();
-      const token = await this.jwtprovider.GenerateEmailToken({
+      const token = await this._jwtprovider.GenerateEmailToken({
         user_id: user.user_id,
       });
       try {
@@ -81,7 +81,7 @@ export class RegisterUserUseCase implements IRegiserUserUseCase {
       const otpdata = Otp.create({ email: user.email, otp });
       await uow.otpRepo.storeOtp(otpdata);
       try {
-        await this.nodemailProvider.sendVerificationMail(
+        await this._nodemailProvider.sendVerificationMail(
           user.email,
           token,
           otp
