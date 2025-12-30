@@ -182,6 +182,7 @@ export class SubscriptionWebhookHandlerUsecase
   private async handleInvoicePaymentFailed(event: any): Promise<void> {
     const invoice = event.data.object;
     const customerId = invoice.customer as string;
+    const amountPaid = invoice.amount_paid / 100;
 
     await this._uow.startTransaction(async (uow) => {
       const subscription =
@@ -189,8 +190,20 @@ export class SubscriptionWebhookHandlerUsecase
 
       if (subscription) {
         subscription.markExpired();
-        await uow.userSubscriptionRepo.createOrUpdate(subscription);
-        console.log(`⚠️ Subscription ${subscription.id} marked as expired`);
+        const usersubs =
+          await uow.userSubscriptionRepo.createOrUpdate(subscription);
+        // console.log(`⚠️ Subscription marked as expired`);
+        const payment = Payment.create({
+          clientId: subscription?.userId,
+          paidFor: "subscription",
+          referenceId: subscription.id,
+          amount: amountPaid,
+          currency: "INR",
+          provider: "stripe",
+          providerRefId: invoice.id,
+        });
+        payment.updateStatus("failed");
+        await uow.paymentRepo.create(payment);
       }
     });
   }
