@@ -5,7 +5,8 @@ export const AuthRoute = {
   verifyMail: "/verify-email",
   verifyOtp: "/verify-otp",
   resendOtp: "/resend-otp",
-  google: "/google"
+  google: "/google",
+  forgotPassword: "/forgot-password",
 };
 
 export const AdminRoutes = {
