@@ -91,6 +91,9 @@ export const ClientRoutes = {
   chat: {
     sendFile: "/chat/sendFile",
   },
+  payments: {
+    base: "/payments",
+  },
 };
 
 export const LawyerRoutes = {
