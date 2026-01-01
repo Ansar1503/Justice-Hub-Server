@@ -8,7 +8,6 @@ export interface PersistedCallLogsProps {
     client_left_at?: Date;
     lawyer_joined_at?: Date;
     lawyer_left_at?: Date;
-    end_reason?: string;
     callDuration?: number;
     status: "ongoing" | "completed" | "cancelled" | "missed" | "dropped";
     createdAt: Date;
@@ -24,7 +23,6 @@ export interface CreateCallLogsProps {
     client_left_at?: Date;
     lawyer_joined_at?: Date;
     lawyer_left_at?: Date;
-    end_reason?: string;
     callDuration?: number;
     status: "ongoing" | "completed" | "cancelled" | "missed" | "dropped";
 }
@@ -39,7 +37,6 @@ export class CallLogs {
     private _client_left_at?: Date;
     private _lawyer_joined_at?: Date;
     private _lawyer_left_at?: Date;
-    private _end_reason?: string;
     private _callDuration?: number;
     private _status: "ongoing" | "completed" | "cancelled" | "missed" | "dropped";
     private _createdAt: Date;
@@ -55,7 +52,6 @@ export class CallLogs {
         this._client_left_at = props.client_left_at;
         this._lawyer_joined_at = props.lawyer_joined_at;
         this._lawyer_left_at = props.lawyer_left_at;
-        this._end_reason = props.end_reason;
         this._callDuration = props.callDuration;
         this._status = props.status;
         this._createdAt = props.createdAt;
@@ -116,10 +112,6 @@ export class CallLogs {
         return this._lawyer_left_at;
     }
 
-    get end_reason(): string | undefined {
-        return this._end_reason;
-    }
-
     get callDuration(): number | undefined {
         return this._callDuration;
     }
@@ -137,9 +129,8 @@ export class CallLogs {
     }
 
     // Methods
-    updateStatus(status: typeof this._status, reason?: string): void {
+    updateStatus(status: typeof this._status): void {
         this._status = status;
-        if (reason) this._end_reason = reason;
         this.touch();
     }
 

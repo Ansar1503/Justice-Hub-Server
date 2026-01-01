@@ -49,7 +49,6 @@ export class EndSessionUseCase implements IEndSessionUseCase {
         end_time: currentDate,
         callDuration: durationInMinutes,
         status: "completed",
-        end_reason: "session completed",
       });
       if (!updatedSession) throw new Error("End Session Failed");
       await uow.callLogsRepo.updateByRoomId({
@@ -58,7 +57,6 @@ export class EndSessionUseCase implements IEndSessionUseCase {
         end_time: currentDate,
         status: "completed",
         callDuration: durationInMinutes,
-        end_reason: "session completed",
       });
       const commissionTransaction =
         await uow.commissionTransactionRepo.findByBookingId(

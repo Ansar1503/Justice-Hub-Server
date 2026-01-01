@@ -59,7 +59,6 @@ export class CallLogsRepository implements ICallLogs {
       callDuration,
       client_joined_at,
       client_left_at,
-      end_reason,
       end_time,
       lawyer_joined_at,
       lawyer_left_at,
@@ -77,9 +76,6 @@ export class CallLogsRepository implements ICallLogs {
     }
     if (client_left_at) {
       update.client_left_at = client_left_at;
-    }
-    if (end_reason) {
-      update.end_reason = end_reason;
     }
     if (end_time) {
       update.end_time = end_time;

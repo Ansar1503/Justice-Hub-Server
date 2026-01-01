@@ -4,12 +4,14 @@ import { StartSessionUseCase } from "@src/application/usecases/Lawyer/implementa
 import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
 import { CallLogsRepository } from "@infrastructure/database/repo/CallLogsRepo";
 import { AppointmentsRepository } from "@infrastructure/database/repo/AppointmentsRepo";
+import { MongoUnitofWork } from "@infrastructure/database/UnitofWork/implementations/UnitofWork";
 
 export function StartSessionComposer(): IController {
-    const usecase = new StartSessionUseCase(
-        new SessionsRepository(),
-        new CallLogsRepository(),
-        new AppointmentsRepository(),
-    );
-    return new StartSessionController(usecase);
+  const usecase = new StartSessionUseCase(
+    new SessionsRepository(),
+    new CallLogsRepository(),
+    new AppointmentsRepository(),
+    new MongoUnitofWork()
+  );
+  return new StartSessionController(usecase);
 }
