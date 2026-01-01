@@ -13,6 +13,17 @@ export class FetchPaymentsController implements IController {
     private _success: IHttpSuccess
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+    let user_id = "";
+    if (
+      httpRequest.user &&
+      typeof httpRequest.user === "object" &&
+      "id" in httpRequest.user
+    ) {
+      user_id = String(httpRequest.user.id);
+    }
+    if (!user_id) {
+      return this._errors.error_400("User id is required");
+    }
     const parsed = await fetchPaymentsQueryValidation.safeParse(
       httpRequest.query
     );
@@ -21,7 +32,10 @@ export class FetchPaymentsController implements IController {
       return this._errors.error_400(err);
     }
     try {
-      const data = await this._fetchPaymentsUsecase.execute(parsed.data);
+      const data = await this._fetchPaymentsUsecase.execute({
+        ...parsed.data,
+        clientId: user_id,
+      });
       return this._success.success_200(data);
     } catch (error) {
       if (error instanceof Error) {

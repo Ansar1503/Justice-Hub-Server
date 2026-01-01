@@ -148,8 +148,8 @@ const router = express.Router();
 // payments
 router.get(
   ClientRoutes.payments.base,
-  // authenticateUser,
-  // authenticateClient,
+  authenticateUser,
+  authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchPaymentsComposer());
     res.status(adapter.statusCode).json(adapter.body);

@@ -30,7 +30,6 @@ export class PaymentRepo
     totalPages: number;
   }> {
     const { page, limit, sortBy, order, status, clientId, paidFor } = payload;
-
     const skip = (page - 1) * limit;
     const sortOrder = order === "asc" ? 1 : -1;
 
