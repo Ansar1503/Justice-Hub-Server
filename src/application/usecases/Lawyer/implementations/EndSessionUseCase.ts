@@ -45,19 +45,13 @@ export class EndSessionUseCase implements IEndSessionUseCase {
       const updatedSession = await uow.sessionRepo.update({
         session_id: input.sessionId,
         lawyer_left_at: currentDate,
+        client_left_at: currentDate,
         room_id: "",
         end_time: currentDate,
         callDuration: durationInMinutes,
         status: "completed",
       });
       if (!updatedSession) throw new Error("End Session Failed");
-      await uow.callLogsRepo.updateByRoomId({
-        roomId: session?.room_id,
-        lawyer_left_at: currentDate,
-        end_time: currentDate,
-        status: "completed",
-        callDuration: durationInMinutes,
-      });
       const commissionTransaction =
         await uow.commissionTransactionRepo.findByBookingId(
           appointmentDetails.bookingId

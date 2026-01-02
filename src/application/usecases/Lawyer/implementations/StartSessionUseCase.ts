@@ -7,8 +7,6 @@ import { timeStringToDate } from "@shared/utils/helpers/DateAndTimeHelper";
 import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { createToken } from "@src/application/services/ZegoCloud.service";
-import { CallLogs } from "@domain/entities/CallLogs";
-import { ICallLogs } from "@domain/IRepository/ICallLogs";
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 import { IStartSessionUseCase } from "../IStartSessionUseCase";
 import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
@@ -16,7 +14,6 @@ import { IUnitofWork } from "@infrastructure/database/UnitofWork/IUnitofWork";
 export class StartSessionUseCase implements IStartSessionUseCase {
   constructor(
     private _sessionsRepo: ISessionsRepo,
-    private _callLogsRepo: ICallLogs,
     private _appointmentDetails: IAppointmentsRepository,
     private _uow: IUnitofWork
   ) {}
@@ -60,19 +57,6 @@ export class StartSessionUseCase implements IStartSessionUseCase {
       expiry: appointmentDetails?.duration * 60,
     });
     return this._uow.startTransaction(async (uow) => {
-      const newcallLog = CallLogs.create({
-        status: "ongoing",
-        start_time: newDate,
-        lawyer_joined_at: newDate,
-        session_id: input.sessionId,
-        roomId: roomId,
-      });
-      try {
-        await uow.callLogsRepo.create(newcallLog);
-      } catch (error) {
-        console.log("errors", error);
-        throw new Error("call log creation failed");
-      }
       const session = await uow.sessionRepo.update({
         start_time: newDate,
         room_id: roomId,

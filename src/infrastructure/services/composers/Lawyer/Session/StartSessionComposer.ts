@@ -9,7 +9,6 @@ import { MongoUnitofWork } from "@infrastructure/database/UnitofWork/implementat
 export function StartSessionComposer(): IController {
   const usecase = new StartSessionUseCase(
     new SessionsRepository(),
-    new CallLogsRepository(),
     new AppointmentsRepository(),
     new MongoUnitofWork()
   );
