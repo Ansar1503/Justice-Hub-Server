@@ -5,16 +5,22 @@ import { ValidationError } from "@interfaces/middelwares/Error/CustomError";
 import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 import { IAppointmentsRepository } from "@domain/IRepository/IAppointmentsRepo";
 import { IJoinSessionUseCase } from "../IJoinSessionUseCase";
+import { IUserRepository } from "@domain/IRepository/IUserRepo";
 
 export class JoinSessionUseCase implements IJoinSessionUseCase {
   constructor(
     private _sessionsRepo: ISessionsRepo,
-    private _appointmentRepo: IAppointmentsRepository
+    private _appointmentRepo: IAppointmentsRepository,
+    private userRepo: IUserRepository
   ) {}
-  async execute(input: { sessionId: string }): Promise<StartSessionOutputDto> {
+  async execute(input: {
+    sessionId: string;
+    userId: string;
+  }): Promise<StartSessionOutputDto> {
     const existingSession = await this._sessionsRepo.findById({
       session_id: input.sessionId,
     });
+    const user = await this.userRepo.findByuser_id(input.userId);
     if (!existingSession) throw new ValidationError("session not found");
     const appointmentDetails = await this._appointmentRepo.findByBookingId(
       existingSession.bookingId
@@ -45,7 +51,10 @@ export class JoinSessionUseCase implements IJoinSessionUseCase {
     //   throw new ValidationError("session time is over");
     // console.log("sessssion", existingSession.);
     const { appId, token } = await createToken({
-      userId: existingSession.client_id,
+      userId:
+        user?.role === "client"
+          ? existingSession.client_id
+          : existingSession.lawyer_id,
       roomId: existingSession.room_id,
       expiry: appointmentDetails.duration * 60,
     });

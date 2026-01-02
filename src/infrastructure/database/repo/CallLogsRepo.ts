@@ -31,7 +31,10 @@ export class CallLogsRepository implements ICallLogs {
   }> {
     const { limit, page, sessionId } = payload;
     const skip = (page - 1) * limit;
-    const data = await CallLogsModel.find({ session_id: sessionId })
+    const data = await CallLogsModel.find({
+      session_id: sessionId,
+      status: { $ne: "ongoing" },
+    })
       .limit(limit)
       .skip(skip)
       .lean();
@@ -106,5 +109,13 @@ export class CallLogsRepository implements ICallLogs {
     // console.log("updatedLogs:", updatedLog);
     if (!updatedLog) return null;
     return this.mapper.toDomain(updatedLog);
+  }
+  async findByRoomId(payload: { roomId: string }): Promise<CallLogsEntity[]> {
+    const { roomId } = payload;
+    const log = await CallLogsModel.find({
+      roomId: roomId,
+    });
+    if (!log) return [];
+    return this.mapper.toDomainArray ? this.mapper.toDomainArray(log) : [];
   }
 }

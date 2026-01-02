@@ -41,6 +41,7 @@ import { FetchCallLogsSessionComposer } from "@infrastructure/services/composers
 import { FetchReviewsByUserIdComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsByUserIdComposer";
 import {
   BlogRoute,
+  CallLogsRoute,
   CasesRoutes,
   CasetypeRoutes,
   ClientRoutes,
@@ -95,6 +96,7 @@ import { LikeOrDislikeBlogComposer } from "@infrastructure/services/composers/Bl
 import { FetchAmountPayableComposer } from "@infrastructure/services/composers/Client/FetchAmountPayableComposer";
 import { BookFollowupAppointmentByWalletComposer } from "@infrastructure/services/composers/Client/Appointment/BookFollowupAppointmentByWalletComposer";
 import { FetchPaymentsComposer } from "@infrastructure/services/composers/Client/FetchPaymentsComposer";
+import { StartCallComposer } from "@infrastructure/services/composers/Lawyer/JoinCallComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -144,6 +146,14 @@ const caseDocumentUpload = multer({
 });
 
 const router = express.Router();
+
+router
+  .route(CallLogsRoute.base)
+  .all(authenticateUser, authenticateClient)
+  .post(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, StartCallComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+  });
 
 // payments
 router.get(

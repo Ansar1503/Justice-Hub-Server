@@ -26,6 +26,7 @@ import { SendMessageFileComposer } from "@infrastructure/services/composers/Clie
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 import {
   BlogRoute,
+  CallLogsRoute,
   CasesRoutes,
   CasetypeRoutes,
   ClientRoutes,
@@ -73,6 +74,7 @@ import { UpdateBlogComposer } from "@infrastructure/services/composers/Blog/Upda
 import { DeleteBlogComposer } from "@infrastructure/services/composers/Blog/DeleteBlogComposer";
 import { ToggleBlogPublishComposer } from "@infrastructure/services/composers/Blog/ToggleBlogStatusComposer";
 import { updateCaseDetailsComposer } from "@infrastructure/services/composers/Cases/UpdateCasesDetailsComposer";
+import { StartCallComposer } from "@infrastructure/services/composers/Lawyer/JoinCallComposer";
 
 const upload = multer({ storage: documentstorage });
 const caseDocumentUpload = multer({
@@ -110,6 +112,14 @@ const blogImageUpload = multer({
   },
 });
 const router = express.Router();
+
+router
+  .route(CallLogsRoute.base)
+  .all(authenticateUser, authenticateClient, authenticateLawyer)
+  .post(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, StartCallComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+  });
 
 router.post(
   LawyerRoutes.verification,
@@ -241,9 +251,9 @@ router
 // profiles
 router.get(
   LawyerRoutes.profile.base +
-  LawyerRoutes.base +
-  LawyerRoutes.professional +
-  CommonParamsRoute.params,
+    LawyerRoutes.base +
+    LawyerRoutes.professional +
+    CommonParamsRoute.params,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -258,9 +268,9 @@ router.get(
 
 router.get(
   LawyerRoutes.profile.base +
-  LawyerRoutes.base +
-  LawyerRoutes.verification +
-  CommonParamsRoute.params,
+    LawyerRoutes.base +
+    LawyerRoutes.verification +
+    CommonParamsRoute.params,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {
@@ -597,11 +607,17 @@ router.post(
   }
 );
 
-router.put(CasesRoutes.base + CommonParamsRoute.params, authenticateUser, authenticateClient, authenticateLawyer, async (req: Request, res: Response) => {
-  const adapter = await expressAdapter(req, updateCaseDetailsComposer())
-  res.status(adapter.statusCode).json(adapter.body)
-  return
-})
+router.put(
+  CasesRoutes.base + CommonParamsRoute.params,
+  authenticateUser,
+  authenticateClient,
+  authenticateLawyer,
+  async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, updateCaseDetailsComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+    return;
+  }
+);
 
 router.get(
   CasesRoutes.base + CasesRoutes.documents + CommonParamsRoute.params,

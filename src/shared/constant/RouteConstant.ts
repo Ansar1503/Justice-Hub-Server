@@ -96,6 +96,10 @@ export const ClientRoutes = {
   },
 };
 
+export const CallLogsRoute = {
+  base:"/calls",
+}
+
 export const LawyerRoutes = {
   base: "/lawyers",
   verification: "/verification",
