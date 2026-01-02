@@ -1,0 +1,22 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SocketEventEnum = void 0;
+var SocketEventEnum;
+(function (SocketEventEnum) {
+    SocketEventEnum["CONNECTED_EVENT"] = "user_connected";
+    SocketEventEnum["ONLINE_USERS"] = "user_online";
+    SocketEventEnum["DISCONNECT_EVENT"] = "disconnect";
+    SocketEventEnum["JOIN_CHAT_EVENT"] = "joinChat";
+    SocketEventEnum["MESSAGE_RECEIVED_EVENT"] = "messageReceived";
+    SocketEventEnum["SOCKET_ERROR_EVENT"] = "socketError";
+    SocketEventEnum["STOP_TYPING_EVENT"] = "stopTyping";
+    SocketEventEnum["ERROR"] = "error";
+    SocketEventEnum["TYPING_EVENT"] = "typing";
+    SocketEventEnum["MESSAGE_DELETE_EVENT"] = "messageDeleted";
+    SocketEventEnum["REPORT_MESSAGE"] = "report_message";
+    SocketEventEnum["CHECKONLINE_STATUS"] = "onlineStatus";
+    SocketEventEnum["SEND_MESSAGE_EVENT"] = "sendMessage";
+    SocketEventEnum["CHANGE_CHAT_NAME_EVENT"] = "changeChatName";
+    SocketEventEnum["NOTIFICATION_RECEIVED"] = "NOTIFICATION_RECEIVED";
+    SocketEventEnum["NOTIFICATION_SEND"] = "NOTIFICATION_SEND";
+})(SocketEventEnum || (exports.SocketEventEnum = SocketEventEnum = {}));

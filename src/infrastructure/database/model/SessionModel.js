@@ -1,0 +1,92 @@
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importStar(require("mongoose"));
+const sessionSchema = new mongoose_1.Schema({
+    _id: { type: String },
+    appointment_id: {
+        type: String,
+        required: true,
+    },
+    lawyer_id: {
+        type: String,
+        required: true,
+    },
+    client_id: {
+        type: String,
+        required: true,
+    },
+    caseId: { type: String, required: true },
+    bookingId: { type: String, required: true },
+    status: {
+        type: String,
+        required: true,
+        enum: ["upcoming", "ongoing", "completed", "cancelled", "missed"],
+        default: "upcoming",
+    },
+    notes: {
+        type: String,
+    },
+    summary: {
+        type: String,
+    },
+    follow_up_suggested: {
+        type: Boolean,
+        default: false,
+    },
+    follow_up_session_id: {
+        type: String,
+        ref: "sessions",
+    },
+    room_id: {
+        type: String,
+    },
+    start_time: {
+        type: Date,
+    },
+    end_time: {
+        type: Date,
+    },
+    client_joined_at: { type: Date },
+    client_left_at: { type: Date },
+    lawyer_joined_at: { type: Date },
+    lawyer_left_at: { type: Date },
+    end_reason: { type: String },
+    callDuration: { type: Number },
+}, {
+    timestamps: true,
+});
+sessionSchema.index({ appointment_id: 1 }, { unique: true });
+exports.default = mongoose_1.default.model("sessions", sessionSchema);
