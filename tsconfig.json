@@ -7,15 +7,15 @@
     "module": "Node16",
     "moduleResolution": "Node16",
 
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "@shared/*": ["src/shared/*"],
-      "@application/*": ["src/application/*"],
-      "@domain/*": ["src/domain/*"],
-      "@infrastructure/*": ["src/infrastructure/*"],
-      "@interfaces/*": ["src/interfaces/*"],
-      "@ZegoCloud/*": ["src/ZegoCloud/*"],
-      "@src/*": ["src/*"]
+      "@shared/*": ["shared/*"],
+      "@application/*": ["application/*"],
+      "@domain/*": ["domain/*"],
+      "@infrastructure/*": ["infrastructure/*"],
+      "@interfaces/*": ["interfaces/*"],
+      "@ZegoCloud/*": ["ZegoCloud/*"],
+      "@src/*": ["*"]
     },
 
     "esModuleInterop": true,
