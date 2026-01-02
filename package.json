@@ -1,8 +1,8 @@
 {
   "type": "commonjs",
   "scripts": {
-    "build": "npx tsc",
-    "start": "node -r tsconfig-paths/register dist/infrastructure/express/server.js",
+    "build": "npx tsc && npx tsc-alias",
+    "start": "node dist/infrastructure/express/server.js",
     "dev": "ts-node -r tsconfig-paths/register src/infrastructure/express/server.ts",
     "lint": "eslint",
     "lint:fix": "eslint --fix"
