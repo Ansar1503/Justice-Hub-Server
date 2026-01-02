@@ -1,10 +1,11 @@
-import { CaseType } from "../../domain/entities/CaseType"
+
 import {
     CasetypeFetchQueryDto,
     CaseTypeFetchResultDto,
     UpdateCasetypeInputDto,
 } from "@src/application/dtos/CaseType/CaseTypeDto";
 import { IBaseRepository } from "./IBaseRepo";
+import { CaseType } from "@domain/entities/CaseType";
 
 export interface ICasetype extends IBaseRepository<CaseType> {
     findByName(name: string): Promise<CaseType | null>;

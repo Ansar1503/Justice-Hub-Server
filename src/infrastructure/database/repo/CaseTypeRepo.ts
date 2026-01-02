@@ -1,4 +1,4 @@
-import { CaseType } from "../../../domain/entities/CaseType";
+
 import { ICasetype } from "@domain/IRepository/ICasetype";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
 import {
@@ -8,6 +8,7 @@ import {
 } from "@src/application/dtos/CaseType/CaseTypeDto";
 import { CasetypeModel, ICasetypeModel } from "../model/CaseTypeModel";
 import { BaseRepository } from "./base/BaseRepo";
+import { CaseType } from "@domain/entities/CaseType";
 
 export class CaseTypeRepo extends BaseRepository<CaseType, ICasetypeModel> implements ICasetype {
     constructor(mapper: IMapper<CaseType, ICasetypeModel>) {

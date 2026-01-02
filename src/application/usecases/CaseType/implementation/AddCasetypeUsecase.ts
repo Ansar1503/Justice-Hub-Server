@@ -1,8 +1,8 @@
 import { ICasetype } from "@domain/IRepository/ICasetype";
 import { AddCasetypeInputDto, CaseTypeDto } from "@src/application/dtos/CaseType/CaseTypeDto";
 import { IPracticAreaRepo } from "@domain/IRepository/IPracticeAreas";
-import { CaseType } from "../../../../domain/entities/CaseType";
 import { IAddCasetypeUsecase } from "../IAddCasetypeUsecase";
+import { CaseType } from "@domain/entities/CaseType";
 
 export class AddCasetypeUsecase implements IAddCasetypeUsecase {
     constructor(
