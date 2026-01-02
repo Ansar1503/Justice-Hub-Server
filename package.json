@@ -1,7 +1,7 @@
 {
   "type": "commonjs",
   "scripts": {
-    "build": "tsc",
+    "build": "npx tsc",
     "start": "node -r tsconfig-paths/register dist/infrastructure/express/server.js",
     "dev": "ts-node -r tsconfig-paths/register src/infrastructure/express/server.ts",
     "lint": "eslint",
