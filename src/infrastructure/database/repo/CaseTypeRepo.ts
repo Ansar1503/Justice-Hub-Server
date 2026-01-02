@@ -1,4 +1,4 @@
-import { CaseType } from "@domain/entities/CaseType";
+import { CaseType } from "../../../domain/entities/CaseType";
 import { ICasetype } from "@domain/IRepository/ICasetype";
 import { IMapper } from "@infrastructure/Mapper/IMapper";
 import {

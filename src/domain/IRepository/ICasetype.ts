@@ -1,4 +1,4 @@
-import { CaseType } from "@domain/entities/CaseType";
+import { CaseType } from "../../domain/entities/CaseType"
 import {
     CasetypeFetchQueryDto,
     CaseTypeFetchResultDto,
