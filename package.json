@@ -2,8 +2,8 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/infrastructure/express/server.js",
-    "dev": "npx nodemon --exec tsx src/infrastructure/express/server.ts",
+    "start": "node -r tsconfig-paths/register dist/infrastructure/express/server.js",
+    "dev": "ts-node -r tsconfig-paths/register src/infrastructure/express/server.ts",
     "lint": "eslint",
     "lint:fix": "eslint --fix"
   },
@@ -71,6 +71,7 @@
     "rrule": "^2.8.1",
     "socket.io": "^4.8.1",
     "stripe": "^18.1.1",
+    "tsconfig-paths": "^4.2.0",
     "uuid": "^11.1.0",
     "winston": "^3.17.0",
     "zod": "^3.25.17"
