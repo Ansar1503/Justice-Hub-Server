@@ -12,7 +12,6 @@ import { AddOverrideSlotsComposer } from "@infrastructure/services/composers/Law
 import { RemoveOverriedSlotsComposer } from "@infrastructure/services/composers/Lawyer/Slots/RemoveOverrideSlotsComposer";
 import { RejectClientAppointmentComposer } from "@infrastructure/services/composers/Lawyer/Appointment/RejectClientAppointmentComposer";
 import { ConfirmClientAppointmentComposer } from "@infrastructure/services/composers/Lawyer/Appointment/ConfirmClientAppointment";
-import { FetchSessionDocumentsComposer } from "@infrastructure/services/composers/Lawyer/Session/FetchSessionDocumentsComposer";
 import { StartSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/StartSessionComposer";
 import { JoinVideoSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/JoinVideoSessionComposer";
 import { EndSessionComposer } from "@infrastructure/services/composers/Lawyer/Session/EndSessionComposer";
@@ -348,17 +347,7 @@ router.get(
     return;
   }
 );
-router.get(
-  LawyerRoutes.profile.sessions.document,
-  authenticateUser,
-  authenticateClient,
-  authenticateLawyer,
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FetchSessionDocumentsComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
-);
+
 router.patch(
   LawyerRoutes.profile.sessions.start,
   authenticateUser,

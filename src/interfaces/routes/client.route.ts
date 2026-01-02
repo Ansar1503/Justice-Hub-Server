@@ -13,9 +13,6 @@ import { UpdatePasswordComposer } from "@infrastructure/services/composers/Clien
 import { UpdateAddressComposer } from "@infrastructure/services/composers/Client/Profile/UpdateAddressComposer";
 import { FetchAppointmentDataComposer } from "@infrastructure/services/composers/Client/Appointment/FetchAppointmentsComposer";
 import { fetchSessionsComposer } from "@infrastructure/services/composers/Admin/FetchSessions";
-import { FetchSessionDocumentsComposer } from "@infrastructure/services/composers/Client/sessions/FetchSessionDocumentsComposer";
-import { UploadSessionDocumentsComposer } from "@infrastructure/services/composers/Client/sessions/UploadSessionDocumentsComposer";
-import { RemoveSessionDocumentComposer } from "@infrastructure/services/composers/Client/sessions/RemoveSessionDocumentComposer";
 import { GetLawyersComposer } from "@infrastructure/services/composers/Client/LawyerProfile/GetLawyerComposer";
 import { GetLawyerDetailComposer } from "@infrastructure/services/composers/Client/LawyerProfile/GetLawyerDetailsComposer";
 import { FetchReviewsComposer } from "@infrastructure/services/composers/Client/review/FetchReviewsComposers";
@@ -377,29 +374,6 @@ router.get(
   }
 );
 
-router
-  .route(ClientRoutes.profile.sessionDocs.byId)
-  .all(authenticateUser, authenticateClient)
-  .get(async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, FetchSessionDocumentsComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-  })
-  .delete(async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, RemoveSessionDocumentComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-  });
-
-router.post(
-  ClientRoutes.profile.sessionDocs.base,
-  authenticateUser,
-  authenticateClient,
-  handleMulterErrors(documentUpload.array("documents", 3)),
-  async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, UploadSessionDocumentsComposer());
-    res.status(adapter.statusCode).json(adapter.body);
-    return;
-  }
-);
 
 router.patch(
   ClientRoutes.profile.cancelSession,
