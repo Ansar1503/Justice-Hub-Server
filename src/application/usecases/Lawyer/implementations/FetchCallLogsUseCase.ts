@@ -23,7 +23,6 @@ export class FetchCallLogsUseCase implements IFetchCallLogsUseCase {
                     callDuration: c.callDuration,
                     client_joined_at: c.client_joined_at,
                     client_left_at: c.client_left_at,
-                    end_reason: c.end_reason,
                     end_time: c.end_time,
                     lawyer_joined_at: c.lawyer_joined_at,
                     lawyer_left_at: c.lawyer_left_at,
