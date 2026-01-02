@@ -1,0 +1,20 @@
+image: node:20
+
+stages:
+  - install
+  - test
+
+cache:
+  paths:
+    - node_modules/
+
+install_dependencies:
+  stage: install
+  script:
+    - npm install
+
+run_tests:
+  stage: test
+  script:
+    - npm test
+  allow_failure: true
