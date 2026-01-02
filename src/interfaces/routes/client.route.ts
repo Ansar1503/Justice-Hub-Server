@@ -96,7 +96,8 @@ import { LikeOrDislikeBlogComposer } from "@infrastructure/services/composers/Bl
 import { FetchAmountPayableComposer } from "@infrastructure/services/composers/Client/FetchAmountPayableComposer";
 import { BookFollowupAppointmentByWalletComposer } from "@infrastructure/services/composers/Client/Appointment/BookFollowupAppointmentByWalletComposer";
 import { FetchPaymentsComposer } from "@infrastructure/services/composers/Client/FetchPaymentsComposer";
-import { StartCallComposer } from "@infrastructure/services/composers/Lawyer/JoinCallComposer";
+import { StartCallComposer } from "@infrastructure/services/composers/Lawyer/StartCallComposer";
+import { EndCallComposer } from "@infrastructure/services/composers/Lawyer/EndCallComposer";
 
 const upload = multer({ storage: profilestorage });
 const documentUpload = multer({
@@ -152,6 +153,10 @@ router
   .all(authenticateUser, authenticateClient)
   .post(async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, StartCallComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+  })
+  .put(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, EndCallComposer());
     res.status(adapter.statusCode).json(adapter.body);
   });
 

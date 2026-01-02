@@ -24,10 +24,7 @@ export class StartCallUsecase implements IStartCallUsecase {
       roomId: input.roomId,
     });
     const existingCall = CallsByRoomId.find(
-      (call) =>
-        call.status === "ongoing" &&
-        ((user?.role === "client" && call.client_joined_at) ||
-          (user?.role === "lawyer" && call.lawyer_joined_at))
+      (call) => call.status === "ongoing"
     );
     const newDate = new Date();
     if (!existingCall) {
@@ -43,15 +40,15 @@ export class StartCallUsecase implements IStartCallUsecase {
       await this._callLogsRepo.create(newCall);
     } else {
       if (user?.role === "client" && !existingCall.client_joined_at) {
-        await this._callLogsRepo.updateByRoomId({
+        await this._callLogsRepo.updateByRoomAndOngoingStatus({
           roomId: input.roomId,
           client_joined_at: newDate,
         });
       } else if (user?.role === "lawyer" && !existingCall.lawyer_joined_at) {
-        await this._callLogsRepo.updateByRoomId({
-            roomId:input.roomId,
-            lawyer_joined_at:newDate
-        })
+        await this._callLogsRepo.updateByRoomAndOngoingStatus({
+          roomId: input.roomId,
+          lawyer_joined_at: newDate,
+        });
       }
     }
   }

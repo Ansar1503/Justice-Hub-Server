@@ -14,4 +14,7 @@ export interface ICallLogs {
   create(payload: CallLogs): Promise<CallLogs>;
   updateByRoomId(payload: Partial<CallLogs>): Promise<CallLogs | null>;
   findByRoomId(payload: { roomId: string }): Promise<CallLogs[]>;
+  updateByRoomAndOngoingStatus(
+    payload: Partial<CallLogs>
+  ): Promise<CallLogs | null>;
 }

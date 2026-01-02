@@ -118,4 +118,60 @@ export class CallLogsRepository implements ICallLogs {
     if (!log) return [];
     return this.mapper.toDomainArray ? this.mapper.toDomainArray(log) : [];
   }
+  async updateByRoomAndOngoingStatus(
+    payload: Partial<CallLogsEntity>
+  ): Promise<CallLogsEntity | null> {
+    const {
+      roomId,
+      callDuration,
+      client_joined_at,
+      client_left_at,
+      end_time,
+      lawyer_joined_at,
+      lawyer_left_at,
+      start_time,
+      session_id,
+      status,
+    } = payload;
+    if (!roomId) return null;
+    const update: any = {};
+    if (callDuration) {
+      update.callDuration = callDuration;
+    }
+    if (client_joined_at) {
+      update.client_joined_at = client_joined_at;
+    }
+    if (client_left_at) {
+      update.client_left_at = client_left_at;
+    }
+    if (end_time) {
+      update.end_time = end_time;
+    }
+    if (lawyer_joined_at) {
+      update.lawyer_joined_at = lawyer_joined_at;
+    }
+    if (lawyer_left_at) {
+      update.lawyer_left_at = lawyer_left_at;
+    }
+    if (start_time) {
+      update.start_time = start_time;
+    }
+    if (end_time) {
+      update.end_time = end_time;
+    }
+    if (session_id) {
+      update.session_id = session_id;
+    }
+    if (status) {
+      update.status = status;
+    }
+    const updatedLog = await CallLogsModel.findOneAndUpdate(
+      { roomId: roomId, status: "ongoing" },
+      { $set: update },
+      { new: true }
+    );
+    // console.log("updatedLogs:", updatedLog);
+    if (!updatedLog) return null;
+    return this.mapper.toDomain(updatedLog);
+  }
 }

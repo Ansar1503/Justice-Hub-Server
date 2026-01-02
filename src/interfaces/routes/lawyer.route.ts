@@ -74,7 +74,8 @@ import { UpdateBlogComposer } from "@infrastructure/services/composers/Blog/Upda
 import { DeleteBlogComposer } from "@infrastructure/services/composers/Blog/DeleteBlogComposer";
 import { ToggleBlogPublishComposer } from "@infrastructure/services/composers/Blog/ToggleBlogStatusComposer";
 import { updateCaseDetailsComposer } from "@infrastructure/services/composers/Cases/UpdateCasesDetailsComposer";
-import { StartCallComposer } from "@infrastructure/services/composers/Lawyer/JoinCallComposer";
+import { StartCallComposer } from "@infrastructure/services/composers/Lawyer/StartCallComposer";
+import { EndCallComposer } from "@infrastructure/services/composers/Lawyer/EndCallComposer";
 
 const upload = multer({ storage: documentstorage });
 const caseDocumentUpload = multer({
@@ -118,6 +119,10 @@ router
   .all(authenticateUser, authenticateClient, authenticateLawyer)
   .post(async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, StartCallComposer());
+    res.status(adapter.statusCode).json(adapter.body);
+  })
+  .put(async (req: Request, res: Response) => {
+    const adapter = await expressAdapter(req, EndCallComposer());
     res.status(adapter.statusCode).json(adapter.body);
   });
 
