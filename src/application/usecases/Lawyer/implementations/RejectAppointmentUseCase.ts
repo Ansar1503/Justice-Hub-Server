@@ -40,7 +40,7 @@ export class RejectAppointmentUseCase implements IRejectAppointmentUseCase {
         throw error;
       }
       if (appointment.status === "confirmed") {
-        const error: any = new Error("appointment already confirmed by lawyer");
+        const error: any = new Error("appointment already confirmed by lawyer. Try cancelling the session.");
         error.code = STATUS_CODES.BAD_REQUEST;
         throw error;
       }
@@ -96,7 +96,7 @@ export class RejectAppointmentUseCase implements IRejectAppointmentUseCase {
 
       await uow.transactionsRepo.create(adminTransaction);
       await uow.transactionsRepo.create(clientTransaction);
-      
+
       const response = await uow.appointmentRepo.updateWithId(input);
       if (!response) throw new Error("appointment cancellation failed");
 
