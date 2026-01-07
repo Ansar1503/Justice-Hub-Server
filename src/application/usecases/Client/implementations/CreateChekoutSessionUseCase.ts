@@ -116,7 +116,10 @@ export class CreateCheckoutSessionUseCase
       await this._appointmentRepo.findByDateandClientId({ client_id, date });
     const bookingExist = existingApointmentonDate?.some(
       (appointment) =>
-        appointment.time === timeSlot && appointment.payment_status !== "failed"
+        appointment.time === timeSlot &&
+        appointment.payment_status !== "failed" &&
+        appointment.status !== "rejected" &&
+        appointment.status !== "cancelled"
     );
 
     const existingApps = await this._appointmentRepo.findByClientID(client_id);
