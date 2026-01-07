@@ -51,7 +51,10 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
 
     const booked = new Set<string>();
     existingAppointment?.forEach(
-      (a) => (a.payment_status !== "failed" && a.status!="cancelled") && booked.add(a.time)
+      (a) =>
+        a.payment_status !== "failed" &&
+        a.status != "cancelled" &&
+        booked.add(a.time)
     );
 
     const slotDuration = slotSettings.slotDuration;
@@ -115,7 +118,6 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
         if (isToday(date)) {
           allSlots = allSlots.filter(isSlotInFuture);
         }
-
         return {
           slots: allSlots,
           isAvailable: allSlots.length > 0,
@@ -135,11 +137,9 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
       daySlots.push(...generateTimeSlots(range.start, range.end, slotDuration));
     }
     daySlots = filterBookedSlots(daySlots);
-
     if (isToday(date)) {
       daySlots = daySlots.filter(isSlotInFuture);
     }
-
     return {
       slots: daySlots,
       isAvailable: daySlots.length > 0,
@@ -149,11 +149,7 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
 
 const isToday = (someDate: Date) => {
   const today = new Date();
-  return (
-    someDate.getDate() === today.getDate() &&
-    someDate.getMonth() === today.getMonth() &&
-    someDate.getFullYear() === today.getFullYear()
-  );
+  return toISTDateString(someDate) === toISTDateString(today);
 };
 
 const isSlotInFuture = (slotTime: string) => {
@@ -165,3 +161,6 @@ const isSlotInFuture = (slotTime: string) => {
 
   return slotDate > now;
 };
+
+const toISTDateString = (d: Date) =>
+  d.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });

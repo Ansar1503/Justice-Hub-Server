@@ -25,7 +25,7 @@ export class GetLawyerSlotDetailsController implements IController {
                 return this.httpErrors.error_400("Invalid Credentials");
             }
 
-            const dateObj = new Date(new Date(date).getTime() - new Date(date).getTimezoneOffset() * 60000);
+            const dateObj = new Date(date);
 
             const result = await this.fetchLawyerSlots.execute({
                 lawyer_id,
