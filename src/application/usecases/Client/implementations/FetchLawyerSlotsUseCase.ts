@@ -158,6 +158,7 @@ const isToday = (someDate: Date) => {
 
 const isSlotInFuture = (slotTime: string) => {
   const now = new Date();
+  now.setMinutes(now.getMinutes() + 15);
   const [hours, minutes] = slotTime.split(":").map(Number);
   const slotDate = new Date();
   slotDate.setHours(hours, minutes, 0, 0);
