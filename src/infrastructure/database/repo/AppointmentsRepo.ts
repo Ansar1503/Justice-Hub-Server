@@ -45,7 +45,6 @@ export class AppointmentsRepository
         error.code = 409;
         throw error;
       }
-
       const newAppointment = new AppointmentModel(
         this.mapper.toPersistence(payload)
       );

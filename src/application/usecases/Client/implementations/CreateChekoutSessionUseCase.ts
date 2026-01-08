@@ -50,7 +50,6 @@ export class CreateCheckoutSessionUseCase
     if (!lawyerVerificaitionDetails) throw new Error(ERRORS.USER_NOT_FOUND);
     if (lawyerVerificaitionDetails.verificationStatus !== "verified")
       throw new Error(ERRORS.LAWYER_NOT_VERIFIED);
-
     const slotDateTime = timeStringToDate(date, timeSlot);
     const now = new Date();
     now.setMinutes(now.getMinutes());
