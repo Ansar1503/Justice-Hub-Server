@@ -53,7 +53,7 @@ export class CreateCheckoutSessionUseCase
 
     const slotDateTime = timeStringToDate(date, timeSlot);
     const now = new Date();
-    now.setMinutes(now.getMinutes() + 15);
+    now.setMinutes(now.getMinutes());
     if (slotDateTime <= now) {
       const err: any = new Error("Selected time slot is in the past");
       err.code = STATUS_CODES.BAD_REQUEST;
