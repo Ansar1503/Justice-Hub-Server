@@ -223,7 +223,7 @@ export class CreateFollowupCheckoutSessionUsecase
 
         const stripe = await getFollowupStripeSession({
           amountPaid: amountPaid,
-          date: String(date),
+          date: date.toISOString().split("T")[0],
           lawyer_name: user.name,
           slot: timeSlot,
           userEmail: user.email,
@@ -316,7 +316,7 @@ export class CreateFollowupCheckoutSessionUsecase
       );
     const stripe = await getFollowupStripeSession({
       amountPaid: amountPaid,
-      date: String(date),
+      date: date.toISOString().split("T")[0],
       lawyer_name: user.name,
       slot: timeSlot,
       userEmail: user.email,

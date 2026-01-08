@@ -217,7 +217,7 @@ export class CreateCheckoutSessionUseCase
 
         const stripe = await getStripeSession({
           amountPaid,
-          date: String(date),
+          date: date.toISOString().split("T")[0],
           lawyer_name: user.name,
           slot: timeSlot,
           userEmail: user.email,
@@ -310,7 +310,7 @@ export class CreateCheckoutSessionUseCase
       );
     const stripe = await getStripeSession({
       amountPaid,
-      date: String(date),
+      date: date.toISOString().split("T")[0],
       lawyer_name: user.name,
       slot: timeSlot,
       userEmail: user.email,

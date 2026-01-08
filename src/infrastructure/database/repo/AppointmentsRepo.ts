@@ -30,7 +30,7 @@ export class AppointmentsRepository
     startOfDay.setUTCHours(0, 0, 0, 0);
     const endOfDay = new Date(inputDate);
     endOfDay.setUTCHours(23, 59, 59, 999);
-
+    console.log("inputdate",inputDate)
     const session = await mongoose.startSession();
     session.startTransaction();
 

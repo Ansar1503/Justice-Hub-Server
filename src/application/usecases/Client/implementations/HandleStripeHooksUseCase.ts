@@ -81,9 +81,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
             title: title,
             summary: reason,
           });
-          const datetoadd = new Date(date);
-          datetoadd.setUTCHours(0, 0, 0, 0);
-
+          const datetoadd = new Date(`${date}T00:00:00.000Z`);
           await uow.caseRepo.create(casepayload);
           const appointmentPayload = Appointment.create({
             amount: Number(amountPaid),
@@ -194,8 +192,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
         this._unitofwork.startTransaction(async (uow) => {
           const caseRecord = await uow.caseRepo.findById(caseId);
           if (!caseRecord) throw new Error("Case not found for follow-up");
-          const datetoadd = new Date(date);
-          datetoadd.setUTCHours(0, 0, 0, 0);
+          const datetoadd = new Date(`${date}T00:00:00.000Z`);
 
           const appointmentPayload = Appointment.create({
             amount: Number(amountPaid),
