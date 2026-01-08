@@ -81,11 +81,14 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
             title: title,
             summary: reason,
           });
+          const datetoadd = new Date(date);
+          datetoadd.setUTCHours(0, 0, 0, 0);
+
           await uow.caseRepo.create(casepayload);
           const appointmentPayload = Appointment.create({
             amount: Number(amountPaid),
             client_id: client_id,
-            date: new Date(date),
+            date: datetoadd,
             caseId: casepayload.id,
             payment_status: payment_status,
             duration: Number(duration),
