@@ -16,7 +16,6 @@ import {
 //   FetchAppointmentsOutputDto,
 // } from "@src/application/dtos/Admin/FetchAppointmentsDto";
 import { BaseRepository } from "./base/BaseRepo";
-import { error } from "node:console";
 
 export class AppointmentsRepository
   extends BaseRepository<Appointment, IAppointmentModel>
@@ -41,7 +40,6 @@ export class AppointmentsRepository
         date: { $gte: startOfDay, $lte: endOfDay },
         time: payload.time,
       }).session(session);
-      console.log("existing", existing);
       if (existing) {
         const error: any = new Error("Slot already booked");
         error.code = 409;
@@ -52,7 +50,6 @@ export class AppointmentsRepository
         this.mapper.toPersistence(payload)
       );
       await newAppointment.save({ session });
-
       await session.commitTransaction();
       return this.mapper.toDomain(newAppointment);
     } catch (error) {
