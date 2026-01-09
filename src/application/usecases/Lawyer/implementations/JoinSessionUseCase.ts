@@ -41,7 +41,7 @@ export class JoinSessionUseCase implements IJoinSessionUseCase {
       appointmentDetails.time
     );
     const newDate = new Date();
-    if (newDate < slotDateTime) {
+    if (newDate.getTime() < slotDateTime.getTime() - 5 * 60 * 1000) {
       throw new ValidationError("Scheduled time is not reached");
     }
     slotDateTime.setMinutes(

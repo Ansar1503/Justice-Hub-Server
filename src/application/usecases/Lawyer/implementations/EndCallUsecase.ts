@@ -22,21 +22,34 @@ export class EndCallUsecase implements IEndCallUsecase {
     const ongoingLog = callLogs.find((log) => log.status === "ongoing");
     if (!ongoingLog) throw new Error("call log not found");
     const newDate = new Date();
-    const callStart =
-      ongoingLog.client_joined_at && ongoingLog.lawyer_joined_at
-        ? Math.max(
-            ongoingLog.client_joined_at.getTime(),
-            ongoingLog.lawyer_joined_at.getTime()
-          )
-        : ongoingLog.start_time?.getTime();
-    const callDuration = callStart ? newDate.getTime() - callStart : 0;
+    const joinTimes = [
+      ongoingLog.client_joined_at,
+      ongoingLog.lawyer_joined_at,
+    ].filter(Boolean) as Date[];
+
+    const sessionStart = joinTimes.length
+      ? Math.min(...joinTimes.map((d) => d.getTime()))
+      : ongoingLog.start_time?.getTime();
+    const leaveTimes = [
+      ongoingLog.client_left_at,
+      ongoingLog.lawyer_left_at,
+    ].filter(Boolean) as Date[];
+
+    const sessionEnd = leaveTimes.length
+      ? Math.max(...leaveTimes.map((d) => d.getTime()))
+      : newDate.getTime();
+
+    const callDuration =
+      sessionStart && sessionEnd ? sessionEnd - sessionStart : 0;
     await this._callLogsRepo.updateByRoomAndOngoingStatus({
       roomId: input.roomId,
       end_time: newDate,
       status: "completed",
-      callDuration: callDuration,
-      lawyer_left_at: newDate,
-      client_left_at: newDate,
+      callDuration,
+      lawyer_left_at:
+        user?.role === "lawyer" ? newDate : ongoingLog.lawyer_left_at,
+      client_left_at:
+        user?.role === "client" ? newDate : ongoingLog.client_left_at,
     });
   }
 }
