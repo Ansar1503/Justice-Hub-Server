@@ -374,7 +374,6 @@ router.get(
   }
 );
 
-
 router.patch(
   ClientRoutes.profile.cancelSession,
   authenticateUser,
@@ -804,7 +803,10 @@ router.post(
 );
 
 router.get(
-  CasesRoutes.base + CasesRoutes.caseTypes + CasesRoutes.ids,
+  CasesRoutes.base +
+    CasesRoutes.caseTypes +
+    CasesRoutes.ids +
+    CommonParamsRoute.params,
   authenticateUser,
   authenticateClient,
   async (req: Request, res: Response) => {

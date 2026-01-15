@@ -12,6 +12,7 @@ export interface ICaseRepo extends IBaseRepository<Case> {
   ): Promise<FindCasesWithPagination>;
   findById(id: string): Promise<AggregatedCasesData | null>;
   findByCaseTypes(payload: {
+    lawyerId:string
     userId: string;
     caseTypeIds: string[];
   }): Promise<Case[] | []>;

@@ -12,7 +12,8 @@ import { BaseRepository } from "./base/BaseRepo";
 
 export class CaseRepository
   extends BaseRepository<Case, ICaseModel>
-  implements ICaseRepo {
+  implements ICaseRepo
+{
   constructor(mapper: IMapper<Case, ICaseModel>, session?: ClientSession) {
     super(CaseModel, mapper, session);
   }
@@ -339,10 +340,12 @@ export class CaseRepository
     return data[0];
   }
   async findByCaseTypes(payload: {
+    lawyerId: string;
     userId: string;
     caseTypeIds: string[];
   }): Promise<Case[] | []> {
     const data = await this.model.find({
+      lawyerId: payload.lawyerId,
       clientId: payload.userId,
       caseType: { $in: payload.caseTypeIds },
     });
@@ -404,7 +407,9 @@ export class CaseRepository
     }));
   }
   async update(caseId: string, data: Partial<Case>): Promise<Case | null> {
-    const updated = await this.model.findOneAndUpdate({ _id: caseId }, data, { new: true })
-    return updated ? this.mapper.toDomain(updated) : null
+    const updated = await this.model.findOneAndUpdate({ _id: caseId }, data, {
+      new: true,
+    });
+    return updated ? this.mapper.toDomain(updated) : null;
   }
 }

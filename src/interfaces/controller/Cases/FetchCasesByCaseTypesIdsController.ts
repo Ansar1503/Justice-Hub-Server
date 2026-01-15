@@ -15,6 +15,7 @@ export class FetchCaseByCaseTypesIdsController implements IController {
   ) {}
   async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
     let userId = "";
+    let lawyerId = "";
     if (
       httpRequest.user &&
       typeof httpRequest.user === "object" &&
@@ -22,11 +23,20 @@ export class FetchCaseByCaseTypesIdsController implements IController {
     ) {
       userId = String(httpRequest.user.id);
     }
-    console.log("reached cnotroller now to parse");
     const parsed = await FetchCaseByCaseTypesSchema.safeParse(
       httpRequest.query
     );
 
+    if (
+      httpRequest.params &&
+      typeof httpRequest.params === "object" &&
+      "id" in httpRequest.params
+    ) {
+      lawyerId = String(httpRequest.params.id);
+    }
+    if (!lawyerId) {
+      return this._errors.error_400("lawyer Id not found");
+    }
     if (!userId) {
       WLogger.warn("user id not found", {
         page: "FetchCaseByCaseTypeIdsController",
@@ -48,6 +58,7 @@ export class FetchCaseByCaseTypesIdsController implements IController {
       const result = await this._fetchCasesByCaseType.execute({
         caseTypeIds: parsed.data.caseTypeIds,
         userId: userId,
+        lawyerId: lawyerId,
       });
       return this._success.success_200(result);
     } catch (error) {
