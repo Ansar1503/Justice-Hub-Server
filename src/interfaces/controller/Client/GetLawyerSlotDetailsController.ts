@@ -26,13 +26,9 @@ export class GetLawyerSlotDetailsController implements IController {
       if (!lawyer_id.trim() || !date || !client_id) {
         return this.httpErrors.error_400("Invalid Credentials");
       }
-
-      const dateObj = new Date(date);
-      dateObj.setHours(dateObj.getHours() + 5);
-      dateObj.setMinutes(dateObj.getMinutes() + 30);
       const result = await this.fetchLawyerSlots.execute({
         lawyer_id,
-        date: dateObj,
+        date: date,
         client_id,
       });
 

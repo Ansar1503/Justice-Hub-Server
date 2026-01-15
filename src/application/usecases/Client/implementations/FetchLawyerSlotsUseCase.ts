@@ -8,6 +8,7 @@ import { IAvailableSlots } from "@domain/IRepository/IAvailableSlots";
 import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
 import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
 import { IFetchLawyerSlotsUseCase } from "../IFetchLawyerSlotsUseCase";
+import moment from "moment";
 
 export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
   constructor(
@@ -20,10 +21,11 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
   ) {}
   async execute(input: {
     lawyer_id: string;
-    date: Date;
+    date: string;
     client_id: string;
   }): Promise<{ slots: string[]; isAvailable: boolean }> {
     const { client_id, date, lawyer_id } = input;
+    const dateObj = moment(date, "ddd MMM DD YYYY HH:mm:ss [GMT] ZZ").toDate();
     const filterBookedSlots = (slots: string[]) =>
       slots.filter((t) => !booked.has(t));
     const user = await this.userRepository.findByuser_id(lawyer_id);
@@ -44,7 +46,7 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
     }
     const existingAppointment =
       await this.appointmentRepo.findByDateandLawyer_id({
-        date,
+        date: dateObj,
         lawyer_id,
       });
 
@@ -60,7 +62,7 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
 
     const override = await this.ovverrideRepo.fetcghOverrideSlotByDate(
       lawyer_id,
-      date
+      dateObj
     );
 
     const availableSlots =
@@ -82,7 +84,7 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
       "saturday",
     ];
 
-    const index = date.getDay();
+    const index = dateObj.getDay();
     const day = days[index];
 
     if (!availableSlots.getDayAvailability(day)) {
@@ -113,8 +115,8 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
           allSlots.push(...timeSlot);
         }
         allSlots = filterBookedSlots(allSlots);
-
-        if (isToday(date)) {
+        console.log("istoday", isToday(dateObj));
+        if (isToday(dateObj)) {
           allSlots = allSlots.filter(isSlotInFuture);
         }
         return {
@@ -136,7 +138,7 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
       daySlots.push(...generateTimeSlots(range.start, range.end, slotDuration));
     }
     daySlots = filterBookedSlots(daySlots);
-    if (isToday(date)) {
+    if (isToday(dateObj)) {
       daySlots = daySlots.filter(isSlotInFuture);
     }
     return {
@@ -152,13 +154,16 @@ const isToday = (someDate: Date) => {
 };
 
 const isSlotInFuture = (slotTime: string) => {
-  const now = new Date();
-  now.setMinutes(now.getMinutes());
+  const nowISTString = new Date().toLocaleString("en-US", {
+    timeZone: "Asia/Kolkata",
+  });
+  const nowIST = new Date(nowISTString);
+
   const [hours, minutes] = slotTime.split(":").map(Number);
-  const slotDate = new Date();
+  const slotDate = new Date(nowIST);
   slotDate.setHours(hours, minutes, 0, 0);
 
-  return slotDate > now;
+  return slotDate > nowIST;
 };
 
 const toISTDateString = (d: Date) =>
