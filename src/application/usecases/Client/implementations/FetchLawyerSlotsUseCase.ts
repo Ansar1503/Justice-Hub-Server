@@ -24,7 +24,6 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
     client_id: string;
   }): Promise<{ slots: string[]; isAvailable: boolean }> {
     const { client_id, date, lawyer_id } = input;
-
     const filterBookedSlots = (slots: string[]) =>
       slots.filter((t) => !booked.has(t));
     const user = await this.userRepository.findByuser_id(lawyer_id);

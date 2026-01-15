@@ -9,46 +9,51 @@ import { ERRORS } from "@infrastructure/constant/errors";
 import { IFetchLawyerSlotsUseCase } from "@src/application/usecases/Client/IFetchLawyerSlotsUseCase";
 
 export class GetLawyerSlotDetailsController implements IController {
-    constructor(
-        private readonly fetchLawyerSlots: IFetchLawyerSlotsUseCase,
-        private readonly httpErrors: IHttpErrors = new HttpErrors(),
-        private readonly httpSuccess: IHttpSuccess = new HttpSuccess(),
-    ) {}
+  constructor(
+    private readonly fetchLawyerSlots: IFetchLawyerSlotsUseCase,
+    private readonly httpErrors: IHttpErrors = new HttpErrors(),
+    private readonly httpSuccess: IHttpSuccess = new HttpSuccess()
+  ) {}
 
-    async handle(httpRequest: IHttpRequest): Promise<IHttpResponse> {
-        try {
-            const lawyer_id = (httpRequest.params as { id: string })?.id || "";
-            const date = (httpRequest.query as { date: string })?.date;
-            const client_id = (httpRequest as IHttpRequest & { user?: { id?: string } }).user?.id;
+  async handle(httpRequest: IHttpRequest): Promise<IHttpResponse> {
+    try {
+      const lawyer_id = (httpRequest.params as { id: string })?.id || "";
+      const date = (httpRequest.query as { date: string })?.date;
+      const client_id = (
+        httpRequest as IHttpRequest & { user?: { id?: string } }
+      ).user?.id;
 
-            if (!lawyer_id.trim() || !date || !client_id) {
-                return this.httpErrors.error_400("Invalid Credentials");
-            }
+      if (!lawyer_id.trim() || !date || !client_id) {
+        return this.httpErrors.error_400("Invalid Credentials");
+      }
 
-            const dateObj = new Date(date);
+      const dateObj = new Date(date);
+      dateObj.setHours(dateObj.getHours() + 5);
+      dateObj.setMinutes(dateObj.getMinutes() + 30);
+      const result = await this.fetchLawyerSlots.execute({
+        lawyer_id,
+        date: dateObj,
+        client_id,
+      });
 
-            const result = await this.fetchLawyerSlots.execute({
-                lawyer_id,
-                date: dateObj,
-                client_id,
-            });
-
-            return this.httpSuccess.success_200({
-                success: true,
-                message: "Lawyer slots fetched successfully",
-                data: result,
-            });
-        } catch (error: any) {
-            switch (error.message) {
-            case ERRORS.USER_NOT_FOUND:
-                return this.httpErrors.error_404("User not found");
-            case ERRORS.USER_BLOCKED:
-                return this.httpErrors.error_403("User is blocked");
-            case ERRORS.LAWYER_NOT_VERIFIED:
-                return this.httpErrors.error_400("Lawyer is not verified");
-            default:
-                return this.httpErrors.error_500(error.message || "Internal Server Error");
-            }
-        }
+      return this.httpSuccess.success_200({
+        success: true,
+        message: "Lawyer slots fetched successfully",
+        data: result,
+      });
+    } catch (error: any) {
+      switch (error.message) {
+        case ERRORS.USER_NOT_FOUND:
+          return this.httpErrors.error_404("User not found");
+        case ERRORS.USER_BLOCKED:
+          return this.httpErrors.error_403("User is blocked");
+        case ERRORS.LAWYER_NOT_VERIFIED:
+          return this.httpErrors.error_400("Lawyer is not verified");
+        default:
+          return this.httpErrors.error_500(
+            error.message || "Internal Server Error"
+          );
+      }
     }
+  }
 }
