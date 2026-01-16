@@ -83,6 +83,8 @@ export class FetchLawyerCalendarAvailabilityUseCase
           start: t.start,
           end: t.end,
         }));
+        console.log("datestr", dateStr);
+        console.log("dateobj", date);
         console.log("dayavailability", dayAvailability);
         let isAvailable = dayAvailability.enabled;
 
