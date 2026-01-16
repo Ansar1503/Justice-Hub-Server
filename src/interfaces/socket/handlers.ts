@@ -188,11 +188,21 @@ export class SocketHandlers {
 
   async handleDeleteMessage(payload: { messageId: string; sessionId: string }) {
     try {
+      const deletingMessage =
+        await chatUsecase.getChatSessionDetailsBysessionId(payload.sessionId);
       const lastMessage = await chatUsecase.deleteMessage(payload);
-      this.io.in(payload.sessionId).emit(this.eventEnum.MESSAGE_DELETE_EVENT, {
-        ...payload,
-        lastMessage: lastMessage,
-      });
+      this.io
+        .in(deletingMessage?.participants.client_id || "")
+        .emit(this.eventEnum.MESSAGE_DELETE_EVENT, {
+          ...payload,
+          lastMessage: lastMessage,
+        });
+      this.io
+        .in(deletingMessage?.participants.lawyer_id || "")
+        .emit(this.eventEnum.MESSAGE_DELETE_EVENT, {
+          ...payload,
+          lastMessage: lastMessage,
+        });
     } catch (error) {
       if (error instanceof Error) {
         WLogger.error(error.message, {

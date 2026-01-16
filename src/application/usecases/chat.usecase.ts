@@ -243,4 +243,9 @@ export class ChatUseCase implements IChatusecase {
   }> {
     return await this._chatMessageRepo.fetchDisputesAggregation(payload);
   }
+  async getChatSessionDetailsBysessionId(
+    sessionId: string
+  ): Promise<ChatSession | null> {
+    return await this._chatSessionRepo.findById(sessionId);
+  }
 }
