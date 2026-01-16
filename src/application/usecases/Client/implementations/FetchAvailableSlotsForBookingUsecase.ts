@@ -1,5 +1,4 @@
 import { startOfMonth, endOfMonth, eachDayOfInterval, format } from "date-fns";
-import { formatInTimeZone, toDate } from "date-fns-tz";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
 import { IScheduleSettingsRepo } from "@domain/IRepository/IScheduleSettingsRepo";
@@ -20,7 +19,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
     private scheduleSettingsRepo: IScheduleSettingsRepo,
     private availabilityRepo: IAvailableSlots,
     private overrideRepo: IOverrideRepo,
-    private appointmentRepo: IAppointmentsRepository,
+    private appointmentRepo: IAppointmentsRepository
   ) {}
 
   async execute(input: {
@@ -51,31 +50,33 @@ export class FetchLawyerCalendarAvailabilityUseCase
     const baseDate = month ? new Date(`${month}-01`) : new Date();
     const monthStart = startOfMonth(baseDate);
     const monthEnd = endOfMonth(baseDate);
-    const timeZone = "Asia/Kolkata";
-    const now = new Date();
-    const todayISTString = formatInTimeZone(now, timeZone, "yyyy-MM-dd");
-    const todayStart = toDate(`${todayISTString}T00:00:00`, { timeZone });
+    const today = new Date();
 
     const appointments =
       await this.appointmentRepo.findAppointmentsByLawyerAndRange(
         lawyerId,
         monthStart,
-        monthEnd,
+        monthEnd
       );
 
     const allDates = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
     const availableDates = allDates
       .filter((d) => {
-        const diff = Math.round(
-          (d.getTime() - todayStart.getTime()) / (1000 * 60 * 60 * 24),
-        );
+        const diff = (d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
         return diff >= 0 && diff <= maxDaysInAdvance;
       })
       .map((date) => {
-        const dateStr = formatInTimeZone(date, timeZone, "yyyy-MM-dd");
-
-        const dayName = format(date, "eeee").toLowerCase();
+        const dateStr = date.toISOString().split("T")[0];
+        const dayName = [
+          "sunday",
+          "monday",
+          "tuesday",
+          "wednesday",
+          "thursday",
+          "friday",
+          "saturday",
+        ][date.getDay()];
 
         const dayAvailability = availability.getDayAvailability(dayName as any);
         let timeRanges = dayAvailability.timeSlots.map((t) => ({
@@ -85,11 +86,8 @@ export class FetchLawyerCalendarAvailabilityUseCase
         let isAvailable = dayAvailability.enabled;
 
         const overrideForDate = overrides?.overrideDates.find(
-          (ov) =>
-            formatInTimeZone(new Date(ov.date), timeZone, "yyyy-MM-dd") ===
-            dateStr,
+          (ov) => new Date(ov.date).toDateString() === date.toDateString()
         );
-
         if (overrideForDate) {
           if (overrideForDate.isUnavailable) {
             isAvailable = false;
@@ -102,24 +100,19 @@ export class FetchLawyerCalendarAvailabilityUseCase
 
         const bookedTimes = new Set(
           appointments
-            .filter((appt) => {
-              const apptDateStr = formatInTimeZone(
-                new Date(appt.date),
-                timeZone,
-                "yyyy-MM-dd",
-              );
-              return (
-                apptDateStr === dateStr && appt.payment_status !== "failed"
-              );
-            })
-            .map((appt) => appt.time),
+            .filter(
+              (appt) =>
+                new Date(appt.date).toDateString() === date.toDateString() &&
+                appt.payment_status !== "failed"
+            )
+            .map((appt) => appt.time)
         );
 
         const timeRangeResults = timeRanges.map((range) => {
           const generatedSlots = generateTimeSlots(
             range.start,
             range.end,
-            slotDuration,
+            slotDuration
           );
           const remaining = generatedSlots.filter((s) => !bookedTimes.has(s));
           return {
@@ -130,7 +123,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
         });
 
         const totalAvailable = timeRangeResults.some(
-          (r) => r.availableSlots > 0,
+          (r) => r.availableSlots > 0
         );
 
         return {
@@ -139,6 +132,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
           timeRanges: timeRangeResults,
         };
       });
+
     return {
       lawyerId,
       month: format(baseDate, "yyyy-MM"),
