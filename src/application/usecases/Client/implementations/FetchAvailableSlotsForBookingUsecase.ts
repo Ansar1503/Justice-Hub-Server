@@ -85,7 +85,10 @@ export class FetchLawyerCalendarAvailabilityUseCase
         return diff >= 0 && diff <= maxDaysInAdvance;
       })
       .map((date) => {
-        const dateStr = date.toISOString().split("T")[0];
+        const localDate = startOfLocalDay(date);
+
+        const dateStr = format(localDate, "yyyy-MM-dd");
+
         const dayName = [
           "sunday",
           "monday",
@@ -94,7 +97,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
           "thursday",
           "friday",
           "saturday",
-        ][date.getDay()];
+        ][localDate.getDay()];
         const dayAvailability = availability.getDayAvailability(dayName as any);
         let timeRanges = dayAvailability.timeSlots.map((t) => ({
           start: t.start,
@@ -103,7 +106,9 @@ export class FetchLawyerCalendarAvailabilityUseCase
         let isAvailable = dayAvailability.enabled;
 
         const overrideForDate = overrides?.overrideDates.find(
-          (ov) => startOfLocalDay(new Date(ov.date)).getTime() === startOfLocalDay(date).getTime(),
+          (ov) =>
+            startOfLocalDay(new Date(ov.date)).getTime() ===
+            startOfLocalDay(date).getTime(),
         );
         if (overrideForDate) {
           if (overrideForDate.isUnavailable) {
@@ -138,7 +143,6 @@ export class FetchLawyerCalendarAvailabilityUseCase
             availableSlots: remaining.length,
           };
         });
-        console.log("timeragneresults ", timeRangeResults);
         const totalAvailable = timeRangeResults.some(
           (r) => r.availableSlots > 0,
         );
