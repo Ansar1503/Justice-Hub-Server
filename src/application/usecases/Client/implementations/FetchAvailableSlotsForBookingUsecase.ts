@@ -48,8 +48,11 @@ export class FetchLawyerCalendarAvailabilityUseCase
     const { slotDuration, maxDaysInAdvance } = settings;
 
     const baseDate = month ? new Date(`${month}-01`) : new Date();
+    console.log("basedate",baseDate)
     const monthStart = startOfMonth(baseDate);
     const monthEnd = endOfMonth(baseDate);
+    console.log("monthStart",monthStart)
+    console.log("monthEnd",monthEnd)
     const today = new Date();
 
     const appointments =
