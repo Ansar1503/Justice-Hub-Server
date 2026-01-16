@@ -25,7 +25,7 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
     client_id: string;
   }): Promise<{ slots: string[]; isAvailable: boolean }> {
     const { client_id, date, lawyer_id } = input;
-    const dateObj = moment(date, "ddd MMM DD YYYY HH:mm:ss [GMT] ZZ").toDate();
+    const dateObj = new Date(date)
     const filterBookedSlots = (slots: string[]) =>
       slots.filter((t) => !booked.has(t));
     const user = await this.userRepository.findByuser_id(lawyer_id);
@@ -115,7 +115,6 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
           allSlots.push(...timeSlot);
         }
         allSlots = filterBookedSlots(allSlots);
-        console.log("istoday", isToday(dateObj));
         if (isToday(dateObj)) {
           allSlots = allSlots.filter(isSlotInFuture);
         }
