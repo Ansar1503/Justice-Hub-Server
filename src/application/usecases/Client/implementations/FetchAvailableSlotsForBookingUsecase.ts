@@ -27,10 +27,6 @@ export class FetchLawyerCalendarAvailabilityUseCase
     month?: string;
   }): Promise<CalendarAvailabilityResponseDto> {
     const { lawyerId, month } = input;
-    console.log({
-      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      today: new Date().toString(),
-    });
 
     const user = await this.userRepo.findByuser_id(lawyerId);
     if (!user) throw new Error(ERRORS.USER_NOT_FOUND);
@@ -51,18 +47,10 @@ export class FetchLawyerCalendarAvailabilityUseCase
 
     const { slotDuration, maxDaysInAdvance } = settings;
 
-    const baseDate = month
-      ? new Date(
-          Number(month.split("-")[0]),
-          Number(month.split("-")[1]) - 1,
-          1,
-        )
-      : new Date();
-
+    const baseDate = month ? new Date(`${month}-01`) : new Date();
     const monthStart = startOfMonth(baseDate);
     const monthEnd = endOfMonth(baseDate);
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
 
     const appointments =
       await this.appointmentRepo.findAppointmentsByLawyerAndRange(
@@ -75,18 +63,11 @@ export class FetchLawyerCalendarAvailabilityUseCase
 
     const availableDates = allDates
       .filter((d) => {
-        const localD = new Date(d);
-        localD.setHours(0, 0, 0, 0);
-
-        const diff =
-          (localD.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
-
+        const diff = (d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
         return diff >= 0 && diff <= maxDaysInAdvance;
       })
       .map((date) => {
-        const localDate = new Date(date);
-        localDate.setHours(0, 0, 0, 0);
-        const dateStr = format(localDate, "yyyy-MM-dd");
+        const dateStr = date.toISOString().split("T")[0];
         const dayName = [
           "sunday",
           "monday",
@@ -104,12 +85,9 @@ export class FetchLawyerCalendarAvailabilityUseCase
         }));
         let isAvailable = dayAvailability.enabled;
 
-        const overrideForDate = overrides?.overrideDates.find((ov) => {
-          const ovDate = new Date(ov.date);
-          ovDate.setHours(0, 0, 0, 0);
-
-          return ovDate.getTime() === localDate.getTime();
-        });
+        const overrideForDate = overrides?.overrideDates.find(
+          (ov) => new Date(ov.date).toDateString() === date.toDateString(),
+        );
         if (overrideForDate) {
           if (overrideForDate.isUnavailable) {
             isAvailable = false;
@@ -122,15 +100,11 @@ export class FetchLawyerCalendarAvailabilityUseCase
 
         const bookedTimes = new Set(
           appointments
-            .filter((appt) => {
-              const apptDate = new Date(appt.date);
-              apptDate.setHours(0, 0, 0, 0);
-
-              return (
-                apptDate.getTime() === localDate.getTime() &&
-                appt.payment_status !== "failed"
-              );
-            })
+            .filter(
+              (appt) =>
+                new Date(appt.date)?.toDateString().split("T")[0] === date.toDateString().split("T")[0] &&
+                appt.payment_status !== "failed",
+            )
             .map((appt) => appt.time),
         );
 
