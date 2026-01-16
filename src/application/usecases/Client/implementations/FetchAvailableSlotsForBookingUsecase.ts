@@ -19,7 +19,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
     private scheduleSettingsRepo: IScheduleSettingsRepo,
     private availabilityRepo: IAvailableSlots,
     private overrideRepo: IOverrideRepo,
-    private appointmentRepo: IAppointmentsRepository
+    private appointmentRepo: IAppointmentsRepository,
   ) {}
 
   async execute(input: {
@@ -56,13 +56,21 @@ export class FetchLawyerCalendarAvailabilityUseCase
       await this.appointmentRepo.findAppointmentsByLawyerAndRange(
         lawyerId,
         monthStart,
-        monthEnd
+        monthEnd,
       );
 
     const allDates = eachDayOfInterval({ start: monthStart, end: monthEnd });
 
     const availableDates = allDates
       .filter((d) => {
+        console.log({
+          d: d,
+          dgettime: d.getTime(),
+          today: today,
+          todaygettime: today.getTime(),
+          diff: (d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
+          maxDaysInAdvance,
+        });
         const diff = (d.getTime() - today.getTime()) / (1000 * 60 * 60 * 24);
         return diff >= 0 && diff <= maxDaysInAdvance;
       })
@@ -77,17 +85,15 @@ export class FetchLawyerCalendarAvailabilityUseCase
           "friday",
           "saturday",
         ][date.getDay()];
-
         const dayAvailability = availability.getDayAvailability(dayName as any);
         let timeRanges = dayAvailability.timeSlots.map((t) => ({
           start: t.start,
           end: t.end,
         }));
-        console.log("day availability", dayAvailability);
         let isAvailable = dayAvailability.enabled;
-        
+
         const overrideForDate = overrides?.overrideDates.find(
-          (ov) => new Date(ov.date).toDateString() === date.toDateString()
+          (ov) => new Date(ov.date).toDateString() === date.toDateString(),
         );
         if (overrideForDate) {
           if (overrideForDate.isUnavailable) {
@@ -104,16 +110,15 @@ export class FetchLawyerCalendarAvailabilityUseCase
             .filter(
               (appt) =>
                 new Date(appt.date).toDateString() === date.toDateString() &&
-                appt.payment_status !== "failed"
+                appt.payment_status !== "failed",
             )
-            .map((appt) => appt.time)
+            .map((appt) => appt.time),
         );
-        console.log("timeranges",timeRanges)
         const timeRangeResults = timeRanges.map((range) => {
           const generatedSlots = generateTimeSlots(
             range.start,
             range.end,
-            slotDuration
+            slotDuration,
           );
           const remaining = generatedSlots.filter((s) => !bookedTimes.has(s));
           return {
@@ -122,9 +127,9 @@ export class FetchLawyerCalendarAvailabilityUseCase
             availableSlots: remaining.length,
           };
         });
-        console.log("timeragneresults ",timeRangeResults)
+        console.log("timeragneresults ", timeRangeResults);
         const totalAvailable = timeRangeResults.some(
-          (r) => r.availableSlots > 0
+          (r) => r.availableSlots > 0,
         );
 
         return {
