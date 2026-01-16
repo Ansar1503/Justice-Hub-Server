@@ -19,7 +19,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
     private scheduleSettingsRepo: IScheduleSettingsRepo,
     private availabilityRepo: IAvailableSlots,
     private overrideRepo: IOverrideRepo,
-    private appointmentRepo: IAppointmentsRepository,
+    private appointmentRepo: IAppointmentsRepository
   ) {}
 
   async execute(input: {
@@ -56,7 +56,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
       await this.appointmentRepo.findAppointmentsByLawyerAndRange(
         lawyerId,
         monthStart,
-        monthEnd,
+        monthEnd
       );
 
     const allDates = eachDayOfInterval({ start: monthStart, end: monthEnd });
@@ -86,7 +86,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
         let isAvailable = dayAvailability.enabled;
 
         const overrideForDate = overrides?.overrideDates.find(
-          (ov) => new Date(ov.date).toDateString() === date.toDateString(),
+          (ov) => new Date(ov.date).toDateString() === date.toDateString()
         );
         if (overrideForDate) {
           if (overrideForDate.isUnavailable) {
@@ -102,17 +102,17 @@ export class FetchLawyerCalendarAvailabilityUseCase
           appointments
             .filter(
               (appt) =>
-                new Date(appt.date)?.toDateString().split("T")[0] === date.toDateString().split("T")[0] &&
-                appt.payment_status !== "failed",
+                new Date(appt.date).toDateString() === date.toDateString() &&
+                appt.payment_status !== "failed"
             )
-            .map((appt) => appt.time),
+            .map((appt) => appt.time)
         );
 
         const timeRangeResults = timeRanges.map((range) => {
           const generatedSlots = generateTimeSlots(
             range.start,
             range.end,
-            slotDuration,
+            slotDuration
           );
           const remaining = generatedSlots.filter((s) => !bookedTimes.has(s));
           return {
@@ -123,7 +123,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
         });
 
         const totalAvailable = timeRangeResults.some(
-          (r) => r.availableSlots > 0,
+          (r) => r.availableSlots > 0
         );
 
         return {
