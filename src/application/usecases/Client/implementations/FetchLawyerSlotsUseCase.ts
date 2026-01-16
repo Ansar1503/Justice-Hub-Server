@@ -115,7 +115,7 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
           allSlots.push(...timeSlot);
         }
         allSlots = filterBookedSlots(allSlots);
-        if (isToday(dateObj)) {
+        if (isSameDayUTC(dateObj, new Date())) {
           allSlots = allSlots.filter(isSlotInFuture);
         }
         return {
@@ -137,7 +137,7 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
       daySlots.push(...generateTimeSlots(range.start, range.end, slotDuration));
     }
     daySlots = filterBookedSlots(daySlots);
-    if (isToday(dateObj)) {
+    if (isSameDayUTC(dateObj, new Date())) {
       daySlots = daySlots.filter(isSlotInFuture);
     }
     return {
@@ -150,6 +150,10 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
 const isToday = (someDate: Date) => {
   const today = new Date();
   return toISTDateString(someDate) === toISTDateString(today);
+};
+
+const isSameDayUTC = (date1: Date, date2: Date) => {
+  return date1.toISOString().split('T')[0] === date2.toISOString().split('T')[0];
 };
 
 const isSlotInFuture = (slotTime: string) => {
