@@ -75,6 +75,8 @@ export class FetchLawyerCalendarAvailabilityUseCase
       })
       .map((date) => {
         const dateStr = format(date, "yyyy-MM-dd");
+        const isToday = date.toDateString() === new Date().toDateString();
+        const currentTime = new Date().toTimeString().slice(0, 5);
         const dayName = [
           "sunday",
           "monday",
@@ -125,7 +127,13 @@ export class FetchLawyerCalendarAvailabilityUseCase
             range.end,
             slotDuration,
           );
-          const remaining = generatedSlots.filter((s) => !bookedTimes.has(s));
+          const remaining = generatedSlots.filter((slot) => {
+            if (bookedTimes.has(slot)) return false;
+            if (isToday && slot <= currentTime) return false;
+
+            return true;
+          });
+
           return {
             start: range.start,
             end: range.end,
