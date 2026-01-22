@@ -21,6 +21,7 @@ import { WLogger } from "@shared/utils/Winston/WinstonLoggerConfig";
 const PORT = process.env.PORT || 4000;
 const app: Application = express();
 app.set("trust proxy", 1);
+console.log("TRUST PROXY:", app.get("trust proxy"));
 const server = createServer(app);
 const io = InitialiseSocketServer(server);
 const rateLimiter = rateLimit({
