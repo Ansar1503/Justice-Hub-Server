@@ -40,6 +40,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
       await this.scheduleSettingsRepo.fetchScheduleSettings(lawyerId);
     const availability =
       await this.availabilityRepo.findAvailableSlots(lawyerId);
+    // console.log("avali", availability);
     const overrides = await this.overrideRepo.fetchOverrideSlots(lawyerId);
 
     if (!settings || !availability)
@@ -67,7 +68,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
         return diff >= 0 && diff <= maxDaysInAdvance;
       })
       .map((date) => {
-        const dateStr = date.toISOString().split("T")[0];
+        const dateStr = format(date, "yyyy-MM-dd");
         const dayName = [
           "sunday",
           "monday",
@@ -77,19 +78,20 @@ export class FetchLawyerCalendarAvailabilityUseCase
           "friday",
           "saturday",
         ][date.getDay()];
-
+        // console.log("date.getday", date.getDay());
+        // console.log("dayname", dayName);
         const dayAvailability = availability.getDayAvailability(dayName as any);
         let timeRanges = dayAvailability.timeSlots.map((t) => ({
           start: t.start,
           end: t.end,
         }));
-        console.log("datestr", dateStr);
-        console.log("dateobj", date);
-        console.log("dayavailability", dayAvailability);
+        // console.log("datestr", dateStr);
+        // console.log("dateobj", date);
+        // console.log("dayavailability", dayAvailability);
         let isAvailable = dayAvailability.enabled;
 
         const overrideForDate = overrides?.overrideDates.find(
-          (ov) => new Date(ov.date).toDateString() === date.toDateString(),
+          (ov) => format(new Date(ov.date), "yyyy-MM-dd") === dateStr,
         );
         if (overrideForDate) {
           if (overrideForDate.isUnavailable) {
@@ -105,7 +107,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
           appointments
             .filter(
               (appt) =>
-                new Date(appt.date).toDateString() === date.toDateString() &&
+                format(new Date(appt.date), "yyyy-MM-dd") === dateStr &&
                 appt.payment_status !== "failed",
             )
             .map((appt) => appt.time),
@@ -135,7 +137,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
           timeRanges: timeRangeResults,
         };
       });
-    console.log("availableDates ", availableDates);
+    // console.log("availableDates ", availableDates);
     return {
       lawyerId,
       month: format(baseDate, "yyyy-MM"),
