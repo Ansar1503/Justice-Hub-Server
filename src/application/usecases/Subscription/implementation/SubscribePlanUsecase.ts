@@ -10,7 +10,7 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
     private _subscriptionRepo: ISubscriptionRepo,
     private _userSubscriptionRepo: IUserSubscriptionRepo,
     private _stripeSubscriptionService: IStripeSubscriptionService,
-    private _userRepo: IUserRepository
+    private _userRepo: IUserRepository,
   ) {}
 
   async execute(input: {
@@ -24,12 +24,12 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
     if (!user) throw new Error("User not found");
 
     const existingSub = await this._userSubscriptionRepo.findByUser(
-      input.userId
+      input.userId,
     );
 
     if (existingSub) {
       const currentPlan = await this._subscriptionRepo.findById(
-        existingSub.planId
+        existingSub.planId,
       );
       if (!currentPlan) throw new Error("Current plan not found");
       const isDowngrade = currentPlan.price > plan.price || plan.isFree;
@@ -45,7 +45,7 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
         }
         if (new Date() < endDate) {
           throw new Error(
-            `You can only downgrade after ${endDate.toDateString()}.`
+            `You can only downgrade after ${endDate.toDateString()}.`,
           );
         }
       }
@@ -58,18 +58,19 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
         existingSub.stripeSubscriptionId
       ) {
         throw new Error(
-          "To downgrade to free plan, please wait until your current paid subscription period ends."
+          "To downgrade to free plan, please wait until your current paid subscription period ends.",
         );
       }
     }
-
+    const cancelUrl = `${process.env.FRONTEND_URL}${process.env.STRIPE_SUBSCRIPTION_CANCEL_URL}`;
+    const successUrl = `${process.env.FRONTEND_URL}${process.env.STRIPE_SUBSCRIPTION_SUCCESS_URL}`;
     const checkoutSession =
       await this._stripeSubscriptionService.createCheckoutSession({
         customerId: existingSub?.stripeCustomerId,
         priceId: plan.stripePriceId,
         customerEmail: user.email,
-        successUrl: process.env.STRIPE_SUBSCRIPTION_SUCCESS_URL!,
-        cancelUrl: process.env.STRIPE_SUBSCRIPTION_CANCEL_URL!,
+        successUrl: successUrl,
+        cancelUrl: cancelUrl,
         metadata: {
           userId: input.userId,
           planId: input.planId,
