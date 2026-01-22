@@ -1,4 +1,10 @@
-import { startOfMonth, endOfMonth, eachDayOfInterval, format } from "date-fns";
+import {
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  format,
+  startOfDay,
+} from "date-fns";
 import { IUserRepository } from "@domain/IRepository/IUserRepo";
 import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
 import { IScheduleSettingsRepo } from "@domain/IRepository/IScheduleSettingsRepo";
@@ -51,7 +57,7 @@ export class FetchLawyerCalendarAvailabilityUseCase
     const baseDate = month ? new Date(`${month}-01`) : new Date();
     const monthStart = startOfMonth(baseDate);
     const monthEnd = endOfMonth(baseDate);
-    const today = new Date();
+    const today = startOfDay(new Date());
 
     const appointments =
       await this.appointmentRepo.findAppointmentsByLawyerAndRange(
