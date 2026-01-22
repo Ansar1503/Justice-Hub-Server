@@ -64,6 +64,9 @@ export class SubscribePlanUsecase implements ISubscribePlanUsecase {
     }
     const cancelUrl = `${process.env.FRONTEND_URL}${process.env.STRIPE_SUBSCRIPTION_CANCEL_URL}`;
     const successUrl = `${process.env.FRONTEND_URL}${process.env.STRIPE_SUBSCRIPTION_SUCCESS_URL}`;
+    console.log("Stripe success URL =>", successUrl);
+    console.log("Stripe cancel URL =>", cancelUrl);
+
     const checkoutSession =
       await this._stripeSubscriptionService.createCheckoutSession({
         customerId: existingSub?.stripeCustomerId,
