@@ -25,7 +25,7 @@ export function InitialiseSocketServer(server: HTTPServer): SocketIOServer {
         return next(err);
       }
       next();
-    }); 
+    });
   });
 
   io.engine.on("connection_error", (err) => {

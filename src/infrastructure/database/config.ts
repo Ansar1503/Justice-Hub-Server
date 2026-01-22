@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import "dotenv/config";
 
-
 mongoose.set("bufferCommands", false);
 const connectDB = async (retry = 0): Promise<void> => {
   try {
@@ -11,7 +10,7 @@ const connectDB = async (retry = 0): Promise<void> => {
   } catch (error) {
     retry++;
     if (retry > 3) {
-      process.exit(1);
+      return;
     } else {
       setTimeout(() => connectDB(retry), 5000);
     }

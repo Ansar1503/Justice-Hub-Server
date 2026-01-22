@@ -44,6 +44,15 @@ app.use((req, res, next) => {
   }
   next();
 });
+server.on("clientError", (err, socket) => {
+  if ((err as any).code === "ECONNRESET") {
+    socket.destroy();
+    return;
+  }
+
+  console.error("HTTP client error:", err);
+  socket.end("HTTP/1.1 400 Bad Request\r\n\r\n");
+});
 
 app.use(
   cors({
@@ -85,6 +94,13 @@ process.on("unhandledRejection", (reason: any) => {
     return;
   }
   console.error("Unhandled Rejection:", reason);
+});
+process.on("uncaughtException", (err) => {
+  if ((err as any)?.code === "ECONNRESET") {
+    console.warn("Uncaught ECONNRESET");
+    return;
+  }
+  console.error("Uncaught Exception:", err);
 });
 
 setUpChatSocket(io);
