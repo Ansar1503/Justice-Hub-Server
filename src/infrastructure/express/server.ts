@@ -21,7 +21,6 @@ import { WLogger } from "@shared/utils/Winston/WinstonLoggerConfig";
 const PORT = process.env.PORT || 4000;
 const app: Application = express();
 app.set("trust proxy", 1);
-console.log("TRUST PROXY:", app.get("trust proxy"));
 const server = createServer(app);
 const io = InitialiseSocketServer(server);
 const rateLimiter = rateLimit({
@@ -30,7 +29,11 @@ const rateLimiter = rateLimit({
   message: "Too many requests from this IP, please try again later.",
   standardHeaders: true,
   legacyHeaders: false,
+  validate: {
+    xForwardedForHeader: false,
+  },
 });
+
 connectDB();
 app.use(
   cors({
