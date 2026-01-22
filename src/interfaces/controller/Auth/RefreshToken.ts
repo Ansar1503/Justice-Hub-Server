@@ -9,31 +9,28 @@ import { IUserReAuth } from "@src/application/usecases/Auth/IUserReAuthUseCase";
 import { IController } from "../Interface/IController";
 
 export class RefreshToken implements IController {
-    constructor(
-        private userReAuth: IUserReAuth,
-        private httpErrors: IHttpErrors = new HttpErrors(),
-        private httpSuccess: IHttpSuccess = new HttpSuccess(),
-    ) {}
-    async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
-        const token = (httpRequest as Record<string, any>)?.cookies?.refresh;
-        console.log((httpRequest as Record<string, any>)?.cookies)
-        console.log("token",token)
-        if (!token) {
-            const err = this.httpErrors.error_400();
-            return new HttpResponse(err.statusCode, err.body);
-        }
-        try {
-            const accesstoken = await this.userReAuth.execute(token);
-            if (!accesstoken) {
-                const err = this.httpErrors.error_400();
-                return new HttpResponse(err.statusCode, err.body);
-            }
-            const success = this.httpSuccess.success_200(accesstoken);
-            return new HttpResponse(success.statusCode, success.body);
-        } catch (error) {
-            console.log(error);
-            const err = this.httpErrors.error_500();
-            return new HttpResponse(err.statusCode, err.body);
-        }
+  constructor(
+    private userReAuth: IUserReAuth,
+    private httpErrors: IHttpErrors = new HttpErrors(),
+    private httpSuccess: IHttpSuccess = new HttpSuccess(),
+  ) {}
+  async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
+    const token = (httpRequest as Record<string, any>)?.cookies?.refresh;
+    if (!token) {
+      const err = this.httpErrors.error_400();
+      return new HttpResponse(err.statusCode, err.body);
     }
+    try {
+      const accesstoken = await this.userReAuth.execute(token);
+      if (!accesstoken) {
+        const err = this.httpErrors.error_400();
+        return new HttpResponse(err.statusCode, err.body);
+      }
+      const success = this.httpSuccess.success_200(accesstoken);
+      return new HttpResponse(success.statusCode, success.body);
+    } catch (error) {
+      const err = this.httpErrors.error_500();
+      return new HttpResponse(err.statusCode, err.body);
+    }
+  }
 }

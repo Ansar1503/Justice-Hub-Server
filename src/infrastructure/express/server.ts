@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
-import connectDB from "../../infrastructure/database/config";
+import connectDB, { isDBConnected } from "../../infrastructure/database/config";
 import authRoute from "../../interfaces/routes/auth.route";
 import clientRoute from "../../interfaces/routes/client.route";
 import adminRoute from "../../interfaces/routes/admin.routes";
@@ -35,6 +35,16 @@ const rateLimiter = rateLimit({
 });
 
 connectDB();
+app.use((req, res, next) => {
+  if (!isDBConnected()) {
+    res.status(503).json({
+      message: "Database unavailable. Please try again later.",
+    });
+    return;
+  }
+  next();
+});
+
 app.use(
   cors({
     origin: [
@@ -69,6 +79,13 @@ app.use("/api/lawyer/", lawyerRoute);
 
 app.use(NotFoundErrorHandler);
 app.use(errorMiddleware);
+process.on("unhandledRejection", (reason: any) => {
+  if (reason?.code === "ECONNRESET") {
+    console.warn("Network connection reset");
+    return;
+  }
+  console.error("Unhandled Rejection:", reason);
+});
 
 setUpChatSocket(io);
 
