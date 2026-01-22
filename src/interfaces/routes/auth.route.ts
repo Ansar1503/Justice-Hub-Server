@@ -26,7 +26,8 @@ router.post(
 );
 router.post(AuthRoute.login, async (req: Request, res: Response) => {
   const adaper = await expressAdapter(req, LoginUserComposer());
-  res.cookie("refresh", adaper.body?.refreshToken, {
+  console.log("LOGIN RESPONSE BODY:", adaper.body);
+  res.cookie("refresh", adaper.body?.refreshtoken, {
     httpOnly: true,
     secure: true,
     sameSite: "none",
