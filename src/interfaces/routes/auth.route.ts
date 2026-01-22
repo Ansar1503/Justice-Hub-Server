@@ -22,14 +22,14 @@ router.post(
     const adaper = await expressAdapter(req, RegisterUserComponser());
     res.status(adaper.statusCode).json(adaper.body);
     return;
-  }
+  },
 );
 router.post(AuthRoute.login, async (req: Request, res: Response) => {
   const adaper = await expressAdapter(req, LoginUserComposer());
-  res.cookie("refresh", adaper.body?.refreshtoken, {
+  res.cookie("refresh", adaper.body?.refreshToken, {
     httpOnly: true,
     secure: true,
-    sameSite: "strict",
+    sameSite: "none",
     maxAge: 24 * 60 * 60 * 1000,
   });
   res.status(adaper.statusCode).json(adaper.body);
