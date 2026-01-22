@@ -16,6 +16,8 @@ export class RefreshToken implements IController {
     ) {}
     async handle(httpRequest: HttpRequest): Promise<IHttpResponse> {
         const token = (httpRequest as Record<string, any>)?.cookies?.refresh;
+        console.log((httpRequest as Record<string, any>)?.cookies)
+        console.log("token",token)
         if (!token) {
             const err = this.httpErrors.error_400();
             return new HttpResponse(err.statusCode, err.body);
