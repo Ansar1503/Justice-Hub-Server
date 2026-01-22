@@ -1,4 +1,3 @@
-
 import { createServer } from "http";
 import express, { Application } from "express";
 import cookieParser from "cookie-parser";
@@ -21,6 +20,7 @@ import { WLogger } from "@shared/utils/Winston/WinstonLoggerConfig";
 
 const PORT = process.env.PORT || 4000;
 const app: Application = express();
+app.set("trust proxy", 1);
 const server = createServer(app);
 const io = InitialiseSocketServer(server);
 const rateLimiter = rateLimit({
@@ -39,18 +39,18 @@ app.use(
     ],
     methods: ["PUT", "POST", "GET", "PATCH", "DELETE"],
     credentials: true,
-  })
+  }),
 );
 app.use(rateLimiter);
 app.use(
   "/api/client/stripe/webhooks",
   express.raw({ type: "application/json" }),
-  clientRoute
+  clientRoute,
 );
 app.use(
   "/api/client/stripe/subscription/webhooks",
   express.raw({ type: "application/json" }),
-  clientRoute
+  clientRoute,
 );
 app.use(morgan("dev"));
 app.use(express.json());
@@ -72,5 +72,5 @@ server.listen(PORT, () =>
   WLogger.info("Server Started Successfully", {
     port: PORT,
     url: process.env.BASE_URL,
-  })
+  }),
 );
