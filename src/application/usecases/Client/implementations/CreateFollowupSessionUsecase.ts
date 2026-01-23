@@ -152,14 +152,6 @@ export class CreateFollowupCheckoutSessionUsecase
       }
     }
 
-    let numberOfCancel;
-    if (existingApps && existingApps.length > 0) {
-      numberOfCancel = existingApps.filter(
-        (a) => a.status == "cancelled"
-      ).length;
-    }
-    if (numberOfCancel && numberOfCancel >= 2)
-      throw new Error("Number of cancellation exceeded");
     if (bookingExist) {
       const error: any = new Error("you have booking on same time");
       error.code = STATUS_CODES.BAD_REQUEST;
