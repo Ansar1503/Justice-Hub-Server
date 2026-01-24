@@ -16,6 +16,7 @@ import {
 //   FetchAppointmentsOutputDto,
 // } from "@src/application/dtos/Admin/FetchAppointmentsDto";
 import { BaseRepository } from "./base/BaseRepo";
+import SessionModel from "../model/SessionModel";
 
 export class AppointmentsRepository
   extends BaseRepository<Appointment, IAppointmentModel>
@@ -30,7 +31,7 @@ export class AppointmentsRepository
     startOfDay.setUTCHours(0, 0, 0, 0);
     const endOfDay = new Date(inputDate);
     endOfDay.setUTCHours(23, 59, 59, 999);
-    console.log("inputdate",inputDate)
+    console.log("inputdate", inputDate);
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -39,14 +40,19 @@ export class AppointmentsRepository
         lawyer_id: payload.lawyer_id,
         date: { $gte: startOfDay, $lte: endOfDay },
         time: payload.time,
+        status: { $nin: ["cancelled", "rejected"] },
       }).session(session);
-      if (existing) {
-        const error: any = new Error("Slot already booked");
-        error.code = 409;
-        throw error;
+      if (existing && existing.status === "completed") {
+        const existingSession = await SessionModel.findOne({
+          appointment_id: existing._id,
+          status: { $nin: ["cancelled"] },
+        }).session(session);
+        if (existingSession) {
+          throw new Error("Session already exists");
+        }
       }
       const newAppointment = new AppointmentModel(
-        this.mapper.toPersistence(payload)
+        this.mapper.toPersistence(payload),
       );
       await newAppointment.save({ session });
       await session.commitTransaction();
@@ -106,7 +112,7 @@ export class AppointmentsRepository
       },
       {
         new: true,
-      }
+      },
     );
     return updated ? this.mapper.toDomain(updated) : null;
   }
@@ -219,7 +225,7 @@ export class AppointmentsRepository
       { $project: { "userData.password": 0, "lawyerData.documents": 0 } },
       { $sort: sortStage },
       { $skip: (page - 1) * limit },
-      { $limit: limit }
+      { $limit: limit },
     );
 
     countPipeline.push(...lookups, { $count: "total" });
@@ -334,7 +340,7 @@ export class AppointmentsRepository
       { $project: { "userData.password": 0, "lawyerData.documents": 0 } },
       { $sort: sortStage },
       { $skip: (page - 1) * limit },
-      { $limit: limit }
+      { $limit: limit },
     );
 
     countPipeline.push(...lookups, { $count: "total" });
@@ -358,14 +364,14 @@ export class AppointmentsRepository
     return await AppointmentModel.findOneAndUpdate(
       { _id: payload.id },
       { $set: { status: payload.status } },
-      { new: true, session: this.session }
+      { new: true, session: this.session },
     );
   }
   async findById(id: string): Promise<Appointment | null> {
     return await AppointmentModel.findOne({ _id: id });
   }
   async findAllAggregate(
-    payload: FetchAppointmentsInputDto
+    payload: FetchAppointmentsInputDto,
   ): Promise<FetchAppointmentsOutputDto> {
     const {
       search,
@@ -676,7 +682,7 @@ export class AppointmentsRepository
   async findAppointmentsByLawyerAndRange(
     lawyer_id: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<Appointment[]> {
     const data = await this.model.find({
       lawyer_id,
