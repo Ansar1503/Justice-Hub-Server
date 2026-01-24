@@ -21,7 +21,7 @@ export function InitialiseSocketServer(server: HTTPServer): SocketIOServer {
   io.use((socket, next) => {
     authenticateClientSocket(socket, (err) => {
       if (err) {
-        console.warn("Socket auth failed:", err.message);
+        // console.warn("Socket auth failed:", err.message);
         return next(err);
       }
       next();
@@ -30,22 +30,22 @@ export function InitialiseSocketServer(server: HTTPServer): SocketIOServer {
 
   io.engine.on("connection_error", (err) => {
     if (err.code === "ECONNRESET") {
-      console.warn("Socket engine connection reset");
+      // console.warn("Socket engine connection reset");
       return;
     }
-    console.error("Socket engine error:", err);
+    // console.error("Socket engine error:", err);
   });
   io.on("connection", (socket) => {
     socket.on("error", (err) => {
       if ((err as any)?.code === "ECONNRESET") {
-        console.warn("Client socket reset");
+        // console.warn("Client socket reset");
         return;
       }
-      console.error("Socket error:", err);
+      // console.error("Socket error:", err);
     });
 
     socket.on("disconnect", (reason) => {
-      console.log("Socket disconnected:", reason);
+      // console.log("Socket disconnected:", reason);
     });
   });
 
