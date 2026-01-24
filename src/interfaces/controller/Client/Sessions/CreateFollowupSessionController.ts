@@ -60,6 +60,7 @@ export class CreateFollowupCheckoutSessionController implements IController {
 
       return this._success.success_200(response);
     } catch (error) {
+      console.log("error in create followup checkout session", error);
       if (error instanceof Error) {
         return this._errors.error_400(error.message);
       }

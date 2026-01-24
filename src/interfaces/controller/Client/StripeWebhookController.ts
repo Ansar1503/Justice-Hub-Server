@@ -19,6 +19,7 @@ export class HandleWebhookController implements IController {
             await this.handleWebHook.execute({ body: httpRequest.body, signature });
             return new HttpResponse(200, "Webhook received");
         } catch (error: any) {
+            console.log("error in stripe webhook", error);
             return new HttpResponse(400, "Webhook error");
         }
     }
