@@ -394,16 +394,16 @@ export class UserRepository implements IUserRepository {
 
     if (status) {
       if (status === "verified") {
-        matchStage2["lawyerData.verification_status"] = "verified";
+        matchStage2["lawyerData.verificationStatus"] = "verified";
       } else if (status === "rejected") {
-        matchStage2["lawyerData.verification_status"] = "rejected";
+        matchStage2["lawyerData.verificationStatus"] = "rejected";
       } else if (status === "pending") {
-        matchStage2["lawyerData.verification_status"] = "pending";
+        matchStage2["lawyerData.verificationStatus"] = "pending";
       } else if (status === "requested") {
-        matchStage2["lawyerData.verification_status"] = "requested";
+        matchStage2["lawyerData.verificationStatus"] = "requested";
       }
     }
-
+    console.log("matchStage2", matchStage2);
     if (sort === "experience") {
       sortStage["lawyerData.experience"] = sortBy === "asc" ? 1 : -1;
     } else if (sort === "consultation_fee") {

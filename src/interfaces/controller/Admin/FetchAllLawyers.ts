@@ -51,7 +51,6 @@ export class FetchAllLawyers implements IController {
             search: typeof search === "string" ? search : undefined,
             status: lawyerStatus,
         };
-
         try {
             const result = await this.fetchAllLawyerUseCase.execute(input);
 
