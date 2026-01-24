@@ -28,6 +28,7 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
   }): Promise<{ slots: string[]; isAvailable: boolean }> {
     const { client_id, date, lawyer_id } = input;
     const dateObj = new Date(date);
+    console.log("dateObj", dateObj);
     const filterBookedSlots = (slots: string[]) =>
       slots.filter((t) => !booked.has(t));
     const user = await this.userRepository.findByuser_id(lawyer_id);
@@ -78,11 +79,13 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
         const appointment = activeAppointments.find(
           (a) => a.id === session.appointment_id,
         );
+        console.log("a[",appointment)
         if (appointment) {
           booked.add(appointment.time);
         }
       }
     }
+    console.log("booked", booked);
 
     const slotDuration = slotSettings.slotDuration;
 
@@ -166,6 +169,10 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
     if (isSameDayUTC(dateObj, new Date())) {
       daySlots = daySlots.filter(isSlotInFuture);
     }
+    console.log({
+      slots: daySlots,
+      isAvailable: daySlots.length > 0,
+    })
     return {
       slots: daySlots,
       isAvailable: daySlots.length > 0,
