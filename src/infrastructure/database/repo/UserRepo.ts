@@ -9,14 +9,15 @@ import UserModel, { IUserModel } from "../model/UserModel";
 export class UserRepository implements IUserRepository {
   constructor(
     private readonly Mapper: IMapper<User, IUserModel> = new UserMapper(),
-    private readonly _session?: ClientSession
+    private readonly _session?: ClientSession,
   ) {
     // super(UserModel, Mapper);
   }
   async create(user: User): Promise<User> {
     const mapped = this.Mapper.toPersistence(user);
-    const savedUser = await new UserModel(mapped)
-      .save({ session: this._session })
+    const savedUser = await new UserModel(mapped).save({
+      session: this._session,
+    });
     return this.Mapper.toDomain(savedUser);
   }
 
@@ -209,7 +210,7 @@ export class UserRepository implements IUserRepository {
       { $project: { password: 0 } },
       { $sort: sortStage },
       { $skip: (page - 1) * limit },
-      { $limit: limit }
+      { $limit: limit },
     );
 
     countPipeline.push({ $count: "total" });
@@ -232,12 +233,12 @@ export class UserRepository implements IUserRepository {
   async findLawyersByQuery(query: {
     search?: string;
     status?: "verified" | "rejected" | "pending" | "requested";
-    sort: "name" | "experience" | "consultation_fee" | "createdAt";
-    sortBy: "asc" | "desc";
-    limit: number;
-    page: number;
+    sort?: "name" | "experience" | "consultation_fee" | "createdAt";
+    sortBy?: "asc" | "desc";
+    limit?: number;
+    page?: number;
   }): Promise<{
-    lawyers: AggregatedLawyerProfile[] | [];
+    lawyers: AggregatedLawyerProfile[];
     totalCount: number;
     currentPage: number;
     totalPages: number;
@@ -251,21 +252,19 @@ export class UserRepository implements IUserRepository {
       status,
     } = query;
 
-    const matchStage: Record<string, any> = { role: "lawyer" };
-    const matchStage2: Record<string, any> = {};
-    const sortStage: Record<string, any> = {
-      [sort]: sortBy === "asc" ? 1 : -1,
+    const baseMatch: Record<string, any> = { role: "lawyer" };
+    const filterMatch: Record<string, any> = {};
+    const sortFieldMap: Record<string, string> = {
+      name: "personalDetails.name",
+      experience: "ProfessionalDetails.experience",
+      consultation_fee: "ProfessionalDetails.consultationFee",
+      createdAt: "ProfessionalDetails.createdAt", // ✅ FIXED
     };
 
-    if (search) {
-      matchStage["$or"] = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
-      ];
-    }
-    const dataPipeline: any[] = [{ $match: matchStage }];
-    const countPipeline: any[] = [{ $match: matchStage }];
-    const lookupStage = [
+    const sortStage: Record<string, 1 | -1> = {
+      [sortFieldMap[sort]]: sortBy === "asc" ? 1 : -1,
+    };
+    const lookupStages = [
       {
         $lookup: {
           from: "lawyers",
@@ -341,7 +340,6 @@ export class UserRepository implements IUserRepository {
       {
         $project: {
           userId: "$user_id",
-          createdAt: "$createdAt",
           personalDetails: {
             name: "$name",
             email: "$email",
@@ -391,52 +389,54 @@ export class UserRepository implements IUserRepository {
         },
       },
     ];
+    if (search) {
+      filterMatch.$or = [
+        { "personalDetails.name": { $regex: search, $options: "i" } },
+        { "personalDetails.email": { $regex: search, $options: "i" } },
+        {
+          "ProfessionalDetails.description": {
+            $regex: search,
+            $options: "i",
+          },
+        },
+      ];
+    }
 
     if (status) {
-      if (status === "verified") {
-        matchStage2["lawyerData.verificationStatus"] = "verified";
-      } else if (status === "rejected") {
-        matchStage2["lawyerData.verificationStatus"] = "rejected";
-      } else if (status === "pending") {
-        matchStage2["lawyerData.verificationStatus"] = "pending";
-      } else if (status === "requested") {
-        matchStage2["lawyerData.verificationStatus"] = "requested";
-      }
-    }
-    console.log("matchStage2", matchStage2);
-    if (sort === "experience") {
-      sortStage["lawyerData.experience"] = sortBy === "asc" ? 1 : -1;
-    } else if (sort === "consultation_fee") {
-      sortStage["lawyerData.consultation_fee"] = sortBy === "asc" ? 1 : -1;
+      filterMatch["verificationDetails.verificationStatus"] = status;
     }
 
-    dataPipeline.push(
-      ...lookupStage,
-      { $match: matchStage2 },
-      { $project: { password: 0 } },
+    const dataPipeline = [
+      { $match: baseMatch },
+      ...lookupStages,
+      { $match: filterMatch },
       { $sort: sortStage },
       { $skip: (page - 1) * limit },
-      { $limit: limit }
-    );
-    countPipeline.push(
-      ...lookupStage,
-      { $match: matchStage2 },
-      { $count: "total" }
-    );
+      { $limit: limit },
+    ];
+
+    const countPipeline = [
+      { $match: baseMatch },
+      ...lookupStages,
+      { $match: filterMatch },
+      { $count: "total" },
+    ];
 
     const [lawyers, countResult] = await Promise.all([
       UserModel.aggregate(dataPipeline),
       UserModel.aggregate(countPipeline),
     ]);
-    const totalCount = countResult[0]?.total || 0;
-    const totalPages = Math.ceil(totalCount / limit);
+
+    const totalCount = countResult[0]?.total ?? 0;
+
     return {
       lawyers,
       totalCount,
       currentPage: page,
-      totalPages,
+      totalPages: Math.ceil(totalCount / limit),
     };
   }
+
   async countTotalClients(): Promise<number> {
     return await UserModel.countDocuments({ role: "client" });
   }
