@@ -51,6 +51,6 @@ const appointmentSchema = new Schema<IAppointmentModel>(
     { timestamps: true },
 );
 
-appointmentSchema.index({ lawyer_id: 1, date: 1, time: 1 }, { unique: true });
+// appointmentSchema.index({ lawyer_id: 1, date: 1, time: 1 }, { unique: true });
 
 export const AppointmentModel = mongoose.model<IAppointmentModel>("appointments", appointmentSchema);
