@@ -609,7 +609,7 @@ router.post(
   ClientRoutes.stripe.webhook,
   express.raw({ type: "application/json" }),
   async (req: Request, res: Response) => {
-    const adapter = await expressAdapter(req, HandleWebhookComposer());
+    const adapter = await expressAdapter(req, await HandleWebhookComposer());
     res.status(adapter.statusCode).send(adapter.body);
     return;
   }

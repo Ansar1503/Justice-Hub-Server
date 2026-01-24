@@ -7,15 +7,17 @@ import { OverrideSlotsRepository } from "@infrastructure/database/repo/OverrideS
 import { AvailableSlotRepository } from "@infrastructure/database/repo/AvailableSlotsRepo";
 import { LawyerVerificationRepo } from "@infrastructure/database/repo/LawyerVerificationRepo";
 import { LawyerVerificationMapper } from "@infrastructure/Mapper/Implementations/LawyerVerificaitionMapper";
+import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
 
 export const GetLawyerSlotDetailsComposer = () => {
-    const useCase = new FetchLawyerSlotsUseCase(
-        new UserRepository(),
-        new LawyerVerificationRepo(new LawyerVerificationMapper()),
-        new ScheduleSettingsRepository(),
-        new AppointmentsRepository(),
-        new OverrideSlotsRepository(),
-        new AvailableSlotRepository(),
-    );
-    return new GetLawyerSlotDetailsController(useCase);
+  const useCase = new FetchLawyerSlotsUseCase(
+    new UserRepository(),
+    new LawyerVerificationRepo(new LawyerVerificationMapper()),
+    new ScheduleSettingsRepository(),
+    new AppointmentsRepository(),
+    new OverrideSlotsRepository(),
+    new AvailableSlotRepository(),
+    new SessionsRepository(),
+  );
+  return new GetLawyerSlotDetailsController(useCase);
 };

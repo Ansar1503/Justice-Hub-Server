@@ -9,6 +9,7 @@ import { Daytype } from "@src/application/dtos/AvailableSlotsDto";
 import { ILawyerVerificationRepo } from "@domain/IRepository/ILawyerVerificationRepo";
 import { IFetchLawyerSlotsUseCase } from "../IFetchLawyerSlotsUseCase";
 import moment from "moment";
+import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 
 export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
   constructor(
@@ -17,7 +18,8 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
     private scheduleSettingsRepo: IScheduleSettingsRepo,
     private appointmentRepo: IAppointmentsRepository,
     private ovverrideRepo: IOverrideRepo,
-    private availableSlotsRepo: IAvailableSlots
+    private availableSlotsRepo: IAvailableSlots,
+    private _sessionRepo: ISessionsRepo,
   ) {}
   async execute(input: {
     lawyer_id: string;
@@ -25,7 +27,7 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
     client_id: string;
   }): Promise<{ slots: string[]; isAvailable: boolean }> {
     const { client_id, date, lawyer_id } = input;
-    const dateObj = new Date(date)
+    const dateObj = new Date(date);
     const filterBookedSlots = (slots: string[]) =>
       slots.filter((t) => !booked.has(t));
     const user = await this.userRepository.findByuser_id(lawyer_id);
@@ -50,19 +52,43 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
         lawyer_id,
       });
 
+    const activeAppointments =
+      existingAppointment?.filter(
+        (a) =>
+          a.payment_status !== "failed" &&
+          a.status !== "cancelled" &&
+          a.status !== "rejected",
+      ) || [];
+
+    const appointmentIds = activeAppointments.map((a) => a.id);
+
+    const sessions =
+      appointmentIds.length > 0
+        ? await this._sessionRepo.findByAppointmentIds(appointmentIds)
+        : [];
+
     const booked = new Set<string>();
-    existingAppointment?.forEach(
-      (a) =>
-        a.payment_status !== "failed" &&
-        a.status != "cancelled" &&
-        booked.add(a.time)
-    );
+
+    for (const session of sessions) {
+      if (
+        session.status === "upcoming" ||
+        session.status === "ongoing" ||
+        session.status === "completed"
+      ) {
+        const appointment = activeAppointments.find(
+          (a) => a.id === session.appointment_id,
+        );
+        if (appointment) {
+          booked.add(appointment.time);
+        }
+      }
+    }
 
     const slotDuration = slotSettings.slotDuration;
 
     const override = await this.ovverrideRepo.fetcghOverrideSlotByDate(
       lawyer_id,
-      dateObj
+      dateObj,
     );
 
     const availableSlots =
@@ -89,7 +115,7 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
 
     if (!availableSlots.getDayAvailability(day)) {
       const error: any = new Error(
-        "No available slots found for the selected date"
+        "No available slots found for the selected date",
       );
       error.code = 404;
       throw error;
@@ -110,7 +136,7 @@ export class FetchLawyerSlotsUseCase implements IFetchLawyerSlotsUseCase {
           const timeSlot = generateTimeSlots(
             timeRange.start,
             timeRange.end,
-            slotDuration
+            slotDuration,
           );
           allSlots.push(...timeSlot);
         }
@@ -153,7 +179,9 @@ const isToday = (someDate: Date) => {
 };
 
 const isSameDayUTC = (date1: Date, date2: Date) => {
-  return date1.toISOString().split('T')[0] === date2.toISOString().split('T')[0];
+  return (
+    date1.toISOString().split("T")[0] === date2.toISOString().split("T")[0]
+  );
 };
 
 const isSlotInFuture = (slotTime: string) => {

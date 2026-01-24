@@ -46,4 +46,5 @@ export interface ISessionsRepo {
   ): Promise<FetchSessionsOutputtDto>;
   findByCase(id: string): Promise<SessionData[] | []>;
   findByUserId(userId: string): Promise<Session[] | []>;
+  findByAppointmentIds(appointmentIds: string[]): Promise<Session[] | []>;
 }

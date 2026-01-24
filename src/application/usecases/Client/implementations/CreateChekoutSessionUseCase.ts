@@ -21,6 +21,7 @@ import { ICreateCheckoutSessionUseCase } from "../ICreateCheckoutSessionUseCase"
 import { ICommissionSettingsRepo } from "@domain/IRepository/ICommissionSettingsRepo";
 import { IUserSubscriptionRepo } from "@domain/IRepository/IUserSubscriptionRepo";
 import { endOfMonth, startOfMonth } from "date-fns";
+import { ISessionsRepo } from "@domain/IRepository/ISessionsRepo";
 
 export class CreateCheckoutSessionUseCase
   implements ICreateCheckoutSessionUseCase
@@ -36,7 +37,8 @@ export class CreateCheckoutSessionUseCase
     private _lawyerRepo: ILawyerRepository,
     private _redisService: IRedisService,
     private _commissionSettingsRepo: ICommissionSettingsRepo,
-    private _userSubscriptionRepo: IUserSubscriptionRepo
+    private _userSubscriptionRepo: IUserSubscriptionRepo,
+    private _sessionRepo: ISessionsRepo,
   ) {}
   async execute(input: CreateCheckoutSessionInputDto): Promise<any> {
     const { client_id, date, duration, lawyer_id, reason, timeSlot } = input;
@@ -71,7 +73,7 @@ export class CreateCheckoutSessionUseCase
     let subscriptionDiscountAmount = 0;
     if (subscriptionDiscountPercent > 0) {
       subscriptionDiscountAmount = Math.round(
-        (amountPaid * subscriptionDiscountPercent) / 100
+        (amountPaid * subscriptionDiscountPercent) / 100,
       );
       amountPaid = Math.max(0, amountPaid - subscriptionDiscountAmount);
     }
@@ -98,30 +100,54 @@ export class CreateCheckoutSessionUseCase
     }
     const override = await this._overrideSlotsRepo.fetcghOverrideSlotByDate(
       lawyer_id,
-      date
+      date,
     );
-    const appointment = await this._appointmentRepo.findByDateandLawyer_id({
+
+    const appointments = await this._appointmentRepo.findByDateandLawyer_id({
       lawyer_id,
       date,
     });
-    const timeSlotExist = appointment?.some(
-      (appointment) =>
-        appointment.time === timeSlot && appointment.payment_status !== "failed"
+
+    const activeAppointments = appointments?.filter(
+      (a) =>
+        a.time === timeSlot &&
+        a.payment_status !== "failed" &&
+        a.status !== "cancelled" &&
+        a.status !== "rejected",
     );
-    if (timeSlotExist) {
-      const error: any = new Error("slot already booked");
-      error.code = 404;
-      throw error;
+
+    if (activeAppointments && activeAppointments.length > 0) {
+      const appointmentIds = activeAppointments.map((a) => a.id);
+
+      const sessions =
+        await this._sessionRepo.findByAppointmentIds(appointmentIds);
+
+      const hasActiveSession = sessions.some(
+        (s) => s.status !== "cancelled" && s.status !== "missed",
+      );
+
+      if (hasActiveSession) {
+        const err: any = new Error("Slot already booked");
+        err.code = STATUS_CODES.BAD_REQUEST;
+        throw err;
+      }
     }
-    const existingApointmentonDate =
-      await this._appointmentRepo.findByDateandClientId({ client_id, date });
-    const bookingExist = existingApointmentonDate?.some(
-      (appointment) =>
-        appointment.time === timeSlot &&
-        appointment.payment_status !== "failed" &&
-        appointment.status !== "rejected" &&
-        appointment.status !== "cancelled"
-    );
+
+    // const existingApointmentonDate =
+    //   await this._appointmentRepo.findByDateandClientId({ client_id, date });
+    // const bookingExist = existingApointmentonDate?.some(
+    //   (appointment) =>
+    //     appointment.time === timeSlot &&
+    //     appointment.payment_status !== "failed" &&
+    //     appointment.status !== "rejected" &&
+    //     appointment.status !== "cancelled",
+    // );
+
+    // if (bookingExist) {
+    //   const error: any = new Error("you have booking on same time");
+    //   error.code = STATUS_CODES.BAD_REQUEST;
+    //   throw error;
+    // }
 
     const existingApps = await this._appointmentRepo.findByClientID(client_id);
     if (
@@ -136,7 +162,7 @@ export class CreateCheckoutSessionUseCase
           a.date >= monthStart &&
           a.date <= monthEnd &&
           a.status !== "cancelled" &&
-          a.status !== "rejected"
+          a.status !== "rejected",
       );
       if (
         existingAppsOnMonth.length >=
@@ -146,11 +172,6 @@ export class CreateCheckoutSessionUseCase
       }
     }
 
-    if (bookingExist) {
-      const error: any = new Error("you have booking on same time");
-      error.code = STATUS_CODES.BAD_REQUEST;
-      throw error;
-    }
     if (override && Object.keys(override).length > 0) {
       const overrideDate = override.overrideDates[0];
       if (overrideDate.isUnavailable) {
@@ -181,7 +202,7 @@ export class CreateCheckoutSessionUseCase
         });
         if (!isValidTime) {
           const error: any = new Error(
-            "Time slots are not valid for the selected time slot"
+            "Time slots are not valid for the selected time slot",
           );
           error.code = 404;
           throw error;
@@ -200,11 +221,11 @@ export class CreateCheckoutSessionUseCase
         const isLocked = await this._redisService.setWithNx(
           key,
           JSON.stringify(newappointment),
-          60 * 10
+          60 * 10,
         );
         if (!isLocked)
           throw new Error(
-            "Slot already temporarily reserved, please choose another."
+            "Slot already temporarily reserved, please choose another.",
           );
 
         const stripe = await getStripeSession({
@@ -243,14 +264,14 @@ export class CreateCheckoutSessionUseCase
     const day = days[index];
     if (!availableSlots.getDayAvailability(day)) {
       const error: any = new Error(
-        "No available slots found for the selected date"
+        "No available slots found for the selected date",
       );
       error.code = 404;
       throw error;
     }
     if (!availableSlots.getDayAvailability(day).enabled) {
       const error: any = new Error(
-        "Slots are not available for the selected date"
+        "Slots are not available for the selected date",
       );
       error.code = 404;
       throw error;
@@ -259,7 +280,7 @@ export class CreateCheckoutSessionUseCase
       availableSlots.getDayAvailability(day).timeSlots;
     if (!timeSlots || timeSlots.length === 0) {
       const error: any = new Error(
-        "Slots are not available for the selected date"
+        "Slots are not available for the selected date",
       );
       error.code = 404;
       throw error;
@@ -294,11 +315,11 @@ export class CreateCheckoutSessionUseCase
     const isLocked = await this._redisService.setWithNx(
       key,
       JSON.stringify(newappointment),
-      60 * 10
+      60 * 10,
     );
     if (!isLocked)
       throw new Error(
-        "Slot already temporarily reserved, please choose another."
+        "Slot already temporarily reserved, please choose another.",
       );
     const stripe = await getStripeSession({
       amountPaid,

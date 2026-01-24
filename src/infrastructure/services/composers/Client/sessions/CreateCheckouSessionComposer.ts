@@ -17,6 +17,7 @@ import { CommissionSettingsRepo } from "@infrastructure/database/repo/Commission
 import { CommissionSettingsMapper } from "@infrastructure/Mapper/Implementations/CommissionSettingsMapper";
 import { UserSubscriptionRepository } from "@infrastructure/database/repo/UserSubscriptionRepository";
 import { UserSubscriptionMapper } from "@infrastructure/Mapper/Implementations/UserSubscriptionMapper";
+import { SessionsRepository } from "@infrastructure/database/repo/SessionRepo";
 
 export const CreateCheckoutSessionComposer = async () => {
   const client = await connectRedis();
@@ -31,7 +32,8 @@ export const CreateCheckoutSessionComposer = async () => {
     new LawyerRepository(),
     new RedisService(client),
     new CommissionSettingsRepo(new CommissionSettingsMapper()),
-    new UserSubscriptionRepository(new UserSubscriptionMapper())
+    new UserSubscriptionRepository(new UserSubscriptionMapper()),
+    new SessionsRepository()
   );
   return new CreateCheckoutSessionController(
     useCase,

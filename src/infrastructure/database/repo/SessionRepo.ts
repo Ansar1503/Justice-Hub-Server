@@ -13,7 +13,7 @@ import SessionModel, { ISessionModel } from "../model/SessionModel";
 export class SessionsRepository implements ISessionsRepo {
   constructor(
     private mapper: IMapper<Session, ISessionModel> = new SessionMapper(),
-    private clientSession?: ClientSession
+    private clientSession?: ClientSession,
   ) {}
   async aggregate(payload: {
     user_id: string;
@@ -61,7 +61,7 @@ export class SessionsRepository implements ISessionsRepo {
     if (
       status &&
       ["upcoming", "ongoing", "completed", "cancelled", "missed"].includes(
-        status
+        status,
       )
     ) {
       matchStage["status"] = status;
@@ -154,7 +154,7 @@ export class SessionsRepository implements ISessionsRepo {
       { $project: { "userData.password": 0 } },
       { $sort: sortStage },
       { $skip: (page - 1) * limit },
-      { $limit: limit }
+      { $limit: limit },
     );
 
     countPipeline.push({ $count: "total" });
@@ -249,7 +249,7 @@ export class SessionsRepository implements ISessionsRepo {
         _id: payload.session_id,
       },
       { $set: update },
-      { new: true, session: this.clientSession }
+      { new: true, session: this.clientSession },
     );
 
     return sessions ? this.mapper.toDomain(sessions) : null;
@@ -259,7 +259,7 @@ export class SessionsRepository implements ISessionsRepo {
     return sessions ? this.mapper.toDomain(sessions) : null;
   }
   async findSessionsAggregate(
-    payload: FetchSessionsInputDto
+    payload: FetchSessionsInputDto,
   ): Promise<FetchSessionsOutputtDto> {
     const {
       search,
@@ -276,7 +276,7 @@ export class SessionsRepository implements ISessionsRepo {
     console.log({
       sortBy,
       sortOrder,
-    })
+    });
     const matchStage: Record<string, any> = {};
     if (user_id) {
       matchStage["$or"] = [{ client_id: user_id }, { lawyer_id: user_id }];
@@ -644,6 +644,16 @@ export class SessionsRepository implements ISessionsRepo {
   async findByUserId(userId: string): Promise<Session[] | []> {
     const data = await SessionModel.find({
       $or: [{ client_id: userId }, { lawyer_id: userId }],
+    });
+    return data && this.mapper.toDomainArray
+      ? this.mapper.toDomainArray(data)
+      : [];
+  }
+  async findByAppointmentIds(
+    appointmentIds: string[],
+  ): Promise<Session[] | []> {
+    const data = await SessionModel.find({
+      appointment_id: { $in: appointmentIds },
     });
     return data && this.mapper.toDomainArray
       ? this.mapper.toDomainArray(data)

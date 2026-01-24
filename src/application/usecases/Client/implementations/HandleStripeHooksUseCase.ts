@@ -8,11 +8,14 @@ import { Case } from "@domain/entities/Case";
 import { IHandleStripeHookUseCase } from "../IHandleStripeHookUseCase";
 import { CommissionTransaction } from "@domain/entities/CommissionTransaction";
 import { Payment } from "@domain/entities/PaymentsEntity";
+import { GetAppointmentRedisKey } from "@shared/utils/helpers/GetAppointmentKey";
+import { IRedisService } from "@domain/IRepository/Redis/IRedisService";
 
 export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
   constructor(
     private _scheduleSettingsRepo: IScheduleSettingsRepo,
-    private _unitofwork: IUnitofWork
+    private _unitofwork: IUnitofWork,
+    private _redisService: IRedisService,
   ) {}
   async execute(input: {
     body: any;
@@ -41,6 +44,11 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
       baseAmount,
       paymentIntentId,
     } = result;
+    console.log("date", date);
+    console.log(
+      "datenew Date(`${date}T00:00:00.000Z`);",
+      new Date(`${date}T00:00:00.000Z`),
+    );
     if (payment_status === "success") {
       if (bookingType === "initial") {
         if (
@@ -142,7 +150,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
             followupDiscount: followupDiscountAmount,
           });
           await uow.commissionTransactionRepo.create(
-            commissionTransactionpayload
+            commissionTransactionpayload,
           );
           const newPayments = Payment.create({
             amount: Number(amountPaid),
@@ -155,6 +163,8 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
           });
           newPayments.updateStatus("paid");
           await uow.paymentRepo.create(newPayments);
+          const key = GetAppointmentRedisKey(lawyer_id, datetoadd, time);
+          await this._redisService.del(key);
         });
       } else if (bookingType === "followup") {
         const { caseId } = result;
@@ -246,7 +256,7 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
             followupDiscount: followupDiscountAmount,
           });
           await uow.commissionTransactionRepo.create(
-            commissionTransactionPayload
+            commissionTransactionPayload,
           );
           const newPayments = Payment.create({
             amount: Number(amountPaid),
@@ -259,6 +269,8 @@ export class HandleStripeHookUseCase implements IHandleStripeHookUseCase {
           });
           newPayments.updateStatus("paid");
           await uow.paymentRepo.create(newPayments);
+          const key = GetAppointmentRedisKey(lawyer_id, datetoadd, time);
+          await this._redisService.del(key);
         });
       }
     }
