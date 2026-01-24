@@ -258,7 +258,7 @@ export class UserRepository implements IUserRepository {
       name: "personalDetails.name",
       experience: "ProfessionalDetails.experience",
       consultation_fee: "ProfessionalDetails.consultationFee",
-      createdAt: "ProfessionalDetails.createdAt", // ✅ FIXED
+      createdAt: "ProfessionalDetails.createdAt",
     };
 
     const sortStage: Record<string, 1 | -1> = {
