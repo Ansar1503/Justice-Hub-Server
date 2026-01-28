@@ -21,7 +21,7 @@ export class LoginUserUseCase implements ILoginUserUseCase {
         } catch (error) {
             throw new Error("DB_ERROR");
         }
-        if (!user) throw new Error("USER_NOT_FOUND");
+        if (!user || !user.is_verified) throw new Error("USER_NOT_FOUND");
 
         const isMatch = await this.passwordManager.comparePasswords(input.password, user.password);
         if (!isMatch) throw new Error("INVALID_PASSWORD");
