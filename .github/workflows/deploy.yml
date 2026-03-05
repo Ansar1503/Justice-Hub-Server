@@ -1,0 +1,24 @@
+name: Deploy JusticeHub
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd ~/Justice-Hub-Server
+            git pull origin main
+            npm install
+            NODE_OPTIONS="--max-old-space-size=3072" npm run build
+            pm2 restart justicehub
