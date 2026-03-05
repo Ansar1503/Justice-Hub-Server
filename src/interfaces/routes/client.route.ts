@@ -244,8 +244,8 @@ router.post(
 
 router.get(
   ClientRoutes.lawyers.FetchLawyerCalendarAvailabilty,
-  authenticateUser,
-  authenticateClient,
+  // authenticateUser,
+  // authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
       req,
@@ -427,7 +427,7 @@ router.get(
 // lawyers finding and booking areas
 router.get(
   ClientRoutes.lawyers.base,
-  authenticateUser,
+  // authenticateUser,
   async (req: Request, res: Response) => {
     const adaper = await expressAdapter(req, GetLawyersComposer());
     res.status(adaper.statusCode).json(adaper.body);
@@ -436,7 +436,7 @@ router.get(
 );
 router.get(
   ClientRoutes.lawyers.byId,
-  authenticateUser,
+  // authenticateUser,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, GetLawyerDetailComposer());
     res.status(adapter.statusCode).json(adapter.body);
@@ -456,8 +456,8 @@ router.post(
 );
 router.get(
   ClientRoutes.lawyers.reviewsByLawyer,
-  authenticateUser,
-  authenticateClient,
+  // authenticateUser,
+  // authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchReviewsComposer());
     res.status(adapter.statusCode).json(adapter.body);
@@ -739,8 +739,8 @@ router.get(
 
 router.get(
   CasetypeRoutes.base + PracticeAreaRoutes.base,
-  authenticateUser,
-  authenticateClient,
+  // authenticateUser,
+  // authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
       req,

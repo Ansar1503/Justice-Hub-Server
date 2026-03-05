@@ -78,5 +78,10 @@ router.post(AuthRoute.resetPassword, async (req: Request, res: Response) => {
   res.status(adapter.statusCode).json(adapter.body);
   return;
 });
+router.post(AuthRoute.logout, async (req: Request, res: Response) => {
+  res.clearCookie("refresh");
+  res.status(200).json({ message: "Logout successful" });
+  return;
+});
 
 export default router;

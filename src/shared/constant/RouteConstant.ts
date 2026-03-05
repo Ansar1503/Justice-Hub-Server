@@ -8,6 +8,7 @@ export const AuthRoute = {
   google: "/google",
   forgotPassword: "/forgot-password",
   resetPassword: "/reset-password",
+  logout: "/logout",
 };
 
 export const AdminRoutes = {
