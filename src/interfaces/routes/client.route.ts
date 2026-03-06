@@ -172,8 +172,8 @@ router.get(
 // blogs
 router.get(
   BlogRoute.base + BlogRoute.users,
-  authenticateUser,
-  authenticateClient,
+  // authenticateUser,
+  // authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(req, FetchBlogsByClientComposer());
     res.status(adapter.statusCode).json(adapter.body);
@@ -194,8 +194,8 @@ router.patch(
 
 router.get(
   BlogRoute.base + BlogRoute.users + CommonParamsRoute.params,
-  authenticateUser,
-  authenticateClient,
+  // authenticateUser,
+  // authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
       req,
