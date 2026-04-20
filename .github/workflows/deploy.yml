@@ -21,4 +21,4 @@ jobs:
             git pull origin main
             npm install
             NODE_OPTIONS="--max-old-space-size=3072" npm run build
-            pm2 restart justicehub
+            pm2 restart Justice-Hub-Server
