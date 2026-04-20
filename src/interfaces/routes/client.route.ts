@@ -699,9 +699,9 @@ router.get(
 );
 
 router.get(
-  SpecializationRoute.base,
-  authenticateUser,
-  authenticateClient,
+    SpecializationRoute.base,
+    // authenticateUser,
+    // authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
       req,
@@ -714,8 +714,8 @@ router.get(
 
 router.get(
   PracticeAreaRoutes.base,
-  authenticateUser,
-  authenticateClient,
+  // authenticateUser,
+  // authenticateClient,
   async (req: Request, res: Response) => {
     const adapter = await expressAdapter(
       req,
